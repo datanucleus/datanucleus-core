@@ -19,7 +19,7 @@ Contributors:
 package org.datanucleus.store.fieldmanager;
 
 /**
- * Provide methods to fetch from/to a persistable object to/from the ObjectProvider/DataStore.
+ * Provide methods to fetch from/to a persistable object to/from StateManager/DataStore.
  */
 public interface FieldManager
 {

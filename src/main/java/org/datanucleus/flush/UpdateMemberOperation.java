@@ -25,14 +25,14 @@ import org.datanucleus.state.ObjectProvider;
  */
 public class UpdateMemberOperation implements Operation
 {
-    final ObjectProvider op;
+    final ObjectProvider sm;
     final int fieldNumber;
     Object oldValue;
     Object newValue;
 
-    public UpdateMemberOperation(ObjectProvider op, int fieldNum, Object newVal, Object oldVal)
+    public UpdateMemberOperation(ObjectProvider sm, int fieldNum, Object newVal, Object oldVal)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = fieldNum;
         this.newValue = newVal;
         this.oldValue = oldVal;
@@ -54,7 +54,7 @@ public class UpdateMemberOperation implements Operation
      */
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /* (non-Javadoc)
@@ -62,7 +62,7 @@ public class UpdateMemberOperation implements Operation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     /* (non-Javadoc)
@@ -75,6 +75,6 @@ public class UpdateMemberOperation implements Operation
 
     public String toString()
     {
-        return "UPDATE : " + op + " field=" + getMemberMetaData().getName();
+        return "UPDATE : " + sm + " field=" + getMemberMetaData().getName();
     }
 }

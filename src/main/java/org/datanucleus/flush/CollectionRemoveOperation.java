@@ -30,7 +30,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class CollectionRemoveOperation<E> implements SCOOperation
 {
-    final ObjectProvider op;
+    final ObjectProvider sm;
     final int fieldNumber;
     final CollectionStore<E> store;
 
@@ -40,18 +40,18 @@ public class CollectionRemoveOperation<E> implements SCOOperation
     /** Whether to allow cascade-delete checks. */
     final boolean allowCascadeDelete;
 
-    public CollectionRemoveOperation(ObjectProvider op, CollectionStore<E> store, E value, boolean allowCascadeDelete)
+    public CollectionRemoveOperation(ObjectProvider sm, CollectionStore<E> store, E value, boolean allowCascadeDelete)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
         this.value = value;
         this.allowCascadeDelete = allowCascadeDelete;
     }
 
-    public CollectionRemoveOperation(ObjectProvider op, int fieldNum, E value, boolean allowCascadeDelete)
+    public CollectionRemoveOperation(ObjectProvider sm, int fieldNum, E value, boolean allowCascadeDelete)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = fieldNum;
         this.store = null;
         this.value = value;
@@ -64,7 +64,7 @@ public class CollectionRemoveOperation<E> implements SCOOperation
     @Override
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return store != null ? store.getOwnerMemberMetaData() : sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**
@@ -83,7 +83,7 @@ public class CollectionRemoveOperation<E> implements SCOOperation
     {
         if (store != null)
         {
-            store.remove(op, value, -1, allowCascadeDelete);
+            store.remove(sm, value, -1, allowCascadeDelete);
         }
     }
 
@@ -97,11 +97,11 @@ public class CollectionRemoveOperation<E> implements SCOOperation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     public String toString()
     {
-        return "COLLECTION REMOVE : " + op + " field=" + getMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
+        return "COLLECTION REMOVE : " + sm + " field=" + getMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
     }
 }

@@ -31,7 +31,7 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
 {
     protected ExecutionContext ec;
 
-    protected ObjectProvider op;
+    protected ObjectProvider sm;
 
     protected AbstractClassMetaData cmd;
 
@@ -44,11 +44,11 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
         this.insert = insert;
     }
 
-    public AbstractStoreFieldManager(ObjectProvider op, boolean insert)
+    public AbstractStoreFieldManager(ObjectProvider sm, boolean insert)
     {
-        this.ec = op.getExecutionContext();
-        this.op = op;
-        this.cmd = op.getClassMetaData();
+        this.ec = sm.getExecutionContext();
+        this.sm = sm;
+        this.cmd = sm.getClassMetaData();
         this.insert = insert;
     }
 

@@ -27,7 +27,7 @@ import org.datanucleus.store.types.scostore.Store;
  */
 public class ListSetOperation<E> implements SCOOperation
 {
-    final ObjectProvider op;
+    final ObjectProvider sm;
     final int fieldNumber;
     final ListStore<E> store;
 
@@ -40,9 +40,9 @@ public class ListSetOperation<E> implements SCOOperation
     /** Whether to allow cascade-delete checks. */
     boolean allowCascadeDelete = true;
 
-    public ListSetOperation(ObjectProvider op, ListStore<E> store, int index, E value, boolean allowCascadeDelete)
+    public ListSetOperation(ObjectProvider sm, ListStore<E> store, int index, E value, boolean allowCascadeDelete)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
         this.index = index;
@@ -50,9 +50,9 @@ public class ListSetOperation<E> implements SCOOperation
         this.allowCascadeDelete = allowCascadeDelete;
     }
 
-    public ListSetOperation(ObjectProvider op, int fieldNum, int index, E value, boolean allowCascadeDelete)
+    public ListSetOperation(ObjectProvider sm, int fieldNum, int index, E value, boolean allowCascadeDelete)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = fieldNum;
         this.store = null;
         this.index = index;
@@ -66,7 +66,7 @@ public class ListSetOperation<E> implements SCOOperation
     @Override
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return store != null ? store.getOwnerMemberMetaData() : sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**
@@ -76,7 +76,7 @@ public class ListSetOperation<E> implements SCOOperation
     {
         if (store != null)
         {
-            store.set(op, index, value, allowCascadeDelete);
+            store.set(sm, index, value, allowCascadeDelete);
         }
     }
 
@@ -90,11 +90,11 @@ public class ListSetOperation<E> implements SCOOperation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     public String toString()
     {
-        return "LIST SET : " + op + " field=" + getMemberMetaData().getName() + " index=" + index;
+        return "LIST SET : " + sm + " field=" + getMemberMetaData().getName() + " index=" + index;
     }
 }

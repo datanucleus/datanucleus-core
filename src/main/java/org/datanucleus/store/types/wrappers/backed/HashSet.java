@@ -79,7 +79,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
     protected transient boolean initialising = false;
 
     /**
-     * Constructor, using the ObjectProvider of the "owner" and the field name.
+     * Constructor, using StateManager of the "owner" and the field name.
      * @param op The owner ObjectProvider
      * @param mmd Metadata for the member
      */

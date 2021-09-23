@@ -39,7 +39,7 @@ public class ManagedRelationsHandler
     /** Flag for whether we are running "managed relations" execute() at this point in time. */
     private boolean executing = false;
 
-    /** Map of RelationshipManager keyed by the ObjectProvider that it is for. */
+    /** Map of RelationshipManager keyed by StateManager that it is for. */
     private Map<ObjectProvider, RelationshipManager> managedRelationDetails = null;
 
     /**

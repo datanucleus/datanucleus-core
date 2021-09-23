@@ -47,7 +47,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
     protected java.util.Map<K, V> delegate;
 
     /**
-     * Constructor, using the ObjectProvider of the "owner" and the field name.
+     * Constructor, using StateManager of the "owner" and the field name.
      * @param ownerOP The owner ObjectProvider
      * @param mmd Metadata for the member
      */

@@ -892,7 +892,7 @@ public class SCOUtils
      * This implementation iterates over the elements in the collection, checking each element in turn for
      * equality with the specified element.
      * @param backingStore the Store
-     * @param op the ObjectProvider
+     * @param op StateManager
      * @return <i>true</i> if this collection contains the specified element.
      */
     public static Object[] toArray(CollectionStore backingStore, ObjectProvider op)
@@ -909,7 +909,7 @@ public class SCOUtils
     /**
      * Returns an array containing all of the elements in this collection;
      * @param backingStore the Store
-     * @param op the ObjectProvider
+     * @param op StateManager
      * @param a the array into which the elements of the collection are to be stored, if it is big enough;
      * otherwise, a new array of the same runtime type is allocated for this purpose.
      * @return an array containing the elements of the collection.

@@ -51,7 +51,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
     protected java.util.Set<E> delegate;
 
     /**
-     * Constructor, using the ObjectProvider of the "owner" and the field name.
+     * Constructor, using StateManager of the "owner" and the field name.
      * @param ownerOP The owner ObjectProvider
      * @param mmd Metadata for the member
      */

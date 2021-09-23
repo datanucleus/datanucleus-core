@@ -48,15 +48,15 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
 
     /**
      * Constructor for a field manager for detachment.
-     * @param op the ObjectProvider of the instance being detached. An instance in Persistent or Transactional state
+     * @param sm StateManager of the instance being detached. An instance in Persistent or Transactional state
      * @param secondClassMutableFields The second class mutable fields for the class of this object
      * @param fpClass Fetch Plan for the class of this instance
      * @param state State object to hold any pertinent controls for the detachment process
      * @param copy Whether to create detached COPIES or just detach in-situ
      */
-    public DetachFieldManager(ObjectProvider op, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state, boolean copy)
+    public DetachFieldManager(ObjectProvider sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state, boolean copy)
     {
-        super(op, secondClassMutableFields, fpClass, state);
+        super(sm, secondClassMutableFields, fpClass, state);
         this.copy = copy;
     }
 
@@ -67,7 +67,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
      */
     protected Object processPersistableCopy(Object pc)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
 
         if (!api.isDetached(pc) && api.isPersistent(pc))
@@ -84,7 +84,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
      */
     protected void processPersistable(Object pc)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
 
         if (!api.isDetached(pc) && api.isPersistent(pc))
@@ -103,13 +103,13 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     protected Object internalFetchObjectField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         Object value = sfv.fetchObjectField(fieldNumber);
 
         Object detachedValue = null;
         if (value != null)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
 
             if (mmd.hasContainer())
             {
@@ -126,7 +126,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
 
     private Object processField(int fieldNumber, Object value, AbstractMemberMetaData mmd)
     {
-        RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+        RelationType relType = mmd.getRelationType(sm.getExecutionContext().getClassLoaderResolver());
         if (relType == RelationType.NONE)
         {
             if (secondClassMutableFields[fieldNumber])
@@ -134,7 +134,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 if (!(value instanceof SCO))
                 {
                     // Replace with SCO so we can work with it
-                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
+                    value = SCOUtils.wrapSCOField(sm, fieldNumber, value, true);
                 }
 
                 // Other SCO
@@ -143,7 +143,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     return ((SCO) value).detachCopy(state);
                 }
 
-                return SCOUtils.detachAsWrapped(op) ? value : SCOUtils.unwrapSCOField(op, fieldNumber, (SCO)value);
+                return SCOUtils.detachAsWrapped(sm) ? value : SCOUtils.unwrapSCOField(sm, fieldNumber, (SCO)value);
             }
         }
         else
@@ -167,7 +167,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     {
         Object detachedContainer;
 
-        TypeManager typeManager = op.getExecutionContext().getTypeManager();
+        TypeManager typeManager = sm.getExecutionContext().getTypeManager();
         ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
 
         if (mmd.hasMap())
@@ -183,10 +183,10 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         {
             // Need to unset owner for mutable SCOs
             Object wrappedContainer;
-            if (SCOUtils.detachAsWrapped(op))
+            if (SCOUtils.detachAsWrapped(sm))
             {
                 // Try to wrap the field, if possible, replacing it since it will be returned as wrapped
-                wrappedContainer = SCOUtils.wrapSCOField(op, fieldNumber, detachedContainer, true);
+                wrappedContainer = SCOUtils.wrapSCOField(sm, fieldNumber, detachedContainer, true);
 
                 // Return the wrapped, if mutable, otherwise just the immutable value
                 detachedContainer = wrappedContainer;
@@ -195,12 +195,12 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
             {
                 // Try to wrap the field, if possible, just to be able to unset the owner, so don't
                 // replace it
-                wrappedContainer = SCOUtils.wrapSCOField(op, fieldNumber, detachedContainer, false);
+                wrappedContainer = SCOUtils.wrapSCOField(sm, fieldNumber, detachedContainer, false);
                 
                 // The container can be already an SCO so unwrap it if necessary
                 if (detachedContainer instanceof SCO)
                 {
-                    detachedContainer = SCOUtils.unwrapSCOField(op, fieldNumber, (SCO) detachedContainer);
+                    detachedContainer = SCOUtils.unwrapSCOField(sm, fieldNumber, (SCO) detachedContainer);
                 }
             }
 
@@ -321,9 +321,9 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     {
         // check if the object here is PC and is in the detached cache anyway
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         Object value = sfv.fetchObjectField(fieldNumber);
-        ApiAdapter api = op.getExecutionContext().getApiAdapter();
+        ApiAdapter api = sm.getExecutionContext().getApiAdapter();
 
         if (api.isPersistable(value))
         {
@@ -336,7 +336,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     return entry.getDetachedCopyObject();
                 }
             }
-            else if (op.getExecutionContext().getApiAdapter().isDetached(value))
+            else if (sm.getExecutionContext().getApiAdapter().isDetached(value))
             {
                 return value;
             }

@@ -45,20 +45,20 @@ public class FlushNonReferential implements FlushProcess
     public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue)
     {
         // Make copy of ObjectProviders so we don't have ConcurrentModification issues
-        Set<ObjectProvider> opsToFlush = new HashSet<ObjectProvider>();
+        Set<ObjectProvider> smsToFlush = new HashSet<ObjectProvider>();
         if (primaryOPs != null)
         {
-            opsToFlush.addAll(primaryOPs);
+            smsToFlush.addAll(primaryOPs);
             primaryOPs.clear();
         }
         if (secondaryOPs != null)
         {
-            opsToFlush.addAll(secondaryOPs);
+            smsToFlush.addAll(secondaryOPs);
             secondaryOPs.clear();
         }
 
         // Process all delete, insert and update of objects
-        List<NucleusOptimisticException> excptns = flushDeleteInsertUpdateGrouped(opsToFlush, ec);
+        List<NucleusOptimisticException> excptns = flushDeleteInsertUpdateGrouped(smsToFlush, ec);
 
         if (opQueue != null)
         {
@@ -78,11 +78,11 @@ public class FlushNonReferential implements FlushProcess
      * finally all UPDATEs. The StorePersistenceHandler will get calls to <i>deleteObjects</i>, <i>insertObjects</i>
      * and <i>updateObject</i> (for each other one). Note that this is in a separate method to allow calls by
      * other FlushProcesses that want to take advantage of the basic flush method without 
-     * @param opsToFlush The ObjectProviders to process
+     * @param smsToFlush The ObjectProviders to process
      * @param ec ExecutionContext
      * @return Any optimistic verification exceptions thrown during flush
      */
-    public List<NucleusOptimisticException> flushDeleteInsertUpdateGrouped(Set<ObjectProvider> opsToFlush, ExecutionContext ec)
+    public List<NucleusOptimisticException> flushDeleteInsertUpdateGrouped(Set<ObjectProvider> smsToFlush, ExecutionContext ec)
     {
         List<NucleusOptimisticException> optimisticFailures = null;
 
@@ -92,42 +92,42 @@ public class FlushNonReferential implements FlushProcess
             classesToFlush = new HashSet();
         }
 
-        Set<ObjectProvider> opsToDelete = new HashSet<ObjectProvider>();
-        Set<ObjectProvider> opsToInsert = new HashSet<ObjectProvider>();
-        Iterator<ObjectProvider> opIter = opsToFlush.iterator();
-        while (opIter.hasNext())
+        Set<ObjectProvider> smsToDelete = new HashSet<ObjectProvider>();
+        Set<ObjectProvider> smsToInsert = new HashSet<ObjectProvider>();
+        Iterator<ObjectProvider> smIter = smsToFlush.iterator();
+        while (smIter.hasNext())
         {
-            ObjectProvider op = opIter.next();
-            if (op.isEmbedded())
+            ObjectProvider sm = smIter.next();
+            if (sm.isEmbedded())
             {
-                op.markAsFlushed(); // Embedded have nothing to flush since the owner manages it
-                opIter.remove();
+                sm.markAsFlushed(); // Embedded have nothing to flush since the owner manages it
+                smIter.remove();
             }
             else
             {
-                if (classesToFlush != null && op.getObject() != null)
+                if (classesToFlush != null && sm.getObject() != null)
                 {
-                    classesToFlush.add(op.getObject().getClass());
+                    classesToFlush.add(sm.getObject().getClass());
                 }
-                if (op.getLifecycleState().isNew() && !op.isFlushedToDatastore() && !op.isFlushedNew())
+                if (sm.getLifecycleState().isNew() && !sm.isFlushedToDatastore() && !sm.isFlushedNew())
                 {
                     // P_NEW and not yet flushed to datastore
-                    opsToInsert.add(op);
-                    opIter.remove();
+                    smsToInsert.add(sm);
+                    smIter.remove();
                 }
-                else if (op.getLifecycleState().isDeleted() && !op.isFlushedToDatastore())
+                else if (sm.getLifecycleState().isDeleted() && !sm.isFlushedToDatastore())
                 {
-                    if (!op.getLifecycleState().isNew())
+                    if (!sm.getLifecycleState().isNew())
                     {
                         // P_DELETED
-                        opsToDelete.add(op);
-                        opIter.remove();
+                        smsToDelete.add(sm);
+                        smIter.remove();
                     }
-                    else if (op.getLifecycleState().isNew() && op.isFlushedNew())
+                    else if (sm.getLifecycleState().isNew() && sm.isFlushedNew())
                     {
                         // P_NEW_DELETED already persisted
-                        opsToDelete.add(op);
-                        opIter.remove();
+                        smsToDelete.add(sm);
+                        smIter.remove();
                     }
                 }
             }
@@ -135,22 +135,22 @@ public class FlushNonReferential implements FlushProcess
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010046", opsToDelete.size(), opsToInsert.size(), opsToFlush.size()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010046", smsToDelete.size(), smsToInsert.size(), smsToFlush.size()));
         }
 
         StorePersistenceHandler persistenceHandler = ec.getStoreManager().getPersistenceHandler();
-        if (!opsToDelete.isEmpty())
+        if (!smsToDelete.isEmpty())
         {
             // Perform preDelete - deleteAll - postDelete, and mark all ObjectProviders as flushed
             // TODO This omits some parts of sm.internalDeletePersistent
-            for (ObjectProvider op : opsToDelete)
+            for (ObjectProvider sm : smsToDelete)
             {
-                op.setFlushing(true);
-                ec.getCallbackHandler().preDelete(op.getObject());
+                sm.setFlushing(true);
+                ec.getCallbackHandler().preDelete(sm.getObject());
             }
             try
             {
-                persistenceHandler.deleteObjects(opsToDelete.toArray(new ObjectProvider[opsToDelete.size()]));
+                persistenceHandler.deleteObjects(smsToDelete.toArray(new ObjectProvider[smsToDelete.size()]));
             }
             catch (NucleusOptimisticException noe)
             {
@@ -169,44 +169,44 @@ public class FlushNonReferential implements FlushProcess
                     optimisticFailures.add(noe);
                 }
             }
-            for (ObjectProvider op : opsToDelete)
+            for (ObjectProvider sm : smsToDelete)
             {
-                ec.getCallbackHandler().postDelete(op.getObject());
-                op.setFlushedNew(false);
-                op.markAsFlushed();
-                op.setFlushing(false);
+                ec.getCallbackHandler().postDelete(sm.getObject());
+                sm.setFlushedNew(false);
+                sm.markAsFlushed();
+                sm.setFlushing(false);
             }
         }
 
-        if (!opsToInsert.isEmpty())
+        if (!smsToInsert.isEmpty())
         {
             // Perform preStore - insertAll - postStore, and mark all ObjectProviders as flushed
             // TODO This omits some parts of sm.internalMakePersistent
-            for (ObjectProvider op : opsToInsert)
+            for (ObjectProvider sm : smsToInsert)
             {
-                op.setFlushing(true);
-                ec.getCallbackHandler().preStore(op.getObject());
+                sm.setFlushing(true);
+                ec.getCallbackHandler().preStore(sm.getObject());
                 // TODO Make sure identity is set since user could have updated fields in preStore
             }
-            persistenceHandler.insertObjects(opsToInsert.toArray(new ObjectProvider[opsToInsert.size()]));
-            for (ObjectProvider op : opsToInsert)
+            persistenceHandler.insertObjects(smsToInsert.toArray(new ObjectProvider[smsToInsert.size()]));
+            for (ObjectProvider sm : smsToInsert)
             {
-                ec.getCallbackHandler().postStore(op.getObject());
-                op.setFlushedNew(true);
-                op.markAsFlushed();
-                op.setFlushing(false);
-                ec.putObjectIntoLevel1Cache(op); // Update the object in the cache(s) now that version/id are set
+                ec.getCallbackHandler().postStore(sm.getObject());
+                sm.setFlushedNew(true);
+                sm.markAsFlushed();
+                sm.setFlushing(false);
+                ec.putObjectIntoLevel1Cache(sm); // Update the object in the cache(s) now that version/id are set
             }
         }
 
-        if (!opsToFlush.isEmpty())
+        if (!smsToFlush.isEmpty())
         {
             // Objects to update
-            for (ObjectProvider op : opsToFlush)
+            for (ObjectProvider sm : smsToFlush)
             {
                 try
                 {
-                    op.flush();
+                    sm.flush();
                 }
                 catch (NucleusOptimisticException oe)
                 {

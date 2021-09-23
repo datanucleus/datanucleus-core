@@ -28,24 +28,24 @@ import org.datanucleus.util.StringUtils;
  */
 public class CollectionAddOperation<E> implements SCOOperation
 {
-    final ObjectProvider op;
+    final ObjectProvider sm;
     final int fieldNumber;
     final CollectionStore<E> store;
 
     /** The value to add. */
     final E value;
 
-    public CollectionAddOperation(ObjectProvider op, CollectionStore<E> store, E value)
+    public CollectionAddOperation(ObjectProvider sm, CollectionStore<E> store, E value)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
         this.value = value;
     }
 
-    public CollectionAddOperation(ObjectProvider op, int fieldNum, E value)
+    public CollectionAddOperation(ObjectProvider sm, int fieldNum, E value)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = fieldNum;
         this.store = null;
         this.value = value;
@@ -57,7 +57,7 @@ public class CollectionAddOperation<E> implements SCOOperation
     @Override
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return store != null ? store.getOwnerMemberMetaData() : sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**
@@ -77,7 +77,7 @@ public class CollectionAddOperation<E> implements SCOOperation
         if (store != null)
         {
             // TODO If this value is the detached object and we are using attachCopy this needs swapping for the attached object
-            store.add(op, value, -1);
+            store.add(sm, value, -1);
         }
     }
 
@@ -91,11 +91,11 @@ public class CollectionAddOperation<E> implements SCOOperation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     public String toString()
     {
-        return "COLLECTION ADD : " + op + " field=" + getMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
+        return "COLLECTION ADD : " + sm + " field=" + getMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
     }
 }

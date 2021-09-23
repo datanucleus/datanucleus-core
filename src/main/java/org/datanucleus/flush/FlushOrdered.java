@@ -100,13 +100,13 @@ public class FlushOrdered implements FlushProcess
         {
             for (int i = 0; i < toFlushPrimary.length; i++)
             {
-                ObjectProvider op = (ObjectProvider) toFlushPrimary[i];
+                ObjectProvider sm = (ObjectProvider) toFlushPrimary[i];
                 try
                 {
-                    op.flush();
-                    if (classesToFlush != null && op.getObject() != null)
+                    sm.flush();
+                    if (classesToFlush != null && sm.getObject() != null)
                     {
-                        classesToFlush.add(op.getObject().getClass());
+                        classesToFlush.add(sm.getObject().getClass());
                     }
                 }
                 catch (NucleusOptimisticException oe)
@@ -125,13 +125,13 @@ public class FlushOrdered implements FlushProcess
         {
             for (int i = 0; i < toFlushSecondary.length; i++)
             {
-                ObjectProvider op = (ObjectProvider) toFlushSecondary[i];
+                ObjectProvider sm = (ObjectProvider) toFlushSecondary[i];
                 try
                 {
-                    op.flush();
-                    if (classesToFlush != null && op.getObject() != null)
+                    sm.flush();
+                    if (classesToFlush != null && sm.getObject() != null)
                     {
-                        classesToFlush.add(op.getObject().getClass());
+                        classesToFlush.add(sm.getObject().getClass());
                     }
                 }
                 catch (NucleusOptimisticException oe)

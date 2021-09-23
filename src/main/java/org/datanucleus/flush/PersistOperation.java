@@ -24,11 +24,11 @@ import org.datanucleus.state.ObjectProvider;
  */
 public class PersistOperation implements Operation
 {
-    ObjectProvider op;
+    ObjectProvider sm;
 
-    public PersistOperation(ObjectProvider op)
+    public PersistOperation(ObjectProvider sm)
     {
-        this.op = op;
+        this.sm = sm;
     }
 
     /* (non-Javadoc)
@@ -36,7 +36,7 @@ public class PersistOperation implements Operation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     /* (non-Javadoc)
@@ -49,6 +49,6 @@ public class PersistOperation implements Operation
 
     public String toString()
     {
-        return "PERSIST : " + op;
+        return "PERSIST : " + sm;
     }
 }

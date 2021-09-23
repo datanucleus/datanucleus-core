@@ -25,7 +25,7 @@ import org.datanucleus.state.ObjectProvider;
 public interface Operation
 {
     /**
-     * Accessor for the ObjectProvider of the object that this operation is performed on.
+     * Accessor for StateManager of the object that this operation is performed on.
      * @return The ObjectProvider
      */
     ObjectProvider getObjectProvider();

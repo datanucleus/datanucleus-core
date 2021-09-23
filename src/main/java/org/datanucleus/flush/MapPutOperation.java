@@ -27,7 +27,7 @@ import org.datanucleus.store.types.scostore.Store;
  */
 public class MapPutOperation<K, V> implements SCOOperation
 {
-    final ObjectProvider op;
+    final ObjectProvider sm;
     final int fieldNumber;
     final MapStore<K, V> store;
 
@@ -37,18 +37,18 @@ public class MapPutOperation<K, V> implements SCOOperation
     /** The value to add. */
     final V value;
 
-    public MapPutOperation(ObjectProvider op, MapStore store, K key, V value)
+    public MapPutOperation(ObjectProvider sm, MapStore store, K key, V value)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
         this.key = key;
         this.value = value;
     }
 
-    public MapPutOperation(ObjectProvider op, int fieldNum, K key, V value)
+    public MapPutOperation(ObjectProvider sm, int fieldNum, K key, V value)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = fieldNum;
         this.store = null;
         this.key = key;
@@ -61,7 +61,7 @@ public class MapPutOperation<K, V> implements SCOOperation
     @Override
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return store != null ? store.getOwnerMemberMetaData() : sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**
@@ -89,7 +89,7 @@ public class MapPutOperation<K, V> implements SCOOperation
     {
         if (store != null)
         {
-            store.put(op, key, value);
+            store.put(sm, key, value);
         }
     }
 
@@ -103,11 +103,11 @@ public class MapPutOperation<K, V> implements SCOOperation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     public String toString()
     {
-        return "MAP PUT : " + op + " field=" + getMemberMetaData().getName();
+        return "MAP PUT : " + sm + " field=" + getMemberMetaData().getName();
     }
 }

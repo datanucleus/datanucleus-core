@@ -24,11 +24,11 @@ import org.datanucleus.state.ObjectProvider;
  */
 public class DeleteOperation implements Operation
 {
-    ObjectProvider op;
+    ObjectProvider sm;
 
-    public DeleteOperation(ObjectProvider op)
+    public DeleteOperation(ObjectProvider sm)
     {
-        this.op = op;
+        this.sm = sm;
     }
 
     /* (non-Javadoc)
@@ -36,7 +36,7 @@ public class DeleteOperation implements Operation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     /* (non-Javadoc)
@@ -49,6 +49,6 @@ public class DeleteOperation implements Operation
 
     public String toString()
     {
-        return "DELETE : " + op;
+        return "DELETE : " + sm;
     }
 }

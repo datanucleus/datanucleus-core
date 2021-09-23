@@ -40,7 +40,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
 {
     /**
      * Constructor for a field manager for make transient process.
-     * @param sm the ObjectProvider of the instance being loaded
+     * @param sm StateManager of the instance being loaded
      * @param secondClassMutableFields The second class mutable fields for the class of this object
      * @param fpClass Fetch Plan for the class of this instance
      * @param state State object to hold any pertinent controls for the fetchplan process
@@ -56,7 +56,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
      */
     protected void processPersistable(Object pc)
     {
-        ExecutionContext ec = op.getExecutionContext().getApiAdapter().getExecutionContext(pc);
+        ExecutionContext ec = sm.getExecutionContext().getApiAdapter().getExecutionContext(pc);
         if (ec != null)
         {
             // Field is persisted (otherwise it may have not been persisted by reachability)
@@ -73,13 +73,13 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
     protected Object internalFetchObjectField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         Object value = sfv.fetchObjectField(fieldNumber);
 
         if (value != null)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            RelationType relationType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            RelationType relationType = mmd.getRelationType(sm.getExecutionContext().getClassLoaderResolver());
 
             if (relationType != RelationType.NONE)
             {
@@ -111,12 +111,12 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
             if (!(container instanceof SCO))
             {
                 // Replace with SCO
-                wrappedContainer = SCOUtils.wrapSCOField(op, fieldNumber, container, true);
+                wrappedContainer = SCOUtils.wrapSCOField(sm, fieldNumber, container, true);
             }
         }
 
         // Process all persistable objects in the container: elements,values and keys
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         TypeManager typeManager = ec.getTypeManager();
         ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
 
@@ -140,7 +140,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
     protected Object endOfGraphOperation(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         Object value = sfv.fetchObjectField(fieldNumber);
 
         return value;

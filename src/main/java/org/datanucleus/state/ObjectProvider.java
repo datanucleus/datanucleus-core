@@ -102,7 +102,7 @@ public interface ObjectProvider<T> extends StateManager
      * Initialises a state manager to manage the passed persistent instance having the given object ID.
      * Used where we have retrieved a PC object from a datastore directly (not field-by-field), for example on an object datastore. 
      * This initialiser will not add ObjectProviders to all related PCs. This must be done by any calling process. 
-     * This simply adds the ObjectProvider to the specified object and records the id, setting all fields of the object as loaded.
+     * This simply adds StateManager to the specified object and records the id, setting all fields of the object as loaded.
      * @param id the identity of the object.
      * @param pc The object to be managed
      */
@@ -112,7 +112,7 @@ public interface ObjectProvider<T> extends StateManager
      * Initialises a state manager to manage a persistable instance that will be EMBEDDED/SERIALISED into another persistable object. 
      * The instance will not be assigned an identity in the process since it is a SCO.
      * @param pc The persistable to manage (see copyPc also)
-     * @param copyPc Whether the ObjectProvider should manage a copy of the passed PC or that one
+     * @param copyPc Whether StateManager should manage a copy of the passed PC or that one
      */
     void initialiseForEmbedded(T pc, boolean copyPc);
 
@@ -135,7 +135,7 @@ public interface ObjectProvider<T> extends StateManager
     void initialiseForTransactionalTransient(T pc);
 
     /**
-     * Initialises the ObjectProvider to manage a persistable object in detached state.
+     * Initialises StateManager to manage a persistable object in detached state.
      * @param pc the detach object.
      * @param id the identity of the object.
      * @param version the detached version
@@ -143,13 +143,13 @@ public interface ObjectProvider<T> extends StateManager
     void initialiseForDetached(T pc, Object id, Object version);
 
     /**
-     * Initialises the ObjectProvider to manage a persistable object that is not persistent but is about to be deleted.
+     * Initialises StateManager to manage a persistable object that is not persistent but is about to be deleted.
      * @param pc the object to delete
      */
     void initialiseForPNewToBeDeleted(T pc);
 
     /**
-     * Initialise the ObjectProvider, assigning the specified id to the object. 
+     * Initialise StateManager, assigning the specified id to the object. 
      * This is used when getting objects out of the L2 Cache, where they have no ObjectProvider assigned, and returning them as associated with a particular ExecutionContext.
      * @param cachedPC The cached PC object
      * @param id Id to assign to the persistable object
@@ -363,7 +363,7 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Method to notify the StateManager that the object has now been flushed to the datastore.
-     * This is performed when handling inserts or deletes in a batch external to the ObjectProvider.
+     * This is performed when handling inserts or deletes in a batch external to StateManager.
      */
     void markAsFlushed();
 

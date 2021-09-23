@@ -30,16 +30,16 @@ import org.datanucleus.store.types.TypeManager;
  */
 public class NullifyRelationFieldManager extends AbstractFieldManager
 {
-    /** ObjectProvider for the object. */
-    private final ObjectProvider op;
+    /** StateManager for the object. */
+    private final ObjectProvider sm;
 
     /**
      * Constructor.
-     * @param op the ObjectProvider
+     * @param sm StateManager
      */
-    public NullifyRelationFieldManager(ObjectProvider op)
+    public NullifyRelationFieldManager(ObjectProvider sm)
     {
-        this.op = op; 
+        this.sm = sm; 
     }
 
     /**
@@ -49,19 +49,19 @@ public class NullifyRelationFieldManager extends AbstractFieldManager
      */
     public Object fetchObjectField(int fieldNumber)
     {
-        Object value = op.provideField(fieldNumber);
+        Object value = sm.provideField(fieldNumber);
         
         if (value != null)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            RelationType relType = mmd.getRelationType(sm.getExecutionContext().getClassLoaderResolver());
             
             // do not need to nullify fields that are not references and resides embedded in this object
             if (relType != RelationType.NONE)
             {
                 if (mmd.hasContainer())
                 {
-                    TypeManager typeManager = op.getExecutionContext().getTypeManager();
+                    TypeManager typeManager = sm.getExecutionContext().getTypeManager();
                     ContainerAdapter containerAdapter = typeManager.getContainerAdapter(value);
                     containerAdapter.clear();
 
@@ -69,7 +69,7 @@ public class NullifyRelationFieldManager extends AbstractFieldManager
                 }
                 
                 // Process PC fields
-                op.makeDirty(fieldNumber);
+                sm.makeDirty(fieldNumber);
                 return null;
             }
         }

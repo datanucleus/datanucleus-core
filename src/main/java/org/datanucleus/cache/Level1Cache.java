@@ -31,17 +31,17 @@ public interface Level1Cache extends Map<Object, ObjectProvider>
     public static final String NONE_NAME = "none";
 
     /**
-     * Method to retrieve the ObjectProvider for the specified unique key.
+     * Method to retrieve StateManager for the specified unique key.
      * @param key Unique key
      * @return The ObjectProvider if one is cached for this unique key
      */
     ObjectProvider getUnique(CacheUniqueKey key);
 
     /**
-     * Method to store an ObjectProvider for this unique key.
+     * Method to store a StateManager for this unique key.
      * @param key The unique key
-     * @param op The ObjectProvider
-     * @return The previous ObjectProvider for this unique key if one was present, otherwise null
+     * @param sm StateManager
+     * @return The previous StateManager for this unique key if one was present, otherwise null
      */
-    Object putUnique(CacheUniqueKey key, ObjectProvider op);
+    Object putUnique(CacheUniqueKey key, ObjectProvider sm);
 }

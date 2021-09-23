@@ -660,7 +660,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * Initialise the ObjectProvider, assigning the specified id to the object. 
+     * Initialise StateManager, assigning the specified id to the object. 
      * This is used when getting objects out of the L2 Cache, where they have no ObjectProvider 
      * assigned, and returning them as associated with a particular ExecutionContext.
      * @param cachedPC The cached PC object

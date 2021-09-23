@@ -37,20 +37,20 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ReachabilityFieldManager extends AbstractFieldManager
 {
-    /** ObjectProvider for the owning object. */
-    private final ObjectProvider op;
+    /** StateManager for the owning object. */
+    private final ObjectProvider sm;
 
     /** Set of reachables up to this point. */
     private Set reachables = null;
 
     /**
      * Constructor.
-     * @param op The ObjectProvider for the object.
+     * @param sm The ObjectProvider for the object.
      * @param reachables Reachables up to this point
      */
-    public ReachabilityFieldManager(ObjectProvider op, Set reachables)
+    public ReachabilityFieldManager(ObjectProvider sm, Set reachables)
     {
-        this.op = op;
+        this.sm = sm;
         this.reachables = reachables;
     }
 
@@ -61,33 +61,33 @@ public class ReachabilityFieldManager extends AbstractFieldManager
      */
     protected void processPersistable(Object obj, AbstractMemberMetaData mmd)
     {
-        ExecutionContext ec = op.getExecutionContext();
-        ObjectProvider objOP = ec.findObjectProvider(obj);
-        if (objOP != null)
+        ExecutionContext ec = sm.getExecutionContext();
+        ObjectProvider objSM = ec.findObjectProvider(obj);
+        if (objSM != null)
         {
-            Object objID = objOP.getInternalObjectId();
-            if (!reachables.contains(objID) && !objOP.isDeleted())
+            Object objID = objSM.getInternalObjectId();
+            if (!reachables.contains(objID) && !objSM.isDeleted())
             {
                 if (ec.isEnlistedInTransaction(objID))
                 {
                     // This object was enlisted so make sure all of its fields are loaded before continuing
-                    objOP.loadUnloadedRelationFields();
+                    objSM.loadUnloadedRelationFields();
                 }
 
                 // Add this object id since not yet reached
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(objID), objOP.getLifecycleState()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(objID), objSM.getLifecycleState()));
                 }
                 reachables.add(objID);
 
                 // Recurse through relation fields of this object
-                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(objOP, reachables);
-                int[] relationFieldNums = objOP.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver());
-                int[] loadedFieldNumbers = ClassUtils.getFlagsSetTo(objOP.getLoadedFields(), relationFieldNums, true);
+                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(objSM, reachables);
+                int[] relationFieldNums = objSM.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver());
+                int[] loadedFieldNumbers = ClassUtils.getFlagsSetTo(objSM.getLoadedFields(), relationFieldNums, true);
                 if (loadedFieldNumbers != null && loadedFieldNumbers.length > 0)
                 {
-                    objOP.provideFields(loadedFieldNumbers, pcFM);
+                    objSM.provideFields(loadedFieldNumbers, pcFM);
                 }
             }
         }
@@ -95,7 +95,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007005", op.getExecutionContext().getApiAdapter().getIdForObject(obj), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007005", sm.getExecutionContext().getApiAdapter().getIdForObject(obj), mmd.getFullFieldName()));
             }
         }
     }
@@ -108,8 +108,8 @@ public class ReachabilityFieldManager extends AbstractFieldManager
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("007002", mmd.getFullFieldName()));
         }
         
-        ApiAdapter api = op.getExecutionContext().getApiAdapter();
-        TypeManager typeManager = op.getExecutionContext().getTypeManager();
+        ApiAdapter api = sm.getExecutionContext().getApiAdapter();
+        TypeManager typeManager = sm.getExecutionContext().getTypeManager();
         for (Object object : typeManager.getContainerAdapter(container))
         {
             if (api.isPersistable(object))
@@ -126,14 +126,14 @@ public class ReachabilityFieldManager extends AbstractFieldManager
      */
     public void storeObjectField(int fieldNumber, Object value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (value != null)
         {
             boolean persistCascade = mmd.isCascadePersist();
             
             if (persistCascade)
             {
-                RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+                RelationType relType = mmd.getRelationType(sm.getExecutionContext().getClassLoaderResolver());
                 if ( relType != RelationType.NONE ){
                     
                     if ( mmd.hasContainer() )

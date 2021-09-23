@@ -44,8 +44,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class L2CacheRetrieveFieldManager extends AbstractFieldManager
 {
-    /** ObjectProvider of the object we are copying values into. */
-    ObjectProvider op;
+    /** StateManager of the object we are copying values into. */
+    ObjectProvider sm;
 
     /** Execution Context. */
     ExecutionContext ec;
@@ -55,10 +55,10 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
 
     List<Integer> fieldsNotLoaded = null;
 
-    public L2CacheRetrieveFieldManager(ObjectProvider op, CachedPC cachedpc)
+    public L2CacheRetrieveFieldManager(ObjectProvider sm, CachedPC cachedpc)
     {
-        this.op = op;
-        this.ec = op.getExecutionContext();
+        this.sm = sm;
+        this.ec = sm.getExecutionContext();
         this.cachedPC = cachedpc;
     }
 
@@ -170,13 +170,13 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             return null;
         }
 
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         return mmd.hasContainer() ? processContainerField(fieldNumber, value, mmd) : processField(fieldNumber, value, mmd);
     }
 
     private Object processContainerField(int fieldNumber, Object container, AbstractMemberMetaData mmd)
     {
-        ContainerHandler containerHandler = op.getExecutionContext().getTypeManager().getContainerHandler(mmd.getType());
+        ContainerHandler containerHandler = sm.getExecutionContext().getTypeManager().getContainerHandler(mmd.getType());
         return mmd.hasMap() ? processMapContainer(fieldNumber, container, mmd, containerHandler) : processElementContainer(fieldNumber, container, mmd, containerHandler);
     }
 
@@ -238,7 +238,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 fieldMapContainerAdapter.put(mapKey, mapValue);
             }
 
-            return SCOUtils.wrapSCOField(op, fieldNumber, fieldMapContainerAdapter.getContainer(), true);
+            return SCOUtils.wrapSCOField(sm, fieldNumber, fieldMapContainerAdapter.getContainer(), true);
         }
         catch (Exception e)
         {
@@ -317,7 +317,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 }
             }   
             
-            return SCOUtils.wrapSCOField(op, fieldNumber, fieldContainerAdapter.getContainer(), true);
+            return SCOUtils.wrapSCOField(sm, fieldNumber, fieldContainerAdapter.getContainer(), true);
         }
         catch (Exception e)
         {
@@ -337,7 +337,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
         if (relType == RelationType.NONE)
         {
-            return SCOUtils.wrapSCOField(op, fieldNumber, SCOUtils.copyValue(value), true);
+            return SCOUtils.wrapSCOField(sm, fieldNumber, SCOUtils.copyValue(value), true);
         }
         
         if (mmd.isSerialized() || MetaDataUtils.isMemberEmbedded(mmd, relType, ec.getClassLoaderResolver(), ec.getMetaDataManager()))
@@ -419,14 +419,14 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
     private Object convertCachedPCToPersistable(CachedPC cachedPC, int fieldNumber)
     {
         AbstractClassMetaData valueCmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
-        ObjectProvider valueOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, valueCmd, op, fieldNumber);
+        ObjectProvider valueSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber);
 
         // TODO Perhaps only load fetch plan fields?
         int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), valueCmd.getAllMemberPositions(), true);
         if (fieldsToLoad != null && fieldsToLoad.length > 0)
         {
-            valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, cachedPC));
+            valueSM.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueSM, cachedPC));
         }
-        return valueOP.getObject();
+        return valueSM.getObject();
     }
 }

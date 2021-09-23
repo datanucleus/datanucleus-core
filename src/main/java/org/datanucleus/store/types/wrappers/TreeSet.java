@@ -53,7 +53,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
     protected java.util.TreeSet<E> delegate;
 
     /**
-     * Constructor, using the ObjectProvider of the "owner" and the field name.
+     * Constructor, using StateManager of the "owner" and the field name.
      * @param ownerOP The owner ObjectProvider
      * @param mmd Metadata for the member
      */

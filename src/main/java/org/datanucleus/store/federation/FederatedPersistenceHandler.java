@@ -59,24 +59,24 @@ public class FederatedPersistenceHandler implements StorePersistenceHandler
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#insertObjects(org.datanucleus.store.ObjectProvider[])
      */
-    public void insertObjects(ObjectProvider... ops)
+    public void insertObjects(ObjectProvider... sms)
     {
         // TODO Support splitting the array into the respective datastore
-        for (int i=0;i<ops.length;i++)
+        for (int i=0;i<sms.length;i++)
         {
-            insertObject(ops[i]);
+            insertObject(sms[i]);
         }
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#deleteObjects(org.datanucleus.store.ObjectProvider[])
      */
-    public void deleteObjects(ObjectProvider... ops)
+    public void deleteObjects(ObjectProvider... sms)
     {
         // TODO Support splitting the array into the respective datastore
-        for (int i=0;i<ops.length;i++)
+        for (int i=0;i<sms.length;i++)
         {
-            deleteObject(ops[i]);
+            deleteObject(sms[i]);
         }
     }
 
@@ -101,68 +101,68 @@ public class FederatedPersistenceHandler implements StorePersistenceHandler
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#insertObject(org.datanucleus.store.ObjectProvider)
      */
-    public void insertObject(ObjectProvider op)
+    public void insertObject(ObjectProvider sm)
     {
-        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(op.getClassMetaData());
-        classStoreMgr.getPersistenceHandler().insertObject(op);
+        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(sm.getClassMetaData());
+        classStoreMgr.getPersistenceHandler().insertObject(sm);
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#updateObject(org.datanucleus.store.ObjectProvider, int[])
      */
-    public void updateObject(ObjectProvider op, int[] fieldNumbers)
+    public void updateObject(ObjectProvider sm, int[] fieldNumbers)
     {
-        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(op.getClassMetaData());
-        classStoreMgr.getPersistenceHandler().updateObject(op, fieldNumbers);
+        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(sm.getClassMetaData());
+        classStoreMgr.getPersistenceHandler().updateObject(sm, fieldNumbers);
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#deleteObject(org.datanucleus.store.ObjectProvider)
      */
-    public void deleteObject(ObjectProvider op)
+    public void deleteObject(ObjectProvider sm)
     {
-        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(op.getClassMetaData());
-        classStoreMgr.getPersistenceHandler().deleteObject(op);
+        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(sm.getClassMetaData());
+        classStoreMgr.getPersistenceHandler().deleteObject(sm);
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#fetchObject(org.datanucleus.store.ObjectProvider, int[])
      */
-    public void fetchObject(ObjectProvider op, int[] fieldNumbers)
+    public void fetchObject(ObjectProvider sm, int[] fieldNumbers)
     {
-        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(op.getClassMetaData());
-        classStoreMgr.getPersistenceHandler().fetchObject(op, fieldNumbers);
+        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(sm.getClassMetaData());
+        classStoreMgr.getPersistenceHandler().fetchObject(sm, fieldNumbers);
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#fetchObjects(int[], org.datanucleus.state.ObjectProvider[])
      */
     @Override
-    public void fetchObjects(int[] fieldNumbers, ObjectProvider... ops)
+    public void fetchObjects(int[] fieldNumbers, ObjectProvider... sms)
     {
         // Override this to provide bulk fetching of the same fields from multiple objects
-        for (ObjectProvider op : ops)
+        for (ObjectProvider sm : sms)
         {
-            fetchObject(op, fieldNumbers);
+            fetchObject(sm, fieldNumbers);
         }
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#locateObject(org.datanucleus.store.ObjectProvider)
      */
-    public void locateObject(ObjectProvider op)
+    public void locateObject(ObjectProvider sm)
     {
-        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(op.getClassMetaData());
-        classStoreMgr.getPersistenceHandler().locateObject(op);
+        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(sm.getClassMetaData());
+        classStoreMgr.getPersistenceHandler().locateObject(sm);
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#locateObjects(org.datanucleus.store.ObjectProvider[])
      */
-    public void locateObjects(ObjectProvider[] ops)
+    public void locateObjects(ObjectProvider[] sms)
     {
-        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(ops[0].getClassMetaData());
-        classStoreMgr.getPersistenceHandler().locateObjects(ops);
+        StoreManager classStoreMgr = storeMgr.getStoreManagerForClass(sms[0].getClassMetaData());
+        classStoreMgr.getPersistenceHandler().locateObjects(sms);
     }
 
     /* (non-Javadoc)

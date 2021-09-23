@@ -36,7 +36,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
 {
     /**
      * Constructor for a field manager for make transient process.
-     * @param sm the ObjectProvider of the instance being detached. An instance in Persistent or Transactional state
+     * @param sm StateManager of the instance being detached. An instance in Persistent or Transactional state
      * @param secondClassMutableFields The second class mutable fields for the class of this object
      * @param fpClass Fetch Plan for the class of this instance
      * @param state State object to hold any pertinent controls for the fetchplan process
@@ -53,10 +53,10 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
      */
     protected void processPersistable(Object pc)
     {
-        if (op.getExecutionContext().getApiAdapter().isPersistent(pc))
+        if (sm.getExecutionContext().getApiAdapter().isPersistent(pc))
         {
             // Make transient if still persistent
-            op.getExecutionContext().getApiAdapter().getExecutionContext(pc).makeObjectTransient(pc, state);
+            sm.getExecutionContext().getApiAdapter().getExecutionContext(pc).makeObjectTransient(pc, state);
         }
     }
 
@@ -68,24 +68,24 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
     protected Object internalFetchObjectField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         Object value = sfv.fetchObjectField(fieldNumber);
 
         if (value != null)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            RelationType relType = mmd.getRelationType(sm.getExecutionContext().getClassLoaderResolver());
             
             if (relType != RelationType.NONE)
             {
                 if (mmd.hasContainer())
                 {
                     // Replace with SCO, when possible
-                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
+                    value = SCOUtils.wrapSCOField(sm, fieldNumber, value, true);
 
-                    TypeManager typeManager = op.getExecutionContext().getTypeManager();
+                    TypeManager typeManager = sm.getExecutionContext().getTypeManager();
                     ContainerAdapter containerAdapter = typeManager.getContainerAdapter(value);
-                    ApiAdapter api = op.getExecutionContext().getApiAdapter();
+                    ApiAdapter api = sm.getExecutionContext().getApiAdapter();
 
                     // Process all elements of the Container that are PC
                     for (Object object : containerAdapter)
@@ -118,7 +118,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
     protected Object endOfGraphOperation(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         Object value = sfv.fetchObjectField(fieldNumber);
 
         if (value != null && secondClassMutableFields[fieldNumber])

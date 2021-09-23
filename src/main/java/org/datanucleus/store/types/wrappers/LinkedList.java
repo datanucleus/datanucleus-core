@@ -54,7 +54,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
     protected java.util.LinkedList<E> delegate;
 
     /**
-     * Constructor, using the ObjectProvider of the "owner" and the field name.
+     * Constructor, using StateManager of the "owner" and the field name.
      * @param ownerOP The owner ObjectProvider
      * @param mmd Metadata for the member
      */

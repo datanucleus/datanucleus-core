@@ -47,9 +47,9 @@ public class WeakRefCache implements Level1Cache
     {
     }
 
-    public ObjectProvider put(Object id, ObjectProvider op)
+    public ObjectProvider put(Object id, ObjectProvider sm)
     {
-        return weakCache.put(id, op);
+        return weakCache.put(id, sm);
     }
 
     public ObjectProvider get(Object id)
@@ -64,20 +64,20 @@ public class WeakRefCache implements Level1Cache
 
     public ObjectProvider remove(Object id)
     {
-        ObjectProvider op = weakCache.remove(id);
-        if (weakCacheUnique.containsValue(op))
+        ObjectProvider sm = weakCache.remove(id);
+        if (weakCacheUnique.containsValue(sm))
         {
             Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = weakCacheUnique.entrySet().iterator();
             while (entrySetIter.hasNext())
             {
                 Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
-                if (entry.getValue() == op)
+                if (entry.getValue() == sm)
                 {
                     entrySetIter.remove();
                 }
             }
         }
-        return op;
+        return sm;
     }
 
     public void clear()
@@ -148,21 +148,15 @@ public class WeakRefCache implements Level1Cache
         return weakCache.values();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.cache.Level1Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
-     */
     @Override
     public ObjectProvider getUnique(CacheUniqueKey key)
     {
         return weakCacheUnique.get(key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.cache.Level1Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.state.ObjectProvider)
-     */
     @Override
-    public Object putUnique(CacheUniqueKey key, ObjectProvider op)
+    public Object putUnique(CacheUniqueKey key, ObjectProvider sm)
     {
-        return weakCacheUnique.put(key, op);
+        return weakCacheUnique.put(key, sm);
     }
 }

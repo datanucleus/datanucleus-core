@@ -216,14 +216,14 @@ public interface ExecutionContext extends ExecutionContextReference
     boolean isClosed();
 
     /**
-     * Method to find the ObjectProvider for the passed persistable object when it is managed by this manager.
+     * Method to find StateManager for the passed persistable object when it is managed by this manager.
      * @param pc The persistable object
      * @return The ObjectProvider
      */
     ObjectProvider findObjectProvider(Object pc);
 
     /**
-     * Method to find the ObjectProvider for the passed persistable object when it is managed by this manager, 
+     * Method to find StateManager for the passed persistable object when it is managed by this manager, 
      * and if not yet persistent to persist it and return the assigned ObjectProvider.
      * @param pc The persistable object
      * @param persist Whether to persist if not yet persistent
@@ -232,7 +232,7 @@ public interface ExecutionContext extends ExecutionContextReference
     ObjectProvider findObjectProvider(Object pc, boolean persist);
 
     /**
-     * Method to find the ObjectProvider for the passed embedded persistable object.
+     * Method to find StateManager for the passed embedded persistable object.
      * Will create one if not already registered, and tie it to the specified owner.
      * @param value The embedded object
      * @param owner The owner ObjectProvider (if known).
@@ -606,7 +606,7 @@ public interface ExecutionContext extends ExecutionContextReference
     <T> Extent<T> getExtent(Class<T> candidateClass, boolean includeSubclasses);
 
     /**
-     * Method to put a Persistable object associated to the ObjectProvider into the L1 cache.
+     * Method to put a Persistable object associated to StateManager into the L1 cache.
      * @param op The ObjectProvider
      */
     void putObjectIntoLevel1Cache(ObjectProvider op);

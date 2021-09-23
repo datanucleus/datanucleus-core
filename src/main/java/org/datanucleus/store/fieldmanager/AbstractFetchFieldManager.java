@@ -29,19 +29,19 @@ public abstract class AbstractFetchFieldManager extends AbstractFieldManager
 {
     protected ExecutionContext ec;
 
-    protected ObjectProvider op;
+    protected ObjectProvider sm;
 
     protected AbstractClassMetaData cmd;
 
     /**
      * Constructor to use when retrieving values of fields of existing objects.
-     * @param op StateManager for the object
+     * @param sm StateManager for the object
      */
-    public AbstractFetchFieldManager(ObjectProvider op)
+    public AbstractFetchFieldManager(ObjectProvider sm)
     {
-        this.op = op;
-        this.ec = op.getExecutionContext();
-        this.cmd = op.getClassMetaData();
+        this.sm = sm;
+        this.ec = sm.getExecutionContext();
+        this.cmd = sm.getClassMetaData();
     }
 
     /**

@@ -27,20 +27,20 @@ import org.datanucleus.store.types.scostore.Store;
  */
 public class CollectionClearOperation implements SCOOperation
 {
-    final ObjectProvider op;
+    final ObjectProvider sm;
     final int fieldNumber;
     final CollectionStore store;
 
-    public CollectionClearOperation(ObjectProvider op, CollectionStore store)
+    public CollectionClearOperation(ObjectProvider sm, CollectionStore store)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
     }
 
-    public CollectionClearOperation(ObjectProvider op, int fieldNum)
+    public CollectionClearOperation(ObjectProvider sm, int fieldNum)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = fieldNum;
         this.store = null;
     }
@@ -51,7 +51,7 @@ public class CollectionClearOperation implements SCOOperation
     @Override
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return store != null ? store.getOwnerMemberMetaData() : sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**
@@ -61,7 +61,7 @@ public class CollectionClearOperation implements SCOOperation
     {
         if (store != null)
         {
-            store.clear(op);
+            store.clear(sm);
         }
     }
 
@@ -75,11 +75,11 @@ public class CollectionClearOperation implements SCOOperation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     public String toString()
     {
-        return "COLLECTION CLEAR : " + op + " field=" + getMemberMetaData().getName();
+        return "COLLECTION CLEAR : " + sm + " field=" + getMemberMetaData().getName();
     }
 }

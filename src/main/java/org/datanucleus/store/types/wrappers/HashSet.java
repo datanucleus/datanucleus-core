@@ -50,7 +50,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
     protected java.util.HashSet<E> delegate;
 
     /**
-     * Constructor, using the ObjectProvider of the "owner" and the field name.
+     * Constructor, using StateManager of the "owner" and the field name.
      * @param ownerOP The owner ObjectProvider
      * @param mmd Metadata for the member
      */

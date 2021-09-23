@@ -27,7 +27,7 @@ import org.datanucleus.store.types.scostore.Store;
  */
 public class MapRemoveOperation<K, V> implements SCOOperation
 {
-    final ObjectProvider op;
+    final ObjectProvider sm;
     final int fieldNumber;
     final MapStore<K, V> store;
 
@@ -37,18 +37,18 @@ public class MapRemoveOperation<K, V> implements SCOOperation
     /** The value to remove. */
     final V value;
 
-    public MapRemoveOperation(ObjectProvider op, MapStore store, K key, V val)
+    public MapRemoveOperation(ObjectProvider sm, MapStore store, K key, V val)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
         this.key = key;
         this.value = val;
     }
 
-    public MapRemoveOperation(ObjectProvider op, int fieldNum, K key, V val)
+    public MapRemoveOperation(ObjectProvider sm, int fieldNum, K key, V val)
     {
-        this.op = op;
+        this.sm = sm;
         this.fieldNumber = fieldNum;
         this.store = null;
         this.key = key;
@@ -61,7 +61,7 @@ public class MapRemoveOperation<K, V> implements SCOOperation
     @Override
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return store != null ? store.getOwnerMemberMetaData() : sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**
@@ -91,11 +91,11 @@ public class MapRemoveOperation<K, V> implements SCOOperation
         {
             if (value != null)
             {
-                store.remove(op, key, value);
+                store.remove(sm, key, value);
             }
             else
             {
-                store.remove(op, key);
+                store.remove(sm, key);
             }
         }
     }
@@ -110,10 +110,10 @@ public class MapRemoveOperation<K, V> implements SCOOperation
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     public String toString()
     {
-        return "MAP REMOVE : " + op + " field=" + getMemberMetaData().getName();    }
+        return "MAP REMOVE : " + sm + " field=" + getMemberMetaData().getName();    }
 }

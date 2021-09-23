@@ -25,7 +25,7 @@ import org.datanucleus.metadata.VersionStrategy;
  * Interface defining a manager for locking of objects.
  * There are currently two modes to a LockManager.
  * <ol>
- * <li>Where the user has the object and wants it locking. In this case they provide the ObjectProvider and we lock it (by a call to the datastore where appropriate).</li>
+ * <li>Where the user has the object and wants it locking. In this case they provide StateManager and we lock it (by a call to the datastore where appropriate).</li>
  * <li>Where the user wants to do a find of an object with a particular id. In this case we register the identity as needing this lock level, 
  * and the datastore will be called to retrieve the object and will check back what lock level to use.</li>
  * </ol>

@@ -44,7 +44,7 @@ public class LockManagerImpl implements LockManager
     /** Map of lock mode, keyed by the object identity. Utilised on a find operation. */
     Map<Object, LockMode> requiredLockModesById = null;
 
-    /** Map of lock mode, keyed by the ObjectProvider. */
+    /** Map of lock mode, keyed by StateManager. */
     Map<ObjectProvider, LockMode> lockModeByObjectProvider = null;
 
     public LockManagerImpl(ExecutionContext ec)

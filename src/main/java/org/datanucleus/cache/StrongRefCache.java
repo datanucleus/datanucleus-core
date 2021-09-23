@@ -42,9 +42,9 @@ public class StrongRefCache implements Level1Cache
     {
     }
 
-    public ObjectProvider put(Object id, ObjectProvider op)
+    public ObjectProvider put(Object id, ObjectProvider sm)
     {
-        return cache.put(id, op);
+        return cache.put(id, sm);
     }
 
     public ObjectProvider get(Object id)
@@ -59,20 +59,20 @@ public class StrongRefCache implements Level1Cache
 
     public ObjectProvider remove(Object id)
     {
-        ObjectProvider op = cache.remove(id);
-        if (cacheUnique.containsValue(op))
+        ObjectProvider sm = cache.remove(id);
+        if (cacheUnique.containsValue(sm))
         {
             Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = cacheUnique.entrySet().iterator();
             while (entrySetIter.hasNext())
             {
                 Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
-                if (entry.getValue() == op)
+                if (entry.getValue() == sm)
                 {
                     entrySetIter.remove();
                 }
             }
         }
-        return op;
+        return sm;
     }
 
     public void clear()
@@ -143,21 +143,15 @@ public class StrongRefCache implements Level1Cache
         return cache.values();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.cache.Level1Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
-     */
     @Override
     public ObjectProvider getUnique(CacheUniqueKey key)
     {
         return cacheUnique.get(key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.cache.Level1Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.state.ObjectProvider)
-     */
     @Override
-    public Object putUnique(CacheUniqueKey key, ObjectProvider op)
+    public Object putUnique(CacheUniqueKey key, ObjectProvider sm)
     {
-        return cacheUnique.put(key, op);
+        return cacheUnique.put(key, sm);
     }
 }

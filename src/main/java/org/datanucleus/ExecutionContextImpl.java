@@ -134,7 +134,7 @@ import org.datanucleus.util.StringUtils;
  * You may note that we have various fields here storing ObjectProvider-related information such as which ObjectProvider is embedded into which ObjectProvider etc, 
  * or the managed relations for an ObjectProvider. These are stored here to avoid adding a reference to the storage of each and every ObjectProvider, since
  * we could potentially have a very large number of ObjectProviders (and they may not use that field in the majority, but it still needs the reference). 
- * The same should be followed as a general rule when considering storing something in the ObjectProvider.
+ * The same should be followed as a general rule when considering storing something in StateManager.
  * </p>
  * <p>
  * This class is NOT thread-safe. Use ExecutionContextThreadedImpl if you want to *attempt* to have multithreaded PM/EMs.
@@ -217,7 +217,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private Map<ObjectProvider, List<EmbeddedOwnerRelation>> opEmbeddedInfoByEmbedded = null;
 
     /**
-     * Map of associated values for the ObjectProvider. This can contain anything really and is down to the StoreManager to define. 
+     * Map of associated values for StateManager. This can contain anything really and is down to the StoreManager to define. 
      * For example RDBMS datastores typically put external FK info in here keyed by the mapping of the field to which it pertains.
      */
     protected Map<ObjectProvider, Map<?,?>> opAssociatedValuesMapByOP = null;
@@ -1315,7 +1315,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to return the ObjectProvider for an object (if managed).
+     * Method to return StateManager for an object (if managed).
      * @param pc The object we are checking
      * @return The ObjectProvider, null if not found.
      * @throws NucleusUserException if the persistable object is managed by a different ExecutionContext
@@ -1335,7 +1335,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Find the ObjectProvider for the specified object, persisting it if required.
+     * Find StateManager for the specified object, persisting it if required.
      * @param pc The persistable object
      * @param persist persists the object if not yet persisted. 
      * @return The ObjectProvider
@@ -1950,7 +1950,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         ObjectProvider op = findObjectProvider(persistedPc);
         if (op != null)
         {
-            // TODO If attaching (detached=true), we maybe ought not add the ObjectProvider to dirtyOPs/indirectDirtyOPs
+            // TODO If attaching (detached=true), we maybe ought not add StateManager to dirtyOPs/indirectDirtyOPs
             if (indirectDirtyOPs.contains(op))
             {
                 dirtyOPs.add(op);
@@ -3462,7 +3462,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         pc = (Persistable) op.getObject();
                         if (!validate)
                         {
-                            // Mark the ObjectProvider as needing to validate this object before loading fields
+                            // Mark StateManager as needing to validate this object before loading fields
                             op.markForInheritanceValidation();
                         }
 
@@ -3607,7 +3607,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         pc = (Persistable) op.getObject();
                         if (!checkInheritance && !validate)
                         {
-                            // Mark the ObjectProvider as needing to validate this object before loading fields
+                            // Mark StateManager as needing to validate this object before loading fields
                             op.markForInheritanceValidation();
                         }
 
@@ -4032,8 +4032,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to return the RelationshipManager for the ObjectProvider.
-     * If we are currently managing relations and the ObjectProvider has no RelationshipManager allocated then one is created.
+     * Method to return the RelationshipManager for StateManager.
+     * If we are currently managing relations and StateManager has no RelationshipManager allocated then one is created.
      * @param op StateManager
      * @return The RelationshipManager
      */
@@ -4829,7 +4829,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Convenience method to convert the object managed by the ObjectProvider into a form suitable for caching in an L2 cache.
+     * Convenience method to convert the object managed by StateManager into a form suitable for caching in an L2 cache.
      * @param op StateManager for the object
      * @param currentCachedPC Current L2 cached object (if any) to use for updating
      * @return The cacheable form of the object

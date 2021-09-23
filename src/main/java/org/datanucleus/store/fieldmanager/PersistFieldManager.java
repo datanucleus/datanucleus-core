@@ -40,20 +40,20 @@ import org.datanucleus.store.types.TypeManager;
  */
 public class PersistFieldManager extends AbstractFieldManager
 {
-    /** ObjectProvider for the owning object. */
-    private final ObjectProvider op;
+    /** StateManager for the owning object. */
+    private final ObjectProvider sm;
 
     /** Whether this manager will replace any SCO fields with SCO wrappers. */
     private final boolean replaceSCOsWithWrappers;
 
     /**
      * Constructor.
-     * @param op The ObjectProvider for the object.
+     * @param sm The ObjectProvider for the object.
      * @param replaceSCOsWithWrappers Whether to swap any SCO field objects for SCO wrappers
      */
-    public PersistFieldManager(ObjectProvider op, boolean replaceSCOsWithWrappers)
+    public PersistFieldManager(ObjectProvider sm, boolean replaceSCOsWithWrappers)
     {
-        this.op = op;
+        this.sm = sm;
         this.replaceSCOsWithWrappers = replaceSCOsWithWrappers;
     }
 
@@ -67,15 +67,15 @@ public class PersistFieldManager extends AbstractFieldManager
     protected Object processPersistable(Object pc, int ownerFieldNum, int objectType)
     {
         // TODO Consider adding more of the functionality in SCOUtils.validateObjectForWriting
-        ApiAdapter adapter = op.getExecutionContext().getApiAdapter();
+        ApiAdapter adapter = sm.getExecutionContext().getApiAdapter();
         if (!adapter.isPersistent(pc) || (adapter.isPersistent(pc) && adapter.isDeleted(pc)))
         {
             // Object is TRANSIENT/DETACHED and being persisted, or P_NEW_DELETED and being re-persisted
             if (objectType != ObjectProvider.PC)
             {
-                return op.getExecutionContext().persistObjectInternal(pc, op, ownerFieldNum, objectType);
+                return sm.getExecutionContext().persistObjectInternal(pc, sm, ownerFieldNum, objectType);
             }
-            return op.getExecutionContext().persistObjectInternal(pc, null, -1, objectType);
+            return sm.getExecutionContext().persistObjectInternal(pc, null, -1, objectType);
         }
         return pc;
     }
@@ -92,19 +92,19 @@ public class PersistFieldManager extends AbstractFieldManager
             if (replaceSCOsWithWrappers)
             {
                 // Replace any SCO field that isn't already a wrapper, with its wrapper object
-                boolean[] secondClassMutableFieldFlags = op.getClassMetaData().getSCOMutableMemberFlags();
+                boolean[] secondClassMutableFieldFlags = sm.getClassMetaData().getSCOMutableMemberFlags();
                 if (secondClassMutableFieldFlags[fieldNumber] && !(value instanceof SCO))
                 {
                     // Replace the field with a SCO wrapper
-                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
+                    value = SCOUtils.wrapSCOField(sm, fieldNumber, value, true);
                 }
             }
 
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
 
             if (mmd.isCascadePersist())
             {
-                ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+                ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
                 RelationType relationType = mmd.getRelationType(clr);
 
                 if (relationType != RelationType.NONE)
@@ -144,9 +144,9 @@ public class PersistFieldManager extends AbstractFieldManager
 
     private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
     {
-    	TypeManager typeManager = op.getExecutionContext().getTypeManager();
+    	TypeManager typeManager = sm.getExecutionContext().getTypeManager();
     	ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler = typeManager.getContainerHandler(mmd.getType());
-        ApiAdapter api = op.getExecutionContext().getApiAdapter();
+        ApiAdapter api = sm.getExecutionContext().getApiAdapter();
 
         // Process all keys, values of the Map that are PC
         MapContainerAdapter<Object> mapAdapter = containerHandler.getAdapter(container);
@@ -178,8 +178,8 @@ public class PersistFieldManager extends AbstractFieldManager
                 boolean updateValue = false;
                 if (newMapKey != mapKey)
                 {
-                    ObjectProvider keyOP = op.getExecutionContext().findObjectProvider(newMapKey);
-                    if (keyOP.getReferencedPC() != null)
+                    ObjectProvider keySM = sm.getExecutionContext().findObjectProvider(newMapKey);
+                    if (keySM.getReferencedPC() != null)
                     {
                         // Attaching the key
                         updateKey = true;
@@ -187,8 +187,8 @@ public class PersistFieldManager extends AbstractFieldManager
                 }
                 if (newMapValue != mapValue)
                 {
-                    ObjectProvider valOP = op.getExecutionContext().findObjectProvider(newMapValue);
-                    if (valOP.getReferencedPC() != null)
+                    ObjectProvider valSM = sm.getExecutionContext().findObjectProvider(newMapValue);
+                    if (valSM.getReferencedPC() != null)
                     {
                         // Attaching the value
                         updateValue = true;
@@ -210,13 +210,13 @@ public class PersistFieldManager extends AbstractFieldManager
 
     private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
     {
-    	TypeManager typeManager = op.getExecutionContext().getTypeManager();
+    	TypeManager typeManager = sm.getExecutionContext().getTypeManager();
     	ElementContainerHandler<Object, ElementContainerAdapter<Object>> elementContainerHandler = typeManager.getContainerHandler(mmd.getType());
 
         // Process all elements of the container that are PC
         ElementContainerAdapter containerAdapter = elementContainerHandler.getAdapter(container);
 
-        ApiAdapter api = op.getExecutionContext().getApiAdapter();
+        ApiAdapter api = sm.getExecutionContext().getApiAdapter();
         int objectType = elementContainerHandler.getObjectType(mmd);
         if (objectType == ObjectProvider.PC)
         {
@@ -226,7 +226,7 @@ public class PersistFieldManager extends AbstractFieldManager
                 if (api.isPersistable(element))
                 {
                     Object newElement = processPersistable(element, -1, objectType);
-                    ObjectProvider elementSM = op.getExecutionContext().findObjectProvider(newElement);
+                    ObjectProvider elementSM = sm.getExecutionContext().findObjectProvider(newElement);
                     if (elementSM.getReferencedPC() != null)
                     {
                         // Must be attaching this element, so swap element (detached -> attached)

@@ -28,15 +28,15 @@ public class ListAddAtOperation<E> extends CollectionAddOperation<E>
     /** Index to add the object at. */
     final int index;
 
-    public ListAddAtOperation(ObjectProvider op, ListStore<E> store, int index, E value)
+    public ListAddAtOperation(ObjectProvider sm, ListStore<E> store, int index, E value)
     {
-        super(op, store, value);
+        super(sm, store, value);
         this.index = index;
     }
 
-    public ListAddAtOperation(ObjectProvider op, int fieldNum, int index, E value)
+    public ListAddAtOperation(ObjectProvider sm, int fieldNum, int index, E value)
     {
-        super(op, fieldNum, value);
+        super(sm, fieldNum, value);
         this.index = index;
     }
 
@@ -47,12 +47,12 @@ public class ListAddAtOperation<E> extends CollectionAddOperation<E>
     {
         if (store != null)
         {
-            ((ListStore)store).add(op, value, index, -1);
+            ((ListStore)store).add(sm, value, index, -1);
         }
     }
 
     public String toString()
     {
-        return "LIST ADD-AT : " + op + " field=" + getMemberMetaData().getName() + " index=" + index;
+        return "LIST ADD-AT : " + sm + " field=" + getMemberMetaData().getName() + " index=" + index;
     }
 }

@@ -50,18 +50,18 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
 {
     private static final Object[] EMPTY_ARRAY = {};
 
-    /** ObjectProvider of the object we are copying values from. */
-    ObjectProvider op;
+    /** StateManager of the object we are copying values from. */
+    ObjectProvider sm;
 
     ExecutionContext ec;
 
     /** CachedPC that we are copying values into. */
     CachedPC cachedPC;
 
-    public L2CachePopulateFieldManager(ObjectProvider op, CachedPC cachedpc)
+    public L2CachePopulateFieldManager(ObjectProvider sm, CachedPC cachedpc)
     {
-        this.op = op;
-        this.ec = op.getExecutionContext();
+        this.sm = sm;
+        this.ec = sm.getExecutionContext();
         this.cachedPC = cachedpc;
     }
 
@@ -71,7 +71,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeBooleanField(int fieldNumber, boolean value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -95,7 +95,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeCharField(int fieldNumber, char value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -119,7 +119,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeByteField(int fieldNumber, byte value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -143,7 +143,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeShortField(int fieldNumber, short value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -167,7 +167,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeIntField(int fieldNumber, int value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -191,7 +191,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeLongField(int fieldNumber, long value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -215,7 +215,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeFloatField(int fieldNumber, float value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -239,7 +239,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeDoubleField(int fieldNumber, double value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -263,7 +263,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeStringField(int fieldNumber, String value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -287,7 +287,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     @Override
     public void storeObjectField(int fieldNumber, Object value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -349,7 +349,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             unwrappedContainer = ((SCO)container).getValue();
         }
          
-        TypeManager typeManager = op.getExecutionContext().getTypeManager();
+        TypeManager typeManager = sm.getExecutionContext().getTypeManager();
 
         if (mmd.hasMap())
         {
@@ -557,14 +557,14 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             return null;
         }
 
-        ObjectProvider valueOP = ec.findObjectProvider(pc);
-        CachedPC valueCachedPC = new CachedPC(pc.getClass(), valueOP.getLoadedFields(), null, null);
+        ObjectProvider valueSM = ec.findObjectProvider(pc);
+        CachedPC valueCachedPC = new CachedPC(pc.getClass(), valueSM.getLoadedFields(), null, null);
 
-        int[] loadedFields = valueOP.getLoadedFieldNumbers();
+        int[] loadedFields = valueSM.getLoadedFieldNumbers();
         if (loadedFields != null && loadedFields.length > 0)
         {
             // Set the values of any fields that are loaded
-            valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
+            valueSM.provideFields(loadedFields, new L2CachePopulateFieldManager(valueSM, valueCachedPC));
         }
 
         return valueCachedPC;

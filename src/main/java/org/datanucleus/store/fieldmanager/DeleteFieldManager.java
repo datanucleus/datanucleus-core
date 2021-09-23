@@ -38,27 +38,27 @@ import org.datanucleus.store.types.TypeManager;
 public class DeleteFieldManager extends AbstractFieldManager
 {
     /** ObjectProvider for the owning object. */
-    private final ObjectProvider op;
+    private final ObjectProvider sm;
 
     private boolean manageRelationships = false;
 
     /**
      * Constructor.
-     * @param op The ObjectProvider for the object.
+     * @param sm The ObjectProvider for the object.
      */
-    public DeleteFieldManager(ObjectProvider op)
+    public DeleteFieldManager(ObjectProvider sm)
     {
-        this(op, false);
+        this(sm, false);
     }
 
     /**
      * Constructor.
-     * @param op The ObjectProvider for the object.
+     * @param sm The ObjectProvider for the object.
      * @param manageRelationships Whether to make an attempt to manage relationships when bidir fields are affected by this deletion (RDBMS typically doesnt need this)
      */
-    public DeleteFieldManager(ObjectProvider op, boolean manageRelationships)
+    public DeleteFieldManager(ObjectProvider sm, boolean manageRelationships)
     {
-        this.op = op;
+        this.sm = sm;
         this.manageRelationships = manageRelationships;
     }
 
@@ -68,10 +68,10 @@ public class DeleteFieldManager extends AbstractFieldManager
      */
     protected void processPersistable(Object pc)
     {
-        ObjectProvider pcOP = op.getExecutionContext().findObjectProvider(pc);
-        if (pcOP != null)
+        ObjectProvider pcSM = sm.getExecutionContext().findObjectProvider(pc);
+        if (pcSM != null)
         {
-            if (pcOP.isDeleting() || pcOP.becomingDeleted())
+            if (pcSM.isDeleting() || pcSM.becomingDeleted())
             {
                 // Already becoming deleted so jump out
                 return;
@@ -79,7 +79,7 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
 
         // Delete it
-        op.getExecutionContext().deleteObjectInternal(pc);
+        sm.getExecutionContext().deleteObjectInternal(pc);
     }
 
     /**
@@ -91,8 +91,8 @@ public class DeleteFieldManager extends AbstractFieldManager
     {
         if (value != null)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            ExecutionContext ec = op.getExecutionContext();
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            ExecutionContext ec = sm.getExecutionContext();
             RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
 
             if (relationType != RelationType.NONE)
@@ -118,27 +118,27 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
         else if (manageRelationships && RelationType.isBidirectional(relationType) && !mmd.isEmbedded())
         {
-            ObjectProvider valueOP = ec.findObjectProvider(value);
-            if (valueOP != null && !valueOP.getLifecycleState().isDeleted() && !valueOP.isDeleting())
+            ObjectProvider valueSM = ec.findObjectProvider(value);
+            if (valueSM != null && !valueSM.getLifecycleState().isDeleted() && !valueSM.isDeleting())
             {
                 AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
                 if (relationType == RelationType.ONE_TO_ONE_BI)
                 {
-                    valueOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
-                    valueOP.flush();
+                    valueSM.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
+                    valueSM.flush();
                 }
                 else if (relationType == RelationType.MANY_TO_ONE_BI)
                 {
                     // Make sure field at other side is loaded, and remove from any Collection
-                    valueOP.loadField(relMmd.getAbsoluteFieldNumber());
-                    Object relValue = valueOP.provideField(relMmd.getAbsoluteFieldNumber());
+                    valueSM.loadField(relMmd.getAbsoluteFieldNumber());
+                    Object relValue = valueSM.provideField(relMmd.getAbsoluteFieldNumber());
                     if (relValue != null)
                     {
                         ContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(relMmd.getType());
                         if (containerHandler instanceof ElementContainerHandler)
                         {
                             ElementContainerAdapter adapter = (ElementContainerAdapter) containerHandler.getAdapter(relValue);
-                            adapter.remove(op.getObject());
+                            adapter.remove(sm.getObject());
                         }
                     }
                 }
@@ -148,7 +148,7 @@ public class DeleteFieldManager extends AbstractFieldManager
     
     private void processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd, ExecutionContext ec, RelationType relationType)
     {
-        TypeManager typeManager = op.getExecutionContext().getTypeManager();
+        TypeManager typeManager = sm.getExecutionContext().getTypeManager();
         ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
 
         if (mmd.hasMap())
@@ -168,7 +168,7 @@ public class DeleteFieldManager extends AbstractFieldManager
         
         if (dependentKey && dependentValue)
         {
-            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            ApiAdapter api = sm.getExecutionContext().getApiAdapter();
             
             // Process all keys and values of the Map that are PC
             for (Entry<Object, Object> entry : containerHandler.getAdapter(container).entries())
@@ -187,7 +187,7 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
         else if (dependentKey)
         {
-            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            ApiAdapter api = sm.getExecutionContext().getApiAdapter();
             
             // Process all keys of the Map that are PC
             for (Object key : containerHandler.getAdapter(container).keys())
@@ -200,7 +200,7 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
         else if (dependentValue)
         {
-            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            ApiAdapter api = sm.getExecutionContext().getApiAdapter();
             
             // Process all values of the Map that are PC
             for (Object value : containerHandler.getAdapter(container).values())
@@ -221,7 +221,7 @@ public class DeleteFieldManager extends AbstractFieldManager
             (mmd.getArray() != null && mmd.getArray().isDependentElement()))
         {
             // Process all elements of the container that are PC
-            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            ApiAdapter api = sm.getExecutionContext().getApiAdapter();
             for (Object element : containerHandler.getAdapter(container))
             {
                 if (api.isPersistable(element))
@@ -232,17 +232,17 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
         else if (manageRelationships && relationType == RelationType.ONE_TO_MANY_BI && !mmd.isEmbedded() && !mmd.getCollection().isEmbeddedElement())
         {
-            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            ApiAdapter api = sm.getExecutionContext().getApiAdapter();
             for (Object element : containerHandler.getAdapter(container))
             {
                 if (api.isPersistable(element))
                 {
-                    ObjectProvider elementOP = ec.findObjectProvider(element);
-                    if (elementOP != null && !elementOP.getLifecycleState().isDeleted() && !elementOP.isDeleting())
+                    ObjectProvider elementSM = ec.findObjectProvider(element);
+                    if (elementSM != null && !elementSM.getLifecycleState().isDeleted() && !elementSM.isDeleting())
                     {
                         AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
-                        elementOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
-                        elementOP.flush();
+                        elementSM.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
+                        elementSM.flush();
                     }
                 }
             }

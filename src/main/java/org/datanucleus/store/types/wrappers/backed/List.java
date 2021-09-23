@@ -79,7 +79,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
     protected transient boolean isCacheLoaded=false;
 
     /**
-     * Constructor, using the ObjectProvider of the "owner" and the field name.
+     * Constructor, using StateManager of the "owner" and the field name.
      * @param ownerOP The owner ObjectProvider
      * @param mmd Metadata for the member
      */

@@ -30,8 +30,8 @@ import org.datanucleus.state.ObjectProvider;
  */
 public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManager
 {
-    /** ObjectProvider of the instance being fetched (detached or made transient). **/
-    protected final ObjectProvider op;
+    /** StateManager of the instance being fetched (detached or made transient). **/
+    protected final ObjectProvider sm;
 
     /** Second class mutable fields for the class of this object. */
     protected final boolean[] secondClassMutableFields;
@@ -53,14 +53,14 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
 
     /**
      * Constructor for a field manager for fetch plan processing.
-     * @param op the ObjectProvider of the instance being processed.
+     * @param sm StateManager of the instance being processed.
      * @param secondClassMutableFields SCO field flags
      * @param fpClass Fetch Plan for the class of this instance
      * @param state Object containing the state of the fetch process
      */
-    public AbstractFetchDepthFieldManager(ObjectProvider op, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state)
+    public AbstractFetchDepthFieldManager(ObjectProvider sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state)
     {
-        this.op = op;
+        this.sm = sm;
         this.secondClassMutableFields = secondClassMutableFields;
         this.fpClass = fpClass;
         this.state = state;
@@ -75,7 +75,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     throws EndOfFetchPlanGraphException
     {
         AbstractMemberMetaData fmd = fpClass.getAbstractClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        final boolean requiresFCOFetching = MetaDataUtils.getInstance().storesFCO(fmd, op.getExecutionContext());
+        final boolean requiresFCOFetching = MetaDataUtils.getInstance().storesFCO(fmd, sm.getExecutionContext());
         final int maxFetchDepth = fpClass.getFetchPlan().getMaxFetchDepth();
         final int currentFetchDepth = state.getCurrentFetchDepth();
 
@@ -134,7 +134,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public boolean fetchBooleanField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchBooleanField(fieldNumber);
     }
 
@@ -144,7 +144,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public byte fetchByteField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchByteField(fieldNumber);
     }
 
@@ -154,7 +154,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public char fetchCharField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchCharField(fieldNumber);
     }
 
@@ -164,7 +164,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public double fetchDoubleField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchDoubleField(fieldNumber);
     }
 
@@ -174,7 +174,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public float fetchFloatField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchFloatField(fieldNumber);
     }
 
@@ -184,7 +184,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public int fetchIntField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchIntField(fieldNumber);
     }
 
@@ -194,7 +194,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public long fetchLongField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchLongField(fieldNumber);
     }
 
@@ -204,7 +204,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public short fetchShortField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchShortField(fieldNumber);
     }
 
@@ -214,7 +214,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     public String fetchStringField(int fieldNumber)
     {
         SingleValueFieldManager sfv = new SingleValueFieldManager();
-        op.provideFields(new int[]{fieldNumber}, sfv);
+        sm.provideFields(new int[]{fieldNumber}, sfv);
         return sfv.fetchStringField(fieldNumber);
     }
 }

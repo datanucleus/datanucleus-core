@@ -30,15 +30,15 @@ public class ListRemoveAtOperation<E> extends CollectionRemoveOperation<E>
     /** The index to remove. */
     final int index;
 
-    public ListRemoveAtOperation(ObjectProvider op, ListStore<E> store, int index)
+    public ListRemoveAtOperation(ObjectProvider sm, ListStore<E> store, int index)
     {
-        super(op, store, null, true);
+        super(sm, store, null, true);
         this.index = index;
     }
 
-    public ListRemoveAtOperation(ObjectProvider op, int fieldNum, int index, E value)
+    public ListRemoveAtOperation(ObjectProvider sm, int fieldNum, int index, E value)
     {
-        super(op, fieldNum, value, true);
+        super(sm, fieldNum, value, true);
         this.index = index;
     }
 
@@ -48,7 +48,7 @@ public class ListRemoveAtOperation<E> extends CollectionRemoveOperation<E>
     @Override
     public AbstractMemberMetaData getMemberMetaData()
     {
-        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        return store != null ? store.getOwnerMemberMetaData() : sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**
@@ -58,7 +58,7 @@ public class ListRemoveAtOperation<E> extends CollectionRemoveOperation<E>
     {
         if (store != null)
         {
-            ((ListStore)store).remove(op, index, -1);
+            ((ListStore)store).remove(sm, index, -1);
         }
     }
 
@@ -72,11 +72,11 @@ public class ListRemoveAtOperation<E> extends CollectionRemoveOperation<E>
      */
     public ObjectProvider getObjectProvider()
     {
-        return op;
+        return sm;
     }
 
     public String toString()
     {
-        return "LIST REMOVE-AT : " + op + " field=" + getMemberMetaData().getName() + " index=" + index;
+        return "LIST REMOVE-AT : " + sm + " field=" + getMemberMetaData().getName() + " index=" + index;
     }
 }
