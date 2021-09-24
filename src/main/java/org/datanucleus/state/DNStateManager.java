@@ -31,7 +31,7 @@ import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.transaction.Transaction;
 
 /**
- * StateManager for DataNucleus systems for a managed object.
+ * StateManager for DataNucleus systems for a managed object, extending the basic enhancement contract for a StateManager.
  * Each StateManager manages a single Persistable object.
  * 
  * TODO Drop the generics and use Persistable. This will require updates to ExecutionContext to match
