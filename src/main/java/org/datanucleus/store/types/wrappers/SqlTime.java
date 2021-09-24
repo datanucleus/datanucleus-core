@@ -29,18 +29,18 @@ import org.datanucleus.store.types.SCO;
  */
 public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient ObjectProvider ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
      * Creates a <i>SqlTime</i> object that represents the time at which it was allocated.
-     * @param op StateManager for the owning object
+     * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public SqlTime(ObjectProvider op, AbstractMemberMetaData mmd)
+    public SqlTime(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
         super(0);
-        this.ownerOP = op;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -72,7 +72,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
      **/
     public void unsetOwner()
     {
-        ownerOP = null;
+        ownerSM = null;
         ownerMmd = null;
     }
 
@@ -82,7 +82,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
      **/
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -99,12 +99,12 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
      */
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
     }

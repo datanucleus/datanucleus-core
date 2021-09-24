@@ -35,13 +35,13 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
 
     /**
      * Creates a <code>SqlTimestamp</code> object that represents the time at which it was allocated.
-     * @param op StateManager for the owning object
+     * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public SqlTimestamp(ObjectProvider op, AbstractMemberMetaData mmd)
+    public SqlTimestamp(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
         super(0);
-        this.ownerOP = op;
+        this.ownerOP = sm;
         this.ownerMmd = mmd;
     }
 

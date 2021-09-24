@@ -73,12 +73,12 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
 
     /**
      * Constructor. 
-     * @param op The ObjectProvider for this set.
+     * @param sm StateManager for this set.
      * @param mmd Metadata for the member
      */
-    public PriorityQueue(ObjectProvider op, AbstractMemberMetaData mmd)
+    public PriorityQueue(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
@@ -102,8 +102,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(sm, ownerMmd.getName(), this,
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(sm, ownerMmd)));
         }
     }
 

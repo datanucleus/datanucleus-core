@@ -50,7 +50,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
 
     /**
      * Constructor. 
-     * @param ownerOP The ObjectProvider for this set.
+     * @param ownerOP StateManager for this set.
      * @param mmd Metadata for the member
      **/
     public Queue(ObjectProvider ownerOP, AbstractMemberMetaData mmd)

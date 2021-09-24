@@ -78,12 +78,12 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
 
     /**
      * Constructor, using StateManager of the "owner" and the field name.
-     * @param op The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public Vector(ObjectProvider op, AbstractMemberMetaData mmd)
+    public Vector(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our delegate
         this.delegate = new java.util.Vector();

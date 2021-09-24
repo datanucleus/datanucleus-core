@@ -48,7 +48,7 @@ public class PersistFieldManager extends AbstractFieldManager
 
     /**
      * Constructor.
-     * @param sm The ObjectProvider for the object.
+     * @param sm StateManager for the object.
      * @param replaceSCOsWithWrappers Whether to swap any SCO field objects for SCO wrappers
      */
     public PersistFieldManager(ObjectProvider sm, boolean replaceSCOsWithWrappers)

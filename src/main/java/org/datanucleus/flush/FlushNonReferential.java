@@ -78,7 +78,7 @@ public class FlushNonReferential implements FlushProcess
      * finally all UPDATEs. The StorePersistenceHandler will get calls to <i>deleteObjects</i>, <i>insertObjects</i>
      * and <i>updateObject</i> (for each other one). Note that this is in a separate method to allow calls by
      * other FlushProcesses that want to take advantage of the basic flush method without 
-     * @param smsToFlush The ObjectProviders to process
+     * @param smsToFlush StateManagers to process
      * @param ec ExecutionContext
      * @return Any optimistic verification exceptions thrown during flush
      */

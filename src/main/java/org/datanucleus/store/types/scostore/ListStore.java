@@ -35,79 +35,79 @@ public interface ListStore<E> extends CollectionStore<E>
 {
     /**
      * Method to add an element to the List.
-     * @param op StateManager for the owner of the List. 
+     * @param sm StateManager for the owner of the List. 
      * @param element Element to add
      * @param index Position to add the element. 
      * @param size Current size of list (if known). -1 if not known
      */
-    void add(ObjectProvider op, E element, int index, int size);
+    void add(ObjectProvider sm, E element, int index, int size);
 
     /**
      * Method to add a collection of elements to the List.
-     * @param op StateManager for the owner of the List.
+     * @param sm StateManager for the owner of the List.
      * @param c Collection of elements to add
      * @param index Position to add the elements.
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether the elements were added ok
      */
-	boolean addAll(ObjectProvider op, Collection<E> c, int index, int size);
+	boolean addAll(ObjectProvider sm, Collection<E> c, int index, int size);
 
     /**
      * Method to remove an element from the List.
-     * @param op StateManager for the owner of the List.
+     * @param sm StateManager for the owner of the List.
      * @param index Position to remove the element.
      * @param size Current size of the list (if known). -1 if not known
      * @return The element that was removed.
      */
-	E remove(ObjectProvider op, int index, int size);
+	E remove(ObjectProvider sm, int index, int size);
 
     /**
      * Method to retrieve an element from a position in the List.
-     * @param op StateManager for the owner of the List.
+     * @param sm StateManager for the owner of the List.
      * @param index Position of the element.
      * @return The element at that position.
      */
-	E get(ObjectProvider op, int index);
+	E get(ObjectProvider sm, int index);
 
     /**
      * Method to update an element at a position in the List.
-     * @param op StateManager for the owner of the List.
+     * @param sm StateManager for the owner of the List.
      * @param index Position of the element.
      * @param element The element value
      * @param allowDependentField Whether to enable dependent field during this operation
      * @return The previous element at that position.
      */
-	Object set(ObjectProvider op, int index, Object element, boolean allowDependentField);
+	Object set(ObjectProvider sm, int index, Object element, boolean allowDependentField);
 
     /**
      * Accessor for a sublist of elements between from and to indices.
-     * @param op StateManager for the owner of the List.
+     * @param sm StateManager for the owner of the List.
      * @param from Start position (inclusive)
      * @param to End position (exclusive)
      * @return List of elements in this range.
      */
-	java.util.List subList(ObjectProvider op, int from, int to);
+	java.util.List subList(ObjectProvider sm, int from, int to);
 
     /**
      * Method to return the position of an element in the List.
-     * @param op StateManager for the owner of the List.
+     * @param sm StateManager for the owner of the List.
      * @param element The element value
      * @return The position of the element.
      */
-	int indexOf(ObjectProvider op, Object element);
+	int indexOf(ObjectProvider sm, Object element);
 
     /**
      * Method to return the last position of an element in the List.
-     * @param op StateManager for the owner of the List.
+     * @param sm StateManager for the owner of the List.
      * @param element The element value
      * @return The last position of the element.
      **/
-	int lastIndexOf(ObjectProvider op, Object element);
+	int lastIndexOf(ObjectProvider sm, Object element);
 
     /**
      * Accessor for a list iterator for the List.
-     * @param op StateManager for the owner of the List. 
+     * @param sm StateManager for the owner of the List. 
      * @return List iterator for the List.
      */
-	ListIterator<E> listIterator(ObjectProvider op);
+	ListIterator<E> listIterator(ObjectProvider sm);
 }

@@ -113,7 +113,7 @@ public interface TypeManager
     /**
      * Method to create a new SCO wrapper for the specified field replacing the old value with the new value. 
      * If the member value is a SCO already will just return the (new) value.
-     * @param ownerOP The ObjectProvider of the owner object
+     * @param ownerOP StateManager of the owner object
      * @param memberNumber The member number in the owner
      * @param newValue The value to initialise the wrapper with (if any) for this member
      * @param oldValue The previous value that we are replacing with this value

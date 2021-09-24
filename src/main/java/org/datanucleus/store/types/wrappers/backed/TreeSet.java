@@ -79,15 +79,15 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
     /**
      * Constructor, using StateManager of the "owner" and the field name.
-     * @param op The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public TreeSet(ObjectProvider op, AbstractMemberMetaData mmd)
+    public TreeSet(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        useCache = SCOUtils.useContainerCache(op, mmd);
+        useCache = SCOUtils.useContainerCache(sm, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {

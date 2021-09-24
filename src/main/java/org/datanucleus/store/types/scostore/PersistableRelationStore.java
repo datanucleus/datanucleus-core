@@ -28,25 +28,25 @@ public interface PersistableRelationStore extends Store
 {
     /**
      * Method to add the relation between the provided objects.
-     * @param op1 Object 1 provider
-     * @param op2 Object 2 provider
+     * @param sm1 Object 1 StateManager
+     * @param sm2 Object 2 StateManager
      * @return Whether the relation was added
      */
-    boolean add(ObjectProvider op1, ObjectProvider op2);
+    boolean add(ObjectProvider sm1, ObjectProvider sm2);
 
     /**
      * Method to remove the relation from the provided object.
-     * @param op1 Object 1 provider
+     * @param sm1 Object 1 StateManager
      * @return Whether the relation was removed
      */
-    boolean remove(ObjectProvider op1);
+    boolean remove(ObjectProvider sm1);
 
     /**
      * Method to update the relation for the first object to relate to the second object.
      * This removes any previous relation from this object and replaces it with the new relation.
-     * @param op1 Object 1 provider
-     * @param op2 Object 2 provider
+     * @param sm1 Object 1 StateManager
+     * @param sm2 Object 2 StateManager
      * @return Whether the relation was replaced
      */
-    boolean update(ObjectProvider op1, ObjectProvider op2);
+    boolean update(ObjectProvider sm1, ObjectProvider sm2);
 }

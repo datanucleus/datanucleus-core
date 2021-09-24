@@ -44,7 +44,7 @@ public class DeleteFieldManager extends AbstractFieldManager
 
     /**
      * Constructor.
-     * @param sm The ObjectProvider for the object.
+     * @param sm StateManager for the object.
      */
     public DeleteFieldManager(ObjectProvider sm)
     {
@@ -53,7 +53,7 @@ public class DeleteFieldManager extends AbstractFieldManager
 
     /**
      * Constructor.
-     * @param sm The ObjectProvider for the object.
+     * @param sm StateManager for the object.
      * @param manageRelationships Whether to make an attempt to manage relationships when bidir fields are affected by this deletion (RDBMS typically doesnt need this)
      */
     public DeleteFieldManager(ObjectProvider sm, boolean manageRelationships)

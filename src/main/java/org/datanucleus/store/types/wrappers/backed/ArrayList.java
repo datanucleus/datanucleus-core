@@ -76,29 +76,29 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
 
     /**
      * Constructor, using StateManager of the "owner" and the field name.
-     * @param op The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public ArrayList(ObjectProvider op, AbstractMemberMetaData mmd)
+    public ArrayList(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our delegate
         this.delegate = new java.util.ArrayList<E>();
 
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        useCache = SCOUtils.useContainerCache(op, mmd);
+        useCache = SCOUtils.useContainerCache(sm, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-            this.backingStore = (ListStore)((BackedSCOStoreManager)op.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.ArrayList.class);
+            ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+            this.backingStore = (ListStore)((BackedSCOStoreManager)sm.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.ArrayList.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(sm, ownerMmd.getName(), this,
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(sm, ownerMmd)));
         }
     }
 

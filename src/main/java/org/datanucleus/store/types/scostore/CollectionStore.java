@@ -40,85 +40,85 @@ public interface CollectionStore<E> extends Store
 
     /**
      * Method to update en embedded element in the collection.
-     * @param op StateManager for the owner of the collection
+     * @param sm StateManager for the owner of the collection
      * @param element The element
      * @param fieldNumber Field to update in the element
      * @param value The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value);
+    boolean updateEmbeddedElement(ObjectProvider sm, E element, int fieldNumber, Object value);
 
     // -------------------------- Collection Methods ---------------------------
  
     /**
      * Accessor for an iterator for the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      * @return Iterator for the collection.
      **/
-    Iterator<E> iterator(ObjectProvider op);
+    Iterator<E> iterator(ObjectProvider sm);
 
     /**
      * Accessor for the size of the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      * @return The size of the collection.
      **/
-    int size(ObjectProvider op);
+    int size(ObjectProvider sm);
 
     /**
      * Method to check if an element exists in the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      * @param element Element to check
      * @return Whether the element exists in the collection.
      **/
-    boolean contains(ObjectProvider op, Object element);
+    boolean contains(ObjectProvider sm, Object element);
 
     /**
      * Method to add an element to the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      * @param element Element to add
      * @param size Current size of the collection if known. -1 if not known
      * @return Whether the element was added ok
      */
-    boolean add(ObjectProvider op, E element, int size);
+    boolean add(ObjectProvider sm, E element, int size);
 
     /**
      * Method to add a collection of elements to the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      * @param elements Elements to add
      * @param size Current size of collection (if known). -1 if not known
      * @return Whether the elements were added ok
      */
-    boolean addAll(ObjectProvider op, Collection<E> elements, int size);
+    boolean addAll(ObjectProvider sm, Collection<E> elements, int size);
 
     /**
      * Method to remove an element from the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      * @param element Element to remove
      * @param size Current size of collection if known. -1 if not known
      * @param allowDependentField Whether to allow any cascading delete actions to be fired from this removal
      * @return Whether the element was removed ok
      */
-    boolean remove(ObjectProvider op, Object element, int size, boolean allowDependentField);
+    boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField);
 
     /**
      * Method to remove a collection of elements from the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      * @param elements Element to remove
      * @param size Current size of collection if known. -1 if not known
      * @return Whether the elements were removed ok
      */
-    boolean removeAll(ObjectProvider op, Collection elements, int size);
+    boolean removeAll(ObjectProvider sm, Collection elements, int size);
 
     /**
      * Method to clear the collection.
-     * @param op StateManager for the owner of the collection. 
+     * @param sm StateManager for the owner of the collection. 
      **/
-    void clear(ObjectProvider op);
+    void clear(ObjectProvider sm);
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op StateManager of the object
+     * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    void update(ObjectProvider op, Collection coll);
+    void update(ObjectProvider sm, Collection coll);
 }

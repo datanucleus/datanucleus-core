@@ -30,19 +30,19 @@ import org.datanucleus.store.types.SCO;
  */
 public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient ObjectProvider ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
      * Creates a <i>SqlDate</i> object that represents the time at which
      * it was allocated. Assigns owning object and field name.
-     * @param op StateManager for the owning object
+     * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public SqlDate(ObjectProvider op, AbstractMemberMetaData mmd)
+    public SqlDate(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
         super(0);
-        this.ownerOP = op;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -74,7 +74,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
      */
     public void unsetOwner()
     {
-        ownerOP = null;
+        ownerSM = null;
         ownerMmd = null;
     }
 
@@ -84,7 +84,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
      */
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -101,12 +101,12 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
      */
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
     }

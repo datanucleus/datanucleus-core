@@ -53,12 +53,12 @@ public class HashMap<K, V> extends org.datanucleus.store.types.wrappers.HashMap<
 
     /**
      * Constructor
-     * @param op the owner ObjectProvider
+     * @param sm the owner StateManager
      * @param mmd Metadata for the member
      */
-    public HashMap(ObjectProvider op, AbstractMemberMetaData mmd)
+    public HashMap(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our "delegate"
         this.delegate = new java.util.HashMap();

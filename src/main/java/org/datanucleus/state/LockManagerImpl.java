@@ -107,29 +107,29 @@ public class LockManagerImpl implements LockManager
     /* (non-Javadoc)
      * @see org.datanucleus.state.lock.LockManager#lock(org.datanucleus.ObjectProvider, org.datanucleus.state.LockMode)
      */
-    public void lock(ObjectProvider op, LockMode lockMode)
+    public void lock(ObjectProvider sm, LockMode lockMode)
     {
         if (lockModeByObjectProvider == null)
         {
             lockModeByObjectProvider = new HashMap<>();
         }
-        lockModeByObjectProvider.put(op, lockMode);
+        lockModeByObjectProvider.put(sm, lockMode);
 
         if (lockMode == LockMode.LOCK_PESSIMISTIC_READ || lockMode == LockMode.LOCK_PESSIMISTIC_WRITE)
         {
             // Do a SELECT ... FOR UPDATE (for RDBMS) or alternative to lock the object in the datastore
-            op.locate();
+            sm.locate();
         }
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.state.lock.LockManager#unlock(org.datanucleus.ObjectProvider)
      */
-    public void unlock(ObjectProvider op)
+    public void unlock(ObjectProvider sm)
     {
         if (lockModeByObjectProvider != null)
         {
-            lockModeByObjectProvider.remove(op);
+            lockModeByObjectProvider.remove(sm);
         }
         // TODO Need to remove any row lock from the datastore. How, if we did "SELECT ... FOR UPDATE" in RDBMS?
     }
@@ -137,16 +137,16 @@ public class LockManagerImpl implements LockManager
     /* (non-Javadoc)
      * @see org.datanucleus.state.lock.LockManager#getLockMode(org.datanucleus.ObjectProvider)
      */
-    public LockMode getLockMode(ObjectProvider op)
+    public LockMode getLockMode(ObjectProvider sm)
     {
-        if (op == null)
+        if (sm == null)
         {
             return LockMode.LOCK_NONE;
         }
 
         if (lockModeByObjectProvider != null)
         {
-            return lockModeByObjectProvider.containsKey(op) ? lockModeByObjectProvider.get(op) : LockMode.LOCK_NONE;
+            return lockModeByObjectProvider.containsKey(sm) ? lockModeByObjectProvider.get(sm) : LockMode.LOCK_NONE;
         }
         return LockMode.LOCK_NONE;
     }
@@ -154,16 +154,16 @@ public class LockManagerImpl implements LockManager
 
     /**
      * Perform an optimistic version check on the passed object, against the passed version in the datastore.
-     * @param op StateManager of the object to check
+     * @param sm StateManager of the object to check
      * @param versionStrategy Version strategy
      * @param versionDatastore Version of the object in the datastore
      * @throws NucleusUserException thrown when an invalid strategy is specified
      * @throws NucleusOptimisticException thrown when the version check fails
      */
-    public void performOptimisticVersionCheck(ObjectProvider op, VersionStrategy versionStrategy, Object versionDatastore)
+    public void performOptimisticVersionCheck(ObjectProvider sm, VersionStrategy versionStrategy, Object versionDatastore)
     {
         // Extract the version of the object (that we are updating)
-        Object versionObject = op.getTransactionalVersion();
+        Object versionObject = sm.getTransactionalVersion();
         if (versionObject == null)
         {
             return;
@@ -172,7 +172,7 @@ public class LockManagerImpl implements LockManager
         if (versionStrategy == null)
         {
             // No version specification so no check needed
-            NucleusLogger.PERSISTENCE.info(op.getClassMetaData().getFullClassName() + 
+            NucleusLogger.PERSISTENCE.info(sm.getClassMetaData().getFullClassName() + 
                 " has no version metadata so no check of version is required, since this will not have the version flag in its table");
             return;
         }
@@ -201,17 +201,17 @@ public class LockManagerImpl implements LockManager
         else if (versionStrategy == VersionStrategy.STATE_IMAGE)
         {
             // TODO Support state-image strategy
-            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionStrategy));
+            throw new NucleusUserException(Localiser.msg("032017", sm.getClassMetaData().getFullClassName(), versionStrategy));
         }
         else
         {
-            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionStrategy));
+            throw new NucleusUserException(Localiser.msg("032017", sm.getClassMetaData().getFullClassName(), versionStrategy));
         }
 
         if (!valid)
         {
-            throw new NucleusOptimisticException(Localiser.msg("032016", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
-                "" + versionDatastore, "" + versionObject), op.getObject());
+            throw new NucleusOptimisticException(Localiser.msg("032016", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), 
+                "" + versionDatastore, "" + versionObject), sm.getObject());
         }
     }
 

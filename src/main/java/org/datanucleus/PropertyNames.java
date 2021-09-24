@@ -88,9 +88,9 @@ public class PropertyNames
     public static final String PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD = "datanucleus.executionContext.reaperThread";
     public static final String PROPERTY_EXECUTION_CONTEXT_MAX_IDLE = "datanucleus.executionContext.maxIdle";
     public static final String PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION = "datanucleus.executionContext.closeActiveTxAction";
-    public static final String PROPERTY_OBJECT_PROVIDER_REAPER_THREAD = "datanucleus.objectProvider.reaperThread";
-    public static final String PROPERTY_OBJECT_PROVIDER_MAX_IDLE = "datanucleus.objectProvider.maxIdle";
-    public static final String PROPERTY_OBJECT_PROVIDER_CLASS_NAME = "datanucleus.objectProvider.className";
+    public static final String PROPERTY_OBJECT_PROVIDER_REAPER_THREAD = "datanucleus.objectProvider.reaperThread"; // TODO Rename as STATE_MANAGER
+    public static final String PROPERTY_OBJECT_PROVIDER_MAX_IDLE = "datanucleus.objectProvider.maxIdle"; // TODO Rename as STATE_MANAGER
+    public static final String PROPERTY_OBJECT_PROVIDER_CLASS_NAME = "datanucleus.objectProvider.className"; // TODO Rename as STATE_MANAGER
 
     public static final String PROPERTY_TRANSACTION_TYPE = "datanucleus.transaction.type";
     public static final String PROPERTY_TRANSACTION_ISOLATION = "datanucleus.transaction.isolation";

@@ -80,20 +80,20 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
 
     /**
      * Constructor.
-     * @param op The ObjectProvider for this collection.
+     * @param sm StateManager for this collection.
      * @param mmd Metadata for the member
      */
-    public Collection(ObjectProvider op, AbstractMemberMetaData mmd)
+    public Collection(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        useCache = SCOUtils.useContainerCache(op, mmd);
+        useCache = SCOUtils.useContainerCache(sm, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-            this.backingStore = (CollectionStore)((BackedSCOStoreManager)op.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
+            ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+            this.backingStore = (CollectionStore)((BackedSCOStoreManager)sm.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
         }
 
         // Set up our delegate
@@ -110,8 +110,8 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(sm, ownerMmd.getName(), this,
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(sm, ownerMmd)));
         }
     }
 

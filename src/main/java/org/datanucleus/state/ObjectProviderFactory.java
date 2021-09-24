@@ -32,11 +32,11 @@ public interface ObjectProviderFactory
     void close();
 
     /**
-     * Method to be called when an ObjectProvider is disconnected (finished with).
+     * Method to be called when an StateManager is disconnected (finished with).
      * This facilitates its reuse within a pool.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      */
-    void disconnectObjectProvider(ObjectProvider op);
+    void disconnectObjectProvider(ObjectProvider sm);
 
     /**
      * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
@@ -45,7 +45,7 @@ public interface ObjectProviderFactory
      * @param pcClass the class of the new instance to be created.
      * @param id the identity of the object.
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id);
 
@@ -56,7 +56,7 @@ public interface ObjectProviderFactory
      * @param id the identity of the object.
      * @param pc The object that is hollow that we are going to manage
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForHollowPreConstructed(ExecutionContext ec, Object id, T pc);
 
@@ -69,7 +69,7 @@ public interface ObjectProviderFactory
      * @param id the identity of the object.
      * @param fv the initial field values of the object.
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id, FieldValues fv);
 
@@ -79,7 +79,7 @@ public interface ObjectProviderFactory
      * @param id the identity of the object.
      * @param pc The object that is persistent that we are going to manage
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForPersistentClean(ExecutionContext ec, Object id, T pc);
 
@@ -90,7 +90,7 @@ public interface ObjectProviderFactory
      * @param pcClass the class of the new instance to be created.
      * @param fv the initial field values of the object.
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      * @deprecated Use newForHollowPopulated instead
      */
     <T> ObjectProvider<T> newForHollowPopulatedAppId(ExecutionContext ec, Class<T> pcClass, final FieldValues fv);
@@ -105,7 +105,7 @@ public interface ObjectProviderFactory
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
 
@@ -117,7 +117,7 @@ public interface ObjectProviderFactory
      * @param cmd Meta-data for the class that this is an instance of.
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
-     * @return The ObjectProvider
+     * @return StateManager
      */
     ObjectProvider newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber);
 
@@ -130,7 +130,7 @@ public interface ObjectProviderFactory
      * @param pc the instance being make persistent.
      * @param fv Any changes to make before inserting
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForPersistentNew(ExecutionContext ec, T pc, FieldValues fv);
 
@@ -142,7 +142,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pc the instance being make persistent.
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForTransactionalTransient(ExecutionContext ec, T pc);
 
@@ -153,7 +153,7 @@ public interface ObjectProviderFactory
      * @param id the identity of the object.
      * @param version the detached version
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForDetached(ExecutionContext ec, T pc, Object id, Object version);
 
@@ -164,7 +164,7 @@ public interface ObjectProviderFactory
      * @param ec Execution Context
      * @param pc the object being deleted from persistence
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForPNewToBeDeleted(ExecutionContext ec, T pc);
 
@@ -176,7 +176,7 @@ public interface ObjectProviderFactory
      * @param id Id to assign to the persistable object
      * @param cachedPC CachedPC object from the L2 cache
      * @param <T> Type of the persistable class
-     * @return The ObjectProvider
+     * @return StateManager
      */
     <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC cachedPC);
 }

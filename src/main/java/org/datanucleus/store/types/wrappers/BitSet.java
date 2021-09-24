@@ -30,18 +30,18 @@ import org.datanucleus.store.types.SCO;
  */
 public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient ObjectProvider ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
      * Creates a <i>BitSet</i> object. Assigns owning object and field name.
-     * @param op StateManager for the owning object
+     * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public BitSet(ObjectProvider op, AbstractMemberMetaData mmd)
+    public BitSet(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
         super();
-        this.ownerOP = op;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -81,7 +81,7 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
      **/
     public void unsetOwner()
     {
-        ownerOP = null;
+        ownerSM = null;
         ownerMmd = null;
     }
 
@@ -91,7 +91,7 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
      **/
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -108,12 +108,12 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
      **/
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
     }

@@ -78,24 +78,24 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
 
     /**
      * Constructor, using StateManager of the "owner" and the field name.
-     * @param op The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public SortedSet(ObjectProvider op, AbstractMemberMetaData mmd)
+    public SortedSet(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        useCache = SCOUtils.useContainerCache(op, mmd);
+        useCache = SCOUtils.useContainerCache(sm, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+            ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
             this.backingStore = (SetStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.SortedSet.class);
         }
 
         // Set up our delegate, using a suitable comparator
-        Comparator comparator = SCOUtils.getComparator(mmd, op.getExecutionContext().getClassLoaderResolver());
+        Comparator comparator = SCOUtils.getComparator(mmd, sm.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.TreeSet(comparator);

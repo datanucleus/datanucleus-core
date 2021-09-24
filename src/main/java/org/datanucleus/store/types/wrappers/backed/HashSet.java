@@ -80,12 +80,12 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
 
     /**
      * Constructor, using StateManager of the "owner" and the field name.
-     * @param op The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public HashSet(ObjectProvider op, AbstractMemberMetaData mmd)
+    public HashSet(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our delegate
         this.delegate = new java.util.HashSet();

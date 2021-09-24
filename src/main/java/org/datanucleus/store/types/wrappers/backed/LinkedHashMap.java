@@ -53,12 +53,12 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
 
     /**
      * Constructor
-     * @param op the owner of this Map
+     * @param sm the owner of this Map
      * @param mmd Metadata for the member
      */
-    public LinkedHashMap(ObjectProvider op, AbstractMemberMetaData mmd)
+    public LinkedHashMap(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our "delegate"
         this.delegate = new java.util.LinkedHashMap();

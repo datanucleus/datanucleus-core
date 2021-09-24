@@ -59,103 +59,103 @@ public interface MapStore<K, V> extends Store
  
     /**
      * Accessor for whether the Map contains this value.
-     * @param op StateManager for the owner of the map.
+     * @param sm StateManager for the owner of the map.
      * @param value The value to check
      * @return Whether it is contained.
      */
-    boolean containsValue(ObjectProvider op, Object value);
+    boolean containsValue(ObjectProvider sm, Object value);
 
     /**
      * Accessor for whether the Map contains this key.
-     * @param op StateManager for the owner of the map.
+     * @param sm StateManager for the owner of the map.
      * @param key The key to check
      * @return Whether it is contained.
      */
-    boolean containsKey(ObjectProvider op, Object key);
+    boolean containsKey(ObjectProvider sm, Object key);
 
     /**
      * Accessor for a value from the Map.
-     * @param op StateManager for the owner of the map. 
+     * @param sm StateManager for the owner of the map. 
      * @param key Key for the value.
      * @return Value for this key.
      */
-    V get(ObjectProvider op, Object key);
+    V get(ObjectProvider sm, Object key);
 
     /**
      * Method to add a value to the Map against this key.
-     * @param op StateManager for the owner of the map. 
+     * @param sm StateManager for the owner of the map. 
      * @param key The key.
      * @param value The value.
      * @return Value that was previously against this key.
      */
-    V put(ObjectProvider op, K key, V value);
+    V put(ObjectProvider sm, K key, V value);
 
     /**
      * Method to add a value to the Map against this key, where we know the previous value for the key (if present).
      * Default implementation simply calls the <cite>put(ObjectProvider, Object, Object)</cite> method.
      * Override to provide an efficient implementation for this action.
-     * @param op StateManager for the owner of the map. 
+     * @param sm StateManager for the owner of the map. 
      * @param key The key.
      * @param value The value.
      * @param previousValue The previous value
      * @param present Whether the key is present
      */
-    default void put(ObjectProvider op, K key, V value, V previousValue, boolean present)
+    default void put(ObjectProvider sm, K key, V value, V previousValue, boolean present)
     {
-        put(op, key, value);
+        put(sm, key, value);
     }
 
     /**
      * Method to add a map of values to the Map.
-     * @param op StateManager for the owner of the map. 
+     * @param sm StateManager for the owner of the map. 
      * @param m The map to put.
      */ 
-    void putAll(ObjectProvider op, Map<? extends K, ? extends V> m);
+    void putAll(ObjectProvider sm, Map<? extends K, ? extends V> m);
 
     /**
      * Method to add a map of values to the Map where we know the existing Map values prior to the putAll call.
-     * @param op StateManager for the owner of the map.
+     * @param sm StateManager for the owner of the map.
      * @param m The map to add.
      * @param previousMap The map prior to the putAll call.
      */
-    default void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> previousMap)
+    default void putAll(ObjectProvider<?> sm, Map<? extends K, ? extends V> m, Map<K, V> previousMap)
     {
-        putAll(op, m);
+        putAll(sm, m);
     }
 
     /**
      * Method to remove a value from the Map.
-     * @param op StateManager for the owner of the map. 
+     * @param sm StateManager for the owner of the map. 
      * @param key Key whose value is to be removed.
      * @return Value that was removed.
      */
-    V remove(ObjectProvider op, Object key);
+    V remove(ObjectProvider sm, Object key);
 
     /**
      * Method to remove a value from the Map where we know the value assigned to this key (to avoid lookups).
-     * @param op StateManager for the owner of the map. 
+     * @param sm StateManager for the owner of the map. 
      * @param key Key whose value is to be removed.
      * @param val Value for this key when the value is known (to save the lookup)
      */
-    void remove(ObjectProvider op, Object key, Object val);
+    void remove(ObjectProvider sm, Object key, Object val);
 
     /**
      * Method to clear the map.
-     * @param op StateManager for the owner of the map. 
+     * @param sm StateManager for the owner of the map. 
      */
-    void clear(ObjectProvider op);
+    void clear(ObjectProvider sm);
 
     /**
      * Method to update the map to be the supplied map of entries.
      * Default implementation simply does a clear followed by putAll.
      * Override this and provide an efficient implementation for this action.
-     * @param op StateManager of the object
+     * @param sm StateManager of the object
      * @param map The map to use
      */
-    default void update(ObjectProvider op, Map<K, V> map)
+    default void update(ObjectProvider sm, Map<K, V> map)
     {
-        clear(op);
-        putAll(op, map, Collections.emptyMap());
+        clear(sm);
+        putAll(sm, map, Collections.emptyMap());
     }
 
     /**
@@ -178,21 +178,21 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to update an embedded key in the map.
-     * @param op StateManager for the owner of the map
+     * @param sm StateManager for the owner of the map
      * @param key The element
      * @param fieldNumber Field to update in the key
      * @param newValue The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue);
+    boolean updateEmbeddedKey(ObjectProvider sm, Object key, int fieldNumber, Object newValue);
 
     /**
      * Method to update an embedded value in the map.
-     * @param op StateManager for the owner of the map
+     * @param sm StateManager for the owner of the map
      * @param value The element
      * @param fieldNumber Field to update in the value
      * @param newValue The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue);
+    boolean updateEmbeddedValue(ObjectProvider sm, Object value, int fieldNumber, Object newValue);
 }

@@ -56,12 +56,12 @@ public class SortedMap<K, V> extends org.datanucleus.store.types.wrappers.Sorted
 
     /**
      * Constructor
-     * @param op the owner ObjectProvider
+     * @param sm the owner StateManager
      * @param mmd Metadata for the member
      */
-    public SortedMap(ObjectProvider op, AbstractMemberMetaData mmd)
+    public SortedMap(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our delegate, using a suitable comparator
         ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
@@ -78,7 +78,7 @@ public class SortedMap<K, V> extends org.datanucleus.store.types.wrappers.Sorted
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(sm, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(sm, ownerMmd)));
         }
     }
 

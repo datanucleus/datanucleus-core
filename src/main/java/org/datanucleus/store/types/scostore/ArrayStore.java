@@ -31,36 +31,36 @@ public interface ArrayStore<E> extends Store
 {
     /**
      * Accessor for an iterator for the array.
-     * @param op StateManager for the owner of the array. 
+     * @param sm StateManager for the owner of the array. 
      * @return Iterator for the array.
      **/
-    Iterator<E> iterator(ObjectProvider op);
+    Iterator<E> iterator(ObjectProvider sm);
 
     /**
      * Method to retrieve the elements of the array.
-     * @param op StateManager for the owner of the array
+     * @param sm StateManager for the owner of the array
      * @return The List of elements in the array (in the same order)
      */
-    List<E> getArray(ObjectProvider op);
+    List<E> getArray(ObjectProvider sm);
 
     /**
      * Accessor for the size of the array.
-     * @param op StateManager for the owner of the array. 
+     * @param sm StateManager for the owner of the array. 
      * @return The size of the array.
      */
-    int size(ObjectProvider op);
+    int size(ObjectProvider sm);
 
     /**
      * Method to clear the array.
-     * @param op StateManager for the owner of the array. 
+     * @param sm StateManager for the owner of the array. 
      */
-    void clear(ObjectProvider op);
+    void clear(ObjectProvider sm);
 
     /**
      * Method to set the elements in the array.
-     * @param op StateManager for the owner of the array.
+     * @param sm StateManager for the owner of the array.
      * @param array The array
      * @return Whether the elements were added ok
      */
-	boolean set(ObjectProvider op, Object array);
+	boolean set(ObjectProvider sm, Object array);
 }

@@ -3276,18 +3276,18 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * Convenience method to retrieve the detach state from the passed ObjectProvider's object.
-     * @param op StateManager
+     * Convenience method to retrieve the detach state from the passed StateManager's object.
+     * @param sm StateManager
      */
-    public void retrieveDetachState(ObjectProvider op)
+    public void retrieveDetachState(ObjectProvider sm)
     {
-        if (op.getObject() instanceof Detachable)
+        if (sm.getObject() instanceof Detachable)
         {
-            ((StateManagerImpl)op).flags |= FLAG_RETRIEVING_DETACHED_STATE;
+            ((StateManagerImpl)sm).flags |= FLAG_RETRIEVING_DETACHED_STATE;
 
-            ((Detachable)op.getObject()).dnReplaceDetachedState();
+            ((Detachable)sm.getObject()).dnReplaceDetachedState();
 
-            ((StateManagerImpl)op).flags &= ~FLAG_RETRIEVING_DETACHED_STATE;
+            ((StateManagerImpl)sm).flags &= ~FLAG_RETRIEVING_DETACHED_STATE;
         }
     }
 
@@ -3399,7 +3399,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 // Notify any owners that embed this object that it has just changed
                 for (EmbeddedOwnerRelation owner : embeddedOwners)
                 {
-                    StateManagerImpl ownerOP = (StateManagerImpl) owner.getOwnerOP();
+                    StateManagerImpl ownerOP = (StateManagerImpl) owner.getOwnerSM();
 
                     if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
                     {
@@ -4180,7 +4180,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             // We do this before we actually change the object so we can compare with the old value
             for (EmbeddedOwnerRelation ownerRel : embeddedOwners)
             {
-                StateManagerImpl ownerOP = (StateManagerImpl) ownerRel.getOwnerOP();
+                StateManagerImpl ownerOP = (StateManagerImpl) ownerRel.getOwnerSM();
 
                 AbstractMemberMetaData ownerMmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(ownerRel.getOwnerFieldNum());
                 if (ownerMmd.getCollection() != null)

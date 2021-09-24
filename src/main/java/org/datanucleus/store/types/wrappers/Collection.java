@@ -51,7 +51,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
 
     /**
      * Constructor. Called from CollectionMapping. 
-     * @param ownerOP The ObjectProvider for this collection.
+     * @param ownerOP StateManager for this collection.
      * @param mmd Metadata for the member
      */
     public Collection(ObjectProvider ownerOP, AbstractMemberMetaData mmd)

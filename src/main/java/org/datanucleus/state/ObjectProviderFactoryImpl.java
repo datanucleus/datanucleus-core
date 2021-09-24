@@ -38,32 +38,32 @@ import org.datanucleus.util.StringUtils;
  */
 public class ObjectProviderFactoryImpl implements ObjectProviderFactory
 {
-    Class opClass = null;
+    Class smClass = null;
 
-    public static final Class[] OBJECT_PROVIDER_CTR_ARG_CLASSES = new Class[] {ClassConstants.EXECUTION_CONTEXT, AbstractClassMetaData.class};
+    public static final Class[] STATE_MANAGER_CTR_ARG_CLASSES = new Class[] {ClassConstants.EXECUTION_CONTEXT, AbstractClassMetaData.class};
 
-    // Single pool of all ObjectProvider objects. TODO Consider having one pool per object type.
-//    ObjectProviderPool opPool = null;
+    // Single pool of all StateManager objects. TODO Consider having one pool per object type.
+//    ObjectProviderPool smPool = null;
 
     public ObjectProviderFactoryImpl(PersistenceNucleusContext nucCtx)
     {
         Configuration conf = nucCtx.getConfiguration();
-        String opClassName = conf.getStringProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_CLASS_NAME);
-        if (StringUtils.isWhitespace(opClassName))
+        String smClassName = conf.getStringProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_CLASS_NAME);
+        if (StringUtils.isWhitespace(smClassName))
         {
-            // Use default ObjectProvider for the StoreManager
-            opClassName = nucCtx.getStoreManager().getDefaultObjectProviderClassName();
+            // Use default StateManager for the StoreManager
+            smClassName = nucCtx.getStoreManager().getDefaultObjectProviderClassName();
         }
-        opClass = nucCtx.getClassLoaderResolver(null).classForName(opClassName);
+        smClass = nucCtx.getClassLoaderResolver(null).classForName(smClassName);
 
-//        opPool = new ObjectProviderPool(conf.getIntProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_MAX_IDLE),
+//        smPool = new ObjectProviderPool(conf.getIntProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_MAX_IDLE),
 //            conf.getBooleanProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_REAPER_THREAD),
-//            opClass);
+//            smClass);
     }
 
     public void close()
     {
-//        opPool.close();
+//        smPool.close();
     }
 
     /**
@@ -77,9 +77,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForHollow(id, null, cls);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForHollow(id, null, cls);
+        return sm;
     }
 
     /**
@@ -95,9 +95,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForHollow(id, fv, cls);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForHollow(id, fv, cls);
+        return sm;
     }
 
     /**
@@ -110,9 +110,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     public <T> ObjectProvider<T> newForHollowPreConstructed(ExecutionContext ec, Object id, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForHollowPreConstructed(id, pc);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForHollowPreConstructed(id, pc);
+        return sm;
     }
 
     /**
@@ -127,9 +127,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForHollowAppId(fv, cls);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForHollowAppId(fv, cls);
+        return sm;
     }
 
     /**
@@ -141,9 +141,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     public <T> ObjectProvider<T> newForPersistentClean(ExecutionContext ec, Object id, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForPersistentClean(id, pc);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForPersistentClean(id, pc);
+        return sm;
     }
 
     /**
@@ -153,19 +153,19 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pc The persistable to manage (see copyPc also)
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
-     * @param ownerOP Owner ObjectProvider
+     * @param ownerSM Owner StateManager
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    public <T> ObjectProvider<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber)
+    public <T> ObjectProvider<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, ObjectProvider ownerSM, int ownerFieldNumber)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForEmbedded(pc, copyPc);
-        if (ownerOP != null)
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForEmbedded(pc, copyPc);
+        if (ownerSM != null)
         {
-            ec.registerEmbeddedRelation(ownerOP, ownerFieldNumber, op);
+            ec.registerEmbeddedRelation(ownerSM, ownerFieldNumber, sm);
         }
-        return op;
+        return sm;
     }
 
     /**
@@ -174,19 +174,19 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * assigned an identity in the process since it is a SCO.
      * @param ec ExecutionContext
      * @param cmd Meta-data for the class that this is an instance of.
-     * @param ownerOP Owner ObjectProvider
+     * @param ownerSM Owner StateManager
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    public ObjectProvider newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber)
+    public ObjectProvider newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, ObjectProvider ownerSM, int ownerFieldNumber)
     {
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
-        ObjectProvider op = newForHollow(ec, pcClass, null);
-        op.initialiseForEmbedded(op.getObject(), false);
-        if (ownerOP != null)
+        ObjectProvider sm = newForHollow(ec, pcClass, null);
+        sm.initialiseForEmbedded(sm.getObject(), false);
+        if (ownerSM != null)
         {
-            ec.registerEmbeddedRelation(ownerOP, ownerFieldNumber, op);
+            ec.registerEmbeddedRelation(ownerSM, ownerFieldNumber, sm);
         }
-        return op;
+        return sm;
     }
 
     /**
@@ -201,9 +201,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     public <T> ObjectProvider<T> newForPersistentNew(ExecutionContext ec, T pc, FieldValues preInsertChanges)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForPersistentNew(pc, preInsertChanges);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForPersistentNew(pc, preInsertChanges);
+        return sm;
     }
 
     /**
@@ -217,9 +217,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     public <T> ObjectProvider<T> newForTransactionalTransient(ExecutionContext ec, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForTransactionalTransient(pc);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForTransactionalTransient(pc);
+        return sm;
     }
 
     /**
@@ -232,9 +232,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     public <T> ObjectProvider<T> newForDetached(ExecutionContext ec, T pc, Object id, Object version)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForDetached(pc, id, version);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForDetached(pc, id, version);
+        return sm;
     }
 
     /**
@@ -247,9 +247,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     public <T> ObjectProvider<T> newForPNewToBeDeleted(ExecutionContext ec, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForPNewToBeDeleted(pc);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForPNewToBeDeleted(pc);
+        return sm;
     }
 
     /**
@@ -263,26 +263,26 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     public <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC cachedPC)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
-        ObjectProvider op = getObjectProvider(ec, cmd);
-        op.initialiseForCachedPC(cachedPC, id);
-        return op;
+        ObjectProvider sm = getObjectProvider(ec, cmd);
+        sm.initialiseForCachedPC(cachedPC, id);
+        return sm;
     }
 
     /**
-     * Hook to allow an ObjectProvider to mark itself as disconnected so that it is returned to the pool.
-     * @param op The ObjectProvider to re-pool
+     * Hook to allow a StateManager to mark itself as disconnected so that it is returned to the pool.
+     * @param sm StateManager to re-pool
      */
-    public void disconnectObjectProvider(ObjectProvider op)
+    public void disconnectObjectProvider(ObjectProvider sm)
     {
         // TODO Enable this when the pool is working in multithreaded mode [NUCCORE-1007]
-//        opPool.checkIn(op);
+//        smPool.checkIn(sm);
     }
 
     protected ObjectProvider getObjectProvider(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        return (ObjectProvider) ClassUtils.newInstance(opClass, OBJECT_PROVIDER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
+        return (ObjectProvider) ClassUtils.newInstance(smClass, STATE_MANAGER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
         // TODO Enable this when the pool is working in multithreaded mode [NUCCORE-1007]
-//        return opPool.checkOut(ec, cmd);
+//        return smPool.checkOut(ec, cmd);
     }
 
     private Class getInitialisedClassForClass(Class pcCls, ClassLoaderResolver clr)

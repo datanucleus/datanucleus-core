@@ -36,11 +36,11 @@ public class IllegalStateTransitionException extends NucleusException
      * Constructs an illegal state transition exception.
      * @param state The object's current life-cycle state.
      * @param transition A string describing the type of transition.
-     * @param op StateManager for the object.
+     * @param sm StateManager for the object.
      */
-    public IllegalStateTransitionException(LifeCycleState state, String transition, ObjectProvider op)
+    public IllegalStateTransitionException(LifeCycleState state, String transition, ObjectProvider sm)
     {
-        super(Localiser.msg("026027", transition, state, op));
+        super(Localiser.msg("026027", transition, state, sm));
         setFatal();
     }
 }

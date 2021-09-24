@@ -49,7 +49,7 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
 
     /**
      * Constructor. 
-     * @param ownerOP The ObjectProvider for this set.
+     * @param ownerOP StateManager for this set.
      * @param mmd Metadata for the member
      **/
     public PriorityQueue(ObjectProvider ownerOP, AbstractMemberMetaData mmd)

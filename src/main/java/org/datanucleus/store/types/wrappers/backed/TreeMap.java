@@ -57,12 +57,12 @@ public class TreeMap<K, V> extends org.datanucleus.store.types.wrappers.TreeMap<
 
     /**
      * Constructor
-     * @param op the owner ObjectProvider
+     * @param sm the owner StateManager
      * @param mmd Metadata for the member
      */
-    public TreeMap(ObjectProvider op, AbstractMemberMetaData mmd)
+    public TreeMap(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our delegate, using a comparator
         ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
@@ -78,7 +78,7 @@ public class TreeMap<K, V> extends org.datanucleus.store.types.wrappers.TreeMap<
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(sm, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(sm, ownerMmd)));
         }
     }
 

@@ -33,7 +33,7 @@ public interface Level1Cache extends Map<Object, ObjectProvider>
     /**
      * Method to retrieve StateManager for the specified unique key.
      * @param key Unique key
-     * @return The ObjectProvider if one is cached for this unique key
+     * @return StateManager if one is cached for this unique key
      */
     ObjectProvider getUnique(CacheUniqueKey key);
 

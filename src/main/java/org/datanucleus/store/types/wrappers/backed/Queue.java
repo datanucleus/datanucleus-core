@@ -74,12 +74,12 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
 
     /**
      * Constructor. 
-     * @param op The ObjectProvider for this set.
+     * @param sm StateManager for this set.
      * @param mmd Metadata for the member
      **/
-    public Queue(ObjectProvider op, AbstractMemberMetaData mmd)
+    public Queue(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our delegate, using suitable comparator (DN extension to JDO)
         Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerOP.getExecutionContext().getClassLoaderResolver());

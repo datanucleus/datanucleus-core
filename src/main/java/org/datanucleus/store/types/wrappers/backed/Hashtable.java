@@ -52,12 +52,12 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
 
     /**
      * Constructor
-     * @param op the owner of this Map
+     * @param sm the owner of this Map
      * @param mmd Metadata for the member
      */
-    public Hashtable(ObjectProvider op, AbstractMemberMetaData mmd)
+    public Hashtable(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        super(op, mmd);
+        super(sm, mmd);
 
         // Set up our "delegate"
         this.delegate = new java.util.Hashtable();

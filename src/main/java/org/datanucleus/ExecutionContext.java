@@ -218,7 +218,7 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to find StateManager for the passed persistable object when it is managed by this manager.
      * @param pc The persistable object
-     * @return The ObjectProvider
+     * @return StateManager
      */
     ObjectProvider findObjectProvider(Object pc);
 
@@ -227,7 +227,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * and if not yet persistent to persist it and return the assigned ObjectProvider.
      * @param pc The persistable object
      * @param persist Whether to persist if not yet persistent
-     * @return The ObjectProvider
+     * @return StateManager
      */
     ObjectProvider findObjectProvider(Object pc, boolean persist);
 
@@ -237,7 +237,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param value The embedded object
      * @param owner The owner ObjectProvider (if known).
      * @param mmd Metadata for the field of the owner
-     * @return The ObjectProvider for the embedded object
+     * @return StateManager for the embedded object
      */
     ObjectProvider findObjectProviderForEmbedded(Object value, ObjectProvider owner, AbstractMemberMetaData mmd);
 
@@ -245,15 +245,15 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to add the object managed by the specified ObjectProvider to the cache.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      */
-    void addObjectProviderToCache(ObjectProvider op);
+    void addObjectProviderToCache(ObjectProvider sm);
 
     /**
      * Method to remove the object managed by the specified ObjectProvider from the cache.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      */
-    void removeObjectProviderFromCache(ObjectProvider op);
+    void removeObjectProviderFromCache(ObjectProvider sm);
 
     /**
      * Method to evict the passed object.
@@ -439,21 +439,21 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to attach the passed object (and related objects).
      * Throws an exception if another (persistent) object with the same id exists in the L1 cache already.
-     * @param op StateManager of the owning object that has this in a field causing its attach
+     * @param sm StateManager of the owning object that has this in a field causing its attach
      * @param pc The (detached) object
      * @param sco Whether the object has no identity (embedded or serialised)
      */
-    void attachObject(ObjectProvider op, Object pc, boolean sco);
+    void attachObject(ObjectProvider sm, Object pc, boolean sco);
 
     /**
      * Method to attach a copy of the passed object (and related objects).
-     * @param op StateManager of the owning object that has this in a field causing its attach
+     * @param sm StateManager of the owning object that has this in a field causing its attach
      * @param pc The object
      * @param sco Whether it has no identity (second-class object)
      * @param <T> Type of the persistable object
      * @return The attached copy of the input object
      */
-    <T> T attachObjectCopy(ObjectProvider op, T pc, boolean sco);
+    <T> T attachObjectCopy(ObjectProvider sm, T pc, boolean sco);
 
     /**
      * Convenience method to return the attached object for the specified id if one exists.
@@ -475,9 +475,9 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to enlist the specified ObjectProvider in the current transaction.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      */
-    void enlistInTransaction(ObjectProvider op);
+    void enlistInTransaction(ObjectProvider sm);
 
     /**
      * Method to return if an object is enlisted in the current transaction.
@@ -488,22 +488,22 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to evict the specified ObjectProvider from the current transaction.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      */
-    void evictFromTransaction(ObjectProvider op);
+    void evictFromTransaction(ObjectProvider sm);
 
     /**
      * Mark the specified ObjectProvider as dirty
-     * @param op StateManager
+     * @param sm StateManager
      * @param directUpdate Whether the object has had a direct update made on it (if known)
      */
-    void markDirty(ObjectProvider op, boolean directUpdate);
+    void markDirty(ObjectProvider sm, boolean directUpdate);
 
     /**
      * Mark the specified ObjectProvider as clean.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      */
-    void clearDirty(ObjectProvider op);
+    void clearDirty(ObjectProvider sm);
 
     /**
      * Method to mark as clean all ObjectProviders of dirty objects.
@@ -607,9 +607,9 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to put a Persistable object associated to StateManager into the L1 cache.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      */
-    void putObjectIntoLevel1Cache(ObjectProvider op);
+    void putObjectIntoLevel1Cache(ObjectProvider sm);
 
     /**
      * Convenience method to access an object in the cache.
@@ -778,9 +778,9 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to flush all queued operations for the specified backing store (if any).
      * @param backingStore The backing store
-     * @param op StateManager
+     * @param sm StateManager
      */
-    void flushOperationsForBackingStore(Store backingStore, ObjectProvider op);
+    void flushOperationsForBackingStore(Store backingStore, ObjectProvider sm);
 
     /**
      * Convenience method to inspect the list of objects with outstanding changes to flush.
@@ -802,10 +802,10 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Accessor for the RelationshipManager for the provided ObjectProvider.
-     * @param op StateManager
+     * @param sm StateManager
      * @return The RelationshipManager
      */
-    RelationshipManager getRelationshipManager(ObjectProvider op);
+    RelationshipManager getRelationshipManager(ObjectProvider sm);
 
     /**
      * Returns whether this ExecutionContext is currently performing the manage relationships task.
@@ -903,17 +903,17 @@ public interface ExecutionContext extends ExecutionContextReference
      * When attaching and this is the newly attached object this returns the detached object.
      * When detaching and this is the newly detached object this returns the attached object.
      * When detaching and this is the attached object this returns the newly detached object.
-     * @param op Object provider
+     * @param sm Object provider
      * @return The referenced object (if any)
      */
-    Object getAttachDetachReferencedObject(ObjectProvider op);
+    Object getAttachDetachReferencedObject(ObjectProvider sm);
 
     /**
      * Register a referenced object against this ObjectProvider for the attach/detach process.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      * @param obj The referenced object (or null to clear out any reference)
      */
-    void setAttachDetachReferencedObject(ObjectProvider op, Object obj);
+    void setAttachDetachReferencedObject(ObjectProvider sm, Object obj);
 
     /**
      * Method to register an embedded relation for the specified memberf of the owner ObjectProvider
@@ -933,21 +933,21 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Accessor for the relations for the specified embedded ObjectProvider where it is embedded.
-     * @param ownerOP The ObjectProvider that owns the embedded
+     * @param ownerOP StateManager that owns the embedded
      * @return The List of embedded relations involving this ObjectProvider as owner
      */
     List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(ObjectProvider ownerOP);
 
     /**
      * Accessor for the relations for the specified embedded ObjectProvider where it is embedded.
-     * @param embOP The ObjectProvider that is embedded
+     * @param embOP StateManager that is embedded
      * @return The List of embedded relations involving this ObjectProvider as embedded
      */
     List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(ObjectProvider embOP);
 
     /**
      * Accessor for the owner objects for the provided embedded StateManager.
-     * @param embOP The ObjectProvider that is embedded
+     * @param embOP StateManager that is embedded
      * @return The owner object(s) that have this object embedded.
      */
     ObjectProvider[] getOwnersForEmbeddedObjectProvider(ObjectProvider embOP);
@@ -962,25 +962,25 @@ public interface ExecutionContext extends ExecutionContextReference
 
     public static class EmbeddedOwnerRelation
     {
-        protected ObjectProvider ownerOP;
+        protected ObjectProvider ownerSM;
         protected int ownerFieldNum;
-        protected ObjectProvider embOP;
+        protected ObjectProvider embSM;
 
-        public EmbeddedOwnerRelation(ObjectProvider ownerOP, int ownerFieldNum, ObjectProvider embOP)
+        public EmbeddedOwnerRelation(ObjectProvider ownerSM, int ownerFieldNum, ObjectProvider embSM)
         {
-            this.ownerOP = ownerOP;
+            this.ownerSM = ownerSM;
             this.ownerFieldNum = ownerFieldNum;
-            this.embOP = embOP;
+            this.embSM = embSM;
         }
-        public ObjectProvider getOwnerOP() {return ownerOP;}
-        public ObjectProvider getEmbeddedOP() {return embOP;}
+        public ObjectProvider getOwnerSM() {return ownerSM;}
+        public ObjectProvider getEmbeddedSM() {return embSM;}
         public int getOwnerFieldNum() {return ownerFieldNum;}
     }
 
-    void setObjectProviderAssociatedValue(ObjectProvider op, Object key, Object value);
-    Object getObjectProviderAssociatedValue(ObjectProvider op, Object key);
-    void removeObjectProviderAssociatedValue(ObjectProvider op, Object key);
-    boolean containsObjectProviderAssociatedValue(ObjectProvider op, Object key);
+    void setObjectProviderAssociatedValue(ObjectProvider sm, Object key, Object value);
+    Object getObjectProviderAssociatedValue(ObjectProvider sm, Object key);
+    void removeObjectProviderAssociatedValue(ObjectProvider sm, Object key);
+    boolean containsObjectProviderAssociatedValue(ObjectProvider sm, Object key);
 
     /**
      * Register a listener to be called when this ExecutionContext is closing.

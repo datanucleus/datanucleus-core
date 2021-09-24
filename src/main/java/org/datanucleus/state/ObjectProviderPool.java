@@ -37,7 +37,7 @@ public class ObjectProviderPool
     private long maxIdle = 100;
     private long expirationTime;
 
-    private Map<ObjectProvider, Long> recyclableOps;
+    private Map<ObjectProvider, Long> recyclableSMs;
 
     private CleanUpThread cleaner;
 
@@ -47,7 +47,7 @@ public class ObjectProviderPool
     {
         this.maxIdle = maxIdle;
         this.expirationTime = 30000; // 30 seconds
-        this.recyclableOps = new ConcurrentHashMap<>();
+        this.recyclableSMs = new ConcurrentHashMap<>();
         this.opClass = opClass;
 
         if (reaperThread)
@@ -73,84 +73,84 @@ public class ObjectProviderPool
 
     protected ObjectProvider create(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        return (ObjectProvider) ClassUtils.newInstance(opClass, ObjectProviderFactoryImpl.OBJECT_PROVIDER_CTR_ARG_CLASSES, 
+        return (ObjectProvider) ClassUtils.newInstance(opClass, ObjectProviderFactoryImpl.STATE_MANAGER_CTR_ARG_CLASSES, 
             new Object[] {ec, cmd});
     }
 
-    public boolean validate(ObjectProvider op)
+    public boolean validate(ObjectProvider sm)
     {
         // TODO Any situations where we don't want to reuse it?
         return true;
     }
 
-    public void expire(ObjectProvider op)
+    public void expire(ObjectProvider sm)
     {
     }
 
     public synchronized ObjectProvider checkOut(ExecutionContext ec, AbstractClassMetaData cmd)
     {
         long now = System.currentTimeMillis();
-        ObjectProvider op;
-        if (!recyclableOps.isEmpty())
+        ObjectProvider sm;
+        if (!recyclableSMs.isEmpty())
         {
-            Set<ObjectProvider> ops = recyclableOps.keySet();
-            Iterator<ObjectProvider> opIter = ops.iterator();
-            while (opIter.hasNext())
+            Set<ObjectProvider> sms = recyclableSMs.keySet();
+            Iterator<ObjectProvider> smIter = sms.iterator();
+            while (smIter.hasNext())
             {
-                op = opIter.next();
-                if ((now - recyclableOps.get(op)) > expirationTime)
+                sm = smIter.next();
+                if ((now - recyclableSMs.get(sm)) > expirationTime)
                 {
                     // object has expired
-                    recyclableOps.remove(op);
-                    expire(op);
-                    op = null;
+                    recyclableSMs.remove(sm);
+                    expire(sm);
+                    sm = null;
                 }
                 else
                 {
-                    if (validate(op))
+                    if (validate(sm))
                     {
-                        recyclableOps.remove(op);
-                        op.connect(ec, cmd);
-                        return op;
+                        recyclableSMs.remove(sm);
+                        sm.connect(ec, cmd);
+                        return sm;
                     }
 
                     // object failed validation
-                    recyclableOps.remove(op);
-                    expire(op);
-                    op = null;
+                    recyclableSMs.remove(sm);
+                    expire(sm);
+                    sm = null;
                 }
             }
         }
 
         // no objects available, create a new one
-        op = create(ec, cmd);
-        return op;
+        sm = create(ec, cmd);
+        return sm;
     }
 
     public synchronized void cleanUp()
     {
-       ObjectProvider op;
+       ObjectProvider sm;
        long now = System.currentTimeMillis();    
-       Set<ObjectProvider> ops = recyclableOps.keySet();
+       Set<ObjectProvider> ops = recyclableSMs.keySet();
        Iterator<ObjectProvider> opIter = ops.iterator();
        while (opIter.hasNext())
        {
-           op = opIter.next();
-           if ((now - (recyclableOps.get(op)).longValue()) > expirationTime)
+           sm = opIter.next();
+           if ((now - (recyclableSMs.get(sm)).longValue()) > expirationTime)
            {
-               recyclableOps.remove(op);
-               expire(op);
-               op = null;
+               recyclableSMs.remove(sm);
+               expire(sm);
+               sm = null;
            }
        }
        System.gc();
     }
 
-    public synchronized void checkIn(ObjectProvider op)
+    public synchronized void checkIn(ObjectProvider sm)
     {
-        if (recyclableOps.size() < maxIdle)
+        if (recyclableSMs.size() < maxIdle)
         {
-            recyclableOps.put(op, System.currentTimeMillis());
+            recyclableSMs.put(sm, System.currentTimeMillis());
         }
     }
 

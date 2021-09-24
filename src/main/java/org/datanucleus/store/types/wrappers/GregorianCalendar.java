@@ -32,19 +32,19 @@ import org.datanucleus.store.types.SCO;
  */
 public class GregorianCalendar extends java.util.GregorianCalendar implements SCO<java.util.GregorianCalendar>
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient ObjectProvider ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
      * Creates a <i>GregorianCalendar</i> object that represents the time at which it was allocated.
      * Assigns owning object and field name.
-     * @param op StateManager for the owning object
+     * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public GregorianCalendar(ObjectProvider op, AbstractMemberMetaData mmd)
+    public GregorianCalendar(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
         super();
-        this.ownerOP = op;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -79,7 +79,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      **/
     public void unsetOwner()
     {
-        ownerOP = null;
+        ownerSM = null;
         ownerMmd = null;
     }
 
@@ -89,7 +89,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      **/
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -106,12 +106,12 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      */
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
     }

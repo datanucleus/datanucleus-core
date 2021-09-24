@@ -34,24 +34,24 @@ import org.datanucleus.metadata.VersionStrategy;
 public interface LockManager
 {
     /**
-     * Method to lock the object managed by the passed ObjectProvider (mode 1).
-     * @param op StateManager for the object
+     * Method to lock the object managed by the passed StateManager (mode 1).
+     * @param sm StateManager for the object
      * @param lockMode mode for locking
      */
-    void lock(ObjectProvider op, LockMode lockMode);
+    void lock(ObjectProvider sm, LockMode lockMode);
 
     /**
-     * Method to unlock the object managed by the passed ObjectProvider (mode 1).
-     * @param op StateManager for the object
+     * Method to unlock the object managed by the passed StateManager (mode 1).
+     * @param sm StateManager for the object
      */
-    void unlock(ObjectProvider op);
+    void unlock(ObjectProvider sm);
 
     /**
-     * Accessor for the current lock mode for the object managed by the passed ObjectProvider (mode 1).
-     * @param op StateManager for the object
+     * Accessor for the current lock mode for the object managed by the passed StateManager (mode 1).
+     * @param sm StateManager for the object
      * @return The lock mode
      */
-    LockMode getLockMode(ObjectProvider op);
+    LockMode getLockMode(ObjectProvider sm);
 
     /**
      * Method to lock the object with the provided identity (mode 2).
@@ -78,12 +78,12 @@ public interface LockManager
     void close();
 
     /**
-     * Method to perform an optimistic version check on the specified ObjectProvider.
-     * @param op StateManager
+     * Method to perform an optimistic version check on the specified StateManager.
+     * @param sm StateManager
      * @param versionStrategy The version strategy in use
      * @param versionDatastore Version of the object in the datastore
      */
-    void performOptimisticVersionCheck(ObjectProvider op, VersionStrategy versionStrategy, Object versionDatastore);
+    void performOptimisticVersionCheck(ObjectProvider sm, VersionStrategy versionStrategy, Object versionDatastore);
 
     /**
      * Convenience method to provide the next version to use given the VersionMetaData and the current version.

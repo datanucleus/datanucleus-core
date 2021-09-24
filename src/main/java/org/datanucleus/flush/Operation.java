@@ -26,7 +26,7 @@ public interface Operation
 {
     /**
      * Accessor for StateManager of the object that this operation is performed on.
-     * @return The ObjectProvider
+     * @return StateManager
      */
     ObjectProvider getObjectProvider();
 

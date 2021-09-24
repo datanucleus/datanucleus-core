@@ -78,12 +78,12 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
 
     /**
      * Constructor. 
-     * @param op The ObjectProvider for this set.
+     * @param sm StateManager for this set.
      * @param mmd Metadata for the member
      */
-    public Set(ObjectProvider op, AbstractMemberMetaData mmd)
+    public Set(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
-        this(op, mmd, false, null);
+        this(sm, mmd, false, null);
     }
 
     /**

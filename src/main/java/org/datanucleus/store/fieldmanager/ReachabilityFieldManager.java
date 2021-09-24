@@ -45,7 +45,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
 
     /**
      * Constructor.
-     * @param sm The ObjectProvider for the object.
+     * @param sm StateManager for the object.
      * @param reachables Reachables up to this point
      */
     public ReachabilityFieldManager(ObjectProvider sm, Set reachables)
