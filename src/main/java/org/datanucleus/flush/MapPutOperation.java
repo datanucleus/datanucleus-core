@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.MapStore;
 import org.datanucleus.store.types.scostore.Store;
 
@@ -27,7 +27,7 @@ import org.datanucleus.store.types.scostore.Store;
  */
 public class MapPutOperation<K, V> implements SCOOperation
 {
-    final ObjectProvider sm;
+    final DNStateManager sm;
     final int fieldNumber;
     final MapStore<K, V> store;
 
@@ -37,7 +37,7 @@ public class MapPutOperation<K, V> implements SCOOperation
     /** The value to add. */
     final V value;
 
-    public MapPutOperation(ObjectProvider sm, MapStore store, K key, V value)
+    public MapPutOperation(DNStateManager sm, MapStore store, K key, V value)
     {
         this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -46,7 +46,7 @@ public class MapPutOperation<K, V> implements SCOOperation
         this.value = value;
     }
 
-    public MapPutOperation(ObjectProvider sm, int fieldNum, K key, V value)
+    public MapPutOperation(DNStateManager sm, int fieldNum, K key, V value)
     {
         this.sm = sm;
         this.fieldNumber = fieldNum;
@@ -99,9 +99,9 @@ public class MapPutOperation<K, V> implements SCOOperation
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

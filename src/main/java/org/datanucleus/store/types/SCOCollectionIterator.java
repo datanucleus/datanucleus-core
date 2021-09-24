@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.CollectionStore;
 
 /**
@@ -45,7 +45,7 @@ public class SCOCollectionIterator<E> implements Iterator<E>
      * @param backingStore The backing store (connected to the DB)
      * @param useDelegate Whether to use the delegate
      */
-    public SCOCollectionIterator(Collection<E> sco, ObjectProvider sm, Collection<E> theDelegate, CollectionStore<E> backingStore, boolean useDelegate)
+    public SCOCollectionIterator(Collection<E> sco, DNStateManager sm, Collection<E> theDelegate, CollectionStore<E> backingStore, boolean useDelegate)
     {
         ownerSCO = sco;
 

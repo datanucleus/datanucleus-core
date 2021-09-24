@@ -2261,7 +2261,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
             Iterator resultsIter = results.iterator();
             while (resultsIter.hasNext())
             {
-                ec.findObjectProvider(resultsIter.next()).flush();
+                ec.findStateManager(resultsIter.next()).flush();
             }
 
             // Perform the deletion - deletes any dependent objects

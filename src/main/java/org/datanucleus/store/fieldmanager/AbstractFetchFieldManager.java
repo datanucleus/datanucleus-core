@@ -19,7 +19,7 @@ package org.datanucleus.store.fieldmanager;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Abstract field manager for retrieval of objects.
@@ -29,7 +29,7 @@ public abstract class AbstractFetchFieldManager extends AbstractFieldManager
 {
     protected ExecutionContext ec;
 
-    protected ObjectProvider sm;
+    protected DNStateManager sm;
 
     protected AbstractClassMetaData cmd;
 
@@ -37,7 +37,7 @@ public abstract class AbstractFetchFieldManager extends AbstractFieldManager
      * Constructor to use when retrieving values of fields of existing objects.
      * @param sm StateManager for the object
      */
-    public AbstractFetchFieldManager(ObjectProvider sm)
+    public AbstractFetchFieldManager(DNStateManager sm)
     {
         this.sm = sm;
         this.ec = sm.getExecutionContext();

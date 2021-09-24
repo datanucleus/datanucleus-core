@@ -86,7 +86,7 @@ import org.datanucleus.util.StringUtils;
  * The store manager's responsibilities include:
  * <ul>
  * <li>Creating and/or validating datastore tables according to the persistent classes being accessed by the application.</li>
- * <li>Serving as the primary intermediary between ObjectProviders and the database.</li>
+ * <li>Serving as the primary intermediary between StateManagers and the database.</li>
  * <li>Serving as the base Extent and Query factory.</li>
  * </ul>
  * <p>
@@ -1424,9 +1424,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getDefaultObjectProviderClassName()
+     * @see org.datanucleus.store.StoreManager#getDefaultStateManagerClassName()
      */
-    public String getDefaultObjectProviderClassName()
+    public String getDefaultStateManagerClassName()
     {
         return StateManagerImpl.class.getName();
     }

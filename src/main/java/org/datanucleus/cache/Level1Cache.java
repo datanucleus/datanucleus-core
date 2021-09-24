@@ -20,13 +20,13 @@ package org.datanucleus.cache;
 
 import java.util.Map;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Provides an interface for Level 1 caches.
  * Currently we just require a Map, but interfacing this provides the flexibility to being able to add requirements in the future.
  */
-public interface Level1Cache extends Map<Object, ObjectProvider>
+public interface Level1Cache extends Map<Object, DNStateManager>
 {
     public static final String NONE_NAME = "none";
 
@@ -35,7 +35,7 @@ public interface Level1Cache extends Map<Object, ObjectProvider>
      * @param key Unique key
      * @return StateManager if one is cached for this unique key
      */
-    ObjectProvider getUnique(CacheUniqueKey key);
+    DNStateManager getUnique(CacheUniqueKey key);
 
     /**
      * Method to store a StateManager for this unique key.
@@ -43,5 +43,5 @@ public interface Level1Cache extends Map<Object, ObjectProvider>
      * @param sm StateManager
      * @return The previous StateManager for this unique key if one was present, otherwise null
      */
-    Object putUnique(CacheUniqueKey key, ObjectProvider sm);
+    Object putUnique(CacheUniqueKey key, DNStateManager sm);
 }

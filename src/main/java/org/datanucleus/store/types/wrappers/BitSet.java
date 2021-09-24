@@ -22,7 +22,7 @@ import java.io.ObjectStreamException;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCO;
 
 /**
@@ -30,7 +30,7 @@ import org.datanucleus.store.types.SCO;
  */
 public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
 {
-    protected transient ObjectProvider ownerSM;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
@@ -38,7 +38,7 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
      * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public BitSet(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public BitSet(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super();
         this.ownerSM = sm;

@@ -24,7 +24,7 @@ import java.util.TimeZone;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCO;
 
 /**
@@ -32,7 +32,7 @@ import org.datanucleus.store.types.SCO;
  */
 public class GregorianCalendar extends java.util.GregorianCalendar implements SCO<java.util.GregorianCalendar>
 {
-    protected transient ObjectProvider ownerSM;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
@@ -41,7 +41,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public GregorianCalendar(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public GregorianCalendar(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super();
         this.ownerSM = sm;
@@ -130,8 +130,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
     }
 
     /**
-     * Method to return an attached version for the passed ObjectProvider and
-     * field, using the passed value.
+     * Method to return an attached version for the passed StateManager and field, using the passed value.
      * @param value The new value
      */
     public void attachCopy(java.util.GregorianCalendar value)

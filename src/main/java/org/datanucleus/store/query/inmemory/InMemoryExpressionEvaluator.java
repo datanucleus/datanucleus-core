@@ -41,7 +41,7 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryUtils;
 import org.datanucleus.store.query.expression.AbstractExpressionEvaluator;
@@ -1269,7 +1269,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 if (ec.getApiAdapter().isPersistent(value))
                 {
                     // Make sure this field is loaded
-                    ObjectProvider valueOP = ec.findObjectProvider(value);
+                    DNStateManager valueOP = ec.findStateManager(value);
                     if (valueOP != null)
                     {
                         AbstractMemberMetaData mmd = valueOP.getClassMetaData().getMetaDataForMember(fieldName);

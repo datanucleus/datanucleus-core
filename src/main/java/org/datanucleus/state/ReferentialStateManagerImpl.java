@@ -101,7 +101,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
      */
     public void updateFieldAfterInsert(Object pc, int fieldNumber)
     {
-        ReferentialStateManagerImpl otherSM = (ReferentialStateManagerImpl) myEC.findObjectProvider(pc);
+        ReferentialStateManagerImpl otherSM = (ReferentialStateManagerImpl) myEC.findStateManager(pc);
 
         // Register the other SM to update us when it is inserted
         if (otherSM.insertionNotifyList == null)
@@ -135,7 +135,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
     }
 
     /**
-     * Method called by another ObjectProvider when this object has registered that it needs to know
+     * Method called by another StateManager when this object has registered that it needs to know
      * when the other object has been inserted.
      * @param op StateManager of the other object that has just been inserted
      */

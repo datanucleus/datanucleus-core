@@ -23,7 +23,7 @@ import org.datanucleus.FetchPlanState;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
@@ -41,7 +41,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
      * @param fpClass Fetch Plan for the class of this instance
      * @param state State object to hold any pertinent controls for the fetchplan process
      */
-    public MakeTransientFieldManager(ObjectProvider sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, 
+    public MakeTransientFieldManager(DNStateManager sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, 
             FetchPlanState state)
     {
         super(sm, secondClassMutableFields, fpClass, state);

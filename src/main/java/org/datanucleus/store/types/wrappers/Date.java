@@ -22,7 +22,7 @@ import java.io.ObjectStreamException;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCO;
 
 /**
@@ -30,7 +30,7 @@ import org.datanucleus.store.types.SCO;
  */
 public class Date extends java.util.Date implements SCO<java.util.Date>
 {
-    protected transient ObjectProvider ownerSM;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
@@ -39,7 +39,7 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
      * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public Date(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public Date(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super();
         this.ownerSM = sm;

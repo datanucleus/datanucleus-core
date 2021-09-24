@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
@@ -37,8 +37,8 @@ public class WeakRefCache implements Level1Cache
 {
     public static final String NAME = "weak";
 
-    private Map<Object, ObjectProvider> weakCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
-    private Map<CacheUniqueKey, ObjectProvider> weakCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    private Map<Object, DNStateManager> weakCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    private Map<CacheUniqueKey, DNStateManager> weakCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 
     /**
      * Default constructor (required)
@@ -47,12 +47,12 @@ public class WeakRefCache implements Level1Cache
     {
     }
 
-    public ObjectProvider put(Object id, ObjectProvider sm)
+    public DNStateManager put(Object id, DNStateManager sm)
     {
         return weakCache.put(id, sm);
     }
 
-    public ObjectProvider get(Object id)
+    public DNStateManager get(Object id)
     {
         return weakCache.get(id);
     }
@@ -62,15 +62,15 @@ public class WeakRefCache implements Level1Cache
         return weakCache.containsKey(id);
     }
 
-    public ObjectProvider remove(Object id)
+    public DNStateManager remove(Object id)
     {
-        ObjectProvider sm = weakCache.remove(id);
+        DNStateManager sm = weakCache.remove(id);
         if (weakCacheUnique.containsValue(sm))
         {
-            Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = weakCacheUnique.entrySet().iterator();
+            Iterator<Entry<CacheUniqueKey, DNStateManager>> entrySetIter = weakCacheUnique.entrySet().iterator();
             while (entrySetIter.hasNext())
             {
-                Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
+                Entry<CacheUniqueKey, DNStateManager> entry = entrySetIter.next();
                 if (entry.getValue() == sm)
                 {
                     entrySetIter.remove();
@@ -149,13 +149,13 @@ public class WeakRefCache implements Level1Cache
     }
 
     @Override
-    public ObjectProvider getUnique(CacheUniqueKey key)
+    public DNStateManager getUnique(CacheUniqueKey key)
     {
         return weakCacheUnique.get(key);
     }
 
     @Override
-    public Object putUnique(CacheUniqueKey key, ObjectProvider sm)
+    public Object putUnique(CacheUniqueKey key, DNStateManager sm)
     {
         return weakCacheUnique.put(key, sm);
     }

@@ -37,7 +37,7 @@ import org.datanucleus.flush.CollectionClearOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOCollection;
@@ -82,7 +82,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
      * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public TreeSet(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public TreeSet(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super(sm, mmd);
 
@@ -91,12 +91,12 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
-            this.backingStore = (SetStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.TreeSet.class);
+            ClassLoaderResolver clr = ownerSM.getExecutionContext().getClassLoaderResolver();
+            this.backingStore = (SetStore)((BackedSCOStoreManager)ownerSM.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.TreeSet.class);
         }
 
         // Set up our delegate, using a suitable comparator
-        Comparator comparator = SCOUtils.getComparator(mmd, ownerOP.getExecutionContext().getClassLoaderResolver());
+        Comparator comparator = SCOUtils.getComparator(mmd, ownerSM.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.TreeSet(comparator);
@@ -108,8 +108,8 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerSM, ownerMmd.getName(), this,
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerSM, ownerMmd)));
         }
     }
 
@@ -117,25 +117,25 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     {
         if (newValue != null)
         {
-            // Check for the case of serialised PC elements, and assign ObjectProviders to the elements without
+            // Check for the case of serialised PC elements, and assign StateManagers to the elements without
             if (SCOUtils.collectionHasSerialisedElements(ownerMmd) && ownerMmd.getCollection().elementIsPersistent())
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 Iterator iter = newValue.iterator();
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    ObjectProvider objSM = ec.findObjectProvider(pc);
+                    DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
             }
 
             // Detect which objects are added and which are deleted
@@ -149,7 +149,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
                 }
                 isCacheLoaded = true;
 
-                SCOUtils.updateCollectionWithCollection(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
+                SCOUtils.updateCollectionWithCollection(ownerSM.getExecutionContext().getApiAdapter(), this, newValue);
             }
             else
             {
@@ -191,18 +191,18 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     {
         if (c != null)
         {
-            // Check for the case of serialised PC elements, and assign ObjectProviders to the elements without
+            // Check for the case of serialised PC elements, and assign StateManagers to the elements without
             if (SCOUtils.collectionHasSerialisedElements(ownerMmd) && ownerMmd.getCollection().elementIsPersistent())
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 Iterator iter = c.iterator();
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    ObjectProvider objSM = ec.findObjectProvider(pc);
+                    DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }
@@ -215,7 +215,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
             }
             delegate.clear();
             delegate.addAll(c);
@@ -227,7 +227,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
      */
     public void initialise()
     {
-        if (useCache && !SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd))
+        if (useCache && !SCOUtils.useCachedLazyLoading(ownerSM, ownerMmd))
         {
             // Load up the container now if not using lazy loading
             loadFromStore();
@@ -278,10 +278,10 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
+                    ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator<E> iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerSM);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -310,7 +310,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     {
         if (backingStore != null)
         {
-            backingStore.updateEmbeddedElement(ownerOP, element, fieldNumber, value);
+            backingStore.updateEmbeddedElement(ownerSM, element, fieldNumber, value);
         }
     }
 
@@ -365,7 +365,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
         else if (backingStore != null)
         {
-            return backingStore.contains(ownerOP,element);
+            return backingStore.contains(ownerSM,element);
         }
 
         return delegate.contains(element);
@@ -481,7 +481,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         {
             loadFromStore();
         }
-        return new SCOCollectionIterator(this, ownerOP, delegate, backingStore, useCache);
+        return new SCOCollectionIterator(this, ownerSM, delegate, backingStore, useCache);
     }
 
     /**
@@ -603,7 +603,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
         else if (backingStore != null)
         {
-            return backingStore.size(ownerOP);
+            return backingStore.size(ownerSM);
         }
 
         return delegate.size();
@@ -621,7 +621,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerOP);
+            return SCOUtils.toArray(backingStore,ownerSM);
         }  
         return delegate.toArray();
     }
@@ -639,7 +639,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerOP,a);
+            return SCOUtils.toArray(backingStore,ownerSM,a);
         }  
         return delegate.toArray(a);
     }
@@ -668,24 +668,24 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             return false;
         }
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
         }
 
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
             }
             else
             {
                 try
                 {
-                    backingSuccess = backingStore.add(ownerOP, element, useCache ? delegate.size() : -1);
+                    backingSuccess = backingStore.add(ownerSM, element, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -700,9 +700,9 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
         boolean delegateSuccess = delegate.add(element);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
@@ -718,11 +718,11 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         {
             loadFromStore();
         }
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();
-            RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+            RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
             while (iter.hasNext())
             {
                 relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
@@ -732,18 +732,18 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 for (Object element : elements)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
                 }
             }
             else
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerOP, elements, useCache ? delegate.size() : -1);
+                    backingSuccess = backingStore.addAll(ownerSM, elements, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -758,9 +758,9 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
         boolean delegateSuccess = delegate.addAll(elements);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
@@ -775,19 +775,19 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerSM, backingStore));
             }
             else
             {
-                backingStore.clear(ownerOP);
+                backingStore.clear(ownerSM);
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -818,27 +818,27 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
 
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 backingSuccess = contained;
                 if (backingSuccess)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, backingStore, element, allowCascadeDelete));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, allowCascadeDelete));
                 }
             }
             else
             {
                 try
                 {
-                    backingSuccess = backingStore.remove(ownerOP, element, size, allowCascadeDelete);
+                    backingSuccess = backingStore.remove(ownerSM, element, size, allowCascadeDelete);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -848,9 +848,9 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
 
         return backingStore != null ? backingSuccess : delegateSuccess;
@@ -881,7 +881,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
         int size = useCache ? delegate.size() : -1;
         Collection contained = null;
-        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
+        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerSM))
         {
             // Check which are contained before updating the delegate
             contained = new java.util.HashSet();
@@ -895,21 +895,21 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();
-            RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+            RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
             while (iter.hasNext())
             {
                 relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
             }
         }
 
-        if (backingStore != null && ownerOP != null)
+        if (backingStore != null && ownerSM != null)
         {
             boolean backingSuccess = true;
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 if (contained != null && !contained.isEmpty())
                 {
@@ -917,7 +917,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
                     for (Object element : contained)
                     {
                         backingSuccess = true;
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, backingStore, element, true));
+                        ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, true));
                     }
                 }
             }
@@ -925,7 +925,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             {
                 try
                 {
-                    backingSuccess = backingStore.removeAll(ownerOP, elements, size);
+                    backingSuccess = backingStore.removeAll(ownerSM, elements, size);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -934,17 +934,17 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
                 }
             }
 
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
 
             return backingSuccess;
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return delegateSuccess;
     }
@@ -975,9 +975,9 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return modified;
     }

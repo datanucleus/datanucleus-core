@@ -33,7 +33,7 @@ import org.datanucleus.flush.MapPutOperation;
 import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.scostore.MapStore;
@@ -56,24 +56,24 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
      * @param sm the owner of this Map
      * @param mmd Metadata for the member
      */
-    public LinkedHashMap(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public LinkedHashMap(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super(sm, mmd);
 
         // Set up our "delegate"
         this.delegate = new java.util.LinkedHashMap();
         this.allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        this.useCache = SCOUtils.useContainerCache(ownerOP, mmd);
+        this.useCache = SCOUtils.useContainerCache(ownerSM, mmd);
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), 
+            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerSM.getStoreManager()).getBackingStoreForField(ownerSM.getExecutionContext().getClassLoaderResolver(), 
                 mmd, java.util.LinkedHashMap.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerSM, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerSM, ownerMmd)));
         }
     }
 
@@ -81,10 +81,10 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
     {
         if (newValue != null)
         {
-            // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
+            // Check for the case of serialised maps, and assign StateManagers to any PC keys/values without
             if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 Iterator iter = newValue.entrySet().iterator();
                 while (iter.hasNext())
                 {
@@ -93,18 +93,18 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
                     {
-                        ObjectProvider keyOP = ec.findObjectProvider(key);
+                        DNStateManager keyOP = ec.findStateManager(key);
                         if (keyOP == null)
                         {
-                            keyOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
                     {
-                        ObjectProvider valOP = ec.findObjectProvider(value);
+                        DNStateManager valOP = ec.findStateManager(value);
                         if (valOP == null)
                         {
-                            valOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -112,7 +112,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
             }
 
             if (useCache)
@@ -125,32 +125,32 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
                 }
                 isCacheLoaded = true;
 
-                SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
+                SCOUtils.updateMapWithMapKeysValues(ownerSM.getExecutionContext().getApiAdapter(), this, newValue);
             }
             else
             {
                 // TODO This is clear+putAll. Improve it to work out what is changed using oldValue
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerSM))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
-                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
+                        if (ownerSM.isFlushedToDatastore() || !ownerSM.getLifecycleState().isNew())
                         {
-                            ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
+                            ownerSM.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerSM, backingStore));
 
                             Iterator iter = newValue.entrySet().iterator();
                             while (iter.hasNext())
                             {
                                 java.util.Map.Entry entry = (java.util.Map.Entry)iter.next();
-                                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
+                                ownerSM.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerSM, backingStore, entry.getKey(), entry.getValue()));
                             }
                         }
                     }
                     else
                     {
-                        backingStore.clear(ownerOP);
-                        backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
+                        backingStore.clear(ownerSM);
+                        backingStore.putAll(ownerSM, newValue, Collections.emptyMap());
                     }
                 }
                 delegate.putAll(newValue);
@@ -168,10 +168,10 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
     {
         if (m != null)
         {
-            // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
+            // Check for the case of serialised maps, and assign StateManagers to any PC keys/values without
             if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
                 {
@@ -180,18 +180,18 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
                     {
-                        ObjectProvider keyOP = ec.findObjectProvider(key);
+                        DNStateManager keyOP = ec.findStateManager(key);
                         if (keyOP == null)
                         {
-                            keyOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
                     {
-                        ObjectProvider valOP = ec.findObjectProvider(value);
+                        DNStateManager valOP = ec.findStateManager(value);
                         if (valOP == null)
                         {
-                            valOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -199,7 +199,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
             }
 
             delegate.putAll(m);
@@ -212,7 +212,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
      */
     public void initialise()
     {
-        if (useCache && !SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd))
+        if (useCache && !SCOUtils.useCachedLazyLoading(ownerSM, ownerMmd))
         {
             // Load up the container now if not using lazy loading
             loadFromStore();
@@ -261,12 +261,12 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
+                    ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
 
             // Populate the delegate with the keys/values from the store
-            SCOUtils.populateMapDelegateWithStoreData(delegate, backingStore, ownerOP);
+            SCOUtils.populateMapDelegateWithStoreData(delegate, backingStore, ownerSM);
 
             isCacheLoaded = true;
         }
@@ -291,7 +291,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
     {
         if (backingStore != null)
         {
-            backingStore.updateEmbeddedKey(ownerOP, key, fieldNumber, newValue);
+            backingStore.updateEmbeddedKey(ownerSM, key, fieldNumber, newValue);
         }
     }
 
@@ -306,7 +306,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
     {
         if (backingStore != null)
         {
-            backingStore.updateEmbeddedValue(ownerOP, value, fieldNumber, newValue);
+            backingStore.updateEmbeddedValue(ownerSM, value, fieldNumber, newValue);
         }
     }
 
@@ -354,7 +354,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         }
         else if (backingStore != null)
         {
-            return backingStore.containsKey(ownerOP, key);
+            return backingStore.containsKey(ownerSM, key);
         }
 
         return delegate.containsKey(key);
@@ -374,7 +374,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         }
         else if (backingStore != null)
         {
-            return backingStore.containsValue(ownerOP, value);
+            return backingStore.containsValue(ownerSM, value);
         }
 
         return delegate.containsValue(value);
@@ -392,7 +392,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         }
         else if (backingStore != null)
         {
-            return new Set(ownerOP, ownerMmd, false, backingStore.entrySetStore());
+            return new Set(ownerSM, ownerMmd, false, backingStore.entrySetStore());
         }
 
         return delegate.entrySet();
@@ -458,7 +458,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         }
         else if (backingStore != null)
         {
-            return backingStore.get(ownerOP, key);
+            return backingStore.get(ownerSM, key);
         }
 
         return delegate.get(key);
@@ -509,7 +509,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         }
         else if (backingStore != null)
         {
-            return new Set(ownerOP, ownerMmd, false, backingStore.keySetStore());
+            return new Set(ownerSM, ownerMmd, false, backingStore.keySetStore());
         }
 
         return delegate.keySet();
@@ -528,7 +528,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         }
         else if (backingStore != null)
         {
-            return backingStore.entrySetStore().size(ownerOP);
+            return backingStore.entrySetStore().size(ownerSM);
         }
 
         return delegate.size();
@@ -546,7 +546,7 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         }
         else if (backingStore != null)
         {
-            return new org.datanucleus.store.types.wrappers.backed.Collection(ownerOP, ownerMmd, true, backingStore.valueCollectionStore());
+            return new org.datanucleus.store.types.wrappers.backed.Collection(ownerSM, ownerMmd, true, backingStore.valueCollectionStore());
         }
 
         return delegate.values();
@@ -564,19 +564,19 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
+                ownerSM.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerSM, backingStore));
             }
             else
             {
-                backingStore.clear(ownerOP);
+                backingStore.clear(ownerSM);
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
  
@@ -612,18 +612,18 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         V oldValue = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, key, value));
+                ownerSM.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerSM, backingStore, key, value));
             }
             else if (useCache)
             {
                 oldValue = delegate.get(key);
-                backingStore.put(ownerOP, key, value, oldValue, delegate.containsKey(key));
+                backingStore.put(ownerSM, key, value, oldValue, delegate.containsKey(key));
             }
             else
             {
-                oldValue = backingStore.put(ownerOP, key, value);
+                oldValue = backingStore.put(ownerSM, key, value);
             }
         }
         V delegateOldValue = delegate.put(key, value);
@@ -631,14 +631,14 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         {
             oldValue = delegateOldValue;
         }
-        else if (SCOUtils.useQueuedUpdate(ownerOP))
+        else if (SCOUtils.useQueuedUpdate(ownerSM))
         {
             oldValue = delegateOldValue;
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return oldValue;
     }
@@ -659,32 +659,32 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
                 {
                     Map.Entry entry = (Map.Entry)iter.next();
-                    ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
+                    ownerSM.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerSM, backingStore, entry.getKey(), entry.getValue()));
                 }
             }
             else
             {
                 if (useCache)
                 {
-                    backingStore.putAll(ownerOP, m, Collections.unmodifiableMap(delegate));
+                    backingStore.putAll(ownerSM, m, Collections.unmodifiableMap(delegate));
                 }
                 else
                 {
-                    backingStore.putAll(ownerOP, m);
+                    backingStore.putAll(ownerSM, m);
                 }
             }
         }
         delegate.putAll(m);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -707,19 +707,19 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         V delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
+                ownerSM.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerSM, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;
             }
             else if (useCache)
             {
-                backingStore.remove(ownerOP, key, delegateRemoved);
+                backingStore.remove(ownerSM, key, delegateRemoved);
                 removed = delegateRemoved;
             }
             else
             {
-                removed = backingStore.remove(ownerOP, key);
+                removed = backingStore.remove(ownerSM, key);
             }
         }
         else
@@ -727,9 +727,9 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
             removed = delegateRemoved;
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return removed;
     }

@@ -28,7 +28,7 @@ import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.MapPutOperation;
 import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCOMap;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
@@ -41,7 +41,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.SortedMap<K, V>, SCOMap<java.util.SortedMap<K, V>, K, V>, Cloneable, java.io.Serializable
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
@@ -49,12 +49,12 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
 
     /**
      * Constructor
-     * @param ownerOP the owner ObjectProvider
+     * @param sm the owner StateManager
      * @param mmd Metadata for the member
      */
-    public SortedMap(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public SortedMap(DNStateManager sm, AbstractMemberMetaData mmd)
     {
-        this.ownerOP = ownerOP;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -76,7 +76,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, false, false)));
         }
     }
@@ -91,7 +91,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      */
     protected void initialiseDelegate()
     {
-        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerOP.getExecutionContext().getClassLoaderResolver());
+        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.TreeMap(comparator);
@@ -181,7 +181,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      **/
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -189,9 +189,9 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      **/
     public void unsetOwner()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP = null;
+            ownerSM = null;
             ownerMmd = null;
         }
     }
@@ -201,9 +201,9 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      **/
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
         }
     }
 
@@ -216,7 +216,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
     public java.util.SortedMap detachCopy(FetchPlanState state)
     {
         java.util.SortedMap detached = new java.util.TreeMap();
-        SCOUtils.detachCopyForMap(ownerOP, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
         return detached;
     }
 
@@ -234,10 +234,10 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
         boolean valuesWithoutIdentity = SCOUtils.mapHasValuesWithoutIdentity(ownerMmd);
 
         java.util.Map attachedKeysValues = new java.util.TreeMap();
-        SCOUtils.attachCopyForMap(ownerOP, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
+        SCOUtils.attachCopyForMap(ownerSM, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
 
         // Update the attached map with the detached elements
-        SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, attachedKeysValues);
+        SCOUtils.updateMapWithMapKeysValues(ownerSM.getExecutionContext().getApiAdapter(), this, attachedKeysValues);
     }
 
     // ------------------ Implementation of SortedMap methods --------------------
@@ -418,16 +418,16 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      */
     public void clear()
     {
-        if (ownerOP != null && !delegate.isEmpty())
+        if (ownerSM != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
-                    ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
+                    ownerSM.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
                 }
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
@@ -438,11 +438,11 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
                     Map.Entry entry = entryIter.next();
                     if (SCOUtils.hasDependentKey(ownerMmd))
                     {
-                        ownerOP.getExecutionContext().deleteObjectInternal(entry.getKey());
+                        ownerSM.getExecutionContext().deleteObjectInternal(entry.getKey());
                     }
                     if (SCOUtils.hasDependentValue(ownerMmd))
                     {
-                        ownerOP.getExecutionContext().deleteObjectInternal(entry.getValue());
+                        ownerSM.getExecutionContext().deleteObjectInternal(entry.getValue());
                     }
                 }
             }
@@ -450,9 +450,9 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
 
         delegate.clear();
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
  
@@ -467,16 +467,16 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
         V oldValue = delegate.put(key, value);
         makeDirty();
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
+                ownerSM.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), key, value));
             }
 
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return oldValue;
@@ -491,21 +491,21 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
         delegate.putAll(m);
         makeDirty();
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 Iterator<Map.Entry> entryIter = m.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
-                    ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
+                    ownerSM.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
                 }
             }
 
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
     }
@@ -519,30 +519,30 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
     {
         V value = delegate.remove(key);
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
+                ownerSM.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), key, value));
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
                 if (SCOUtils.hasDependentKey(ownerMmd))
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(key);
+                    ownerSM.getExecutionContext().deleteObjectInternal(key);
                 }
                 if (SCOUtils.hasDependentValue(ownerMmd))
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(value);
+                    ownerSM.getExecutionContext().deleteObjectInternal(value);
                 }
             }
         }
 
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
 
         return value;

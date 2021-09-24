@@ -86,7 +86,7 @@ import org.datanucleus.state.LockManager;
 import org.datanucleus.state.LockManagerImpl;
 import org.datanucleus.state.LockMode;
 import org.datanucleus.state.NullCallbackHandler;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
@@ -129,11 +129,11 @@ import org.datanucleus.util.StringUtils;
  * All of this information is used in the "persistence-by-reachability-at-commit" process which detects if some objects
  * originally persisted are no longer reachable and hence should not be persistent after all.
  * </p>
- * <h3>ObjectProvider-based storage</h3>
+ * <h3>StateManager-based storage</h3>
  * <p>
- * You may note that we have various fields here storing ObjectProvider-related information such as which StateManager is embedded into which ObjectProvider etc, 
- * or the managed relations for a StateManager. These are stored here to avoid adding a reference to the storage of each and every ObjectProvider, since
- * we could potentially have a very large number of ObjectProviders (and they may not use that field in the majority, but it still needs the reference). 
+ * You may note that we have various fields here storing StateManager-related information such as which StateManager is embedded into which StateManager etc, 
+ * or the managed relations for a StateManager. These are stored here to avoid adding a reference to the storage of each and every StateManager, since
+ * we could potentially have a very large number of StateManagers (and they may not use that field in the majority, but it still needs the reference). 
  * The same should be followed as a general rule when considering storing something in StateManager.
  * </p>
  * <p>
@@ -175,17 +175,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private FlushMode flushMode = null;
 
     /** Cache of StateManagers enlisted in the current transaction, keyed by the object id. */
-    private final Map<Object, ObjectProvider> enlistedSMCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    private final Map<Object, DNStateManager> enlistedSMCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 
     /** List of StateManagers for all current dirty objects managed by this context. */
-    private final Collection<ObjectProvider> dirtySMs = new LinkedHashSet<>();
+    private final Collection<DNStateManager> dirtySMs = new LinkedHashSet<>();
 
     /** List of StateManagers for all current dirty objects made dirty by reachability. */
-    private final Collection<ObjectProvider> indirectDirtySMs = new LinkedHashSet<>();
+    private final Collection<DNStateManager> indirectDirtySMs = new LinkedHashSet<>();
 
     private OperationQueue operationQueue = null;
 
-    private Set<ObjectProvider> nontxProcessedSMs = null;
+    private Set<DNStateManager> nontxProcessedSMs = null;
 
     private boolean l2CacheEnabled = false;
 
@@ -208,19 +208,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private LockManager lockMgr = null;
 
     /** Lookup map of attached-detached objects when attaching/detaching. */
-    private Map<ObjectProvider, Object> smAttachDetachObjectReferenceMap = null;
+    private Map<DNStateManager, Object> smAttachDetachObjectReferenceMap = null;
 
     /** Map of embedded StateManager relations, keyed by owner StateManager. */
-    private Map<ObjectProvider, List<EmbeddedOwnerRelation>> smEmbeddedInfoByOwner = null;
+    private Map<DNStateManager, List<EmbeddedOwnerRelation>> smEmbeddedInfoByOwner = null;
 
     /** Map of embedded StateManager relations, keyed by embedded StateManager. */
-    private Map<ObjectProvider, List<EmbeddedOwnerRelation>> smEmbeddedInfoByEmbedded = null;
+    private Map<DNStateManager, List<EmbeddedOwnerRelation>> smEmbeddedInfoByEmbedded = null;
 
     /**
      * Map of associated values for StateManager. This can contain anything really and is down to the StoreManager to define. 
      * For example RDBMS datastores typically put external FK info in here keyed by the mapping of the field to which it pertains.
      */
-    protected Map<ObjectProvider, Map<?,?>> opAssociatedValuesMapBySM = null;
+    protected Map<DNStateManager, Map<?,?>> opAssociatedValuesMapBySM = null;
 
     /** Handler for "managed relations" at flush/commit. */
     private ManagedRelationsHandler managedRelationsHandler = null;
@@ -232,10 +232,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private boolean runningDetachAllOnTxnEnd = false;
 
     /**
-     * Temporary array of ObjectProviders to detach at commit (to prevent garbage collection). 
+     * Temporary array of StateManagers to detach at commit (to prevent garbage collection). 
      * Set up in preCommit() and used in postCommit().
      */
-    private ObjectProvider[] detachAllOnTxnEndSMs = null;
+    private DNStateManager[] detachAllOnTxnEndSMs = null;
 
     /** Statistics gatherer for this context. */
     private ManagerStatistics statistics = null;
@@ -423,7 +423,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // "Detach-on-Close", detaching all currently cached objects
             // TODO This will remove objects from the L1 cache one-by-one. Is there a possibility for optimisation? See also AttachDetachTest.testDetachOnClose
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
-            Collection<ObjectProvider> toDetach = new LinkedHashSet<>(cache.values());
+            Collection<DNStateManager> toDetach = new LinkedHashSet<>(cache.values());
 
             try
             {
@@ -432,7 +432,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     tx.begin();
                 }
 
-                for (ObjectProvider sm : toDetach)
+                for (DNStateManager sm : toDetach)
                 {
                     if (sm != null && sm.getObject() != null && !sm.getExecutionContext().getApiAdapter().isDeleted(sm.getObject()) && sm.getExternalObjectId() != null)
                     {
@@ -479,8 +479,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
-            Collection<ObjectProvider> cachedSMsClone = new HashSet<>(cache.values());
-            for (ObjectProvider sm : cachedSMsClone)
+            Collection<DNStateManager> cachedSMsClone = new HashSet<>(cache.values());
+            for (DNStateManager sm : cachedSMsClone)
             {
                 if (sm != null)
                 {
@@ -501,7 +501,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         else
         {
-            // TODO If there is no cache we need a way for ObjectProviders to be disconnected; have StateManager as listener for EC close? (ecListeners below)
+            // TODO If there is no cache we need a way for StateManagers to be disconnected; have StateManager as listener for EC close? (ecListeners below)
         }
 
         // Clear out lifecycle listeners that were registered
@@ -659,7 +659,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         int referenceCounter = 0;
 
         /** Map of the owner of an attached object, keyed by the object. Present when performing attachment. */
-        Map<Persistable, ObjectProvider> attachedOwnerByObject = null;
+        Map<Persistable, DNStateManager> attachedOwnerByObject = null;
 
         /** Map of attached PC object keyed by the id. Present when performing a attachment. */
         Map<Object, Persistable> attachedPCById = null;
@@ -1129,7 +1129,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public boolean isInserting(Object pc)
     {
-        ObjectProvider sm = findObjectProvider(pc);
+        DNStateManager sm = findStateManager(pc);
         if (sm == null)
         {
             return false;
@@ -1151,7 +1151,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to enlist the specified StateManager in the current transaction.
      * @param sm StateManager
      */
-    public void enlistInTransaction(ObjectProvider sm)
+    public void enlistInTransaction(DNStateManager sm)
     {
         assertActiveTransaction();
 
@@ -1190,7 +1190,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to evict the specified StateManager from the current transaction.
      * @param sm StateManager
      */
-    public void evictFromTransaction(ObjectProvider sm)
+    public void evictFromTransaction(DNStateManager sm)
     {
         if (enlistedSMCache.remove(sm.getInternalObjectId()) != null)
         {
@@ -1229,7 +1229,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public Object getAttachedObjectForId(Object id)
     {
-        ObjectProvider sm = enlistedSMCache.get(id);
+        DNStateManager sm = enlistedSMCache.get(id);
         if (sm != null)
         {
             return sm.getObject();
@@ -1249,7 +1249,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to add the object managed by the specified StateManager to the (L1) cache.
      * @param sm StateManager
      */
-    public void addObjectProviderToCache(ObjectProvider sm)
+    public void addStateManagerToCache(DNStateManager sm)
     {
         // Add to the Level 1 Cache
         putObjectIntoLevel1Cache(sm);
@@ -1259,7 +1259,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to remove the object managed by the specified StateManager from the cache.
      * @param sm StateManager
      */
-    public void removeObjectProviderFromCache(ObjectProvider sm)
+    public void removeStateManagerFromCache(DNStateManager sm)
     {
         if (closing)
         {
@@ -1320,9 +1320,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @return StateManager, null if not found.
      * @throws NucleusUserException if the persistable object is managed by a different ExecutionContext
      */
-    public ObjectProvider findObjectProvider(Object pc)
+    public DNStateManager findStateManager(Object pc)
     {
-        ObjectProvider sm = (ObjectProvider) getApiAdapter().getStateManager(pc);
+        DNStateManager sm = (DNStateManager) getApiAdapter().getStateManager(pc);
         if (sm != null)
         {
             ExecutionContext ec = sm.getExecutionContext();
@@ -1340,14 +1340,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param persist persists the object if not yet persisted. 
      * @return StateManager
      */
-    public ObjectProvider findObjectProvider(Object pc, boolean persist)
+    public DNStateManager findStateManager(Object pc, boolean persist)
     {
-        ObjectProvider sm = findObjectProvider(pc);
+        DNStateManager sm = findStateManager(pc);
         if (sm == null && persist)
         {
-            int objectType = ObjectProvider.PC;
+            int objectType = DNStateManager.PC;
             Object object2 = persistObjectInternal(pc, null, null, -1, objectType);
-            sm = findObjectProvider(object2);
+            sm = findStateManager(object2);
         }
         else if (sm == null)
         {
@@ -1356,26 +1356,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return sm;
     }
 
-    public ObjectProvider findObjectProviderForEmbedded(Object value, ObjectProvider ownerSM, AbstractMemberMetaData mmd)
+    public DNStateManager findStateManagerForEmbedded(Object value, DNStateManager ownerSM, AbstractMemberMetaData mmd)
     {
-        ObjectProvider embeddedSM = findObjectProvider(value);
+        DNStateManager embeddedSM = findStateManager(value);
         if (embeddedSM == null)
         {
             // Assign a StateManager to manage our embedded object
-            embeddedSM = nucCtx.getObjectProviderFactory().newForEmbedded(this, value, false, ownerSM,
+            embeddedSM = nucCtx.getStateManagerFactory().newForEmbedded(this, value, false, ownerSM,
                 ownerSM.getClassMetaData().getMetaDataForMember(mmd.getName()).getAbsoluteFieldNumber());
         }
-        ObjectProvider[] embOwnerSMs = getOwnersForEmbeddedObjectProvider(embeddedSM);
+        DNStateManager[] embOwnerSMs = getOwnersForEmbeddedStateManager(embeddedSM);
         if (embOwnerSMs == null || embOwnerSMs.length == 0)
         {
             int absoluteFieldNumber = ownerSM.getClassMetaData().getMetaDataForMember(mmd.getName()).getAbsoluteFieldNumber();
             registerEmbeddedRelation(ownerSM, absoluteFieldNumber, embeddedSM);
-            embeddedSM.setPcObjectType(ObjectProvider.EMBEDDED_PC);
+            embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_PC);
         }
         return embeddedSM;
     }
 
-    public ObjectProvider findObjectProviderOfOwnerForAttachingObject(Object pc)
+    public DNStateManager findStateManagerOfOwnerForAttachingObject(Object pc)
     {
         ThreadContextInfo threadInfo = acquireThreadContextInfo();
         try
@@ -1451,7 +1451,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (!dirtySMs.isEmpty())
         {
             // Make sure all non-tx dirty objects are enlisted so they get lifecycle changes
-            for (ObjectProvider sm : dirtySMs)
+            for (DNStateManager sm : dirtySMs)
             {
                 if (NucleusLogger.TRANSACTION.isDebugEnabled())
                 {
@@ -1480,9 +1480,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             List failures = null;
             try
             {
-                // "commit" all enlisted ObjectProviders
+                // "commit" all enlisted StateManagers
                 ApiAdapter api = getApiAdapter();
-                ObjectProvider[] sms = enlistedSMCache.values().toArray(new ObjectProvider[enlistedSMCache.size()]);
+                DNStateManager[] sms = enlistedSMCache.values().toArray(new DNStateManager[enlistedSMCache.size()]);
                 for (int i = 0; i < sms.length; ++i)
                 {
                     try
@@ -1519,7 +1519,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (nontxProcessedSMs != null && !nontxProcessedSMs.isEmpty())
         {
-            for (ObjectProvider sm : nontxProcessedSMs)
+            for (DNStateManager sm : nontxProcessedSMs)
             {
                 if (sm != null && sm.getLifecycleState() != null && sm.getLifecycleState().isDeleted())
                 {
@@ -1554,7 +1554,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // We do not directly remove from cache level 1 here. 
             // The cache level 1 will be evicted automatically on garbage collection, if the object can be evicted. 
             // It means not all JDO states allows the object to be evicted.
-            ObjectProvider sm = findObjectProvider(obj);
+            DNStateManager sm = findStateManager(obj);
             if (sm == null)
             {
                 throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(obj), getApiAdapter().getIdForObject(obj), "evict"));
@@ -1576,8 +1576,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (cache != null)
         {
-            Set<ObjectProvider> smsToEvict = new HashSet<>(cache.values());
-            for (ObjectProvider sm : smsToEvict)
+            Set<DNStateManager> smsToEvict = new HashSet<>(cache.values());
+            for (DNStateManager sm : smsToEvict)
             {
                 Object pc = sm.getObject();
                 boolean evict = false;
@@ -1609,8 +1609,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // TODO All persistent non-transactional instances should be evicted here, but not yet supported
 
             // Evict StateManagers and remove objects from cache. Performed in separate loop to avoid ConcurrentModificationException
-            Set<ObjectProvider> smsToEvict = new HashSet(cache.values());
-            for (ObjectProvider sm : smsToEvict)
+            Set<DNStateManager> smsToEvict = new HashSet(cache.values());
+            for (DNStateManager sm : smsToEvict)
             {
                 if (sm != null)
                 {
@@ -1648,7 +1648,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             assertClassPersistable(obj.getClass());
             assertNotDetached(obj);
 
-            ObjectProvider sm = findObjectProvider(obj);
+            DNStateManager sm = findStateManager(obj);
             if (sm == null)
             {
                 throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(obj), getApiAdapter().getIdForObject(obj), "refresh"));
@@ -1674,7 +1674,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void refreshAllObjects()
     {
-        Set<ObjectProvider> toRefresh = new HashSet<>();
+        Set<DNStateManager> toRefresh = new HashSet<>();
         toRefresh.addAll(enlistedSMCache.values());
         toRefresh.addAll(dirtySMs);
         toRefresh.addAll(indirectDirtySMs);
@@ -1684,7 +1684,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         List failures = null;
-        for (ObjectProvider sm : toRefresh)
+        for (DNStateManager sm : toRefresh)
         {
             try
             {
@@ -1733,7 +1733,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 assertClassPersistable(pc.getClass());
                 assertNotDetached(pc);
 
-                ObjectProvider sm = findObjectProvider(pc);
+                DNStateManager sm = findStateManager(pc);
                 if (sm == null)
                 {
                     throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(pc), getApiAdapter().getIdForObject(pc), "retrieve"));
@@ -1944,10 +1944,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         boolean detached = getApiAdapter().isDetached(obj);
 
         // Persist the object
-        Object persistedPc = persistObjectInternal(obj, null, null, -1, ObjectProvider.PC);
+        Object persistedPc = persistObjectInternal(obj, null, null, -1, DNStateManager.PC);
 
         // If using reachability at commit and appropriate save it for reachability checks when we commit
-        ObjectProvider sm = findObjectProvider(persistedPc);
+        DNStateManager sm = findStateManager(persistedPc);
         if (sm != null)
         {
             // TODO If attaching (detached=true), we maybe ought not add StateManager to dirtySMs/indirectDirtySMs
@@ -1984,11 +1984,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param preInsertChanges Any changes to make before inserting
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.ObjectProvider, e.g ObjectProvider.PC)
+     * @param objectType Type of object (see org.datanucleus.DNStateManager, e.g DNStateManager.PC)
      * @return The persisted object
      * @throws NucleusUserException if the object is managed by a different manager
      */
-    public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, ObjectProvider ownerSM, int ownerFieldNum, int objectType)
+    public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, int objectType)
     {
         if (obj == null)
         {
@@ -2034,7 +2034,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("010015", StringUtils.toJVMIDString(obj)));
                 }
-                ObjectProvider sm = findObjectProvider(obj);
+                DNStateManager sm = findStateManager(obj);
                 if (sm == null)
                 {
                     throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(obj)));
@@ -2062,7 +2062,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             {
                                 // User has set id field(s) so find the datastore object (if exists)
                                 T existingObj = (T)findObject(transientId, true, true, cmd.getFullClassName());
-                                findObjectProvider(existingObj).attach(obj);
+                                findStateManager(existingObj).attach(obj);
 
                                 id = transientId;
                                 merged = true;
@@ -2083,16 +2083,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                 if (!merged)
                 {
-                    ObjectProvider<T> op = findObjectProvider(obj);
+                    DNStateManager<T> op = findStateManager(obj);
                     if (op == null)
                     {
-                        if ((objectType == ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC || 
-                             objectType == ObjectProvider.EMBEDDED_MAP_KEY_PC ||
-                             objectType == ObjectProvider.EMBEDDED_MAP_VALUE_PC ||
-                             objectType == ObjectProvider.EMBEDDED_PC) && ownerSM != null)
+                        if ((objectType == DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC || 
+                             objectType == DNStateManager.EMBEDDED_MAP_KEY_PC ||
+                             objectType == DNStateManager.EMBEDDED_MAP_VALUE_PC ||
+                             objectType == DNStateManager.EMBEDDED_PC) && ownerSM != null)
                         {
                             // SCO object
-                            op = nucCtx.getObjectProviderFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum);
+                            op = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum);
                             op.setPcObjectType((short) objectType);
                             op.makePersistent();
                             id = op.getInternalObjectId();
@@ -2100,7 +2100,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         else
                         {
                             // FCO object
-                            op = nucCtx.getObjectProviderFactory().newForPersistentNew(this, obj, preInsertChanges);
+                            op = nucCtx.getStateManagerFactory().newForPersistentNew(this, obj, preInsertChanges);
                             op.makePersistent();
                             id = op.getInternalObjectId();
                         }
@@ -2133,19 +2133,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("010015", StringUtils.toJVMIDString(obj)));
                 }
-                ObjectProvider sm = findObjectProvider(obj);
+                DNStateManager sm = findStateManager(obj);
                 sm.makePersistent();
                 id = sm.getInternalObjectId();
                 cacheable = nucCtx.isClassCacheable(sm.getClassMetaData());
             }
             else if (api.isDeleted(obj))
             {
-                // Deleted : (re)-persist it (permitted in JPA, but not JDO - see ObjectProvider)
+                // Deleted : (re)-persist it (permitted in JPA, but not JDO - see StateManager)
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("010015", StringUtils.toJVMIDString(obj)));
                 }
-                ObjectProvider sm = findObjectProvider(obj);
+                DNStateManager sm = findStateManager(obj);
                 sm.makePersistent();
                 id = sm.getInternalObjectId();
                 cacheable = nucCtx.isClassCacheable(sm.getClassMetaData());
@@ -2159,7 +2159,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     {
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("010015", StringUtils.toJVMIDString(obj)));
                     }
-                    ObjectProvider sm = findObjectProvider(obj);
+                    DNStateManager sm = findStateManager(obj);
                     sm.makePersistent();
                     id = sm.getInternalObjectId();
                     cacheable = nucCtx.isClassCacheable(sm.getClassMetaData());
@@ -2183,14 +2183,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param pc The object
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.ObjectProvider, e.g ObjectProvider.PC)
+     * @param objectType Type of object (see org.datanucleus.DNStateManager, e.g DNStateManager.PC)
      * @return The persisted object
      */
-    public <T> T persistObjectInternal(T pc, ObjectProvider ownerSM, int ownerFieldNum, int objectType)
+    public <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, int objectType)
     {
         if (ownerSM != null)
         {
-            ObjectProvider sm = findObjectProvider(ownerSM.getObject());
+            DNStateManager sm = findStateManager(ownerSM.getObject());
             return persistObjectInternal(pc, null, sm, ownerFieldNum, objectType);
         }
         return persistObjectInternal(pc, null, null, ownerFieldNum, objectType);
@@ -2306,16 +2306,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     void deleteObjectWork(Object obj)
     {
-        ObjectProvider sm = findObjectProvider(obj);
+        DNStateManager sm = findStateManager(obj);
         if (sm == null && getApiAdapter().isDetached(obj))
         {
             // Delete of detached, so find a managed attached version and delete that
             Object attachedObj = findObject(getApiAdapter().getIdForObject(obj), true, false, obj.getClass().getName());
-            sm = findObjectProvider(attachedObj);
+            sm = findStateManager(attachedObj);
         }
         if (sm != null)
         {
-            // Add the object to the relevant list of dirty ObjectProviders
+            // Add the object to the relevant list of dirty StateManagers
             if (indirectDirtySMs.contains(sm))
             {
                 // Object is dirty indirectly, but now user-requested so move to direct list of dirty objects
@@ -2391,7 +2391,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
 
             // Delete it
-            ObjectProvider sm = findObjectProvider(pc);
+            DNStateManager sm = findStateManager(pc);
             if (sm == null)
             {
                 if (!getApiAdapter().allowDeleteOfNonPersistentObject())
@@ -2401,7 +2401,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
 
                 // Put StateManager around object so it is P_NEW (unpersisted), then P_NEW_DELETED soon after
-                sm = nucCtx.getObjectProviderFactory().newForPNewToBeDeleted(this, pc);
+                sm = nucCtx.getStateManagerFactory().newForPNewToBeDeleted(this, pc);
             }
 
             if (l2CacheTxIds != null && nucCtx.isClassCacheable(sm.getClassMetaData()))
@@ -2445,7 +2445,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             if (getApiAdapter().isPersistent(obj))
             {
-                ObjectProvider sm = findObjectProvider(obj);
+                DNStateManager sm = findStateManager(obj);
                 sm.makeTransient(state);
             }
         }
@@ -2477,10 +2477,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 assertActiveTransaction();
             }
 
-            ObjectProvider sm = findObjectProvider(obj);
+            DNStateManager sm = findStateManager(obj);
             if (sm == null)
             {
-                sm = nucCtx.getObjectProviderFactory().newForTransactionalTransient(this, obj);
+                sm = nucCtx.getStateManagerFactory().newForTransactionalTransient(this, obj);
             }
             sm.makeTransactional();
         }
@@ -2510,7 +2510,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 throw new NucleusUserException(Localiser.msg("010024"));
             }
 
-            ObjectProvider sm = findObjectProvider(obj);
+            DNStateManager sm = findStateManager(obj);
             sm.makeNontransactional();
         }
         finally
@@ -2527,12 +2527,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param pc The persistable object
      * @param sco Whether the PC object is stored without an identity (embedded/serialised)
      */
-    public void attachObject(ObjectProvider ownerSM, Object pc, boolean sco)
+    public void attachObject(DNStateManager ownerSM, Object pc, boolean sco)
     {
         assertClassPersistable(pc.getClass());
 
         // Store the owner for this persistable object being attached
-        Map<Persistable, ObjectProvider> attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
+        Map<Persistable, DNStateManager> attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
         if (attachedOwnerByObject != null)
         {
             attachedOwnerByObject.put((Persistable) pc, ownerSM);
@@ -2548,7 +2548,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else if (id == null && !sco)
         {
             // Transient object so needs persisting
-            persistObjectInternal(pc, null, null, -1, ObjectProvider.PC);
+            persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
             return;
         }
 
@@ -2557,7 +2557,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Detached, so migrate to attached
             if (cache != null)
             {
-                ObjectProvider l1CachedSM = cache.get(id);
+                DNStateManager l1CachedSM = cache.get(id);
                 if (l1CachedSM != null && l1CachedSM.getObject() != pc)
                 {
                     // attached object with the same id already present in the L1 cache so cannot attach in-situ
@@ -2570,7 +2570,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("010016", IdentityUtils.getPersistableIdentityForId(id)));
             }
 
-            nucCtx.getObjectProviderFactory().newForDetached(this, pc, id, api.getVersionForObject(pc)).attach(sco);
+            nucCtx.getStateManagerFactory().newForDetached(this, pc, id, api.getVersionForObject(pc)).attach(sco);
         }
         else
         {
@@ -2587,13 +2587,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param sco Whether it has no identity (second-class object)
      * @return The attached object
      */
-    public <T> T attachObjectCopy(ObjectProvider ownerSM, T pc, boolean sco)
+    public <T> T attachObjectCopy(DNStateManager ownerSM, T pc, boolean sco)
     {
         assertClassPersistable(pc.getClass());
         assertDetachable(pc);
 
         // Store the owner for this persistable object being attached
-        Map<Persistable, ObjectProvider> attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
+        Map<Persistable, DNStateManager> attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
         if (attachedOwnerByObject != null)
         {
             attachedOwnerByObject.put((Persistable) pc, ownerSM);
@@ -2609,7 +2609,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else if (id == null && !sco)
         {
             // Object was not persisted before so persist it
-            return persistObjectInternal(pc, null, null, -1, ObjectProvider.PC);
+            return persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
         }
         else if (api.isPersistent(pc))
         {
@@ -2623,7 +2623,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // SCO PC (embedded/serialised)
             boolean detached = getApiAdapter().isDetached(pc);
-            ObjectProvider<T> targetSM = nucCtx.getObjectProviderFactory().newForEmbedded(this, pc, true, null, -1);
+            DNStateManager<T> targetSM = nucCtx.getStateManagerFactory().newForEmbedded(this, pc, true, null, -1);
             pcTarget = targetSM.getObject();
             if (detached)
             {
@@ -2659,7 +2659,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     {
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("010018", StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(pcTarget)));
                     }
-                    pcTarget = (T) findObjectProvider(pcTarget).attachCopy(pc, sco);
+                    pcTarget = (T) findStateManager(pcTarget).attachCopy(pc, sco);
 
                     // Save the detached-attached PCs for later reference
                     if (attachedPCById != null) // Only used by persistObject process
@@ -2699,11 +2699,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Transient object passed so persist it before thinking about detaching
             if (tx.isActive())
             {
-                persistObjectInternal(obj, null, null, -1, ObjectProvider.PC);
+                persistObjectInternal(obj, null, null, -1, DNStateManager.PC);
             }
         }
 
-        ObjectProvider sm = findObjectProvider(obj);
+        DNStateManager sm = findStateManager(obj);
         if (sm == null)
         {
             throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(obj)));
@@ -2729,7 +2729,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return;
         }
 
-        Collection<ObjectProvider> smsToDetach = new HashSet<>();
+        Collection<DNStateManager> smsToDetach = new HashSet<>();
         for (Object pc : pcs)
         {
             if (getApiAdapter().isDetached(pc))
@@ -2748,18 +2748,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Transient object passed so persist it before thinking about detaching
                 if (tx.isActive())
                 {
-                    persistObjectInternal(pc, null, null, -1, ObjectProvider.PC);
+                    persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
                 }
             }
 
-            ObjectProvider sm = findObjectProvider(pc);
+            DNStateManager sm = findStateManager(pc);
             if (sm != null)
             {
                 smsToDetach.add(sm);
             }
         }
 
-        for (ObjectProvider sm : smsToDetach)
+        for (DNStateManager sm : smsToDetach)
         {
             sm.detach(state);
 
@@ -2792,7 +2792,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Transient object passed so persist it before thinking about detaching
                 if (tx.isActive())
                 {
-                    thePC = persistObjectInternal(pc, null, null, -1, ObjectProvider.PC);
+                    thePC = persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
                 }
                 else
                 {
@@ -2809,7 +2809,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 thePC = (T)findObject(getApiAdapter().getIdForObject(thePC), false, true, null);
             }
 
-            ObjectProvider<T> sm = findObjectProvider(thePC);
+            DNStateManager<T> sm = findStateManager(thePC);
             if (sm == null)
             {
                 throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(thePC)));
@@ -2830,20 +2830,20 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void detachAll()
     {
-        Collection<ObjectProvider> smsToDetach = new HashSet<>(this.enlistedSMCache.values());
+        Collection<DNStateManager> smsToDetach = new HashSet<>(this.enlistedSMCache.values());
         if (cache != null && !cache.isEmpty())
         {
             smsToDetach.addAll(cache.values());
         }
 
         FetchPlanState fps = new FetchPlanState();
-        for (ObjectProvider sm : smsToDetach)
+        for (DNStateManager sm : smsToDetach)
         {
             sm.detach(fps);
         }
     }
 
-    public Object getAttachDetachReferencedObject(ObjectProvider sm)
+    public Object getAttachDetachReferencedObject(DNStateManager sm)
     {
         if (smAttachDetachObjectReferenceMap == null)
         {
@@ -2852,13 +2852,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return smAttachDetachObjectReferenceMap.get(sm);
     }
 
-    public void setAttachDetachReferencedObject(ObjectProvider sm, Object obj)
+    public void setAttachDetachReferencedObject(DNStateManager sm, Object obj)
     {
         if (obj != null)
         {
             if (smAttachDetachObjectReferenceMap == null)
             {
-                smAttachDetachObjectReferenceMap = new HashMap<ObjectProvider, Object>();
+                smAttachDetachObjectReferenceMap = new HashMap<DNStateManager, Object>();
             }
             smAttachDetachObjectReferenceMap.put(sm,  obj);
         }
@@ -2947,7 +2947,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         Set objs = new HashSet();
-        for (ObjectProvider sm : enlistedSMCache.values())
+        for (DNStateManager sm : enlistedSMCache.values())
         {
             objs.add(sm.getObject());
         }
@@ -2968,7 +2968,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         Set objs = new HashSet();
-        for (ObjectProvider sm : enlistedSMCache.values())
+        for (DNStateManager sm : enlistedSMCache.values())
         {
             for (int i=0;i<classes.length;i++)
             {
@@ -2996,7 +2996,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         Set objs = new HashSet();
-        for (ObjectProvider sm : enlistedSMCache.values())
+        for (DNStateManager sm : enlistedSMCache.values())
         {
             for (int i=0;i<states.length;i++)
             {
@@ -3025,7 +3025,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         Set objs = new HashSet();
-        for (ObjectProvider sm : enlistedSMCache.values())
+        for (DNStateManager sm : enlistedSMCache.values())
         {
             boolean matches = false;
             for (int i=0;i<states.length;i++)
@@ -3175,7 +3175,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // Check whether this is cached against the unique key
         CacheUniqueKey uniKey = new CacheUniqueKey(cls.getName(), memberNames, memberValues);
-        ObjectProvider sm = cache.getUnique(uniKey);
+        DNStateManager sm = cache.getUnique(uniKey);
         if (sm == null && l2CacheEnabled)
         {
             if (NucleusLogger.CACHE.isDebugEnabled())
@@ -3187,7 +3187,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             Object pc = getObjectFromLevel2CacheForUnique(uniKey);
             if (pc != null)
             {
-                sm = findObjectProvider(pc);
+                sm = findStateManager(pc);
             }
         }
         if (sm != null)
@@ -3219,7 +3219,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         assertIsOpen();
 
         Persistable pc = null;
-        ObjectProvider sm = null;
+        DNStateManager sm = null;
 
         if (!ignoreCache)
         {
@@ -3251,7 +3251,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     // Found following inheritance check via the cache
                     pc = details.pc;
-                    sm = findObjectProvider(pc);
+                    sm = findStateManager(pc);
                 }
             }
 
@@ -3273,7 +3273,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
 
                 createdHollow = true;
-                sm = nucCtx.getObjectProviderFactory().newForHollow(this, cls, id, fv); // Will put object in L1 cache
+                sm = nucCtx.getStateManagerFactory().newForHollow(this, cls, id, fv); // Will put object in L1 cache
                 pc = (Persistable) sm.getObject();
                 putObjectIntoLevel2Cache(sm, false);
             }
@@ -3284,7 +3284,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Object found in the cache so load the requested fields
             if (sm == null)
             {
-                sm = findObjectProvider(pc);
+                sm = findStateManager(pc);
             }
             if (sm != null)
             {
@@ -3385,12 +3385,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         boolean performValidationWhenCached = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED);
-        List<ObjectProvider> smsToValidate = new ArrayList<>();
+        List<DNStateManager> smsToValidate = new ArrayList<>();
         if (validate)
         {
             if (performValidationWhenCached)
             {
-                // Mark all ObjectProviders for validation (performed at end)
+                // Mark all StateManagers for validation (performed at end)
                 Collection pcValues = pcById.values();
                 for (Object pc : pcValues)
                 {
@@ -3401,7 +3401,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     }
 
                     // Mark this object for validation
-                    smsToValidate.add(findObjectProvider(pc));
+                    smsToValidate.add(findStateManager(pc));
                 }
             }
         }
@@ -3418,11 +3418,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             Object idOrig = id; // Id target class could change due to inheritance level
             Persistable pc = foundPcs != null ? (Persistable)foundPcs[foundPcIdx++] : null;
-            ObjectProvider sm = null;
+            DNStateManager sm = null;
             if (pc != null)
             {
                 // Object created by store plugin
-                sm = findObjectProvider(pc);
+                sm = findStateManager(pc);
                 putObjectIntoLevel1Cache(sm);
             }
             else
@@ -3435,7 +3435,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     // Found in cache from updated id
                     pc = details.pc;
-                    sm = findObjectProvider(pc);
+                    sm = findStateManager(pc);
                     if (performValidationWhenCached && validate)
                     {
                         if (!api.isTransactional(pc))
@@ -3457,7 +3457,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             throw new NucleusObjectNotFoundException(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id), className));
                         }
 
-                        sm = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
+                        sm = nucCtx.getStateManagerFactory().newForHollow(this, pcClass, id);
                         pc = (Persistable) sm.getObject();
                         if (!validate)
                         {
@@ -3490,7 +3490,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Validate the objects that need it
             try
             {
-                getStoreManager().getPersistenceHandler().locateObjects(smsToValidate.toArray(new ObjectProvider[smsToValidate.size()]));
+                getStoreManager().getPersistenceHandler().locateObjects(smsToValidate.toArray(new DNStateManager[smsToValidate.size()]));
             }
             catch (NucleusObjectNotFoundException nonfe)
             {
@@ -3547,7 +3547,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // try to find object in cache(s)
         Persistable pc = getObjectFromCache(id);
-        ObjectProvider sm = null;
+        DNStateManager sm = null;
         if (pc != null)
         {
             // Found in L1/L2 cache
@@ -3565,7 +3565,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // JDO [12.6.5] If there's already an object with the same id and it's transactional, return it
                 return pc;
             }
-            sm = findObjectProvider(pc);
+            sm = findStateManager(pc);
         }
         else
         {
@@ -3573,7 +3573,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             pc = (Persistable) getStoreManager().getPersistenceHandler().findObject(this, id);
             if (pc != null)
             {
-                sm = findObjectProvider(pc);
+                sm = findStateManager(pc);
                 putObjectIntoLevel1Cache(sm);
                 putObjectIntoLevel2Cache(sm, false);
             }
@@ -3587,7 +3587,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     // Found during inheritance check via the cache
                     pc = details.pc;
-                    sm = findObjectProvider(pc);
+                    sm = findStateManager(pc);
                     fromCache = true;
                 }
                 else
@@ -3602,7 +3602,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             throw new NucleusObjectNotFoundException(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id), className));
                         }
 
-                        sm = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
+                        sm = nucCtx.getStateManagerFactory().newForHollow(this, pcClass, id);
                         pc = (Persistable) sm.getObject();
                         if (!checkInheritance && !validate)
                         {
@@ -3954,7 +3954,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to clear an object from the list of dirty objects.
      * @param sm StateManager
      */
-    public void clearDirty(ObjectProvider sm)
+    public void clearDirty(DNStateManager sm)
     {
         dirtySMs.remove(sm);
         indirectDirtySMs.remove(sm);
@@ -3974,7 +3974,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param sm StateManager
      * @param directUpdate Whether the object has had a direct update made on it (if known)
      */
-    public void markDirty(ObjectProvider sm, boolean directUpdate)
+    public void markDirty(DNStateManager sm, boolean directUpdate)
     {
         if (tx.isCommitting() && !tx.isActive())
         {
@@ -4036,9 +4036,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param sm StateManager
      * @return The RelationshipManager
      */
-    public RelationshipManager getRelationshipManager(ObjectProvider sm)
+    public RelationshipManager getRelationshipManager(DNStateManager sm)
     {
-        return managedRelationsHandler != null ? managedRelationsHandler.getRelationshipManagerForObjectProvider(sm) : null;
+        return managedRelationsHandler != null ? managedRelationsHandler.getRelationshipManagerForStateManager(sm) : null;
     }
 
     /**
@@ -4052,11 +4052,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Convenience method to inspect the list of objects with outstanding changes to flush.
-     * @return ObjectProviders for the objects to be flushed.
+     * @return StateManagers for the objects to be flushed.
      */
-    public List<ObjectProvider> getObjectsToBeFlushed()
+    public List<DNStateManager> getObjectsToBeFlushed()
     {
-        List<ObjectProvider> sms = new ArrayList<>();
+        List<DNStateManager> sms = new ArrayList<>();
         sms.addAll(dirtySMs);
         sms.addAll(indirectDirtySMs);
         return sms;
@@ -4186,9 +4186,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#flushSCOOperationsForBackingStore(org.datanucleus.store.scostore.Store, org.datanucleus.state.ObjectProvider)
+     * @see org.datanucleus.ExecutionContext#flushSCOOperationsForBackingStore(org.datanucleus.store.scostore.Store, org.datanucleus.state.DNStateManager)
      */
-    public void flushOperationsForBackingStore(Store backingStore, ObjectProvider sm)
+    public void flushOperationsForBackingStore(Store backingStore, DNStateManager sm)
     {
         if (operationQueue != null)
         {
@@ -4211,12 +4211,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void postBegin()
     {
-        ObjectProvider[] sms = dirtySMs.toArray(new ObjectProvider[dirtySMs.size()]);
+        DNStateManager[] sms = dirtySMs.toArray(new DNStateManager[dirtySMs.size()]);
         for (int i=0; i<sms.length; i++)
         {
             sms[i].preBegin(tx);
         }
-        sms = indirectDirtySMs.toArray(new ObjectProvider[indirectDirtySMs.size()]);
+        sms = indirectDirtySMs.toArray(new DNStateManager[indirectDirtySMs.size()]);
         for (int i=0; i<sms.length; i++)
         {
             sms[i].preBegin(tx);
@@ -4231,8 +4231,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             // Check for objects that are managed but not dirty, yet require a version update
-            Collection<ObjectProvider> cachedSMs = new HashSet<>(cache.values());
-            for (ObjectProvider cachedSM : cachedSMs)
+            Collection<DNStateManager> cachedSMs = new HashSet<>(cache.values());
+            for (DNStateManager cachedSM : cachedSMs)
             {
                 LockMode lockMode = getLockManager().getLockMode(cachedSM);
                 if (cachedSM != null && cachedSM.isFlushedToDatastore() && cachedSM.getClassMetaData().isVersioned() && 
@@ -4358,11 +4358,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         // Process all modified objects adding/updating/removing from L2 cache as appropriate
-        Set<ObjectProvider> smsToCache = null;
+        Set<DNStateManager> smsToCache = null;
         Set<Object> idsToRemove = null;
         for (Object id : l2CacheTxIds)
         {
-            ObjectProvider sm = enlistedSMCache.get(id);
+            DNStateManager sm = enlistedSMCache.get(id);
             if (sm == null)
             {
                 // Modified object either no longer enlisted (GCed) OR is an embedded object without own identity. Remove from L2 if present
@@ -4425,7 +4425,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         if (smsToCache != null && !smsToCache.isEmpty())
         {
-            // Bulk put into L2 cache of required ObjectProviders
+            // Bulk put into L2 cache of required StateManagers
             putObjectsIntoLevel2Cache(smsToCache);
         }
 
@@ -4445,7 +4445,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // the user via the FetchPlan property DetachmentRoots or DetachmentRootClasses. 
         // If not set explicitly, the detachment roots consist of the union of all root instances of
         // methods executed since the last commit or rollback."
-        Collection<ObjectProvider> sms = new ArrayList<>();
+        Collection<DNStateManager> sms = new ArrayList<>();
         Collection roots = fetchPlan.getDetachmentRoots();
         Class[] rootClasses = fetchPlan.getDetachmentRootClasses();
         if (roots != null && !roots.isEmpty())
@@ -4453,13 +4453,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Detachment roots specified
             for (Object root : roots)
             {
-                sms.add(findObjectProvider(root));
+                sms.add(findStateManager(root));
             }
         }
         else if (rootClasses != null && rootClasses.length > 0)
         {
             // Detachment root classes specified
-            ObjectProvider[] txSMs = enlistedSMCache.values().toArray(new ObjectProvider[enlistedSMCache.size()]);
+            DNStateManager[] txSMs = enlistedSMCache.values().toArray(new DNStateManager[enlistedSMCache.size()]);
             for (int i=0;i<txSMs.length;i++)
             {
                 for (int j=0;j<rootClasses.length;j++)
@@ -4481,10 +4481,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         // Make sure that all FetchPlan fields are loaded
-        Iterator<ObjectProvider> smsIter = sms.iterator();
+        Iterator<DNStateManager> smsIter = sms.iterator();
         while (smsIter.hasNext())
         {
-            ObjectProvider sm = smsIter.next();
+            DNStateManager sm = smsIter.next();
             Object pc = sm.getObject();
             if (pc != null && !getApiAdapter().isDetached(pc) && !getApiAdapter().isDeleted(pc))
             {
@@ -4505,7 +4505,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
             }
         }
-        detachAllOnTxnEndSMs = sms.toArray(new ObjectProvider[sms.size()]);
+        detachAllOnTxnEndSMs = sms.toArray(new DNStateManager[sms.size()]);
     }
 
     /**
@@ -4520,7 +4520,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (detachAllOnTxnEndSMs != null)
             {
                 // Detach all detachment root objects (causes recursion through the fetch plan)
-                ObjectProvider[] smsToDetach = detachAllOnTxnEndSMs;
+                DNStateManager[] smsToDetach = detachAllOnTxnEndSMs;
                 DetachState state = new DetachState(getApiAdapter());
                 for (int i=0;i<smsToDetach.length;i++)
                 {
@@ -4562,9 +4562,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         List failures = null;
         try
         {
-            // Commit all enlisted ObjectProviders
+            // Commit all enlisted StateManagers
             ApiAdapter api = getApiAdapter();
-            ObjectProvider[] ops = enlistedSMCache.values().toArray(new ObjectProvider[enlistedSMCache.size()]);
+            DNStateManager[] ops = enlistedSMCache.values().toArray(new DNStateManager[enlistedSMCache.size()]);
             for (int i = 0; i < ops.length; ++i)
             {
                 try
@@ -4580,7 +4580,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         if (properties.getFrequentProperties().getDetachAllOnCommit() && api.isDetachable(ops[i].getObject()))
                         {
                             // "DetachAllOnCommit" - Remove the object from the L1 cache since it is now detached
-                            removeObjectProviderFromCache(ops[i]);
+                            removeStateManagerFromCache(ops[i]);
                         }
                     }
                 }
@@ -4612,11 +4612,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         List<Exception> failures = null;
         try
         {
-            Collection<ObjectProvider> sms = enlistedSMCache.values();
-            Iterator<ObjectProvider> smsIter = sms.iterator();
+            Collection<DNStateManager> sms = enlistedSMCache.values();
+            Iterator<DNStateManager> smsIter = sms.iterator();
             while (smsIter.hasNext())
             {
-                ObjectProvider sm = smsIter.next();
+                DNStateManager sm = smsIter.next();
                 try
                 {
                     sm.preRollback(getTransaction());
@@ -4722,7 +4722,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Convenience method to add an object to the L1 cache.
      * @param sm StateManager
      */
-    public void putObjectIntoLevel1Cache(ObjectProvider sm)
+    public void putObjectIntoLevel1Cache(DNStateManager sm)
     {
         if (cache != null)
         {
@@ -4749,7 +4749,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     for (UniqueMetaData unimd : unimds)
                     {
-                        CacheUniqueKey uniKey = getCacheUniqueKeyForObjectProvider(sm, unimd);
+                        CacheUniqueKey uniKey = getCacheUniqueKeyForStateManager(sm, unimd);
                         if (uniKey != null)
                         {
                             cache.putUnique(uniKey, sm);
@@ -4759,7 +4759,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
 
             // Put into Level 1 Cache
-            ObjectProvider oldSM = cache.put(id, sm);
+            DNStateManager oldSM = cache.put(id, sm);
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
                 if (oldSM == null)
@@ -4776,7 +4776,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param unimd The unique key that this key will relate to
      * @return The CacheUniqueKey, or null if any member of the unique key is null, or if the unique key is not defined on members
      */
-    private CacheUniqueKey getCacheUniqueKeyForObjectProvider(ObjectProvider sm, UniqueMetaData unimd)
+    private CacheUniqueKey getCacheUniqueKeyForStateManager(DNStateManager sm, UniqueMetaData unimd)
     {
         boolean nonNullMembers = true;
         if (unimd.getNumberOfMembers() > 0)
@@ -4806,7 +4806,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param sm StateManager for the object
      * @param updateIfPresent Whether to update it in the L2 cache if already present
      */
-    protected void putObjectIntoLevel2Cache(ObjectProvider sm, boolean updateIfPresent)
+    protected void putObjectIntoLevel2Cache(DNStateManager sm, boolean updateIfPresent)
     {
         if (sm.getInternalObjectId() == null || !nucCtx.isClassCacheable(sm.getClassMetaData()))
         {
@@ -4833,7 +4833,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param currentCachedPC Current L2 cached object (if any) to use for updating
      * @return The cacheable form of the object
      */
-    protected CachedPC getL2CacheableObject(ObjectProvider sm, CachedPC currentCachedPC)
+    protected CachedPC getL2CacheableObject(DNStateManager sm, CachedPC currentCachedPC)
     {
         CachedPC cachedPC = null;
         int[] fieldsToUpdate = null;
@@ -4919,13 +4919,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Performs the "put" in batches
      * @param sms StateManagers whose objects are to be cached
      */
-    protected void putObjectsIntoLevel2Cache(Set<ObjectProvider> sms)
+    protected void putObjectsIntoLevel2Cache(Set<DNStateManager> sms)
     {
         int batchSize = nucCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_BATCHSIZE);
         Level2Cache l2Cache = nucCtx.getLevel2Cache();
         Map<Object, CachedPC> dataToUpdate = new HashMap<>();
         Map<CacheUniqueKey, CachedPC> dataUniqueToUpdate = new HashMap<>();
-        for (ObjectProvider sm : sms)
+        for (DNStateManager sm : sms)
         {
             Object id = sm.getInternalObjectId();
             if (id == null || !nucCtx.isClassCacheable(sm.getClassMetaData()))
@@ -4955,7 +4955,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     for (UniqueMetaData unimd : unimds)
                     {
-                        CacheUniqueKey uniKey = getCacheUniqueKeyForObjectProvider(sm, unimd);
+                        CacheUniqueKey uniKey = getCacheUniqueKeyForStateManager(sm, unimd);
                         if (uniKey != null)
                         {
                             dataUniqueToUpdate.put(uniKey, cachedPC);
@@ -4989,7 +4989,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param sm StateManager of the object to add.
      * @param updateIfPresent Whether to update the L2 cache if it is present
      */
-    protected void putObjectIntoLevel2CacheInternal(ObjectProvider sm, boolean updateIfPresent)
+    protected void putObjectIntoLevel2CacheInternal(DNStateManager sm, boolean updateIfPresent)
     {
         Object id = sm.getInternalObjectId();
         if (id == null || id instanceof IdentityReference)
@@ -5019,7 +5019,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 for (UniqueMetaData unimd : unimds)
                 {
-                    CacheUniqueKey uniKey = getCacheUniqueKeyForObjectProvider(sm, unimd);
+                    CacheUniqueKey uniKey = getCacheUniqueKeyForStateManager(sm, unimd);
                     if (uniKey != null)
                     {
                         l2Cache.putUnique(uniKey, cachedPC);
@@ -5094,7 +5094,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Convenience method to access an object in the cache.
      * Firstly looks in the L1 cache for this context, and if not found looks in the L2 cache.
      * @param id Id of the object
-     * @return Persistable object (with connected ObjectProvider).
+     * @return Persistable object (with connected StateManager).
      */
     public Persistable getObjectFromCache(Object id)
     {
@@ -5118,7 +5118,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Convenience method to access objects in the cache.
      * Firstly looks in the L1 cache for this context, and if not found looks in the L2 cache.
      * @param ids Ids of the objects
-     * @return Persistable objects (with connected ObjectProviders), or null.
+     * @return Persistable objects (with connected StateManagers), or null.
      */
     public Persistable[] getObjectsFromCache(Object[] ids)
     {
@@ -5159,12 +5159,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /**
      * Convenience method to access an object in the Level 1 cache.
      * @param id Id of the object
-     * @return Persistable object (with connected ObjectProvider).
+     * @return Persistable object (with connected StateManager).
      */
     protected Persistable getObjectFromLevel1Cache(Object id)
     {
         Persistable pc = null;
-        ObjectProvider sm = null;
+        DNStateManager sm = null;
 
         if (cache != null)
         {
@@ -5194,7 +5194,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /**
      * Convenience method to access an object in the Level 2 cache.
      * @param id Id of the object
-     * @return Persistable object (with connected ObjectProvider).
+     * @return Persistable object (with connected StateManager).
      */
     protected Persistable getObjectFromLevel2Cache(Object id)
     {
@@ -5220,7 +5220,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (cachedPC != null)
             {
                 // Create active version of cached object with StateManager connected and same id
-                ObjectProvider sm = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
+                DNStateManager sm = nucCtx.getStateManagerFactory().newForCachedPC(this, id, cachedPC);
                 pc = (Persistable) sm.getObject(); // Object in P_CLEAN state
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
@@ -5277,7 +5277,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 Object id = cachedPC.getId();
 
                 // Create active version of cached object with StateManager connected and same id
-                ObjectProvider sm = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
+                DNStateManager sm = nucCtx.getStateManagerFactory().newForCachedPC(this, id, cachedPC);
                 pc = (Persistable) sm.getObject(); // Object in P_CLEAN state
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
@@ -5311,7 +5311,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /**
      * Convenience method to access a collection of objects from the Level 2 cache.
      * @param ids Collection of ids to retrieve
-     * @return Map of persistable objects (with connected ObjectProvider) keyed by their id if found in the L2 cache
+     * @return Map of persistable objects (with connected StateManager) keyed by their id if found in the L2 cache
      */
     protected Map<Object, Persistable> getObjectsFromLevel2Cache(Collection ids)
     {
@@ -5329,7 +5329,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (cachedPC != null)
                 {
                     // Create active version of cached object with StateManager connected and same id
-                    ObjectProvider sm = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
+                    DNStateManager sm = nucCtx.getStateManagerFactory().newForCachedPC(this, id, cachedPC);
                     Persistable pc = (Persistable)sm.getObject(); // Object in P_CLEAN state
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
@@ -5379,7 +5379,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return;
         }
 
-        ObjectProvider sm = findObjectProvider(pc);
+        DNStateManager sm = findStateManager(pc);
 
         // Update L1 cache
         if (cache != null)
@@ -5732,15 +5732,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#registerEmbeddedRelation(org.datanucleus.state.ObjectProvider, int, org.datanucleus.state.ObjectProvider)
+     * @see org.datanucleus.ExecutionContext#registerEmbeddedRelation(org.datanucleus.state.DNStateManager, int, org.datanucleus.state.DNStateManager)
      */
-    public EmbeddedOwnerRelation registerEmbeddedRelation(ObjectProvider ownerSM, int ownerFieldNum, ObjectProvider embSM)
+    public EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM)
     {
         EmbeddedOwnerRelation relation = new EmbeddedOwnerRelation(ownerSM, ownerFieldNum, embSM);
 
         if (smEmbeddedInfoByEmbedded == null)
         {
-            smEmbeddedInfoByEmbedded = new HashMap<ObjectProvider, List<EmbeddedOwnerRelation>>();
+            smEmbeddedInfoByEmbedded = new HashMap<DNStateManager, List<EmbeddedOwnerRelation>>();
         }
         List<EmbeddedOwnerRelation> relations = smEmbeddedInfoByEmbedded.get(embSM);
         if (relations == null)
@@ -5752,7 +5752,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (smEmbeddedInfoByOwner == null)
         {
-            smEmbeddedInfoByOwner = new HashMap<ObjectProvider, List<EmbeddedOwnerRelation>>();
+            smEmbeddedInfoByOwner = new HashMap<DNStateManager, List<EmbeddedOwnerRelation>>();
         }
         relations = smEmbeddedInfoByOwner.get(ownerSM);
         if (relations == null)
@@ -5799,9 +5799,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#removeEmbeddedOwnerRelation(org.datanucleus.state.ObjectProvider, int, org.datanucleus.state.ObjectProvider)
+     * @see org.datanucleus.ExecutionContext#removeEmbeddedOwnerRelation(org.datanucleus.state.DNStateManager, int, org.datanucleus.state.DNStateManager)
      */
-    public void removeEmbeddedOwnerRelation(ObjectProvider ownerSM, int ownerFieldNum, ObjectProvider embSM)
+    public void removeEmbeddedOwnerRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM)
     {
         if (smEmbeddedInfoByOwner != null)
         {
@@ -5823,12 +5823,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Accessor for the owning ObjectProviders for the managed object when stored embedded.
+     * Accessor for the owning StateManagers for the managed object when stored embedded.
      * Should really only have a single owner but users could, in principle, assign it to multiple.
      * @param embSM StateManager that is embedded that we are looking for the owners for
-     * @return ObjectProviders owning this embedded object.
+     * @return StateManagers owning this embedded object.
      */
-    public ObjectProvider[] getOwnersForEmbeddedObjectProvider(ObjectProvider embSM)
+    public DNStateManager[] getOwnersForEmbeddedStateManager(DNStateManager embSM)
     {
         if (smEmbeddedInfoByEmbedded == null || !smEmbeddedInfoByEmbedded.containsKey(embSM))
         {
@@ -5836,7 +5836,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         List<EmbeddedOwnerRelation> ownerRels = smEmbeddedInfoByEmbedded.get(embSM);
-        ObjectProvider[] owners = new ObjectProvider[ownerRels.size()];
+        DNStateManager[] owners = new DNStateManager[ownerRels.size()];
         int i = 0;
         for (EmbeddedOwnerRelation rel : ownerRels)
         {
@@ -5846,9 +5846,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getOwnerInformationForEmbedded(org.datanucleus.state.ObjectProvider)
+     * @see org.datanucleus.ExecutionContext#getOwnerInformationForEmbedded(org.datanucleus.state.DNStateManager)
      */
-    public List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(ObjectProvider embSM)
+    public List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(DNStateManager embSM)
     {
         // TODO Drop this method
         if (smEmbeddedInfoByEmbedded == null)
@@ -5859,9 +5859,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getEmbeddedInformationForOwner(org.datanucleus.state.ObjectProvider)
+     * @see org.datanucleus.ExecutionContext#getEmbeddedInformationForOwner(org.datanucleus.state.DNStateManager)
      */
-    public List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(ObjectProvider ownerSM)
+    public List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(DNStateManager ownerSM)
     {
         if (smEmbeddedInfoByOwner == null)
         {
@@ -5871,9 +5871,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#setObjectProviderAssociatedValue(org.datanucleus.state.ObjectProvider, java.lang.Object, java.lang.Object)
+     * @see org.datanucleus.ExecutionContext#setStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object, java.lang.Object)
      */
-    public void setObjectProviderAssociatedValue(ObjectProvider sm, Object key, Object value)
+    public void setStateManagerAssociatedValue(DNStateManager sm, Object key, Object value)
     {
         Map opMap = null;
         if (opAssociatedValuesMapBySM == null)
@@ -5895,9 +5895,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getObjectProviderAssociatedValue(org.datanucleus.state.ObjectProvider, java.lang.Object)
+     * @see org.datanucleus.ExecutionContext#getStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object)
      */
-    public Object getObjectProviderAssociatedValue(ObjectProvider sm, Object key)
+    public Object getStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
         if (opAssociatedValuesMapBySM == null)
         {
@@ -5908,9 +5908,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#removeObjectProviderAssociatedValue(org.datanucleus.state.ObjectProvider, java.lang.Object)
+     * @see org.datanucleus.ExecutionContext#removeStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object)
      */
-    public void removeObjectProviderAssociatedValue(ObjectProvider sm, Object key)
+    public void removeStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
         if (opAssociatedValuesMapBySM != null)
         {
@@ -5923,9 +5923,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#containsObjectProviderAssociatedValue(org.datanucleus.state.ObjectProvider, java.lang.Object)
+     * @see org.datanucleus.ExecutionContext#containsStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object)
      */
-    public boolean containsObjectProviderAssociatedValue(ObjectProvider sm, Object key)
+    public boolean containsStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
         if (opAssociatedValuesMapBySM != null && opAssociatedValuesMapBySM.containsKey(sm))
         {

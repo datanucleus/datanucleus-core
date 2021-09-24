@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
@@ -39,19 +39,19 @@ public class SoftRefCache implements Level1Cache
 {
     public static final String NAME = "soft";
 
-    private Map<Object, ObjectProvider> softCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
-    private Map<CacheUniqueKey, ObjectProvider> softCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
+    private Map<Object, DNStateManager> softCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
+    private Map<CacheUniqueKey, DNStateManager> softCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
 
     public SoftRefCache()
     {
     }
 
-    public ObjectProvider put(Object id, ObjectProvider sm)
+    public DNStateManager put(Object id, DNStateManager sm)
     {
         return softCache.put(id, sm);
     }
 
-    public ObjectProvider get(Object id)
+    public DNStateManager get(Object id)
     {
         return softCache.get(id);
     }
@@ -61,15 +61,15 @@ public class SoftRefCache implements Level1Cache
         return softCache.containsKey(id);
     }
 
-    public ObjectProvider remove(Object id)
+    public DNStateManager remove(Object id)
     {
-        ObjectProvider sm = softCache.remove(id);
+        DNStateManager sm = softCache.remove(id);
         if (softCacheUnique.containsValue(sm))
         {
-            Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = softCacheUnique.entrySet().iterator();
+            Iterator<Entry<CacheUniqueKey, DNStateManager>> entrySetIter = softCacheUnique.entrySet().iterator();
             while (entrySetIter.hasNext())
             {
-                Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
+                Entry<CacheUniqueKey, DNStateManager> entry = entrySetIter.next();
                 if (entry.getValue() == sm)
                 {
                     entrySetIter.remove();
@@ -153,13 +153,13 @@ public class SoftRefCache implements Level1Cache
     }
 
     @Override
-    public ObjectProvider getUnique(CacheUniqueKey key)
+    public DNStateManager getUnique(CacheUniqueKey key)
     {
         return softCacheUnique.get(key);
     }
 
     @Override
-    public Object putUnique(CacheUniqueKey key, ObjectProvider sm)
+    public Object putUnique(CacheUniqueKey key, DNStateManager sm)
     {
         return softCacheUnique.put(key, sm);
     }

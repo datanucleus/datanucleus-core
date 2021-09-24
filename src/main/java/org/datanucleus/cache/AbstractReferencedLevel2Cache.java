@@ -211,8 +211,8 @@ public abstract class AbstractReferencedLevel2Cache implements Level2Cache
     }
 
     /**
-     * Accessor for an object from the cache. The returned object will not have a ObjectProvider connected.
-     * This is because data stored in the Level 2 cache is ObjectProvider and PersistenceManager independent.
+     * Accessor for an object from the cache. The returned object will not have a StateManager connected.
+     * This is because data stored in the Level 2 cache is StateManager and PersistenceManager independent.
      * @param oid The Object ID
      * @return The L2 cacheable object
      */

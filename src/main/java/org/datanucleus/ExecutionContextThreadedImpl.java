@@ -23,7 +23,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.datanucleus.enhancement.Persistable;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.Extent;
 
 /**
@@ -85,7 +85,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void enlistInTransaction(ObjectProvider sm)
+    public void enlistInTransaction(DNStateManager sm)
     {
         try
         {
@@ -99,7 +99,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void evictFromTransaction(ObjectProvider sm)
+    public void evictFromTransaction(DNStateManager sm)
     {
         try
         {
@@ -113,13 +113,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void addObjectProviderToCache(ObjectProvider sm)
+    public void addStateManagerToCache(DNStateManager sm)
     {
         try
         {
             lock.lock();
 
-            super.addObjectProviderToCache(sm);
+            super.addStateManagerToCache(sm);
         }
         finally
         {
@@ -127,13 +127,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void removeObjectProviderFromCache(ObjectProvider sm)
+    public void removeStateManagerFromCache(DNStateManager sm)
     {
         try
         {
             lock.lock();
 
-            super.removeObjectProviderFromCache(sm);
+            super.removeStateManagerFromCache(sm);
         }
         finally
         {
@@ -141,13 +141,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public ObjectProvider findObjectProvider(Object pc)
+    public DNStateManager findStateManager(Object pc)
     {
         try
         {
             lock.lock();
 
-            return super.findObjectProvider(pc);
+            return super.findStateManager(pc);
         }
         finally
         {
@@ -295,7 +295,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void attachObject(ObjectProvider ownerSM, Object pc, boolean sco)
+    public void attachObject(DNStateManager ownerSM, Object pc, boolean sco)
     {
         try
         {
@@ -309,7 +309,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public Object attachObjectCopy(ObjectProvider ownerSM, Object pc, boolean sco)
+    public Object attachObjectCopy(DNStateManager ownerSM, Object pc, boolean sco)
     {
         try
         {
@@ -365,7 +365,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void clearDirty(ObjectProvider sm)
+    public void clearDirty(DNStateManager sm)
     {
         try
         {
@@ -412,7 +412,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void markDirty(ObjectProvider sm, boolean directUpdate)
+    public void markDirty(DNStateManager sm, boolean directUpdate)
     {
         try
         {
@@ -510,7 +510,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public List<ObjectProvider> getObjectsToBeFlushed()
+    public List<DNStateManager> getObjectsToBeFlushed()
     {
         try
         {

@@ -332,7 +332,7 @@ public interface ApiAdapter extends Serializable
      */
     boolean getDefaultPersistentPropertyWhenNotSpecified();
 
-    // ------------------------------ ObjectProvider --------------------------------
+    // ------------------------------ StateManager --------------------------------
 
     /**
      * Convenience method to convert the passed NucleusException into an exception for the API.

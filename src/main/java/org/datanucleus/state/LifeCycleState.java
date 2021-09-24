@@ -87,7 +87,7 @@ public abstract class LifeCycleState
      * @param newStateType The new state
      * @return new LifeCycle state.
      */
-    protected final LifeCycleState changeState(ObjectProvider sm, int newStateType)
+    protected final LifeCycleState changeState(DNStateManager sm, int newStateType)
     {
         LifeCycleState newState = sm.getExecutionContext().getNucleusContext().getApiAdapter().getLifeCycleState(newStateType);
 
@@ -125,7 +125,7 @@ public abstract class LifeCycleState
      * @param newStateType The new state
      * @return new LifeCycle state.
      */
-    protected final LifeCycleState changeTransientState(ObjectProvider sm, int newStateType)
+    protected final LifeCycleState changeTransientState(DNStateManager sm, int newStateType)
     {
         LifeCycleState newState = sm.getExecutionContext().getNucleusContext().getApiAdapter().getLifeCycleState(newStateType);
         
@@ -146,7 +146,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionMakePersistent(ObjectProvider sm)
+    public LifeCycleState transitionMakePersistent(DNStateManager sm)
     {
         return this;
     }
@@ -156,7 +156,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      */
-    public LifeCycleState transitionDeletePersistent(ObjectProvider sm)
+    public LifeCycleState transitionDeletePersistent(DNStateManager sm)
     {
         return this;
     }
@@ -167,7 +167,7 @@ public abstract class LifeCycleState
      * @param refreshFields Whether to refresh loaded fields
      * @return new LifeCycle state.
      */
-    public LifeCycleState transitionMakeTransactional(ObjectProvider sm, boolean refreshFields)
+    public LifeCycleState transitionMakeTransactional(DNStateManager sm, boolean refreshFields)
     {
         return this;
     }
@@ -177,7 +177,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionMakeNontransactional(ObjectProvider sm)
+    public LifeCycleState transitionMakeNontransactional(DNStateManager sm)
     {
         return this;
     }
@@ -189,7 +189,7 @@ public abstract class LifeCycleState
      * @param detachAllOnCommit Whether to detach on commit
      * @return new LifeCycle state.
      */
-    public LifeCycleState transitionMakeTransient(ObjectProvider sm, boolean useFetchPlan, boolean detachAllOnCommit)
+    public LifeCycleState transitionMakeTransient(DNStateManager sm, boolean useFetchPlan, boolean detachAllOnCommit)
     {
         return this;
     }
@@ -200,7 +200,7 @@ public abstract class LifeCycleState
      * @param tx Transaction.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionBegin(ObjectProvider sm, org.datanucleus.transaction.Transaction tx)
+    public LifeCycleState transitionBegin(DNStateManager sm, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
@@ -211,7 +211,7 @@ public abstract class LifeCycleState
      * @param tx the Transaction been committed.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionCommit(ObjectProvider sm, org.datanucleus.transaction.Transaction tx)
+    public LifeCycleState transitionCommit(DNStateManager sm, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
@@ -222,7 +222,7 @@ public abstract class LifeCycleState
      * @param tx Transaction.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRollback(ObjectProvider sm, org.datanucleus.transaction.Transaction tx)
+    public LifeCycleState transitionRollback(DNStateManager sm, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
@@ -232,7 +232,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRefresh(ObjectProvider sm)
+    public LifeCycleState transitionRefresh(DNStateManager sm)
     {
         return this;
     }
@@ -242,7 +242,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionEvict(ObjectProvider sm)
+    public LifeCycleState transitionEvict(DNStateManager sm)
     {
         return this;
     }
@@ -253,7 +253,7 @@ public abstract class LifeCycleState
      * @param isLoaded if the field was previously loaded 
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionReadField(ObjectProvider sm, boolean isLoaded)
+    public LifeCycleState transitionReadField(DNStateManager sm, boolean isLoaded)
     {
         return this;
     }
@@ -263,7 +263,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionWriteField(ObjectProvider sm)
+    public LifeCycleState transitionWriteField(DNStateManager sm)
     {
         return this;
     }
@@ -274,7 +274,7 @@ public abstract class LifeCycleState
      * @param fgOnly only retrieve the current fetch group fields
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRetrieve(ObjectProvider sm, boolean fgOnly)
+    public LifeCycleState transitionRetrieve(DNStateManager sm, boolean fgOnly)
     {
         return this;
     }
@@ -285,7 +285,7 @@ public abstract class LifeCycleState
      * @param fetchPlan the fetch plan to load fields
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRetrieve(ObjectProvider sm, FetchPlan fetchPlan)
+    public LifeCycleState transitionRetrieve(DNStateManager sm, FetchPlan fetchPlan)
     {
         return this;
     }
@@ -295,7 +295,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionDetach(ObjectProvider sm)
+    public LifeCycleState transitionDetach(DNStateManager sm)
     {
         return this;
     }
@@ -305,7 +305,7 @@ public abstract class LifeCycleState
      * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionAttach(ObjectProvider sm)
+    public LifeCycleState transitionAttach(DNStateManager sm)
     {
         return this;
     }
@@ -315,7 +315,7 @@ public abstract class LifeCycleState
      * @param sm StateManager
      * @return The new LifeCycle state
      */
-    public LifeCycleState transitionSerialize(ObjectProvider sm)
+    public LifeCycleState transitionSerialize(DNStateManager sm)
     {
         return this;
     }

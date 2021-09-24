@@ -27,7 +27,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.scostore.CollectionStore;
 import org.datanucleus.store.types.scostore.ListStore;
@@ -55,7 +55,7 @@ public class OperationQueue
      */
     public void enqueue(Operation oper)
     {
-        ObjectProvider sm = oper.getObjectProvider();
+        DNStateManager sm = oper.getStateManager();
         if (oper instanceof SCOOperation)
         {
             if (sm.isWaitingToBeFlushedToDatastore())
@@ -113,12 +113,12 @@ public class OperationQueue
     }
 
     /**
-     * Method to perform all operations queued for the specified ObjectProvider and backing store.
+     * Method to perform all operations queued for the specified StateManager and backing store.
      * Those operations are then removed from the queue.
      * @param store The backing store
      * @param sm StateManager
      */
-    public void performAll(Store store, ObjectProvider sm)
+    public void performAll(Store store, DNStateManager sm)
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
@@ -131,9 +131,9 @@ public class OperationQueue
         while (operIter.hasNext())
         {
             Operation oper = operIter.next();
-            if (oper.getObjectProvider() == sm && oper instanceof SCOOperation && ((SCOOperation)oper).getStore() == store)
+            if (oper.getStateManager() == sm && oper instanceof SCOOperation && ((SCOOperation)oper).getStore() == store)
             {
-                // Process operations for this Store and this ObjectProvider
+                // Process operations for this Store and this StateManager
                 flushOperations.add(oper);
                 operIter.remove();
             }
@@ -249,9 +249,9 @@ public class OperationQueue
                                 {
                                     // Check whether this is the persist of an object the same type as the owner of the removed element (i.e assigned to new owner)
                                     PersistOperation persOp = (PersistOperation)subOper;
-                                    if (persOp.getObjectProvider().getObject().getClass().equals(collRemoveOper.getObjectProvider().getObject().getClass()))
+                                    if (persOp.getStateManager().getObject().getClass().equals(collRemoveOper.getStateManager().getObject().getClass()))
                                     {
-                                        Collection persColl = (Collection) persOp.getObjectProvider().provideField(collRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
+                                        Collection persColl = (Collection) persOp.getStateManager().provideField(collRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
                                         if (persColl != null && persColl.contains(collRemoveOper.getValue()))
                                         {
                                             needsRemoving = false;
@@ -302,9 +302,9 @@ public class OperationQueue
                                     {
                                         // Check whether this is the persist of an object the same type as the owner of the removed key (i.e assigned to new owner)
                                         PersistOperation persOper = (PersistOperation)subOper;
-                                        if (persOper.getObjectProvider().getObject().getClass().equals(mapRemoveOper.getObjectProvider().getObject().getClass()))
+                                        if (persOper.getStateManager().getObject().getClass().equals(mapRemoveOper.getStateManager().getObject().getClass()))
                                         {
-                                            Map persMap = (Map) persOper.getObjectProvider().provideField(mapRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
+                                            Map persMap = (Map) persOper.getStateManager().provideField(mapRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
                                             if (persMap != null && persMap.containsKey(mapRemoveOper.getKey()))
                                             {
                                                 keyNeedsRemoving = false;
@@ -347,9 +347,9 @@ public class OperationQueue
                                     {
                                         // Check whether this is the persist of an object the same type as the owner of the removed value (i.e assigned to new owner)
                                         PersistOperation persOper = (PersistOperation)subOper;
-                                        if (persOper.getObjectProvider().getObject().getClass().equals(mapRemoveOper.getObjectProvider().getObject().getClass()))
+                                        if (persOper.getStateManager().getObject().getClass().equals(mapRemoveOper.getStateManager().getObject().getClass()))
                                         {
-                                            Map persMap = (Map) persOper.getObjectProvider().provideField(mapRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
+                                            Map persMap = (Map) persOper.getStateManager().provideField(mapRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
                                             if (persMap != null && persMap.containsValue(mapRemoveOper.getValue()))
                                             {
                                                 valNeedsRemoving = false;
@@ -400,7 +400,7 @@ public class OperationQueue
      * @param listIter The iterator of operations
      * @return Whether this is an ADD that has a REMOVE of the same element immediately after
      */
-    protected static boolean isAddFollowedByRemoveOnSameSCO(Store store, ObjectProvider sm, Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isAddFollowedByRemoveOnSameSCO(Store store, DNStateManager sm, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (CollectionAddOperation.class.isInstance(currentOper))
         {
@@ -439,7 +439,7 @@ public class OperationQueue
      * @param listIter The iterator of operations
      * @return Whether this is a REMOVE that has an ADD of the same element immediately after
      */
-    protected static boolean isRemoveFollowedByAddOnSameSCO(Store store, ObjectProvider sm, Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isRemoveFollowedByAddOnSameSCO(Store store, DNStateManager sm, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (CollectionRemoveOperation.class.isInstance(currentOper))
         {
@@ -478,7 +478,7 @@ public class OperationQueue
      * @param listIter The iterator of operations
      * @return Whether this is a PUT that has a REMOVE of the same key immediately after
      */
-    protected static boolean isPutFollowedByRemoveOnSameSCO(Store store, ObjectProvider sm, Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isPutFollowedByRemoveOnSameSCO(Store store, DNStateManager sm, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (MapPutOperation.class.isInstance(currentOper))
         {

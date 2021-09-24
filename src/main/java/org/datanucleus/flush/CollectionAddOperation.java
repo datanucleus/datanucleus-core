@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.CollectionStore;
 import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.StringUtils;
@@ -28,14 +28,14 @@ import org.datanucleus.util.StringUtils;
  */
 public class CollectionAddOperation<E> implements SCOOperation
 {
-    final ObjectProvider sm;
+    final DNStateManager sm;
     final int fieldNumber;
     final CollectionStore<E> store;
 
     /** The value to add. */
     final E value;
 
-    public CollectionAddOperation(ObjectProvider sm, CollectionStore<E> store, E value)
+    public CollectionAddOperation(DNStateManager sm, CollectionStore<E> store, E value)
     {
         this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -43,7 +43,7 @@ public class CollectionAddOperation<E> implements SCOOperation
         this.value = value;
     }
 
-    public CollectionAddOperation(ObjectProvider sm, int fieldNum, E value)
+    public CollectionAddOperation(DNStateManager sm, int fieldNum, E value)
     {
         this.sm = sm;
         this.fieldNumber = fieldNum;
@@ -87,9 +87,9 @@ public class CollectionAddOperation<E> implements SCOOperation
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

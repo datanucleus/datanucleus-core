@@ -38,20 +38,20 @@ public interface LockManager
      * @param sm StateManager for the object
      * @param lockMode mode for locking
      */
-    void lock(ObjectProvider sm, LockMode lockMode);
+    void lock(DNStateManager sm, LockMode lockMode);
 
     /**
      * Method to unlock the object managed by the passed StateManager (mode 1).
      * @param sm StateManager for the object
      */
-    void unlock(ObjectProvider sm);
+    void unlock(DNStateManager sm);
 
     /**
      * Accessor for the current lock mode for the object managed by the passed StateManager (mode 1).
      * @param sm StateManager for the object
      * @return The lock mode
      */
-    LockMode getLockMode(ObjectProvider sm);
+    LockMode getLockMode(DNStateManager sm);
 
     /**
      * Method to lock the object with the provided identity (mode 2).
@@ -83,7 +83,7 @@ public interface LockManager
      * @param versionStrategy The version strategy in use
      * @param versionDatastore Version of the object in the datastore
      */
-    void performOptimisticVersionCheck(ObjectProvider sm, VersionStrategy versionStrategy, Object versionDatastore);
+    void performOptimisticVersionCheck(DNStateManager sm, VersionStrategy versionStrategy, Object versionDatastore);
 
     /**
      * Convenience method to provide the next version to use given the VersionMetaData and the current version.

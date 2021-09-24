@@ -48,7 +48,7 @@ import org.datanucleus.util.StringUtils;
 public class RelationshipManagerImpl implements RelationshipManager
 {
     /** StateManager for the object we are managing the relationships for. */
-    final ObjectProvider ownerSM;
+    final DNStateManager ownerSM;
 
     final ExecutionContext ec;
 
@@ -62,7 +62,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * Constructor.
      * @param sm StateManager for the object that we are managing relations for.
      */
-    public RelationshipManagerImpl(ObjectProvider sm)
+    public RelationshipManagerImpl(DNStateManager sm)
     {
         this.ownerSM = sm;
         this.ec = sm.getExecutionContext();
@@ -175,7 +175,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                             {
                                 // Deleting the owner, so register the element to reset its owner
                                 ec.removeObjectFromLevel2Cache(ec.getApiAdapter().getIdForObject(element));
-                                ObjectProvider elementSM = ec.findObjectProvider(element);
+                                DNStateManager elementSM = ec.findStateManager(element);
                                 if (relationType == RelationType.ONE_TO_MANY_BI)
                                 {
                                     // TODO This needs marking as a secondary change. i.e we dont want follow on checks, just null out the relation during process()
@@ -210,7 +210,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                             }
                             if (!alreadyExists)
                             {
-                                ObjectProvider elemSM = ec.findObjectProvider(newElem);
+                                DNStateManager elemSM = ec.findStateManager(newElem);
                                 if (elemSM != null)
                                 {
                                     AbstractMemberMetaData elemMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
@@ -222,7 +222,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                     if (oldOwner != null)
                                     {
                                         // Remove from old owner collection
-                                        ObjectProvider oldOwnerSM = ec.findObjectProvider(oldOwner);
+                                        DNStateManager oldOwnerSM = ec.findStateManager(oldOwner);
                                         if (oldOwnerSM != null)
                                         {
                                             // TODO This needs marking as a secondary change. i.e we dont want follow on checks, just remove the element from the relation during process()
@@ -273,7 +273,7 @@ public class RelationshipManagerImpl implements RelationshipManager
             return;
         }
 
-        ObjectProvider elemSM = ec.findObjectProvider(val);
+        DNStateManager elemSM = ec.findStateManager(val);
         if (elemSM != null)
         {
             AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
@@ -439,7 +439,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     // Previously had "a.b = b1"; Now have "a.b = b2"
                     // Check that the new value hasnt been assigned to something other than this object
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
-                    ObjectProvider newSM = ec.findObjectProvider(newValue);
+                    DNStateManager newSM = ec.findStateManager(newValue);
                     if (newSM != null && relatedMmd != null)
                     {
                         if (!newSM.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
@@ -493,7 +493,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                 }
 
                 AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                ObjectProvider newElementSM = ec.findObjectProvider(change.value);
+                DNStateManager newElementSM = ec.findStateManager(change.value);
                 if (newElementSM != null)
                 {
                     if (newElementSM.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
@@ -535,7 +535,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                 else
                 {
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                    ObjectProvider newElementSM = ec.findObjectProvider(change.value);
+                    DNStateManager newElementSM = ec.findStateManager(change.value);
                     if (newElementSM != null)
                     {
                         if (newElementSM.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
@@ -620,7 +620,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     // Previously had "a.b = b1"; "a.b" has been changed
                     // Need to remove from the other side if still set
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, oldValue);
-                    ObjectProvider oldSM = ec.findObjectProvider(oldValue);
+                    DNStateManager oldSM = ec.findStateManager(oldValue);
                     if (oldSM != null)
                     {
                         boolean oldIsDeleted = ec.getApiAdapter().isDeleted(oldSM.getObject());
@@ -667,7 +667,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     // Need to set the other side if not yet set, and unset any related old value on the other side
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
                     // Force persistence because it might not be persisted yet when using delayed operations
-                    ObjectProvider newSM = ec.findObjectProvider(newValue,true);
+                    DNStateManager newSM = ec.findStateManager(newValue,true);
                     if (newSM != null && relatedMmd != null)
                     {
                         if (!newSM.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
@@ -699,7 +699,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         else if (newValueFieldValue != pc)
                         {
                             // Was set to different object, so null out the other objects relation
-                            ObjectProvider newValueFieldSM = ec.findObjectProvider(newValueFieldValue);
+                            DNStateManager newValueFieldSM = ec.findStateManager(newValueFieldValue);
                             if (newValueFieldSM != null)
                             {
                                 // Null out the field of the related object of the new value
@@ -754,14 +754,14 @@ public class RelationshipManagerImpl implements RelationshipManager
                 continue;
             }
 
-            ObjectProvider sm = ec.findObjectProvider(change.value);
+            DNStateManager sm = ec.findStateManager(change.value);
             if (sm == null && ec.getApiAdapter().isDetached(change.value))
             {
                 // Provided value was detached, so get its attached equivalent
                 Object attached = ec.getAttachedObjectForId(ec.getApiAdapter().getIdForObject(change.value));
                 if (attached != null)
                 {
-                    sm = ec.findObjectProvider(attached);
+                    sm = ec.findStateManager(attached);
                 }
             }
             if (sm != null)
@@ -831,7 +831,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                 {
                     // Has been removed from a Collection/Map
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, oldValue);
-                    ObjectProvider oldSM = ec.findObjectProvider(oldValue);
+                    DNStateManager oldSM = ec.findStateManager(oldValue);
                     if (oldSM != null && relatedMmd != null && oldSM.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
                     {
                         if (oldSM.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
@@ -874,7 +874,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                 {
                     // Add new value to the Collection
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
-                    ObjectProvider newSM = ec.findObjectProvider(newValue);
+                    DNStateManager newSM = ec.findStateManager(newValue);
                     if (newSM != null && relatedMmd != null && newSM.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
                     {
                         Object newContainerValue = newSM.provideField(relatedMmd.getAbsoluteFieldNumber());
@@ -918,14 +918,14 @@ public class RelationshipManagerImpl implements RelationshipManager
                 continue;
             }
 
-            ObjectProvider sm = ec.findObjectProvider(change.value);
+            DNStateManager sm = ec.findStateManager(change.value);
             if (sm == null && ec.getApiAdapter().isDetached(change.value))
             {
                 // Provided value was detached, so get its attached equivalent
                 Object attached = ec.getAttachedObjectForId(ec.getApiAdapter().getIdForObject(change.value));
                 if (attached != null)
                 {
-                    sm = ec.findObjectProvider(attached);
+                    sm = ec.findStateManager(attached);
                 }
             }
             if (sm != null)

@@ -21,7 +21,7 @@ import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Base field manager for handling the fetching of fields.
@@ -31,7 +31,7 @@ import org.datanucleus.state.ObjectProvider;
 public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManager
 {
     /** StateManager of the instance being fetched (detached or made transient). **/
-    protected final ObjectProvider sm;
+    protected final DNStateManager sm;
 
     /** Second class mutable fields for the class of this object. */
     protected final boolean[] secondClassMutableFields;
@@ -58,7 +58,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
      * @param fpClass Fetch Plan for the class of this instance
      * @param state Object containing the state of the fetch process
      */
-    public AbstractFetchDepthFieldManager(ObjectProvider sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state)
+    public AbstractFetchDepthFieldManager(DNStateManager sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state)
     {
         this.sm = sm;
         this.secondClassMutableFields = secondClassMutableFields;

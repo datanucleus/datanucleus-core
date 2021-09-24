@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.state.LifeCycleState;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.state.RelationshipManagerImpl;
 import org.datanucleus.util.Localiser;
@@ -40,7 +40,7 @@ public class ManagedRelationsHandler
     private boolean executing = false;
 
     /** Map of RelationshipManager keyed by StateManager that it is for. */
-    private Map<ObjectProvider, RelationshipManager> managedRelationDetails = null;
+    private Map<DNStateManager, RelationshipManager> managedRelationDetails = null;
 
     /**
      * Constructor for a "managed relations" handler.
@@ -58,12 +58,12 @@ public class ManagedRelationsHandler
     }
 
     /**
-     * Method to return the RelationshipManager for the specified ObjectProvider.
+     * Method to return the RelationshipManager for the specified StateManager.
      * If none is currently present will create one
      * @param sm StateManager
      * @return The RelationshipManager for this object
      */
-    public RelationshipManager getRelationshipManagerForObjectProvider(ObjectProvider sm)
+    public RelationshipManager getRelationshipManagerForStateManager(DNStateManager sm)
     {
         RelationshipManager relMgr = managedRelationDetails.get(sm);
         if (relMgr == null)
@@ -84,7 +84,7 @@ public class ManagedRelationsHandler
         return executing;
     }
 
-    public void addRelationshipManagerForObjectProvider(ObjectProvider sm, RelationshipManager relMgr)
+    public void addRelationshipManagerForStateManager(DNStateManager sm, RelationshipManager relMgr)
     {
         managedRelationDetails.put(sm, relMgr);
     }
@@ -107,11 +107,11 @@ public class ManagedRelationsHandler
             if (performChecks)
             {
                 // Tests for negative situations where inconsistently assigned
-                Iterator<Map.Entry<ObjectProvider, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
+                Iterator<Map.Entry<DNStateManager, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
                 while (managedRelEntryIter.hasNext())
                 {
-                    Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
-                    ObjectProvider sm = managedRelEntry.getKey();
+                    Map.Entry<DNStateManager, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
+                    DNStateManager sm = managedRelEntry.getKey();
                     LifeCycleState lc = sm.getLifecycleState();
                     if (lc == null || lc.isDeleted())
                     {
@@ -124,11 +124,11 @@ public class ManagedRelationsHandler
             }
 
             // Process updates to manage the other side of the relations
-            Iterator<Map.Entry<ObjectProvider, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
+            Iterator<Map.Entry<DNStateManager, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
             while (managedRelEntryIter.hasNext())
             {
-                Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
-                ObjectProvider sm = managedRelEntry.getKey();
+                Map.Entry<DNStateManager, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
+                DNStateManager sm = managedRelEntry.getKey();
                 LifeCycleState lc = sm.getLifecycleState();
                 if (lc == null || lc.isDeleted())
                 {

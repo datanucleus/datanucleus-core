@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.store;
 
 import org.datanucleus.FetchPlan;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Interface for field values.
@@ -29,13 +29,13 @@ public interface FieldValues
      * Method to retrieve the fields and store them in the object managed by StateManager.
      * @param sm StateManager for the object
      */
-    void fetchFields(ObjectProvider sm);
+    void fetchFields(DNStateManager sm);
 
     /**
      * Method to retrieve the unloaded fields and store them in the object managed by StateManager. 
      * @param sm StateManager for the object
      */
-    void fetchNonLoadedFields(ObjectProvider sm);
+    void fetchNonLoadedFields(DNStateManager sm);
 
     /**
      * Accessor for any FetchPlan to use when loading of fields (if any).

@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Representation of a persistence flush process.
@@ -33,10 +33,10 @@ public interface FlushProcess
     /**
      * Execute the flush.
      * @param ec ExecutionContext
-     * @param primaryOPs ObjectProviders that were made dirty by direct API calls. Cleared during this method
-     * @param secondaryOPs ObjectProviders that were made dirty by reachability. Cleared during this method
+     * @param primarySMs StateManagers that were made dirty by direct API calls. Cleared during this method
+     * @param secondarySMs StateManagers that were made dirty by reachability. Cleared during this method
      * @param opQueue Queue of operations
      * @return Any optimistic exceptions during the deletes/inserts/updates
      */
-    List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue);
+    List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<DNStateManager> primarySMs, Collection<DNStateManager> secondarySMs, OperationQueue opQueue);
 }

@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCO;
 
 /**
@@ -30,7 +30,7 @@ import org.datanucleus.store.types.SCO;
  */
 public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Timestamp>
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
@@ -38,10 +38,10 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public SqlTimestamp(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public SqlTimestamp(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super(0);
-        this.ownerOP = sm;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -76,7 +76,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      **/
     public void unsetOwner()
     {
-        ownerOP = null;
+        ownerSM = null;
         ownerMmd = null;
     }
 
@@ -86,7 +86,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      **/
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -103,12 +103,12 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      **/
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
     }
@@ -126,7 +126,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
     }
 
     /**
-     * Method to return an attached version for the passed ObjectProvider and field, using the passed value.
+     * Method to return an attached version for the passed StateManager and field, using the passed value.
      * @param value The new value
      */
     public void attachCopy(java.sql.Timestamp value)

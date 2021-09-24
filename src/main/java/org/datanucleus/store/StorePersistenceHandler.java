@@ -22,7 +22,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Interface defining persistence operations of a StoreManager.
@@ -68,22 +68,22 @@ public interface StorePersistenceHandler
      * @param sm StateManager of the object to be inserted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void insertObject(ObjectProvider sm);
+    void insertObject(DNStateManager sm);
 
     /**
      * Method to insert an array of objects to the datastore.
-     * @param ops ObjectProviders for the objects to insert
+     * @param sms StateManagers for the objects to insert
      */
-    default void insertObjects(ObjectProvider... ops)
+    default void insertObjects(DNStateManager... sms)
     {
-        if (ops.length == 1)
+        if (sms.length == 1)
         {
-            insertObject(ops[0]);
+            insertObject(sms[0]);
             return;
         }
-        for (int i=0;i<ops.length;i++)
+        for (int i=0;i<sms.length;i++)
         {
-            insertObject(ops[i]);
+            insertObject(sms[i]);
         }
     }
 
@@ -93,20 +93,20 @@ public interface StorePersistenceHandler
      * @param fieldNumbers The numbers of the fields to be updated.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void updateObject(ObjectProvider sm, int fieldNumbers[]);
+    void updateObject(DNStateManager sm, int fieldNumbers[]);
 
     /**
      * Deletes a persistent object from the datastore.
      * @param sm StateManager of the object to be deleted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void deleteObject(ObjectProvider sm);
+    void deleteObject(DNStateManager sm);
 
     /**
      * Method to delete an array of objects from the datastore.
      * @param sms StateManagers for the objects to delete
      */
-    default void deleteObjects(ObjectProvider... sms)
+    default void deleteObjects(DNStateManager... sms)
     {
         if (sms.length == 1)
         {
@@ -127,7 +127,7 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void fetchObject(ObjectProvider sm, int fieldNumbers[]);
+    void fetchObject(DNStateManager sm, int fieldNumbers[]);
 
     /**
      * Fetches specified fields of several persistent objects (of the same type) from the database.
@@ -136,10 +136,10 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    default void fetchObjects(int[] fieldNumbers, ObjectProvider... sms)
+    default void fetchObjects(int[] fieldNumbers, DNStateManager... sms)
     {
         // Override this to provide bulk fetching of the same fields from multiple objects
-        for (ObjectProvider sm : sms)
+        for (DNStateManager sm : sms)
         {
             fetchObject(sm, fieldNumbers);
         }
@@ -151,7 +151,7 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void locateObject(ObjectProvider sm);
+    void locateObject(DNStateManager sm);
 
     /**
      * Locates object(s) in the datastore.
@@ -159,7 +159,7 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if an object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    default void locateObjects(ObjectProvider[] sms)
+    default void locateObjects(DNStateManager[] sms)
     {
         if (sms.length == 1)
         {

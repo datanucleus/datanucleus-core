@@ -24,7 +24,7 @@ import org.datanucleus.FetchPlanState;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
@@ -45,7 +45,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
      * @param fpClass Fetch Plan for the class of this instance
      * @param state State object to hold any pertinent controls for the fetchplan process
      */
-    public LoadFieldManager(ObjectProvider sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state)
+    public LoadFieldManager(DNStateManager sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state)
     {
         super(sm, secondClassMutableFields, fpClass, state);
     }
@@ -60,7 +60,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
         if (ec != null)
         {
             // Field is persisted (otherwise it may have not been persisted by reachability)
-            ec.findObjectProvider(pc).loadFieldsInFetchPlan(state);
+            ec.findStateManager(pc).loadFieldsInFetchPlan(state);
         }
     }
 

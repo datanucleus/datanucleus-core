@@ -32,7 +32,7 @@ import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.flush.ListAddAtOperation;
 import org.datanucleus.flush.ListRemoveAtOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.types.SCOList;
 import org.datanucleus.store.types.SCOListIterator;
@@ -47,7 +47,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java.util.ArrayList<E>, E>
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
@@ -55,12 +55,12 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
 
     /**
      * Constructor, using StateManager of the "owner" and the member.
-     * @param ownerOP The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public ArrayList(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public ArrayList(DNStateManager sm, AbstractMemberMetaData mmd)
     {
-        this.ownerOP = ownerOP;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -81,7 +81,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }
     }
@@ -156,7 +156,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      */
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -164,9 +164,9 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      */
     public void unsetOwner()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP = null;
+            ownerSM = null;
             ownerMmd = null;
         }
     }
@@ -176,9 +176,9 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      */
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
         }
     }
 
@@ -191,7 +191,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public java.util.ArrayList detachCopy(FetchPlanState state)
     {
         java.util.ArrayList detached = new java.util.ArrayList();
-        SCOUtils.detachCopyForCollection(ownerOP, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
         return detached;
     }
 
@@ -208,7 +208,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
 
         java.util.List attachedElements = new java.util.ArrayList(value.size());
-        SCOUtils.attachCopyForCollection(ownerOP, value.toArray(), attachedElements, elementsWithoutIdentity);
+        SCOUtils.attachCopyForCollection(ownerSM, value.toArray(), attachedElements, elementsWithoutIdentity);
 
         // Update the attached list with the detached elements
         SCOUtils.updateListWithListElements(this, attachedElements);
@@ -296,7 +296,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      **/
     public Iterator iterator()
     {
-        return new SCOListIterator(this, ownerOP, delegate, null, true, -1);
+        return new SCOListIterator(this, ownerSM, delegate, null, true, -1);
     }
 
     /**
@@ -305,7 +305,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      **/
     public ListIterator listIterator()
     {
-        return new SCOListIterator(this, ownerOP, delegate, null, true, -1);
+        return new SCOListIterator(this, ownerSM, delegate, null, true, -1);
     }
 
     /**
@@ -315,7 +315,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      **/
     public ListIterator listIterator(int index)
     {
-        return new SCOListIterator(this, ownerOP, delegate, null, true, index);
+        return new SCOListIterator(this, ownerSM, delegate, null, true, index);
     }
 
     /**
@@ -375,19 +375,19 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public void add(int index, E element)
     {
         delegate.add(index, element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
         }
 
-        if (SCOUtils.useQueuedUpdate(ownerOP))
+        if (SCOUtils.useQueuedUpdate(ownerSM))
         {
-            ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index, element));
+            ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, element));
         }
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -399,21 +399,21 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public boolean add(E element)
     {
         boolean success = delegate.add(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
         }
 
         if (success)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -428,11 +428,11 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public boolean addAll(Collection elements)
     {
         boolean success = delegate.addAll(elements);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
             Iterator iter = elements.iterator();
-            RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+            RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
             while (iter.hasNext())
             {
                 relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
@@ -441,17 +441,17 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
 
         if (success)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 for (Object element : elements)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }
             }
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -467,11 +467,11 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public boolean addAll(int index, Collection elements)
     {
         boolean success = delegate.addAll(index, elements);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
             Iterator iter = elements.iterator();
-            RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+            RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
             while (iter.hasNext())
             {
                 relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
@@ -480,18 +480,18 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
 
         if (success)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 int pos = index;
                 for (Object element : elements)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), pos++, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), pos++, element));
                 }
             }
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -503,27 +503,27 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      */
     public void clear()
     {
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
             Iterator iter = delegate.iterator();
-            RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+            RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
             while (iter.hasNext())
             {
                 relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
             }
         }
 
-        if (ownerOP != null && !delegate.isEmpty())
+        if (ownerSM != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 java.util.List copy = new java.util.ArrayList(delegate);
                 Iterator iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -532,7 +532,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
                 Iterator iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -540,9 +540,9 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
         delegate.clear();
 
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -564,30 +564,30 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
 
-        if (ownerOP != null && allowCascadeDelete)
+        if (ownerSM != null && allowCascadeDelete)
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                ownerSM.getExecutionContext().deleteObjectInternal(element);
             }
         }
 
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -602,28 +602,28 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public E remove(int index)
     {
         E element = delegate.remove(index);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, element));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                ownerSM.getExecutionContext().deleteObjectInternal(element);
             }
         }
         makeDirty();
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return element;
     }
@@ -646,13 +646,13 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
 
         boolean success = delegate.removeAll(elements);
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            if (ownerOP.getExecutionContext().getManageRelations())
+            if (ownerSM.getExecutionContext().getManageRelations())
             {
                 // Relationship management
                 Iterator iter = elements.iterator();
-                RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+                RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
                 while (iter.hasNext())
                 {
                     relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
@@ -660,12 +660,12 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
             }
 
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -673,7 +673,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -681,9 +681,9 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -701,9 +701,9 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return success;
@@ -721,23 +721,23 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public E set(int index, E element, boolean allowDependentField)
     {
         E prevElement = delegate.set(index, element);
-        if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
+        if (ownerSM != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index, prevElement));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, prevElement));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(prevElement);
+                ownerSM.getExecutionContext().deleteObjectInternal(prevElement);
             }
         }
 
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
 
         return prevElement;

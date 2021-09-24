@@ -6,7 +6,7 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.scostore.CollectionStore;
@@ -56,51 +56,51 @@ public class SCOUtilsTest extends TestCase
             return false;
         }
 
-        public boolean updateEmbeddedElement(ObjectProvider sm, Object element, int fieldNumber, Object value)
+        public boolean updateEmbeddedElement(DNStateManager sm, Object element, int fieldNumber, Object value)
         {
             return false;
         }
 
-        public Iterator iterator(ObjectProvider sm)
+        public Iterator iterator(DNStateManager sm)
         {
             return elm.iterator();
         }
 
-        public void update(ObjectProvider sm, Collection coll)
+        public void update(DNStateManager sm, Collection coll)
         {
         }
 
-        public int size(ObjectProvider sm)
+        public int size(DNStateManager sm)
         {
             return elm.size();
         }
 
-        public boolean contains(ObjectProvider sm, Object element)
+        public boolean contains(DNStateManager sm, Object element)
         {
             return false;
         }
 
-        public boolean add(ObjectProvider sm, Object element, int size)
+        public boolean add(DNStateManager sm, Object element, int size)
         {
             return false;
         }
 
-        public boolean addAll(ObjectProvider sm, Collection elements, int size)
+        public boolean addAll(DNStateManager sm, Collection elements, int size)
         {
             return false;
         }
 
-        public boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField)
+        public boolean remove(DNStateManager sm, Object element, int size, boolean allowDependentField)
         {
             return false;
         }
 
-        public boolean removeAll(ObjectProvider sm, Collection elements, int size)
+        public boolean removeAll(DNStateManager sm, Collection elements, int size)
         {
             return false;
         }
 
-        public void clear(ObjectProvider sm)
+        public void clear(DNStateManager sm)
         {
         }
 

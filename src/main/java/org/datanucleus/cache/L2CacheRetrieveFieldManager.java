@@ -30,7 +30,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.ElementContainerAdapter;
@@ -45,7 +45,7 @@ import org.datanucleus.util.NucleusLogger;
 public class L2CacheRetrieveFieldManager extends AbstractFieldManager
 {
     /** StateManager of the object we are copying values into. */
-    ObjectProvider sm;
+    DNStateManager sm;
 
     /** Execution Context. */
     ExecutionContext ec;
@@ -55,7 +55,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
 
     List<Integer> fieldsNotLoaded = null;
 
-    public L2CacheRetrieveFieldManager(ObjectProvider sm, CachedPC cachedpc)
+    public L2CacheRetrieveFieldManager(DNStateManager sm, CachedPC cachedpc)
     {
         this.sm = sm;
         this.ec = sm.getExecutionContext();
@@ -419,7 +419,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
     private Object convertCachedPCToPersistable(CachedPC cachedPC, int fieldNumber)
     {
         AbstractClassMetaData valueCmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
-        ObjectProvider valueSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber);
+        DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber);
 
         // TODO Perhaps only load fetch plan fields?
         int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), valueCmd.getAllMemberPositions(), true);

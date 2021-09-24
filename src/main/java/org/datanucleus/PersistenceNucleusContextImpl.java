@@ -66,8 +66,8 @@ import org.datanucleus.metadata.TransactionType;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.properties.CorePropertyValidator;
 import org.datanucleus.properties.StringPropertyValidator;
-import org.datanucleus.state.ObjectProviderFactory;
-import org.datanucleus.state.ObjectProviderFactoryImpl;
+import org.datanucleus.state.StateManagerFactory;
+import org.datanucleus.state.StateManagerFactoryImpl;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StoreManagerHelper;
@@ -97,7 +97,7 @@ import org.datanucleus.util.StringUtils;
  * <ul>
  * <li>creating <i>ExecutionContext</i> objects to handle persistence. Uses a pool of <i>ExecutionContext</i> objects, reusing them as required.</li>
  * <li>providing a cache across <i>ExecutionContext</i> objects (the "Level 2" cache).</li>
- * <li>provides a factory for creating <i>ObjectProviders</i>. This factory makes use of pooling, allowing reuse.</li>
+ * <li>provides a factory for creating <i>StateManagers</i>. This factory makes use of pooling, allowing reuse.</li>
  * <li>provides access to the datastore via a <i>StoreManager</i></li>
  * </ul>
  */
@@ -159,8 +159,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     /** Pool for ExecutionContexts. */
     private ExecutionContextPool ecPool = null;
 
-    /** Factory for ObjectProviders for managing persistable objects. */
-    private ObjectProviderFactory opFactory = null;
+    /** Factory for StateManagers for managing persistable objects. */
+    private StateManagerFactory smFactory = null;
 
     private MultiTenancyProvider multiTenancyProvider = null;
 
@@ -209,9 +209,9 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_MAX_IDLE, null, 20, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION, null, "exception", CorePropertyValidator.class.getName(), false, false);
 
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_REAPER_THREAD, null, false, false, false);
-        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_MAX_IDLE, null, 0, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_CLASS_NAME, null, null, null, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_STATE_MANAGER_REAPER_THREAD, null, false, false, false);
+        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_STATE_MANAGER_MAX_IDLE, null, 0, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_STATE_MANAGER_CLASS_NAME, null, null, null, false, false);
 
         conf.addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE, null, "datanucleus", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE, null, null, null, false, false);
@@ -506,9 +506,9 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             ecPool = new ExecutionContextPool(this);
         }
-        if (opFactory == null)
+        if (smFactory == null)
         {
-            opFactory = new ObjectProviderFactoryImpl(this);
+            smFactory = new StateManagerFactoryImpl(this);
         }
 
         if (config.hasProperty(PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER))
@@ -544,10 +544,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             cdiHandler.close();
         }
-        if (opFactory != null)
+        if (smFactory != null)
         {
-            opFactory.close();
-            opFactory = null;
+            smFactory.close();
+            smFactory = null;
         }
         if (ecPool != null)
         {
@@ -1316,16 +1316,16 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getObjectProviderFactory()
+     * @see org.datanucleus.NucleusContext#getStateManagerFactory()
      */
     @Override
-    public ObjectProviderFactory getObjectProviderFactory()
+    public StateManagerFactory getStateManagerFactory()
     {
-        if (opFactory == null)
+        if (smFactory == null)
         {
             initialise();
         }
-        return opFactory;
+        return smFactory;
     }
 
     /* (non-Javadoc)

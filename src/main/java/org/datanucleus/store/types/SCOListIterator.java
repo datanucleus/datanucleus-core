@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.ListStore;
 
 /**
@@ -43,13 +43,13 @@ public class SCOListIterator<E> implements ListIterator<E>
     /**
      * Constructor taking the delegate or backing store, and any start index.
      * @param sco Owner SCO 
-     * @param sm ObjectProvider of SCO List to iterate 
+     * @param sm StateManager of SCO List to iterate 
      * @param theDelegate The delegate list
      * @param theStore The backing store (connected to the DB)
      * @param useDelegate whether to use a delegate
      * @param startIndex The start index position (any value below 0 will mean start at index 0).
      */
-    public SCOListIterator(List<E> sco, ObjectProvider sm, List<E> theDelegate, ListStore<E> theStore, boolean useDelegate, int startIndex)
+    public SCOListIterator(List<E> sco, DNStateManager sm, List<E> theDelegate, ListStore<E> theStore, boolean useDelegate, int startIndex)
     {
         ownerSCO = sco;
 

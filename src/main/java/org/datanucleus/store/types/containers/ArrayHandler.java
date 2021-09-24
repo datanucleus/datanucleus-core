@@ -28,7 +28,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.StringUtils;
@@ -84,7 +84,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
     public int getObjectType(AbstractMemberMetaData mmd)
     {
         // TODO This should be ARRAY_ELEMENT_PC but we haven't got that yet
-        return mmd.getArray().isEmbeddedElement() || mmd.getArray().isSerializedElement() ? ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC : ObjectProvider.PC;
+        return mmd.getArray().isEmbeddedElement() || mmd.getArray().isSerializedElement() ? DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC : DNStateManager.PC;
     }
 
     @Override

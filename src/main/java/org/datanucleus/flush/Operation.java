@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Interface for an operation to be flushed.
@@ -28,7 +28,7 @@ public interface Operation
      * Accessor for StateManager of the object that this operation is performed on.
      * @return StateManager
      */
-    ObjectProvider getObjectProvider();
+    DNStateManager getStateManager();
 
     /**
      * Method to perform the operation.

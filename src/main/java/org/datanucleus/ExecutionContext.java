@@ -38,7 +38,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
@@ -56,7 +56,7 @@ import org.datanucleus.transaction.Transaction;
  * <li>have a set of properties defining behaviour over and above the default configuration of the
  * parent NucleusContext</li>
  * <li>provide an interface to querying of the persistable objects in the StoreManager</li>
- * <li>provide a way of managing persistable objects using ObjectProviders</li>
+ * <li>provide a way of managing persistable objects using StateManagers</li>
  * <li>have a cache of currently managed objects (the "Level 1" cache), and make use of the
  * cache of the parent NucleusContext when not available in its cache</li>
  * <li>have a single "current" transaction. This transaction can be local, or JTA</li>
@@ -220,40 +220,40 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param pc The persistable object
      * @return StateManager
      */
-    ObjectProvider findObjectProvider(Object pc);
+    DNStateManager findStateManager(Object pc);
 
     /**
      * Method to find StateManager for the passed persistable object when it is managed by this manager, 
-     * and if not yet persistent to persist it and return the assigned ObjectProvider.
+     * and if not yet persistent to persist it and return the assigned StateManager.
      * @param pc The persistable object
      * @param persist Whether to persist if not yet persistent
      * @return StateManager
      */
-    ObjectProvider findObjectProvider(Object pc, boolean persist);
+    DNStateManager findStateManager(Object pc, boolean persist);
 
     /**
      * Method to find StateManager for the passed embedded persistable object.
      * Will create one if not already registered, and tie it to the specified owner.
      * @param value The embedded object
-     * @param owner The owner ObjectProvider (if known).
+     * @param owner The owner StateManager (if known).
      * @param mmd Metadata for the field of the owner
      * @return StateManager for the embedded object
      */
-    ObjectProvider findObjectProviderForEmbedded(Object value, ObjectProvider owner, AbstractMemberMetaData mmd);
+    DNStateManager findStateManagerForEmbedded(Object value, DNStateManager owner, AbstractMemberMetaData mmd);
 
-    ObjectProvider findObjectProviderOfOwnerForAttachingObject(Object pc);
-
-    /**
-     * Method to add the object managed by the specified ObjectProvider to the cache.
-     * @param sm StateManager
-     */
-    void addObjectProviderToCache(ObjectProvider sm);
+    DNStateManager findStateManagerOfOwnerForAttachingObject(Object pc);
 
     /**
-     * Method to remove the object managed by the specified ObjectProvider from the cache.
+     * Method to add the object managed by the specified StateManager to the cache.
      * @param sm StateManager
      */
-    void removeObjectProviderFromCache(ObjectProvider sm);
+    void addStateManagerToCache(DNStateManager sm);
+
+    /**
+     * Method to remove the object managed by the specified StateManager from the cache.
+     * @param sm StateManager
+     */
+    void removeStateManagerFromCache(DNStateManager sm);
 
     /**
      * Method to evict the passed object.
@@ -300,30 +300,30 @@ public interface ExecutionContext extends ExecutionContextReference
      * Method to persist the passed object (internally).
      * @param pc The object
      * @param preInsertChanges Changes to be made before inserting
-     * @param ownerOP ObjectProvider of the owner when embedded
+     * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.store.ObjectProvider, e.g ObjectProvider.PC)
+     * @param objectType Type of object (see org.datanucleus.store.DNStateManager, e.g DNStateManager.PC)
      * @param <T> Type of the persistable object
      * @return The persisted object
      */
-    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, ObjectProvider ownerOP, int ownerFieldNum, int objectType);
+    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, int objectType);
 
     /**
      * Method to persist the passed object (internally).
      * @param pc The object
-     * @param ownerOP ObjectProvider of the owner when embedded
+     * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.state.ObjectProvider, e.g ObjectProvider.PC)
+     * @param objectType Type of object (see org.datanucleus.state.DNStateManager, e.g DNStateManager.PC)
      * @param <T> Type of the persistable object
      * @return The persisted object
      */
-    <T> T persistObjectInternal(T pc, ObjectProvider ownerOP, int ownerFieldNum, int objectType);
+    <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, int objectType);
 
     /**
      * Method to persist the passed object (internally).
      * @param pc The object
      * @param preInsertChanges Changes to be made before inserting
-     * @param objectType Type of object (see org.datanucleus.state.ObjectProvider, e.g ObjectProvider.PC)
+     * @param objectType Type of object (see org.datanucleus.state.DNStateManager, e.g DNStateManager.PC)
      * @param <T> Type of the persistable object
      * @return The persisted object
      */
@@ -443,7 +443,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param pc The (detached) object
      * @param sco Whether the object has no identity (embedded or serialised)
      */
-    void attachObject(ObjectProvider sm, Object pc, boolean sco);
+    void attachObject(DNStateManager sm, Object pc, boolean sco);
 
     /**
      * Method to attach a copy of the passed object (and related objects).
@@ -453,7 +453,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param <T> Type of the persistable object
      * @return The attached copy of the input object
      */
-    <T> T attachObjectCopy(ObjectProvider sm, T pc, boolean sco);
+    <T> T attachObjectCopy(DNStateManager sm, T pc, boolean sco);
 
     /**
      * Convenience method to return the attached object for the specified id if one exists.
@@ -474,10 +474,10 @@ public interface ExecutionContext extends ExecutionContextReference
     void refreshAllObjects();
 
     /**
-     * Method to enlist the specified ObjectProvider in the current transaction.
+     * Method to enlist the specified StateManager in the current transaction.
      * @param sm StateManager
      */
-    void enlistInTransaction(ObjectProvider sm);
+    void enlistInTransaction(DNStateManager sm);
 
     /**
      * Method to return if an object is enlisted in the current transaction.
@@ -487,26 +487,26 @@ public interface ExecutionContext extends ExecutionContextReference
     boolean isEnlistedInTransaction(Object id);
 
     /**
-     * Method to evict the specified ObjectProvider from the current transaction.
+     * Method to evict the specified StateManager from the current transaction.
      * @param sm StateManager
      */
-    void evictFromTransaction(ObjectProvider sm);
+    void evictFromTransaction(DNStateManager sm);
 
     /**
-     * Mark the specified ObjectProvider as dirty
+     * Mark the specified StateManager as dirty
      * @param sm StateManager
      * @param directUpdate Whether the object has had a direct update made on it (if known)
      */
-    void markDirty(ObjectProvider sm, boolean directUpdate);
+    void markDirty(DNStateManager sm, boolean directUpdate);
 
     /**
-     * Mark the specified ObjectProvider as clean.
+     * Mark the specified StateManager as clean.
      * @param sm StateManager
      */
-    void clearDirty(ObjectProvider sm);
+    void clearDirty(DNStateManager sm);
 
     /**
-     * Method to mark as clean all ObjectProviders of dirty objects.
+     * Method to mark as clean all StateManagers of dirty objects.
      */
     void clearDirty();
 
@@ -609,13 +609,13 @@ public interface ExecutionContext extends ExecutionContextReference
      * Method to put a Persistable object associated to StateManager into the L1 cache.
      * @param sm StateManager
      */
-    void putObjectIntoLevel1Cache(ObjectProvider sm);
+    void putObjectIntoLevel1Cache(DNStateManager sm);
 
     /**
      * Convenience method to access an object in the cache.
      * Firstly looks in the L1 cache for this ExecutionContext, and if not found looks in the L2 cache.
      * @param id Id of the object
-     * @return Persistable object (with connected ObjectProvider).
+     * @return Persistable object (with connected StateManager).
      */
     Persistable getObjectFromCache(Object id);
 
@@ -623,7 +623,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * Convenience method to access objects in the cache.
      * Firstly looks in the L1 cache, and if not found looks in the L2 cache.
      * @param ids Ids of the objects
-     * @return Persistable objects (with connected ObjectProvider).
+     * @return Persistable objects (with connected StateManager).
      */
     Persistable[] getObjectsFromCache(Object[] ids);
 
@@ -780,13 +780,13 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param backingStore The backing store
      * @param sm StateManager
      */
-    void flushOperationsForBackingStore(Store backingStore, ObjectProvider sm);
+    void flushOperationsForBackingStore(Store backingStore, DNStateManager sm);
 
     /**
      * Convenience method to inspect the list of objects with outstanding changes to flush.
-     * @return ObjectProviders for the objects to be flushed.
+     * @return StateManagers for the objects to be flushed.
      */
-    List<ObjectProvider> getObjectsToBeFlushed();
+    List<DNStateManager> getObjectsToBeFlushed();
 
     /**
      * Accessor for whether this context is multithreaded.
@@ -801,11 +801,11 @@ public interface ExecutionContext extends ExecutionContextReference
     boolean getManageRelations();
 
     /**
-     * Accessor for the RelationshipManager for the provided ObjectProvider.
+     * Accessor for the RelationshipManager for the provided StateManager.
      * @param sm StateManager
      * @return The RelationshipManager
      */
-    RelationshipManager getRelationshipManager(ObjectProvider sm);
+    RelationshipManager getRelationshipManager(DNStateManager sm);
 
     /**
      * Returns whether this ExecutionContext is currently performing the manage relationships task.
@@ -898,32 +898,32 @@ public interface ExecutionContext extends ExecutionContextReference
     void replaceObjectId(Persistable pc, Object oldID, Object newID);
 
     /**
-     * Access a referenced object for this ObjectProvider during the attach/detach process.
+     * Access a referenced object for this StateManager during the attach/detach process.
      * When attaching and this is the detached object this returns the newly attached object.
      * When attaching and this is the newly attached object this returns the detached object.
      * When detaching and this is the newly detached object this returns the attached object.
      * When detaching and this is the attached object this returns the newly detached object.
-     * @param sm Object provider
+     * @param sm StateManager
      * @return The referenced object (if any)
      */
-    Object getAttachDetachReferencedObject(ObjectProvider sm);
+    Object getAttachDetachReferencedObject(DNStateManager sm);
 
     /**
-     * Register a referenced object against this ObjectProvider for the attach/detach process.
+     * Register a referenced object against this StateManager for the attach/detach process.
      * @param sm StateManager
      * @param obj The referenced object (or null to clear out any reference)
      */
-    void setAttachDetachReferencedObject(ObjectProvider sm, Object obj);
+    void setAttachDetachReferencedObject(DNStateManager sm, Object obj);
 
     /**
-     * Method to register an embedded relation for the specified memberf of the owner ObjectProvider
-     * where the embedded ObjectProvider is stored.
-     * @param ownerOP Owner ObjectProvider
+     * Method to register an embedded relation for the specified memberf of the owner StateManager
+     * where the embedded StateManager is stored.
+     * @param ownerSM Owner StateManager
      * @param ownerFieldNum Member number that is embedded
-     * @param embOP ObjectProvider of the embedded object
+     * @param embSM StateManager of the embedded object
      * @return The EmbeddedOwnerRelation
      */
-    EmbeddedOwnerRelation registerEmbeddedRelation(ObjectProvider ownerOP, int ownerFieldNum, ObjectProvider embOP);
+    EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM);
 
     /**
      * Method to deregister the specified embedded relation (e.g when the embedded object is disconnected).
@@ -932,55 +932,55 @@ public interface ExecutionContext extends ExecutionContextReference
     void deregisterEmbeddedRelation(EmbeddedOwnerRelation rel);
 
     /**
-     * Accessor for the relations for the specified embedded ObjectProvider where it is embedded.
+     * Accessor for the relations for the specified embedded StateManager where it is embedded.
      * @param ownerOP StateManager that owns the embedded
-     * @return The List of embedded relations involving this ObjectProvider as owner
+     * @return The List of embedded relations involving this StateManager as owner
      */
-    List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(ObjectProvider ownerOP);
+    List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(DNStateManager ownerOP);
 
     /**
-     * Accessor for the relations for the specified embedded ObjectProvider where it is embedded.
+     * Accessor for the relations for the specified embedded StateManager where it is embedded.
      * @param embOP StateManager that is embedded
-     * @return The List of embedded relations involving this ObjectProvider as embedded
+     * @return The List of embedded relations involving this StateManager as embedded
      */
-    List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(ObjectProvider embOP);
+    List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(DNStateManager embOP);
 
     /**
      * Accessor for the owner objects for the provided embedded StateManager.
      * @param embOP StateManager that is embedded
      * @return The owner object(s) that have this object embedded.
      */
-    ObjectProvider[] getOwnersForEmbeddedObjectProvider(ObjectProvider embOP);
+    DNStateManager[] getOwnersForEmbeddedStateManager(DNStateManager embOP);
 
     /**
-     * Convenience method to remove the EmbeddedOwnerRelation between the specified ObjectProviders.
-     * @param ownerOP Owner ObjectProvider
+     * Convenience method to remove the EmbeddedOwnerRelation between the specified StateManagers.
+     * @param ownerSM Owner StateManager
      * @param ownerFieldNum Field in owner
-     * @param embOP Embedded ObjectProvider
+     * @param embOP Embedded StateManager
      */
-    void removeEmbeddedOwnerRelation(ObjectProvider ownerOP, int ownerFieldNum, ObjectProvider embOP);
+    void removeEmbeddedOwnerRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embOP);
 
     public static class EmbeddedOwnerRelation
     {
-        protected ObjectProvider ownerSM;
+        protected DNStateManager ownerSM;
         protected int ownerFieldNum;
-        protected ObjectProvider embSM;
+        protected DNStateManager embSM;
 
-        public EmbeddedOwnerRelation(ObjectProvider ownerSM, int ownerFieldNum, ObjectProvider embSM)
+        public EmbeddedOwnerRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM)
         {
             this.ownerSM = ownerSM;
             this.ownerFieldNum = ownerFieldNum;
             this.embSM = embSM;
         }
-        public ObjectProvider getOwnerSM() {return ownerSM;}
-        public ObjectProvider getEmbeddedSM() {return embSM;}
+        public DNStateManager getOwnerSM() {return ownerSM;}
+        public DNStateManager getEmbeddedSM() {return embSM;}
         public int getOwnerFieldNum() {return ownerFieldNum;}
     }
 
-    void setObjectProviderAssociatedValue(ObjectProvider sm, Object key, Object value);
-    Object getObjectProviderAssociatedValue(ObjectProvider sm, Object key);
-    void removeObjectProviderAssociatedValue(ObjectProvider sm, Object key);
-    boolean containsObjectProviderAssociatedValue(ObjectProvider sm, Object key);
+    void setStateManagerAssociatedValue(DNStateManager sm, Object key, Object value);
+    Object getStateManagerAssociatedValue(DNStateManager sm, Object key);
+    void removeStateManagerAssociatedValue(DNStateManager sm, Object key);
+    boolean containsStateManagerAssociatedValue(DNStateManager sm, Object key);
 
     /**
      * Register a listener to be called when this ExecutionContext is closing.

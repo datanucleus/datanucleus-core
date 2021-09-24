@@ -19,7 +19,7 @@ package org.datanucleus.store.fieldmanager;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
 
@@ -31,13 +31,13 @@ import org.datanucleus.store.types.TypeManager;
 public class NullifyRelationFieldManager extends AbstractFieldManager
 {
     /** StateManager for the object. */
-    private final ObjectProvider sm;
+    private final DNStateManager sm;
 
     /**
      * Constructor.
      * @param sm StateManager
      */
-    public NullifyRelationFieldManager(ObjectProvider sm)
+    public NullifyRelationFieldManager(DNStateManager sm)
     {
         this.sm = sm; 
     }

@@ -24,7 +24,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;
@@ -37,8 +37,8 @@ import org.datanucleus.store.types.TypeManager;
  */
 public class DeleteFieldManager extends AbstractFieldManager
 {
-    /** ObjectProvider for the owning object. */
-    private final ObjectProvider sm;
+    /** StateManager for the owning object. */
+    private final DNStateManager sm;
 
     private boolean manageRelationships = false;
 
@@ -46,7 +46,7 @@ public class DeleteFieldManager extends AbstractFieldManager
      * Constructor.
      * @param sm StateManager for the object.
      */
-    public DeleteFieldManager(ObjectProvider sm)
+    public DeleteFieldManager(DNStateManager sm)
     {
         this(sm, false);
     }
@@ -56,7 +56,7 @@ public class DeleteFieldManager extends AbstractFieldManager
      * @param sm StateManager for the object.
      * @param manageRelationships Whether to make an attempt to manage relationships when bidir fields are affected by this deletion (RDBMS typically doesnt need this)
      */
-    public DeleteFieldManager(ObjectProvider sm, boolean manageRelationships)
+    public DeleteFieldManager(DNStateManager sm, boolean manageRelationships)
     {
         this.sm = sm;
         this.manageRelationships = manageRelationships;
@@ -68,7 +68,7 @@ public class DeleteFieldManager extends AbstractFieldManager
      */
     protected void processPersistable(Object pc)
     {
-        ObjectProvider pcSM = sm.getExecutionContext().findObjectProvider(pc);
+        DNStateManager pcSM = sm.getExecutionContext().findStateManager(pc);
         if (pcSM != null)
         {
             if (pcSM.isDeleting() || pcSM.becomingDeleted())
@@ -118,7 +118,7 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
         else if (manageRelationships && RelationType.isBidirectional(relationType) && !mmd.isEmbedded())
         {
-            ObjectProvider valueSM = ec.findObjectProvider(value);
+            DNStateManager valueSM = ec.findStateManager(value);
             if (valueSM != null && !valueSM.getLifecycleState().isDeleted() && !valueSM.isDeleting())
             {
                 AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
@@ -237,7 +237,7 @@ public class DeleteFieldManager extends AbstractFieldManager
             {
                 if (api.isPersistable(element))
                 {
-                    ObjectProvider elementSM = ec.findObjectProvider(element);
+                    DNStateManager elementSM = ec.findStateManager(element);
                     if (elementSM != null && !elementSM.getLifecycleState().isDeleted() && !elementSM.isDeleting())
                     {
                         AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];

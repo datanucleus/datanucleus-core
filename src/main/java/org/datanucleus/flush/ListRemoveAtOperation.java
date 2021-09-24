@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.ListStore;
 import org.datanucleus.store.types.scostore.Store;
 
@@ -30,13 +30,13 @@ public class ListRemoveAtOperation<E> extends CollectionRemoveOperation<E>
     /** The index to remove. */
     final int index;
 
-    public ListRemoveAtOperation(ObjectProvider sm, ListStore<E> store, int index)
+    public ListRemoveAtOperation(DNStateManager sm, ListStore<E> store, int index)
     {
         super(sm, store, null, true);
         this.index = index;
     }
 
-    public ListRemoveAtOperation(ObjectProvider sm, int fieldNum, int index, E value)
+    public ListRemoveAtOperation(DNStateManager sm, int fieldNum, int index, E value)
     {
         super(sm, fieldNum, value, true);
         this.index = index;
@@ -68,9 +68,9 @@ public class ListRemoveAtOperation<E> extends CollectionRemoveOperation<E>
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.ListStore;
 
 /**
@@ -28,13 +28,13 @@ public class ListAddAtOperation<E> extends CollectionAddOperation<E>
     /** Index to add the object at. */
     final int index;
 
-    public ListAddAtOperation(ObjectProvider sm, ListStore<E> store, int index, E value)
+    public ListAddAtOperation(DNStateManager sm, ListStore<E> store, int index, E value)
     {
         super(sm, store, value);
         this.index = index;
     }
 
-    public ListAddAtOperation(ObjectProvider sm, int fieldNum, int index, E value)
+    public ListAddAtOperation(DNStateManager sm, int fieldNum, int index, E value)
     {
         super(sm, fieldNum, value);
         this.index = index;

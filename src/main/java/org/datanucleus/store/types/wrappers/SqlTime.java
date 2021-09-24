@@ -21,7 +21,7 @@ import java.io.ObjectStreamException;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCO;
 
 /**
@@ -29,7 +29,7 @@ import org.datanucleus.store.types.SCO;
  */
 public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
 {
-    protected transient ObjectProvider ownerSM;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
@@ -37,7 +37,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
      * @param sm StateManager for the owning object
      * @param mmd Metadata for the member
      */
-    public SqlTime(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public SqlTime(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super(0);
         this.ownerSM = sm;
@@ -120,7 +120,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
     }
 
     /**
-     * Method to return an attached version for the passed ObjectProvider and field, using the passed value.
+     * Method to return an attached version for the passed StateManager and field, using the passed value.
      * @param value The new value
      */
     public void attachCopy(java.sql.Time value)

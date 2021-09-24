@@ -190,7 +190,7 @@ public class BeanValidationHandler
             }
 
             // Return whether the field is loaded (and don't cause its loading)
-            return ec.findObjectProvider(traversableObject).isFieldLoaded(mmd.getAbsoluteFieldNumber());
+            return ec.findStateManager(traversableObject).isFieldLoaded(mmd.getAbsoluteFieldNumber());
         }
     }
 }

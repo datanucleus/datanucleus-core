@@ -17,24 +17,24 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Flush operation for a delete of the specified object.
  */
 public class DeleteOperation implements Operation
 {
-    ObjectProvider sm;
+    DNStateManager sm;
 
-    public DeleteOperation(ObjectProvider sm)
+    public DeleteOperation(DNStateManager sm)
     {
         this.sm = sm;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

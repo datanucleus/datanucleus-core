@@ -45,7 +45,7 @@ public class LockManagerImpl implements LockManager
     Map<Object, LockMode> requiredLockModesById = null;
 
     /** Map of lock mode, keyed by StateManager. */
-    Map<ObjectProvider, LockMode> lockModeByObjectProvider = null;
+    Map<DNStateManager, LockMode> lockModeBySM = null;
 
     public LockManagerImpl(ExecutionContext ec)
     {
@@ -69,9 +69,9 @@ public class LockManagerImpl implements LockManager
         {
             requiredLockModesById.clear();
         }
-        if (lockModeByObjectProvider != null)
+        if (lockModeBySM != null)
         {
-            lockModeByObjectProvider.clear();
+            lockModeBySM.clear();
         }
     }
 
@@ -105,15 +105,15 @@ public class LockManagerImpl implements LockManager
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.state.lock.LockManager#lock(org.datanucleus.ObjectProvider, org.datanucleus.state.LockMode)
+     * @see org.datanucleus.state.lock.LockManager#lock(org.datanucleus.DNStateManager, org.datanucleus.state.LockMode)
      */
-    public void lock(ObjectProvider sm, LockMode lockMode)
+    public void lock(DNStateManager sm, LockMode lockMode)
     {
-        if (lockModeByObjectProvider == null)
+        if (lockModeBySM == null)
         {
-            lockModeByObjectProvider = new HashMap<>();
+            lockModeBySM = new HashMap<>();
         }
-        lockModeByObjectProvider.put(sm, lockMode);
+        lockModeBySM.put(sm, lockMode);
 
         if (lockMode == LockMode.LOCK_PESSIMISTIC_READ || lockMode == LockMode.LOCK_PESSIMISTIC_WRITE)
         {
@@ -123,30 +123,30 @@ public class LockManagerImpl implements LockManager
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.state.lock.LockManager#unlock(org.datanucleus.ObjectProvider)
+     * @see org.datanucleus.state.lock.LockManager#unlock(org.datanucleus.DNStateManager)
      */
-    public void unlock(ObjectProvider sm)
+    public void unlock(DNStateManager sm)
     {
-        if (lockModeByObjectProvider != null)
+        if (lockModeBySM != null)
         {
-            lockModeByObjectProvider.remove(sm);
+            lockModeBySM.remove(sm);
         }
         // TODO Need to remove any row lock from the datastore. How, if we did "SELECT ... FOR UPDATE" in RDBMS?
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.state.lock.LockManager#getLockMode(org.datanucleus.ObjectProvider)
+     * @see org.datanucleus.state.lock.LockManager#getLockMode(org.datanucleus.DNStateManager)
      */
-    public LockMode getLockMode(ObjectProvider sm)
+    public LockMode getLockMode(DNStateManager sm)
     {
         if (sm == null)
         {
             return LockMode.LOCK_NONE;
         }
 
-        if (lockModeByObjectProvider != null)
+        if (lockModeBySM != null)
         {
-            return lockModeByObjectProvider.containsKey(sm) ? lockModeByObjectProvider.get(sm) : LockMode.LOCK_NONE;
+            return lockModeBySM.containsKey(sm) ? lockModeBySM.get(sm) : LockMode.LOCK_NONE;
         }
         return LockMode.LOCK_NONE;
     }
@@ -160,7 +160,7 @@ public class LockManagerImpl implements LockManager
      * @throws NucleusUserException thrown when an invalid strategy is specified
      * @throws NucleusOptimisticException thrown when the version check fails
      */
-    public void performOptimisticVersionCheck(ObjectProvider sm, VersionStrategy versionStrategy, Object versionDatastore)
+    public void performOptimisticVersionCheck(DNStateManager sm, VersionStrategy versionStrategy, Object versionDatastore)
     {
         // Extract the version of the object (that we are updating)
         Object versionObject = sm.getTransactionalVersion();

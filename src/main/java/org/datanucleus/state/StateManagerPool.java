@@ -28,22 +28,22 @@ import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Pool of ObjectProvider objects.
- * By default pool a maximum of 100 ObjectProvider objects for reuse.
+ * Pool of StateManager objects.
+ * By default pool a maximum of 100 StateManager objects for reuse.
  * Has an optional reaper thread that cleans out the unused pooled objects every 60 secs.
  */
-public class ObjectProviderPool
+public class StateManagerPool
 {
     private long maxIdle = 100;
     private long expirationTime;
 
-    private Map<ObjectProvider, Long> recyclableSMs;
+    private Map<DNStateManager, Long> recyclableSMs;
 
     private CleanUpThread cleaner;
 
     private Class opClass;
 
-    public ObjectProviderPool(int maxIdle, boolean reaperThread, Class opClass)
+    public StateManagerPool(int maxIdle, boolean reaperThread, Class opClass)
     {
         this.maxIdle = maxIdle;
         this.expirationTime = 30000; // 30 seconds
@@ -58,8 +58,7 @@ public class ObjectProviderPool
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug("Started pool of ObjectProviders (maxPool=" + maxIdle + 
-                ", reaperThread=" + reaperThread + ")");
+            NucleusLogger.PERSISTENCE.debug("Started pool of StateManagers (maxPool=" + maxIdle + ", reaperThread=" + reaperThread + ")");
         }
     }
 
@@ -71,30 +70,29 @@ public class ObjectProviderPool
         }
     }
 
-    protected ObjectProvider create(ExecutionContext ec, AbstractClassMetaData cmd)
+    protected DNStateManager create(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        return (ObjectProvider) ClassUtils.newInstance(opClass, ObjectProviderFactoryImpl.STATE_MANAGER_CTR_ARG_CLASSES, 
-            new Object[] {ec, cmd});
+        return (DNStateManager) ClassUtils.newInstance(opClass, StateManagerFactoryImpl.STATE_MANAGER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
     }
 
-    public boolean validate(ObjectProvider sm)
+    public boolean validate(DNStateManager sm)
     {
         // TODO Any situations where we don't want to reuse it?
         return true;
     }
 
-    public void expire(ObjectProvider sm)
+    public void expire(DNStateManager sm)
     {
     }
 
-    public synchronized ObjectProvider checkOut(ExecutionContext ec, AbstractClassMetaData cmd)
+    public synchronized DNStateManager checkOut(ExecutionContext ec, AbstractClassMetaData cmd)
     {
         long now = System.currentTimeMillis();
-        ObjectProvider sm;
+        DNStateManager sm;
         if (!recyclableSMs.isEmpty())
         {
-            Set<ObjectProvider> sms = recyclableSMs.keySet();
-            Iterator<ObjectProvider> smIter = sms.iterator();
+            Set<DNStateManager> sms = recyclableSMs.keySet();
+            Iterator<DNStateManager> smIter = sms.iterator();
             while (smIter.hasNext())
             {
                 sm = smIter.next();
@@ -129,10 +127,10 @@ public class ObjectProviderPool
 
     public synchronized void cleanUp()
     {
-       ObjectProvider sm;
+       DNStateManager sm;
        long now = System.currentTimeMillis();    
-       Set<ObjectProvider> ops = recyclableSMs.keySet();
-       Iterator<ObjectProvider> opIter = ops.iterator();
+       Set<DNStateManager> ops = recyclableSMs.keySet();
+       Iterator<DNStateManager> opIter = ops.iterator();
        while (opIter.hasNext())
        {
            sm = opIter.next();
@@ -146,7 +144,7 @@ public class ObjectProviderPool
        System.gc();
     }
 
-    public synchronized void checkIn(ObjectProvider sm)
+    public synchronized void checkIn(DNStateManager sm)
     {
         if (recyclableSMs.size() < maxIdle)
         {
@@ -156,10 +154,10 @@ public class ObjectProviderPool
 
     class CleanUpThread extends Thread
     {
-        private ObjectProviderPool pool;
+        private StateManagerPool pool;
         private long sleepTime;
 
-        CleanUpThread(ObjectProviderPool pool, long sleepTime)
+        CleanUpThread(StateManagerPool pool, long sleepTime)
         {
             this.pool = pool;
             this.sleepTime = sleepTime;

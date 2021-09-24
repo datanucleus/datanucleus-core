@@ -552,7 +552,7 @@ public interface StoreManager
     {
     }
 
-    String getDefaultObjectProviderClassName();
+    String getDefaultStateManagerClassName();
 
     /**
      * Whether this store manager uses backing-store based SCO wrappers.

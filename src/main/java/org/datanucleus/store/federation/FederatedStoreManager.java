@@ -689,9 +689,9 @@ public class FederatedStoreManager implements StoreManager
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getDefaultObjectProviderClassName()
+     * @see org.datanucleus.store.StoreManager#getDefaultStateManagerClassName()
      */
-    public String getDefaultObjectProviderClassName()
+    public String getDefaultStateManagerClassName()
     {
         return ReferentialStateManagerImpl.class.getName();
     }

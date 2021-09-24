@@ -21,7 +21,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Abstract field manager for storage of objects.
@@ -31,7 +31,7 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
 {
     protected ExecutionContext ec;
 
-    protected ObjectProvider sm;
+    protected DNStateManager sm;
 
     protected AbstractClassMetaData cmd;
 
@@ -44,7 +44,7 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
         this.insert = insert;
     }
 
-    public AbstractStoreFieldManager(ObjectProvider sm, boolean insert)
+    public AbstractStoreFieldManager(DNStateManager sm, boolean insert)
     {
         this.ec = sm.getExecutionContext();
         this.sm = sm;

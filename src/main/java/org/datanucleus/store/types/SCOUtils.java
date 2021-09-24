@@ -48,7 +48,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.types.scostore.CollectionStore;
 import org.datanucleus.store.types.scostore.MapStore;
@@ -71,7 +71,7 @@ public class SCOUtils
      * @return The unwrapped member value
      * TODO Move to TypeManager
      */
-    public static Object unwrapSCOField(ObjectProvider ownerSM, int memberNumber, SCO sco)
+    public static Object unwrapSCOField(DNStateManager ownerSM, int memberNumber, SCO sco)
     {
         if (sco == null)
         {
@@ -97,7 +97,7 @@ public class SCOUtils
      * @return The wrapper (or original value if not wrappable)
      * TODO Move to TypeManager
      */
-    public static Object wrapSCOField(ObjectProvider ownerSM, int memberNumber, Object value, boolean replaceFieldIfChanged)
+    public static Object wrapSCOField(DNStateManager ownerSM, int memberNumber, Object value, boolean replaceFieldIfChanged)
     {
         if (value == null || !ownerSM.getClassMetaData().getSCOMutableMemberFlags()[memberNumber])
         {
@@ -133,7 +133,7 @@ public class SCOUtils
      * @param lazyLoading Whether to use lazy loading in the wrapper
      * @return The String
      */
-    public static String getContainerInfoMessage(ObjectProvider ownerSM, String fieldName, SCOContainer cont, boolean useCache, boolean allowNulls, boolean lazyLoading)
+    public static String getContainerInfoMessage(DNStateManager ownerSM, String fieldName, SCOContainer cont, boolean useCache, boolean allowNulls, boolean lazyLoading)
     {
         String msg = Localiser.msg("023004", ownerSM.getObjectAsPrintable(), fieldName, cont.getClass().getName(),
             "[cache-values=" + useCache + ", lazy-loading=" + lazyLoading + ", allow-nulls=" + allowNulls + "]");
@@ -206,12 +206,12 @@ public class SCOUtils
     }
 
     /**
-     * Utility to return whether or not to use the container cache for the collection/map for the passed ObjectProvider SCO.
+     * Utility to return whether or not to use the container cache for the collection/map for the passed StateManager SCO.
      * @param ownerSM StateManager for the SCO field
      * @param mmd Metadata for the member that we are considering
      * @return Whether to use the cache.
      */
-    public static boolean useContainerCache(ObjectProvider ownerSM, AbstractMemberMetaData mmd)
+    public static boolean useContainerCache(DNStateManager ownerSM, AbstractMemberMetaData mmd)
     {
         if (ownerSM == null)
         {
@@ -245,7 +245,7 @@ public class SCOUtils
      * @param mmd Meta-data of the collection/map field
      * @return Whether to use lazy loading when caching the collection
      */
-    public static boolean useCachedLazyLoading(ObjectProvider ownerSM, AbstractMemberMetaData mmd)
+    public static boolean useCachedLazyLoading(DNStateManager ownerSM, AbstractMemberMetaData mmd)
     {
         if (ownerSM == null)
         {
@@ -461,7 +461,7 @@ public class SCOUtils
      * @param elementsWithoutId Whether the elements have no identity
      * @return If the Collection was updated
      */
-    public static boolean attachCopyElements(ObjectProvider ownerSM, Collection scoColl, Collection detachedElements, boolean elementsWithoutId)
+    public static boolean attachCopyElements(DNStateManager ownerSM, Collection scoColl, Collection detachedElements, boolean elementsWithoutId)
     {
         boolean updated = false;
 
@@ -566,7 +566,7 @@ public class SCOUtils
      * @param attached Collection to add the attached copies to
      * @param elementsWithoutIdentity Whether the elements have their own identity
      */
-    public static void attachCopyForCollection(ObjectProvider ownerSM, Object[] detachedElements, Collection attached, boolean elementsWithoutIdentity)
+    public static void attachCopyForCollection(DNStateManager ownerSM, Object[] detachedElements, Collection attached, boolean elementsWithoutIdentity)
     {
         ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (int i = 0; i < detachedElements.length; i++)
@@ -592,7 +592,7 @@ public class SCOUtils
      * @param keysWithoutIdentity Whether the keys have their own identity
      * @param valuesWithoutIdentity Whether the values have their own identity
      */
-    public static void attachCopyForMap(ObjectProvider ownerSM, Set detachedEntries, Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
+    public static void attachCopyForMap(DNStateManager ownerSM, Set detachedEntries, Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
     {
         Iterator iter = detachedEntries.iterator();
         ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
@@ -824,7 +824,7 @@ public class SCOUtils
      * @param <K> Type of the map key
      * @param <V> Type of the map value
      */
-    public static <K, V> void populateMapDelegateWithStoreData(Map<K, V> delegate, MapStore<K, V> store, ObjectProvider ownerSM)
+    public static <K, V> void populateMapDelegateWithStoreData(Map<K, V> delegate, MapStore<K, V> store, DNStateManager ownerSM)
     {
         // If we have persistable keys then load them. The keys query will pull in the key fetch plan so this instantiates them in the cache
         java.util.Set<K> keys = new java.util.HashSet<>();
@@ -894,7 +894,7 @@ public class SCOUtils
      * @param sm StateManager
      * @return <i>true</i> if this collection contains the specified element.
      */
-    public static Object[] toArray(CollectionStore backingStore, ObjectProvider sm)
+    public static Object[] toArray(CollectionStore backingStore, DNStateManager sm)
     {
         Object[] result = new Object[backingStore.size(sm)];
         Iterator it = backingStore.iterator(sm);
@@ -916,7 +916,7 @@ public class SCOUtils
      * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the
      * runtime type of every element in this collection.
      */
-    public static Object[] toArray(CollectionStore backingStore, ObjectProvider sm, Object a[])
+    public static Object[] toArray(CollectionStore backingStore, DNStateManager sm, Object a[])
     {
         int size = backingStore.size(sm);
         if (a.length < size)
@@ -997,7 +997,7 @@ public class SCOUtils
      * @param elements The elements in the collection
      * @param state FetchPlan state
      */
-    public static void detachForCollection(ObjectProvider ownerSM, Object[] elements, FetchPlanState state)
+    public static void detachForCollection(DNStateManager ownerSM, Object[] elements, FetchPlanState state)
     {
         ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (int i = 0; i < elements.length; i++)
@@ -1017,7 +1017,7 @@ public class SCOUtils
      * @param state FetchPlan state
      * @param detached Collection to add the detached copies to
      */
-    public static void detachCopyForCollection(ObjectProvider ownerSM, Object[] elements, FetchPlanState state, Collection detached)
+    public static void detachCopyForCollection(DNStateManager ownerSM, Object[] elements, FetchPlanState state, Collection detached)
     {
         ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (int i = 0; i < elements.length; i++)
@@ -1048,7 +1048,7 @@ public class SCOUtils
      * @param elements The elements to process
      * @param elementsWithoutIdentity Whether the elements have their own identity
      */
-    public static void attachForCollection(ObjectProvider ownerSM, Object[] elements, boolean elementsWithoutIdentity)
+    public static void attachForCollection(DNStateManager ownerSM, Object[] elements, boolean elementsWithoutIdentity)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
@@ -1073,7 +1073,7 @@ public class SCOUtils
      * @param entries The entries in the map
      * @param state FetchPlan state
      */
-    public static void detachForMap(ObjectProvider ownerSM, Set entries, FetchPlanState state)
+    public static void detachForMap(DNStateManager ownerSM, Set entries, FetchPlanState state)
     {
         ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (Iterator it = entries.iterator(); it.hasNext();)
@@ -1100,7 +1100,7 @@ public class SCOUtils
      * @param state FetchPlan state
      * @param detached Map to add the detached copies to
      */
-    public static void detachCopyForMap(ObjectProvider ownerSM, Set entries, FetchPlanState state, Map detached)
+    public static void detachCopyForMap(DNStateManager ownerSM, Set entries, FetchPlanState state, Map detached)
     {
         ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (Iterator it = entries.iterator(); it.hasNext();)
@@ -1128,7 +1128,7 @@ public class SCOUtils
      * @param keysWithoutIdentity Whether the keys have their own identity
      * @param valuesWithoutIdentity Whether the values have their own identity
      */
-    public static void attachForMap(ObjectProvider ownerSM, Set entries, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
+    public static void attachForMap(DNStateManager ownerSM, Set entries, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
@@ -1200,7 +1200,7 @@ public class SCOUtils
                                 // PM.getObjectById creates a dummy object to represent this object and
                                 // automatically
                                 // enlists it in the txn. Evict it to avoid issues with reachability
-                                ObjectProvider objSM = ec.findObjectProvider(obj);
+                                DNStateManager objSM = ec.findStateManager(obj);
                                 if (objSM != null)
                                 {
                                     ec.evictFromTransaction(objSM);
@@ -1217,14 +1217,14 @@ public class SCOUtils
                 if (!exists)
                 {
                     // Persist the object
-                    ec.persistObjectInternal(object, fieldValues, ObjectProvider.PC);
+                    ec.persistObjectInternal(object, fieldValues, DNStateManager.PC);
                     persisted = true;
                 }
             }
             else
             {
                 // Persistent state, but is it flushed to the datastore?
-                ObjectProvider objectSM = ec.findObjectProvider(object);
+                DNStateManager objectSM = ec.findStateManager(object);
                 if (objectSM.isWaitingToBeFlushedToDatastore())
                 {
                     // Newly persistent but still not flushed (e.g in optimistic txn)
@@ -1315,7 +1315,7 @@ public class SCOUtils
      * @param ownerSM StateManager
      * @return Whether to detach SCOs in wrapped form
      */
-    public static boolean detachAsWrapped(ObjectProvider ownerSM)
+    public static boolean detachAsWrapped(DNStateManager ownerSM)
     {
         return ownerSM.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
     }
@@ -1325,7 +1325,7 @@ public class SCOUtils
      * @param sm StateManager
      * @return Whether to use queued for this operation
      */
-    public static boolean useQueuedUpdate(ObjectProvider sm)
+    public static boolean useQueuedUpdate(DNStateManager sm)
     {
         return sm != null && sm.getExecutionContext().operationQueueIsActive();
     }

@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.MapStore;
 import org.datanucleus.store.types.scostore.Store;
 
@@ -27,18 +27,18 @@ import org.datanucleus.store.types.scostore.Store;
  */
 public class MapClearOperation implements SCOOperation
 {
-    final ObjectProvider sm;
+    final DNStateManager sm;
     final int fieldNumber;
     final MapStore store;
 
-    public MapClearOperation(ObjectProvider sm, MapStore store)
+    public MapClearOperation(DNStateManager sm, MapStore store)
     {
         this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
     }
 
-    public MapClearOperation(ObjectProvider sm, int fieldNum)
+    public MapClearOperation(DNStateManager sm, int fieldNum)
     {
         this.sm = sm;
         this.fieldNumber = fieldNum;
@@ -71,9 +71,9 @@ public class MapClearOperation implements SCOOperation
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

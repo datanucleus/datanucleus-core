@@ -31,7 +31,7 @@ import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.OrderMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.TypeManager;
@@ -93,7 +93,7 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
     @Override
     public int getObjectType(AbstractMemberMetaData mmd) 
     {
-        return mmd.getCollection().isEmbeddedElement() || mmd.getCollection().isSerializedElement() ? ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC : ObjectProvider.PC;
+        return mmd.getCollection().isEmbeddedElement() || mmd.getCollection().isSerializedElement() ? DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC : DNStateManager.PC;
     }
 
     @Override

@@ -30,7 +30,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.MapContainerAdapter;
@@ -54,7 +54,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
      * @param state State object to hold any pertinent controls for the detachment process
      * @param copy Whether to create detached COPIES or just detach in-situ
      */
-    public DetachFieldManager(ObjectProvider sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state, boolean copy)
+    public DetachFieldManager(DNStateManager sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state, boolean copy)
     {
         super(sm, secondClassMutableFields, fpClass, state);
         this.copy = copy;

@@ -122,7 +122,7 @@ import org.datanucleus.util.StringUtils;
  * With small Java objects this can mean a substantial memory overhead and for applications using such small objects can be critical. 
  * For this reason the StateManager should always be minimal in memory consumption.
  */
-public class StateManagerImpl implements ObjectProvider<Persistable>
+public class StateManagerImpl implements DNStateManager<Persistable>
 {
     protected static final SingleTypeFieldManager HOLLOWFIELDMANAGER = new SingleTypeFieldManager();
 
@@ -158,7 +158,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /** Flag for {@link #flags} whether we are in the process of disconnecting the object. */
     protected static final int FLAG_DISCONNECTING = 2<<0;
 
-    /** The persistable instance managed by this ObjectProvider. */
+    /** The persistable instance managed by this StateManager. */
     protected Persistable myPC;
 
     /** Bit-packed flags for operational settings (packed into "int" for memory benefit). */
@@ -311,7 +311,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             provideFields(fieldNumbers, new UnsetOwnerFieldManager());
         }
 
-        myEC.removeObjectProviderFromCache(this);
+        myEC.removeStateManagerFromCache(this);
 
         persistenceFlags = Persistable.READ_WRITE_OK;
         myPC.dnReplaceFlags();
@@ -345,7 +345,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         dirtyFields = null;
         loadedFields = null;
 
-        // TODO Remove the object from any pooling (when we enable it) via nucCtx.getObjectProviderFactory().disconnectObjectProvider(this);
+        // TODO Remove the object from any pooling (when we enable it) via nucCtx.getStateManagerFactory().disconnectStateManager(this);
     }
 
     /**
@@ -441,7 +441,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public void initialiseForEmbedded(Persistable pc, boolean copyPc)
     {
-        objectType = ObjectProvider.EMBEDDED_PC; // Default to an embedded PC object
+        objectType = DNStateManager.EMBEDDED_PC; // Default to an embedded PC object
         myID = null; // It is embedded at this point so dont need an ID since we're not persisting it
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
         persistenceFlags = Persistable.LOAD_REQUIRED;
@@ -533,7 +533,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                             if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
                             {
                                 // Make sure the PC field is persistent - can cause the insert of our object being managed by this SM via flush() when bidir relation
-                                Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, ObjectProvider.PC);
+                                Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, DNStateManager.PC);
                                 replaceField(myPC, fieldNumber, persistedFieldPC, false);
                             }
                         }
@@ -661,7 +661,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Initialise StateManager, assigning the specified id to the object. 
-     * This is used when getting objects out of the L2 Cache, where they have no ObjectProvider 
+     * This is used when getting objects out of the L2 Cache, where they have no StateManager 
      * assigned, and returning them as associated with a particular ExecutionContext.
      * @param cachedPC The cached PC object
      * @param id Id to assign to the Persistable object
@@ -876,7 +876,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.ObjectProvider#setFlushedNew(boolean)
+     * @see org.datanucleus.store.DNStateManager#setFlushedNew(boolean)
      */
     public void setFlushedNew(boolean flag)
     {
@@ -891,7 +891,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.ObjectProvider#isFlushedNew()
+     * @see org.datanucleus.store.DNStateManager#isFlushedNew()
      */
     public boolean isFlushedNew()
     {
@@ -899,7 +899,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.ObjectProvider#isFlushedToDatastore()
+     * @see org.datanucleus.store.DNStateManager#isFlushedToDatastore()
      */
     public boolean isFlushedToDatastore()
     {
@@ -907,7 +907,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.ObjectProvider#setFlushing(boolean)
+     * @see org.datanucleus.store.DNStateManager#setFlushing(boolean)
      */
     public void setFlushing(boolean flushing)
     {
@@ -927,7 +927,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.ObjectProvider#markAsFlushed()
+     * @see org.datanucleus.store.DNStateManager#markAsFlushed()
      */
     public void markAsFlushed()
     {
@@ -1701,7 +1701,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public void unloadField(String fieldName)
     {
-        if (objectType == ObjectProvider.PC)
+        if (objectType == DNStateManager.PC)
         {
             // Mark as not loaded
             AbstractMemberMetaData mmd = getClassMetaData().getMetaDataForMember(fieldName);
@@ -1997,7 +1997,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public void registerTransactional()
     {
-        myEC.addObjectProviderToCache(this);
+        myEC.addStateManagerToCache(this);
     }
 
     /**
@@ -2010,7 +2010,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public void setAssociatedValue(Object key, Object value)
     {
-        myEC.setObjectProviderAssociatedValue(this, key, value);
+        myEC.setStateManagerAssociatedValue(this, key, value);
     }
 
     /**
@@ -2023,20 +2023,20 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public Object getAssociatedValue(Object key)
     {
-        return myEC.getObjectProviderAssociatedValue(this, key);
+        return myEC.getStateManagerAssociatedValue(this, key);
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.state.ObjectProvider#removeAssociatedValue(java.lang.Object)
+     * @see org.datanucleus.state.DNStateManager#removeAssociatedValue(java.lang.Object)
      */
     public void removeAssociatedValue(Object key)
     {
-        myEC.removeObjectProviderAssociatedValue(this, key);
+        myEC.removeStateManagerAssociatedValue(this, key);
     }
 
     public boolean containsAssociatedValue(Object key)
     {
-        return myEC.containsObjectProviderAssociatedValue(this, key);
+        return myEC.containsStateManagerAssociatedValue(this, key);
     }
 
     /**
@@ -2130,12 +2130,12 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 return this;
             }
 
-            if (myEC == ((ObjectProvider)sm).getExecutionContext())
+            if (myEC == ((DNStateManager)sm).getExecutionContext())
             {
                 NucleusLogger.PERSISTENCE.debug("StateManagerImpl.replacingStateManager this=" + this + " sm=" + sm + " with same EC");
                 // This is a race condition when makePersistent or makeTransactional is called on the same PC instance for the
                 // same PM. It has been already set to this SM - just disconnect the other one. Return this SM so it won't be replaced.
-                ((ObjectProvider)sm).disconnect();
+                ((DNStateManager)sm).disconnect();
                 return this;
             }
 
@@ -2559,7 +2559,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2606,7 +2606,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2653,7 +2653,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2700,7 +2700,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2747,7 +2747,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2794,7 +2794,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2841,7 +2841,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2888,7 +2888,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2935,7 +2935,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, currentValue);
@@ -2968,7 +2968,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         if (currentValue != null && currentValue != newValue && currentValue instanceof Persistable)
         {
             // Where the object is embedded, remove the owner from its old value since it is no longer managed by this StateManager
-            ObjectProvider currentSM = myEC.findObjectProvider(currentValue);
+            DNStateManager currentSM = myEC.findStateManager(currentValue);
             if (currentSM != null && currentSM.isEmbedded())
             {
                 myEC.removeEmbeddedOwnerRelation(this, fieldNumber, currentSM);
@@ -3064,7 +3064,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE && relationType == RelationType.NONE)
                 {
-                    String key = ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
+                    String key = DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber;
                     if (!containsAssociatedValue(key))
                     {
                         setAssociatedValue(key, oldValue);
@@ -3279,7 +3279,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * Convenience method to retrieve the detach state from the passed StateManager's object.
      * @param sm StateManager
      */
-    public void retrieveDetachState(ObjectProvider sm)
+    public void retrieveDetachState(DNStateManager sm)
     {
         if (sm.getObject() instanceof Detachable)
         {
@@ -4087,7 +4087,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (!loadedFields[fieldNumber])
             {
                 // Field not loaded, so load it
-                if (objectType != ObjectProvider.PC)
+                if (objectType != DNStateManager.PC)
                 {
                     // TODO When we have nested embedded objects that can have relations to non-embedded then this needs to change
                     // Embedded object so we assume that all was loaded before (when it was read)
@@ -4206,11 +4206,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     Object ownerField = ownerOP.provideField(ownerRel.getOwnerFieldNum());
                     if (ownerField instanceof SCOMap)
                     {
-                        if (objectType == ObjectProvider.EMBEDDED_MAP_KEY_PC)
+                        if (objectType == DNStateManager.EMBEDDED_MAP_KEY_PC)
                         {
                             ((SCOMap)ownerField).updateEmbeddedKey(myPC, fieldNumber, value, makeDirty);
                         }
-                        if (objectType == ObjectProvider.EMBEDDED_MAP_VALUE_PC)
+                        if (objectType == DNStateManager.EMBEDDED_MAP_VALUE_PC)
                         {
                             ((SCOMap)ownerField).updateEmbeddedValue(myPC, fieldNumber, value, makeDirty);
                         }
@@ -4441,7 +4441,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (RelationType.isRelationSingleValued(relationType) && mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null)
             {
                 // Embedded field, so assign the embedded/serialised object "owner-field" if specified
-                ObjectProvider subSM = myEC.findObjectProvider(value);
+                DNStateManager subSM = myEC.findStateManager(value);
                 int ownerAbsFieldNum = subSM.getClassMetaData().getAbsolutePositionOfMember(mmd.getEmbeddedMetaData().getOwnerMember());
                 if (ownerAbsFieldNum >= 0)
                 {
@@ -4589,14 +4589,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (myLC == null)
             {
                 // Initialise the StateManager in T_CLEAN state
-                final ObjectProvider thisOP = this;
+                final DNStateManager thisOP = this;
                 myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.T_CLEAN);
 
                 try
                 {
                     if (myLC.isPersistent())
                     {
-                        myEC.addObjectProviderToCache(this);
+                        myEC.addStateManagerToCache(this);
                     }
 
                     // Everything OK so far. Now we can set SM reference in PC 
@@ -4609,9 +4609,9 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 }
                 catch (NucleusException ne)
                 {
-                    if (myEC.findObjectProvider(myEC.getObjectFromCache(myID)) == this)
+                    if (myEC.findStateManager(myEC.getObjectFromCache(myID)) == this)
                     {
-                        myEC.removeObjectProviderFromCache(this);
+                        myEC.removeStateManagerFromCache(this);
                     }
                     throw ne;
                 }
@@ -4685,7 +4685,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * Make the managed object transient as a result of persistence-by-reachability when run at commit time.
      * The object was brought into persistence by reachability but found to not be needed at commit time.
      * Here we delete it from persistence (since it will have been persisted/flushed to the datastore), and
-     * then we migrate the lifecycle to transient (which disconnects this ObjectProvider).
+     * then we migrate the lifecycle to transient (which disconnects this StateManager).
      */
     public void makeTransientForReachability()
     {
@@ -4797,7 +4797,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                         if (api.isPersistable(value))
                         {
                             // PC field beyond end of graph
-                            ObjectProvider valueOP = myEC.findObjectProvider(value);
+                            DNStateManager valueOP = myEC.findStateManager(value);
                             if (!api.isDetached(value) && !(valueOP != null && valueOP.isDetaching()))
                             {
                                 // Field value is not detached or being detached so unload it
@@ -4951,7 +4951,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 }
 
                 // Create a SM for our copy object
-                ObjectProvider smDetachedPC = new StateManagerImpl(myEC, cmd);
+                DNStateManager smDetachedPC = new StateManagerImpl(myEC, cmd);
                 smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(myPC), getVersion(myPC));
                 myEC.setAttachDetachReferencedObject(smDetachedPC, myPC);
 
@@ -5094,7 +5094,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             getCallbackHandler().preAttach(myPC);
 
             // Connect the transient object to a StateManager so we can get its values
-            ObjectProvider detachedSM = new StateManagerImpl(myEC, cmd);
+            DNStateManager detachedSM = new StateManagerImpl(myEC, cmd);
             detachedSM.initialiseForDetached(detachedPC, myID, null);
 
             // Make sure the attached object is in the cache
@@ -5378,14 +5378,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * Attach the fields for this object using the provided detached object.
      * This will attach all loaded plus all dirty fields.
-     * @param detachedOP ObjectProvider for the detached object.
+     * @param detachedSM StateManager for the detached object.
      * @param loadedFields Fields that were detached with the object
      * @param dirtyFields Fields that have been modified while detached
      * @param persistent whether the object is already persistent
      * @param version the version
      * @param cascade Whether to cascade the attach to related fields
      */
-    private void internalAttachCopy(ObjectProvider detachedOP,
+    private void internalAttachCopy(DNStateManager detachedSM,
                                    boolean[] loadedFields,
                                    boolean[] dirtyFields,
                                    boolean persistent,
@@ -5403,7 +5403,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("026035", IdentityUtils.getPersistableIdentityForId(getInternalObjectId()), StringUtils.intArrayToString(attachFieldNumbers)));
             }
-            detachedOP.provideFields(attachFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields, persistent, cascade, true));
+            detachedSM.provideFields(attachFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields, persistent, cascade, true));
         }
     }
 
@@ -5870,7 +5870,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                         int[] dirtyFieldNumbers = ClassUtils.getFlagsSetTo(dirtyFields, true);
                         if (dirtyFieldNumbers == null)
                         {
-                            // ObjectProvider is dirty but no fields. What happened?
+                            // StateManager is dirty but no fields. What happened?
                             throw new NucleusException(Localiser.msg("026010")).setFatal();
                         }
 
@@ -6005,7 +6005,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public void log(NucleusLogger log)
     {
-        log.debug("ObjectProvider[" + StringUtils.toJVMIDString(this) + "]");
+        log.debug("StateManager[" + StringUtils.toJVMIDString(this) + "]");
         log.debug("    myEC=" + myEC);
         log.debug("    myID=" + myID);
         log.debug("    myLC=" + myLC);

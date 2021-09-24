@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-2011 Andy Jefferson - all javadocs, many methods added during merge with ObjectProvider
+2011 Andy Jefferson - all javadocs, many methods added during merge with StateManager
     ...
 **********************************************************************/
 package org.datanucleus.state;
@@ -31,14 +31,13 @@ import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.transaction.Transaction;
 
 /**
- * Provider of field information for a managed object.
- * A JDO StateManager is one possible implementation of an ObjectProvider, using bytecode enhancement in that case.
- * Another possible implementation would use Java reflection to obtain and set field values in the object.
+ * StateManager for DataNucleus systems for a managed object.
+ * Each StateManager manages a single Persistable object.
  * 
  * TODO Drop the generics and use Persistable. This will require updates to ExecutionContext to match
  * @param <T> Type of the object being managed
  */
-public interface ObjectProvider<T> extends StateManager
+public interface DNStateManager<T> extends StateManager
 {
     /**
      * Key prefix under which the original value of a field is stored in the entity (nondurable objects).
@@ -101,7 +100,7 @@ public interface ObjectProvider<T> extends StateManager
     /**
      * Initialises a state manager to manage the passed persistent instance having the given object ID.
      * Used where we have retrieved a PC object from a datastore directly (not field-by-field), for example on an object datastore. 
-     * This initialiser will not add ObjectProviders to all related PCs. This must be done by any calling process. 
+     * This initialiser will not add StateManagers to all related PCs. This must be done by any calling process. 
      * This simply adds StateManager to the specified object and records the id, setting all fields of the object as loaded.
      * @param id the identity of the object.
      * @param pc The object to be managed
@@ -150,7 +149,7 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Initialise StateManager, assigning the specified id to the object. 
-     * This is used when getting objects out of the L2 Cache, where they have no ObjectProvider assigned, and returning them as associated with a particular ExecutionContext.
+     * This is used when getting objects out of the L2 Cache, where they have no StateManager assigned, and returning them as associated with a particular ExecutionContext.
      * @param cachedPC The cached PC object
      * @param id Id to assign to the persistable object
      */
@@ -311,7 +310,7 @@ public interface ObjectProvider<T> extends StateManager
     void makeDirty(int field);
 
     /**
-     * Convenience accessor for whether this ObjectProvider manages an embedded/serialised object.
+     * Convenience accessor for whether this StateManager manages an embedded/serialised object.
      * @return Whether the managed object is embedded/serialised.
      */
     boolean isEmbedded();
@@ -324,7 +323,7 @@ public interface ObjectProvider<T> extends StateManager
     void updateOwnerFieldInEmbeddedField(int fieldNumber, Object value);
 
     /**
-     * Method to set this ObjectProvider as managing an embedded/serialised object.
+     * Method to set this StateManager as managing an embedded/serialised object.
      * @param type The type of object being managed
      */
     void setPcObjectType(short type);
@@ -757,7 +756,7 @@ public interface ObjectProvider<T> extends StateManager
      * Convenience method to retrieve the detach state from the passed StateManager's managed object
      * @param sm StateManager
      */
-    void retrieveDetachState(ObjectProvider sm);
+    void retrieveDetachState(DNStateManager sm);
 
     /**
      * Look to the database to determine which class this object is. 

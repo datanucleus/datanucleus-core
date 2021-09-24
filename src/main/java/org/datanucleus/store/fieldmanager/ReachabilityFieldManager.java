@@ -24,7 +24,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -38,7 +38,7 @@ import org.datanucleus.util.NucleusLogger;
 public class ReachabilityFieldManager extends AbstractFieldManager
 {
     /** StateManager for the owning object. */
-    private final ObjectProvider sm;
+    private final DNStateManager sm;
 
     /** Set of reachables up to this point. */
     private Set reachables = null;
@@ -48,7 +48,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
      * @param sm StateManager for the object.
      * @param reachables Reachables up to this point
      */
-    public ReachabilityFieldManager(ObjectProvider sm, Set reachables)
+    public ReachabilityFieldManager(DNStateManager sm, Set reachables)
     {
         this.sm = sm;
         this.reachables = reachables;
@@ -62,7 +62,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
     protected void processPersistable(Object obj, AbstractMemberMetaData mmd)
     {
         ExecutionContext ec = sm.getExecutionContext();
-        ObjectProvider objSM = ec.findObjectProvider(obj);
+        DNStateManager objSM = ec.findStateManager(obj);
         if (objSM != null)
         {
             Object objID = objSM.getInternalObjectId();

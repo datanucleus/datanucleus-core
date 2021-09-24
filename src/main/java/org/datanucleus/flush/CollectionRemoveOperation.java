@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.scostore.CollectionStore;
 import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.StringUtils;
@@ -30,7 +30,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class CollectionRemoveOperation<E> implements SCOOperation
 {
-    final ObjectProvider sm;
+    final DNStateManager sm;
     final int fieldNumber;
     final CollectionStore<E> store;
 
@@ -40,7 +40,7 @@ public class CollectionRemoveOperation<E> implements SCOOperation
     /** Whether to allow cascade-delete checks. */
     final boolean allowCascadeDelete;
 
-    public CollectionRemoveOperation(ObjectProvider sm, CollectionStore<E> store, E value, boolean allowCascadeDelete)
+    public CollectionRemoveOperation(DNStateManager sm, CollectionStore<E> store, E value, boolean allowCascadeDelete)
     {
         this.sm = sm;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -49,7 +49,7 @@ public class CollectionRemoveOperation<E> implements SCOOperation
         this.allowCascadeDelete = allowCascadeDelete;
     }
 
-    public CollectionRemoveOperation(ObjectProvider sm, int fieldNum, E value, boolean allowCascadeDelete)
+    public CollectionRemoveOperation(DNStateManager sm, int fieldNum, E value, boolean allowCascadeDelete)
     {
         this.sm = sm;
         this.fieldNumber = fieldNum;
@@ -93,9 +93,9 @@ public class CollectionRemoveOperation<E> implements SCOOperation
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

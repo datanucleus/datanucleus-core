@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -39,14 +39,14 @@ public class FlushOrdered implements FlushProcess
     /* (non-Javadoc)
      * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<DNStateManager> primaryOPs, Collection<DNStateManager> secondaryOPs, OperationQueue opQueue)
     {
         // Note that opQueue is not processed directly here, but instead will be processed via callbacks from the persistence of other objects
         // TODO The opQueue needs to be processed from here instead of via the callbacks, see NUCCORE-904
 
         List<NucleusOptimisticException> optimisticFailures = null;
 
-        // Make copy of ObjectProviders so we don't have ConcurrentModification issues
+        // Make copy of StateManagers so we don't have ConcurrentModification issues
         Object[] toFlushPrimary = null;
         Object[] toFlushSecondary = null;
         try
@@ -100,7 +100,7 @@ public class FlushOrdered implements FlushProcess
         {
             for (int i = 0; i < toFlushPrimary.length; i++)
             {
-                ObjectProvider sm = (ObjectProvider) toFlushPrimary[i];
+                DNStateManager sm = (DNStateManager) toFlushPrimary[i];
                 try
                 {
                     sm.flush();
@@ -125,7 +125,7 @@ public class FlushOrdered implements FlushProcess
         {
             for (int i = 0; i < toFlushSecondary.length; i++)
             {
-                ObjectProvider sm = (ObjectProvider) toFlushSecondary[i];
+                DNStateManager sm = (DNStateManager) toFlushSecondary[i];
                 try
                 {
                     sm.flush();

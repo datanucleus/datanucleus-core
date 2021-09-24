@@ -18,19 +18,19 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Flush operation for an update of the value of a member of the specified object.
  */
 public class UpdateMemberOperation implements Operation
 {
-    final ObjectProvider sm;
+    final DNStateManager sm;
     final int fieldNumber;
     Object oldValue;
     Object newValue;
 
-    public UpdateMemberOperation(ObjectProvider sm, int fieldNum, Object newVal, Object oldVal)
+    public UpdateMemberOperation(DNStateManager sm, int fieldNum, Object newVal, Object oldVal)
     {
         this.sm = sm;
         this.fieldNumber = fieldNum;
@@ -58,9 +58,9 @@ public class UpdateMemberOperation implements Operation
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

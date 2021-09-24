@@ -27,7 +27,7 @@ import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.MapPutOperation;
 import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCOMap;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
@@ -40,7 +40,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map<K, V>, K, V>, Cloneable, java.io.Serializable
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
@@ -48,12 +48,12 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
 
     /**
      * Constructor, using StateManager of the "owner" and the field name.
-     * @param ownerOP The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public Map(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public Map(DNStateManager sm, AbstractMemberMetaData mmd)
     {
-        this.ownerOP = ownerOP;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -74,7 +74,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }
     }
@@ -165,7 +165,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      **/
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -173,9 +173,9 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      */
     public void unsetOwner()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP = null;
+            ownerSM = null;
             ownerMmd = null;
         }
     }
@@ -185,9 +185,9 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      **/
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
         }
     }
 
@@ -200,7 +200,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
     public java.util.Map detachCopy(FetchPlanState state)
     {
         java.util.Map detached = new java.util.HashMap();
-        SCOUtils.detachCopyForMap(ownerOP, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
         return detached;
     }
 
@@ -218,10 +218,10 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
         boolean valuesWithoutIdentity = SCOUtils.mapHasValuesWithoutIdentity(ownerMmd);
 
         java.util.Map attachedKeysValues = new java.util.HashMap(value.size());
-        SCOUtils.attachCopyForMap(ownerOP, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
+        SCOUtils.attachCopyForMap(ownerSM, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
 
         // Update the attached map with the detached entries
-        SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, attachedKeysValues);
+        SCOUtils.updateMapWithMapKeysValues(ownerSM.getExecutionContext().getApiAdapter(), this, attachedKeysValues);
     }
 
     // -------------------- Implementation of Map Methods ----------------------
@@ -341,16 +341,16 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      **/
     public void clear()
     {
-        if (ownerOP != null && !delegate.isEmpty())
+        if (ownerSM != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
-                    ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
+                    ownerSM.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
                 }
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
@@ -361,11 +361,11 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
                     Map.Entry entry = entryIter.next();
                     if (SCOUtils.hasDependentKey(ownerMmd))
                     {
-                        ownerOP.getExecutionContext().deleteObjectInternal(entry.getKey());
+                        ownerSM.getExecutionContext().deleteObjectInternal(entry.getKey());
                     }
                     if (SCOUtils.hasDependentValue(ownerMmd))
                     {
-                        ownerOP.getExecutionContext().deleteObjectInternal(entry.getValue());
+                        ownerSM.getExecutionContext().deleteObjectInternal(entry.getValue());
                     }
                 }
             }
@@ -374,9 +374,9 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
         delegate.clear();
 
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -392,16 +392,16 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
         V oldValue = delegate.put(key, value);
         makeDirty();
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
+                ownerSM.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), key, value));
             }
 
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return oldValue;
@@ -416,21 +416,21 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
         delegate.putAll(m);
         makeDirty();
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 Iterator<Map.Entry> entryIter = m.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
-                    ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
+                    ownerSM.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
                 }
             }
 
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
     }
@@ -444,30 +444,30 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
     {
         V value = delegate.remove(key);
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
+                ownerSM.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), key, value));
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
                 if (SCOUtils.hasDependentKey(ownerMmd))
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(key);
+                    ownerSM.getExecutionContext().deleteObjectInternal(key);
                 }
                 if (SCOUtils.hasDependentValue(ownerMmd))
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(value);
+                    ownerSM.getExecutionContext().deleteObjectInternal(value);
                 }
             }
         }
 
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
 
         return value;

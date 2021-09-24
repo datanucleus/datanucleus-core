@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StorePersistenceHandler;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -42,10 +42,10 @@ public class FlushNonReferential implements FlushProcess
     /* (non-Javadoc)
      * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<DNStateManager> primaryOPs, Collection<DNStateManager> secondaryOPs, OperationQueue opQueue)
     {
-        // Make copy of ObjectProviders so we don't have ConcurrentModification issues
-        Set<ObjectProvider> smsToFlush = new HashSet<ObjectProvider>();
+        // Make copy of StateManagers so we don't have ConcurrentModification issues
+        Set<DNStateManager> smsToFlush = new HashSet<DNStateManager>();
         if (primaryOPs != null)
         {
             smsToFlush.addAll(primaryOPs);
@@ -74,7 +74,7 @@ public class FlushNonReferential implements FlushProcess
     }
 
     /**
-     * Method that does the flushing of the passed ObjectProviders, grouping them into all DELETEs, then all INSERTs,
+     * Method that does the flushing of the passed StateManagers, grouping them into all DELETEs, then all INSERTs,
      * finally all UPDATEs. The StorePersistenceHandler will get calls to <i>deleteObjects</i>, <i>insertObjects</i>
      * and <i>updateObject</i> (for each other one). Note that this is in a separate method to allow calls by
      * other FlushProcesses that want to take advantage of the basic flush method without 
@@ -82,7 +82,7 @@ public class FlushNonReferential implements FlushProcess
      * @param ec ExecutionContext
      * @return Any optimistic verification exceptions thrown during flush
      */
-    public List<NucleusOptimisticException> flushDeleteInsertUpdateGrouped(Set<ObjectProvider> smsToFlush, ExecutionContext ec)
+    public List<NucleusOptimisticException> flushDeleteInsertUpdateGrouped(Set<DNStateManager> smsToFlush, ExecutionContext ec)
     {
         List<NucleusOptimisticException> optimisticFailures = null;
 
@@ -92,12 +92,12 @@ public class FlushNonReferential implements FlushProcess
             classesToFlush = new HashSet();
         }
 
-        Set<ObjectProvider> smsToDelete = new HashSet<ObjectProvider>();
-        Set<ObjectProvider> smsToInsert = new HashSet<ObjectProvider>();
-        Iterator<ObjectProvider> smIter = smsToFlush.iterator();
+        Set<DNStateManager> smsToDelete = new HashSet<DNStateManager>();
+        Set<DNStateManager> smsToInsert = new HashSet<DNStateManager>();
+        Iterator<DNStateManager> smIter = smsToFlush.iterator();
         while (smIter.hasNext())
         {
-            ObjectProvider sm = smIter.next();
+            DNStateManager sm = smIter.next();
             if (sm.isEmbedded())
             {
                 sm.markAsFlushed(); // Embedded have nothing to flush since the owner manages it
@@ -141,16 +141,16 @@ public class FlushNonReferential implements FlushProcess
         StorePersistenceHandler persistenceHandler = ec.getStoreManager().getPersistenceHandler();
         if (!smsToDelete.isEmpty())
         {
-            // Perform preDelete - deleteAll - postDelete, and mark all ObjectProviders as flushed
+            // Perform preDelete - deleteAll - postDelete, and mark all StateManagers as flushed
             // TODO This omits some parts of sm.internalDeletePersistent
-            for (ObjectProvider sm : smsToDelete)
+            for (DNStateManager sm : smsToDelete)
             {
                 sm.setFlushing(true);
                 ec.getCallbackHandler().preDelete(sm.getObject());
             }
             try
             {
-                persistenceHandler.deleteObjects(smsToDelete.toArray(new ObjectProvider[smsToDelete.size()]));
+                persistenceHandler.deleteObjects(smsToDelete.toArray(new DNStateManager[smsToDelete.size()]));
             }
             catch (NucleusOptimisticException noe)
             {
@@ -169,7 +169,7 @@ public class FlushNonReferential implements FlushProcess
                     optimisticFailures.add(noe);
                 }
             }
-            for (ObjectProvider sm : smsToDelete)
+            for (DNStateManager sm : smsToDelete)
             {
                 ec.getCallbackHandler().postDelete(sm.getObject());
                 sm.setFlushedNew(false);
@@ -180,16 +180,16 @@ public class FlushNonReferential implements FlushProcess
 
         if (!smsToInsert.isEmpty())
         {
-            // Perform preStore - insertAll - postStore, and mark all ObjectProviders as flushed
+            // Perform preStore - insertAll - postStore, and mark all StateManagers as flushed
             // TODO This omits some parts of sm.internalMakePersistent
-            for (ObjectProvider sm : smsToInsert)
+            for (DNStateManager sm : smsToInsert)
             {
                 sm.setFlushing(true);
                 ec.getCallbackHandler().preStore(sm.getObject());
                 // TODO Make sure identity is set since user could have updated fields in preStore
             }
-            persistenceHandler.insertObjects(smsToInsert.toArray(new ObjectProvider[smsToInsert.size()]));
-            for (ObjectProvider sm : smsToInsert)
+            persistenceHandler.insertObjects(smsToInsert.toArray(new DNStateManager[smsToInsert.size()]));
+            for (DNStateManager sm : smsToInsert)
             {
                 ec.getCallbackHandler().postStore(sm.getObject());
                 sm.setFlushedNew(true);
@@ -202,7 +202,7 @@ public class FlushNonReferential implements FlushProcess
         if (!smsToFlush.isEmpty())
         {
             // Objects to update
-            for (ObjectProvider sm : smsToFlush)
+            for (DNStateManager sm : smsToFlush)
             {
                 try
                 {

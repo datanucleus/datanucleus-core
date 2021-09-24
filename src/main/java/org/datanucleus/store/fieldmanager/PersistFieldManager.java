@@ -23,7 +23,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;
@@ -41,7 +41,7 @@ import org.datanucleus.store.types.TypeManager;
 public class PersistFieldManager extends AbstractFieldManager
 {
     /** StateManager for the owning object. */
-    private final ObjectProvider sm;
+    private final DNStateManager sm;
 
     /** Whether this manager will replace any SCO fields with SCO wrappers. */
     private final boolean replaceSCOsWithWrappers;
@@ -51,7 +51,7 @@ public class PersistFieldManager extends AbstractFieldManager
      * @param sm StateManager for the object.
      * @param replaceSCOsWithWrappers Whether to swap any SCO field objects for SCO wrappers
      */
-    public PersistFieldManager(ObjectProvider sm, boolean replaceSCOsWithWrappers)
+    public PersistFieldManager(DNStateManager sm, boolean replaceSCOsWithWrappers)
     {
         this.sm = sm;
         this.replaceSCOsWithWrappers = replaceSCOsWithWrappers;
@@ -61,7 +61,7 @@ public class PersistFieldManager extends AbstractFieldManager
      * Utility method to process the passed persistable object.
      * @param pc The PC object
      * @param ownerFieldNum Field number of owner where this is embedded
-     * @param objectType Type of object (see org.datanucleus.ObjectProvider)
+     * @param objectType Type of object (see org.datanucleus.state.DNStateManager)
      * @return The processed persistable object
      */
     protected Object processPersistable(Object pc, int ownerFieldNum, int objectType)
@@ -71,7 +71,7 @@ public class PersistFieldManager extends AbstractFieldManager
         if (!adapter.isPersistent(pc) || (adapter.isPersistent(pc) && adapter.isDeleted(pc)))
         {
             // Object is TRANSIENT/DETACHED and being persisted, or P_NEW_DELETED and being re-persisted
-            if (objectType != ObjectProvider.PC)
+            if (objectType != DNStateManager.PC)
             {
                 return sm.getExecutionContext().persistObjectInternal(pc, sm, ownerFieldNum, objectType);
             }
@@ -118,11 +118,11 @@ public class PersistFieldManager extends AbstractFieldManager
                         // Process PC fields
                         if (mmd.isEmbedded() || mmd.isSerialized())
                         {
-                            processPersistable(value, fieldNumber, ObjectProvider.EMBEDDED_PC);
+                            processPersistable(value, fieldNumber, DNStateManager.EMBEDDED_PC);
                         }
                         else
                         {
-                            processPersistable(value, -1, ObjectProvider.PC);
+                            processPersistable(value, -1, DNStateManager.PC);
                         }
                     }
                 }
@@ -160,14 +160,14 @@ public class PersistFieldManager extends AbstractFieldManager
             if (api.isPersistable(mapKey))
             {
                 // Persist (or attach) the key
-                int mapKeyObjectType = mmd.getMap().isEmbeddedKey() || mmd.getMap().isSerializedKey() ? ObjectProvider.EMBEDDED_MAP_KEY_PC : ObjectProvider.PC;
+                int mapKeyObjectType = mmd.getMap().isEmbeddedKey() || mmd.getMap().isSerializedKey() ? DNStateManager.EMBEDDED_MAP_KEY_PC : DNStateManager.PC;
                 newMapKey = processPersistable(mapKey, fieldNumber, mapKeyObjectType);
             }
 
             if (api.isPersistable(mapValue))
             {
                 // Persist (or attach) the value
-                int mapValueObjectType = mmd.getMap().isEmbeddedValue() || mmd.getMap().isSerializedValue() ? ObjectProvider.EMBEDDED_MAP_VALUE_PC : ObjectProvider.PC;
+                int mapValueObjectType = mmd.getMap().isEmbeddedValue() || mmd.getMap().isSerializedValue() ? DNStateManager.EMBEDDED_MAP_VALUE_PC : DNStateManager.PC;
                 newMapValue = processPersistable(mapValue, fieldNumber, mapValueObjectType);
             }
 
@@ -178,7 +178,7 @@ public class PersistFieldManager extends AbstractFieldManager
                 boolean updateValue = false;
                 if (newMapKey != mapKey)
                 {
-                    ObjectProvider keySM = sm.getExecutionContext().findObjectProvider(newMapKey);
+                    DNStateManager keySM = sm.getExecutionContext().findStateManager(newMapKey);
                     if (keySM.getReferencedPC() != null)
                     {
                         // Attaching the key
@@ -187,7 +187,7 @@ public class PersistFieldManager extends AbstractFieldManager
                 }
                 if (newMapValue != mapValue)
                 {
-                    ObjectProvider valSM = sm.getExecutionContext().findObjectProvider(newMapValue);
+                    DNStateManager valSM = sm.getExecutionContext().findStateManager(newMapValue);
                     if (valSM.getReferencedPC() != null)
                     {
                         // Attaching the value
@@ -218,7 +218,7 @@ public class PersistFieldManager extends AbstractFieldManager
 
         ApiAdapter api = sm.getExecutionContext().getApiAdapter();
         int objectType = elementContainerHandler.getObjectType(mmd);
-        if (objectType == ObjectProvider.PC)
+        if (objectType == DNStateManager.PC)
         {
             int elementPosition = 0;
             for (Object element : containerAdapter)
@@ -226,7 +226,7 @@ public class PersistFieldManager extends AbstractFieldManager
                 if (api.isPersistable(element))
                 {
                     Object newElement = processPersistable(element, -1, objectType);
-                    ObjectProvider elementSM = sm.getExecutionContext().findObjectProvider(newElement);
+                    DNStateManager elementSM = sm.getExecutionContext().findStateManager(newElement);
                     if (elementSM.getReferencedPC() != null)
                     {
                         // Must be attaching this element, so swap element (detached -> attached)

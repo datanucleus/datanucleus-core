@@ -30,7 +30,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;
@@ -51,14 +51,14 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     private static final Object[] EMPTY_ARRAY = {};
 
     /** StateManager of the object we are copying values from. */
-    ObjectProvider sm;
+    DNStateManager sm;
 
     ExecutionContext ec;
 
     /** CachedPC that we are copying values into. */
     CachedPC cachedPC;
 
-    public L2CachePopulateFieldManager(ObjectProvider sm, CachedPC cachedpc)
+    public L2CachePopulateFieldManager(DNStateManager sm, CachedPC cachedpc)
     {
         this.sm = sm;
         this.ec = sm.getExecutionContext();
@@ -557,7 +557,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             return null;
         }
 
-        ObjectProvider valueSM = ec.findObjectProvider(pc);
+        DNStateManager valueSM = ec.findStateManager(pc);
         CachedPC valueCachedPC = new CachedPC(pc.getClass(), valueSM.getLoadedFields(), null, null);
 
         int[] loadedFields = valueSM.getLoadedFieldNumbers();

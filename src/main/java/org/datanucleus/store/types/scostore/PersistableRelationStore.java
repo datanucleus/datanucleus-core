@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.scostore;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Representation of the relation between two persistable objects.
@@ -32,14 +32,14 @@ public interface PersistableRelationStore extends Store
      * @param sm2 Object 2 StateManager
      * @return Whether the relation was added
      */
-    boolean add(ObjectProvider sm1, ObjectProvider sm2);
+    boolean add(DNStateManager sm1, DNStateManager sm2);
 
     /**
      * Method to remove the relation from the provided object.
      * @param sm1 Object 1 StateManager
      * @return Whether the relation was removed
      */
-    boolean remove(ObjectProvider sm1);
+    boolean remove(DNStateManager sm1);
 
     /**
      * Method to update the relation for the first object to relate to the second object.
@@ -48,5 +48,5 @@ public interface PersistableRelationStore extends Store
      * @param sm2 Object 2 StateManager
      * @return Whether the relation was replaced
      */
-    boolean update(ObjectProvider sm1, ObjectProvider sm2);
+    boolean update(DNStateManager sm1, DNStateManager sm2);
 }

@@ -22,7 +22,7 @@ package org.datanucleus.store.types.scostore;
 import java.util.Collections;
 import java.util.Map;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Interface representation of the backing store for a Map, providing its interface with the datastore.
@@ -63,7 +63,7 @@ public interface MapStore<K, V> extends Store
      * @param value The value to check
      * @return Whether it is contained.
      */
-    boolean containsValue(ObjectProvider sm, Object value);
+    boolean containsValue(DNStateManager sm, Object value);
 
     /**
      * Accessor for whether the Map contains this key.
@@ -71,7 +71,7 @@ public interface MapStore<K, V> extends Store
      * @param key The key to check
      * @return Whether it is contained.
      */
-    boolean containsKey(ObjectProvider sm, Object key);
+    boolean containsKey(DNStateManager sm, Object key);
 
     /**
      * Accessor for a value from the Map.
@@ -79,7 +79,7 @@ public interface MapStore<K, V> extends Store
      * @param key Key for the value.
      * @return Value for this key.
      */
-    V get(ObjectProvider sm, Object key);
+    V get(DNStateManager sm, Object key);
 
     /**
      * Method to add a value to the Map against this key.
@@ -88,11 +88,11 @@ public interface MapStore<K, V> extends Store
      * @param value The value.
      * @return Value that was previously against this key.
      */
-    V put(ObjectProvider sm, K key, V value);
+    V put(DNStateManager sm, K key, V value);
 
     /**
      * Method to add a value to the Map against this key, where we know the previous value for the key (if present).
-     * Default implementation simply calls the <cite>put(ObjectProvider, Object, Object)</cite> method.
+     * Default implementation simply calls the <cite>put(DNStateManager, Object, Object)</cite> method.
      * Override to provide an efficient implementation for this action.
      * @param sm StateManager for the owner of the map. 
      * @param key The key.
@@ -100,7 +100,7 @@ public interface MapStore<K, V> extends Store
      * @param previousValue The previous value
      * @param present Whether the key is present
      */
-    default void put(ObjectProvider sm, K key, V value, V previousValue, boolean present)
+    default void put(DNStateManager sm, K key, V value, V previousValue, boolean present)
     {
         put(sm, key, value);
     }
@@ -110,7 +110,7 @@ public interface MapStore<K, V> extends Store
      * @param sm StateManager for the owner of the map. 
      * @param m The map to put.
      */ 
-    void putAll(ObjectProvider sm, Map<? extends K, ? extends V> m);
+    void putAll(DNStateManager sm, Map<? extends K, ? extends V> m);
 
     /**
      * Method to add a map of values to the Map where we know the existing Map values prior to the putAll call.
@@ -118,7 +118,7 @@ public interface MapStore<K, V> extends Store
      * @param m The map to add.
      * @param previousMap The map prior to the putAll call.
      */
-    default void putAll(ObjectProvider<?> sm, Map<? extends K, ? extends V> m, Map<K, V> previousMap)
+    default void putAll(DNStateManager<?> sm, Map<? extends K, ? extends V> m, Map<K, V> previousMap)
     {
         putAll(sm, m);
     }
@@ -129,7 +129,7 @@ public interface MapStore<K, V> extends Store
      * @param key Key whose value is to be removed.
      * @return Value that was removed.
      */
-    V remove(ObjectProvider sm, Object key);
+    V remove(DNStateManager sm, Object key);
 
     /**
      * Method to remove a value from the Map where we know the value assigned to this key (to avoid lookups).
@@ -137,13 +137,13 @@ public interface MapStore<K, V> extends Store
      * @param key Key whose value is to be removed.
      * @param val Value for this key when the value is known (to save the lookup)
      */
-    void remove(ObjectProvider sm, Object key, Object val);
+    void remove(DNStateManager sm, Object key, Object val);
 
     /**
      * Method to clear the map.
      * @param sm StateManager for the owner of the map. 
      */
-    void clear(ObjectProvider sm);
+    void clear(DNStateManager sm);
 
     /**
      * Method to update the map to be the supplied map of entries.
@@ -152,7 +152,7 @@ public interface MapStore<K, V> extends Store
      * @param sm StateManager of the object
      * @param map The map to use
      */
-    default void update(ObjectProvider sm, Map<K, V> map)
+    default void update(DNStateManager sm, Map<K, V> map)
     {
         clear(sm);
         putAll(sm, map, Collections.emptyMap());
@@ -184,7 +184,7 @@ public interface MapStore<K, V> extends Store
      * @param newValue The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedKey(ObjectProvider sm, Object key, int fieldNumber, Object newValue);
+    boolean updateEmbeddedKey(DNStateManager sm, Object key, int fieldNumber, Object newValue);
 
     /**
      * Method to update an embedded value in the map.
@@ -194,5 +194,5 @@ public interface MapStore<K, V> extends Store
      * @param newValue The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedValue(ObjectProvider sm, Object value, int fieldNumber, Object newValue);
+    boolean updateEmbeddedValue(DNStateManager sm, Object value, int fieldNumber, Object newValue);
 }

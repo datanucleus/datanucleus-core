@@ -28,7 +28,7 @@ import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOCollectionIterator;
 import org.datanucleus.store.types.SCOUtils;
@@ -42,7 +42,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.util.Queue<E>, E>, Cloneable, java.io.Serializable
 {
-    protected ObjectProvider ownerOP;
+    protected DNStateManager ownerSM;
     protected AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
@@ -50,12 +50,12 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
 
     /**
      * Constructor. 
-     * @param ownerOP StateManager for this set.
+     * @param sm StateManager for this set.
      * @param mmd Metadata for the member
      **/
-    public Queue(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public Queue(DNStateManager sm, AbstractMemberMetaData mmd)
     {
-        this.ownerOP = ownerOP;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -77,7 +77,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, false, false)));
         }
     }
@@ -92,7 +92,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      */
     protected void initialiseDelegate()
     {
-        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerOP.getExecutionContext().getClassLoaderResolver());
+        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.PriorityQueue(5, comparator);
@@ -168,7 +168,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      */
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -176,9 +176,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      */
     public void unsetOwner()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP = null;
+            ownerSM = null;
             ownerMmd = null;
         }
     }
@@ -188,9 +188,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      */
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
         }
     }
 
@@ -203,7 +203,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     public java.util.Queue detachCopy(FetchPlanState state)
     {
         java.util.Queue detached = new java.util.PriorityQueue();
-        SCOUtils.detachCopyForCollection(ownerOP, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
         return detached;
     }
 
@@ -217,18 +217,17 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     public void attachCopy(java.util.Queue value)
     {
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
-        SCOUtils.attachCopyElements(ownerOP, this, value, elementsWithoutIdentity);
+        SCOUtils.attachCopyElements(ownerSM, this, value, elementsWithoutIdentity);
 
 /*        // Remove any no-longer-needed elements from this collection
-        SCOUtils.attachRemoveDeletedElements(ownerOP.getExecutionContext().getApiAdapter(), this, c, elementsWithoutIdentity);
+        SCOUtils.attachRemoveDeletedElements(ownerSM.getExecutionContext().getApiAdapter(), this, c, elementsWithoutIdentity);
 
         // Persist any new elements and form the attached elements collection
         java.util.Collection attachedElements = new java.util.HashSet(c.size());
-        SCOUtils.attachCopyForCollection(ownerOP, c.toArray(), attachedElements, elementsWithoutIdentity);
+        SCOUtils.attachCopyForCollection(ownerSM, c.toArray(), attachedElements, elementsWithoutIdentity);
 
         // Add any new elements to this collection
-        SCOUtils.attachAddNewElements(ownerOP.getExecutionContext().getApiAdapter(), this, attachedElements,
-            elementsWithoutIdentity);*/
+        SCOUtils.attachAddNewElements(ownerSMgetExecutionContext().getApiAdapter(), this, attachedElements, elementsWithoutIdentity);*/
     }
 
     // ---------------- Implementation of Queue methods -------------------
@@ -300,7 +299,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      **/
     public Iterator iterator()
     {
-        return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
+        return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
     }
 
     /**
@@ -350,14 +349,14 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         boolean success = delegate.add(element);
         if (success)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return success;
@@ -373,17 +372,17 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         boolean success = delegate.addAll(elements);
         if (success)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 for (Object element : elements)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }
             }
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return success;
@@ -394,16 +393,16 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      */
     public void clear()
     {
-        if (ownerOP != null && !delegate.isEmpty())
+        if (ownerSM != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 java.util.List copy = new java.util.ArrayList(delegate);
                 Iterator iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -412,7 +411,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
                 Iterator iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -420,9 +419,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         delegate.clear();
 
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -444,9 +443,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     {
         E obj = delegate.poll();
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return obj;
     }
@@ -470,25 +469,25 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     {
         boolean success = delegate.remove(element);
 
-        if (ownerOP != null && allowCascadeDelete)
+        if (ownerSM != null && allowCascadeDelete)
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                ownerSM.getExecutionContext().deleteObjectInternal(element);
             }
         }
 
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -513,15 +512,15 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
 
         boolean success = delegate.removeAll(elements);
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -529,7 +528,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -537,9 +536,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -557,9 +556,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return success;

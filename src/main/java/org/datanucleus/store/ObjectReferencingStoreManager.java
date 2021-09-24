@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Interface to be implemented by any StoreManager that provides objects that are actually created by the underlying datastore. 
@@ -27,7 +27,7 @@ public interface ObjectReferencingStoreManager
 {
     /**
      * Notifies this store manager that the main memory (RAM, heap) copy of the PC object  of the supplied
-     * ObjectProvider may not be regarded as valid anymore.
+     * StateManager may not be regarded as valid anymore.
      * (The most common case is that the state of the PC becomes HOLLOW).
      * This is especially important for object databases employing implicit storing
      * from the main memory to the database (like DB4O).
@@ -45,5 +45,5 @@ public interface ObjectReferencingStoreManager
      * This method marks the main memory copy of the object (on the Java heap) to be outdated in that sense.
      * @param sm StateManager managing the object
      */
-    void notifyObjectIsOutdated(ObjectProvider sm);
+    void notifyObjectIsOutdated(DNStateManager sm);
 }

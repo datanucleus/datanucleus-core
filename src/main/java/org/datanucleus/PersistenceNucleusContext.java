@@ -27,7 +27,7 @@ import org.datanucleus.identity.IdentityManager;
 import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.state.ObjectProviderFactory;
+import org.datanucleus.state.StateManagerFactory;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.transaction.ResourcedTransactionManager;
@@ -43,7 +43,7 @@ public interface PersistenceNucleusContext extends NucleusContext
 
     AutoStartMechanism getAutoStartMechanism();
 
-    ObjectProviderFactory getObjectProviderFactory();
+    StateManagerFactory getStateManagerFactory();
 
     ExecutionContextPool getExecutionContextPool();
 

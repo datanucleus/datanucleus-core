@@ -17,24 +17,24 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Flush operation for a persist of the specified object.
  */
 public class PersistOperation implements Operation
 {
-    ObjectProvider sm;
+    DNStateManager sm;
 
-    public PersistOperation(ObjectProvider sm)
+    public PersistOperation(DNStateManager sm)
     {
         this.sm = sm;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
+     * @see org.datanucleus.flush.Operation#getStateManager()
      */
-    public ObjectProvider getObjectProvider()
+    public DNStateManager getStateManager()
     {
         return sm;
     }

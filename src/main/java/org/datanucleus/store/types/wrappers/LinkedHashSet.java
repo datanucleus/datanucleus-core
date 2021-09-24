@@ -28,7 +28,7 @@ import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOCollectionIterator;
@@ -43,7 +43,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOCollection<java.util.LinkedHashSet<E>, E>
 {
-    protected transient ObjectProvider ownerOP;
+    protected transient DNStateManager ownerSM;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
@@ -51,12 +51,12 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
 
     /**
      * Constructor, using StateManager of the "owner" and the field name.
-     * @param ownerOP The owner ObjectProvider
+     * @param sm The owner StateManager
      * @param mmd Metadata for the member
      */
-    public LinkedHashSet(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public LinkedHashSet(DNStateManager sm, AbstractMemberMetaData mmd)
     {
-        this.ownerOP = ownerOP;
+        this.ownerSM = sm;
         this.ownerMmd = mmd;
     }
 
@@ -77,7 +77,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }
     }
@@ -152,7 +152,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      */
     public Object getOwner()
     {
-        return ownerOP != null ? ownerOP.getObject() : null;
+        return ownerSM != null ? ownerSM.getObject() : null;
     }
 
     /**
@@ -160,9 +160,9 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      */
     public void unsetOwner()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP = null;
+            ownerSM = null;
             ownerMmd = null;
         }
     }
@@ -172,9 +172,9 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      **/
     public void makeDirty()
     {
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            ownerOP.makeDirty(ownerMmd.getAbsoluteFieldNumber());
+            ownerSM.makeDirty(ownerMmd.getAbsoluteFieldNumber());
         }
     }
 
@@ -187,7 +187,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
     public java.util.LinkedHashSet detachCopy(FetchPlanState state)
     {
         java.util.LinkedHashSet detached = new java.util.LinkedHashSet();
-        SCOUtils.detachCopyForCollection(ownerOP, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
         return detached;
     }
 
@@ -201,18 +201,17 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
     public void attachCopy(java.util.LinkedHashSet value)
     {
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
-        SCOUtils.attachCopyElements(ownerOP, this, value, elementsWithoutIdentity);
+        SCOUtils.attachCopyElements(ownerSM, this, value, elementsWithoutIdentity);
 
 /*        // Remove any no-longer-needed elements from this collection
-        SCOUtils.attachRemoveDeletedElements(ownerOP.getExecutionContext().getApiAdapter(), this, c, elementsWithoutIdentity);
+        SCOUtils.attachRemoveDeletedElements(ownerSM.getExecutionContext().getApiAdapter(), this, c, elementsWithoutIdentity);
 
         // Persist any new elements and form the attached elements collection
         java.util.Collection attachedElements = new java.util.LinkedHashSet(c.size());
-        SCOUtils.attachCopyForCollection(ownerOP, c.toArray(), attachedElements, elementsWithoutIdentity);
+        SCOUtils.attachCopyForCollection(ownerSM, c.toArray(), attachedElements, elementsWithoutIdentity);
 
         // Add any new elements to this collection
-        SCOUtils.attachAddNewElements(ownerOP.getExecutionContext().getApiAdapter(), this, attachedElements,
-            elementsWithoutIdentity);*/
+        SCOUtils.attachAddNewElements(ownerSM.getExecutionContext().getApiAdapter(), this, attachedElements, elementsWithoutIdentity);*/
     }
 
     // ------------------ Implementation of LinkedHashSet methods --------------------
@@ -271,7 +270,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      **/
     public Iterator<E> iterator()
     {
-        return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
+        return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
     }
 
     /**
@@ -312,21 +311,21 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
     public boolean add(E element)
     {
         boolean success = delegate.add(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
         }
         if (success)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return success;
@@ -340,28 +339,28 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
     public boolean addAll(Collection elements)
     {
         boolean success = delegate.addAll(elements);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
             Iterator iter = elements.iterator();
             while (iter.hasNext())
             {
-                ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
             }
         }
         if (success)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 for (Object element : elements)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }
             }
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return success;
@@ -372,27 +371,27 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      */
     public void clear()
     {
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
             Iterator iter = delegate.iterator();
-            RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+            RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
             while (iter.hasNext())
             {
                 relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
             }
         }
 
-        if (ownerOP != null && !delegate.isEmpty())
+        if (ownerSM != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -401,7 +400,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -409,9 +408,9 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
         delegate.clear();
 
         makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -433,32 +432,32 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
     public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
 
-        if (ownerOP != null && allowCascadeDelete)
+        if (ownerSM != null && allowCascadeDelete)
         {
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
                 // Perform the cascade delete
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                ownerSM.getExecutionContext().deleteObjectInternal(element);
             }
         }
 
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -483,13 +482,13 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
 
         boolean success = delegate.removeAll(elements);
 
-        if (ownerOP != null)
+        if (ownerSM != null)
         {
-            if (ownerOP.getExecutionContext().getManageRelations())
+            if (ownerSM.getExecutionContext().getManageRelations())
             {
                 // Relationship management
                 Iterator iter = elements.iterator();
-                RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+                RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
                 while (iter.hasNext())
                 {
                     relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
@@ -497,13 +496,13 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
             }
 
             // Cascade delete
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -512,7 +511,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -520,9 +519,9 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
         if (success)
         {
             makeDirty();
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
 
@@ -553,13 +552,13 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
         if (success)
         {
             makeDirty();
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue any cascade delete
                 Iterator iter = collToRemove.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -568,13 +567,13 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
                 Iterator iter = collToRemove.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
 
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
         }
         return success;

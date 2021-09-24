@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Implementation of a Level 1 cache keeping strong references to the objects.
@@ -35,19 +35,19 @@ public class StrongRefCache implements Level1Cache
 {
     public static final String NAME = "strong";
 
-    private Map<Object, ObjectProvider> cache = new HashMap<>();
-    private Map<CacheUniqueKey, ObjectProvider> cacheUnique = new HashMap<>();
+    private Map<Object, DNStateManager> cache = new HashMap<>();
+    private Map<CacheUniqueKey, DNStateManager> cacheUnique = new HashMap<>();
 
     public StrongRefCache()
     {
     }
 
-    public ObjectProvider put(Object id, ObjectProvider sm)
+    public DNStateManager put(Object id, DNStateManager sm)
     {
         return cache.put(id, sm);
     }
 
-    public ObjectProvider get(Object id)
+    public DNStateManager get(Object id)
     {
         return cache.get(id);
     }
@@ -57,15 +57,15 @@ public class StrongRefCache implements Level1Cache
         return cache.containsKey(id);
     }
 
-    public ObjectProvider remove(Object id)
+    public DNStateManager remove(Object id)
     {
-        ObjectProvider sm = cache.remove(id);
+        DNStateManager sm = cache.remove(id);
         if (cacheUnique.containsValue(sm))
         {
-            Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = cacheUnique.entrySet().iterator();
+            Iterator<Entry<CacheUniqueKey, DNStateManager>> entrySetIter = cacheUnique.entrySet().iterator();
             while (entrySetIter.hasNext())
             {
-                Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
+                Entry<CacheUniqueKey, DNStateManager> entry = entrySetIter.next();
                 if (entry.getValue() == sm)
                 {
                     entrySetIter.remove();
@@ -144,13 +144,13 @@ public class StrongRefCache implements Level1Cache
     }
 
     @Override
-    public ObjectProvider getUnique(CacheUniqueKey key)
+    public DNStateManager getUnique(CacheUniqueKey key)
     {
         return cacheUnique.get(key);
     }
 
     @Override
-    public Object putUnique(CacheUniqueKey key, ObjectProvider sm)
+    public Object putUnique(CacheUniqueKey key, DNStateManager sm)
     {
         return cacheUnique.put(key, sm);
     }

@@ -37,7 +37,7 @@ import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.flush.ListSetOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOListIterator;
 import org.datanucleus.store.types.SCOUtils;
@@ -79,7 +79,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
      * @param sm The owner StateManager
      * @param mmd Metadata for the member
      **/
-    public Stack(ObjectProvider sm, AbstractMemberMetaData mmd)
+    public Stack(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         super(sm, mmd);
 
@@ -87,18 +87,18 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         this.delegate = new java.util.Stack();
 
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        useCache = SCOUtils.useContainerCache(ownerOP, mmd);
+        useCache = SCOUtils.useContainerCache(ownerSM, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
-            this.backingStore = (ListStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Stack.class);
+            ClassLoaderResolver clr = ownerSM.getExecutionContext().getClassLoaderResolver();
+            this.backingStore = (ListStore)((BackedSCOStoreManager)ownerSM.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Stack.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerSM, ownerMmd.getName(), this,
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerSM, ownerMmd)));
         }
     }
 
@@ -106,49 +106,49 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
     {
         if (newValue != null)
         {
-            // Check for the case of serialised PC elements, and assign ObjectProviders to the elements without
+            // Check for the case of serialised PC elements, and assign StateManagers to the elements without
             if (SCOUtils.collectionHasSerialisedElements(ownerMmd) && ownerMmd.getCollection().elementIsPersistent())
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 Iterator iter = newValue.iterator();
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    ObjectProvider objSM = ec.findObjectProvider(pc);
+                    DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
             }
 
             // TODO This does clear+addAll : Improve this and work out which elements are added and which deleted
             if (backingStore != null)
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
+                if (SCOUtils.useQueuedUpdate(ownerSM))
                 {
-                    if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
+                    if (ownerSM.isFlushedToDatastore() || !ownerSM.getLifecycleState().isNew())
                     {
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                        ownerSM.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerSM, backingStore));
 
                         for (Object element : newValue)
                         {
-                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                            ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
                         }
                     }
                 }
                 else
                 {
-                    backingStore.clear(ownerOP);
+                    backingStore.clear(ownerSM);
 
                     try
                     {
-                        backingStore.addAll(ownerOP, newValue, useCache ? 0 : -1);
+                        backingStore.addAll(ownerSM, newValue, useCache ? 0 : -1);
                     }
                     catch (NucleusDataStoreException dse)
                     {
@@ -170,18 +170,18 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
     {
         if (c != null)
         {
-            // Check for the case of serialised PC elements, and assign ObjectProviders to the elements without
+            // Check for the case of serialised PC elements, and assign StateManagers to the elements without
             if (SCOUtils.collectionHasSerialisedElements(ownerMmd) && ownerMmd.getCollection().elementIsPersistent())
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 Iterator iter = c.iterator();
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    ObjectProvider objSM = ec.findObjectProvider(pc);
+                    DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }
@@ -194,7 +194,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerSM.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
             }
             delegate.clear();
             delegate.addAll(c);
@@ -206,7 +206,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
      */
     public void initialise()
     {
-        if (useCache && !SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd))
+        if (useCache && !SCOUtils.useCachedLazyLoading(ownerSM, ownerMmd))
         {
             // Load up the container now if not using lazy loading
             loadFromStore();
@@ -257,10 +257,10 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
+                    ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator<E> iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerSM);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -289,7 +289,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
     {
         if (backingStore != null)
         {
-            backingStore.updateEmbeddedElement(ownerOP, element, fieldNumber, value);
+            backingStore.updateEmbeddedElement(ownerSM, element, fieldNumber, value);
         }
     }
 
@@ -339,7 +339,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return backingStore.contains(ownerOP,element);
+            return backingStore.contains(ownerSM,element);
         }
 
         return delegate.contains(element);
@@ -424,7 +424,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return backingStore.get(ownerOP, index);
+            return backingStore.get(ownerSM, index);
         }
 
         return delegate.get(index);
@@ -443,7 +443,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return backingStore.indexOf(ownerOP, element);
+            return backingStore.indexOf(ownerSM, element);
         }
  
         return delegate.indexOf(element);
@@ -470,7 +470,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             loadFromStore();
         }
 
-        return new SCOListIterator(this, ownerOP, delegate, backingStore, useCache, -1);
+        return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, -1);
     }
 
     /**
@@ -485,7 +485,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             loadFromStore();
         }
 
-        return new SCOListIterator(this, ownerOP, delegate, backingStore, useCache, -1);
+        return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, -1);
     }
 
     /**
@@ -501,7 +501,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             loadFromStore();
         }
 
-        return new SCOListIterator(this, ownerOP, delegate, backingStore, useCache, index);
+        return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, index);
     }
 
     /**
@@ -517,7 +517,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return backingStore.lastIndexOf(ownerOP, element);
+            return backingStore.lastIndexOf(ownerSM, element);
         }
  
         return delegate.lastIndexOf(element);
@@ -546,7 +546,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return backingStore.size(ownerOP);
+            return backingStore.size(ownerSM);
         }
 
         return delegate.size();
@@ -566,7 +566,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return backingStore.subList(ownerOP,from,to);
+            return backingStore.subList(ownerSM,from,to);
         }
 
         return delegate.subList(from,to);
@@ -584,7 +584,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerOP);
+            return SCOUtils.toArray(backingStore,ownerSM);
         }  
         return delegate.toArray();
     }
@@ -602,7 +602,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerOP,a);
+            return SCOUtils.toArray(backingStore,ownerSM,a);
         }  
         return delegate.toArray(a);
     }
@@ -630,15 +630,15 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, backingStore, index, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, backingStore, index, element));
             }
             else
             {
                 try
                 {
-                    backingStore.add(ownerOP, element, index, useCache ? delegate.size() : -1);
+                    backingStore.add(ownerSM, element, index, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -653,9 +653,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         delegate.add(index, element);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -681,15 +681,15 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
             }
             else
             {
                 try
                 {
-                    backingSuccess = backingStore.add(ownerOP,element, useCache ? delegate.size() : -1);
+                    backingSuccess = backingStore.add(ownerSM,element, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -704,9 +704,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         boolean delegateSuccess = delegate.add(element);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
@@ -737,18 +737,18 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 for (Object element : elements)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
                 }
             }
             else
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerOP, elements, useCache ? delegate.size() : -1);
+                    backingSuccess = backingStore.addAll(ownerSM, elements, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -763,9 +763,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         boolean delegateSuccess = delegate.addAll(elements);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
@@ -786,19 +786,19 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 int pos = index;
                 for (Object element : elements)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, backingStore, pos++, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, backingStore, pos++, element));
                 }
             }
             else
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerOP, elements, index, useCache ? delegate.size() : -1);
+                    backingSuccess = backingStore.addAll(ownerSM, elements, index, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -813,9 +813,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         boolean delegateSuccess = delegate.addAll(index, elements);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
@@ -830,19 +830,19 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerSM, backingStore));
             }
             else
             {
-                backingStore.clear(ownerOP);
+                backingStore.clear(ownerSM);
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
     }
 
@@ -861,20 +861,20 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, backingStore, 0));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerSM, backingStore, 0));
             }
             else
             {
-                backingStore.remove(ownerOP, 0, useCache ? delegate.size() : -1);
+                backingStore.remove(ownerSM, 0, useCache ? delegate.size() : -1);
             }
         }
         E removed = delegate.remove(0);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return removed;
     }
@@ -899,13 +899,13 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, backingStore, 0, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, backingStore, 0, element));
             }
             else
             {
-                backingStore.add(ownerOP, element, 0, useCache ? delegate.size() : -1);
+                backingStore.add(ownerSM, element, 0, useCache ? delegate.size() : -1);
             }
         }
 
@@ -915,9 +915,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         delegate.add(0, element);
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return element;
     }
@@ -953,19 +953,19 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 backingSuccess = contained;
                 if (backingSuccess)
                 {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, backingStore, element, allowCascadeDelete));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, allowCascadeDelete));
                 }
             }
             else
             {
                 try
                 {
-                    backingSuccess = backingStore.remove(ownerOP, element, size, allowCascadeDelete);
+                    backingSuccess = backingStore.remove(ownerSM, element, size, allowCascadeDelete);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -975,9 +975,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
 
         return backingStore != null ? backingSuccess : delegateSuccess;
@@ -1008,7 +1008,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         int size = useCache ? delegate.size() : -1;
         Collection contained = null;
-        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
+        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerSM))
         {
             // Check which are contained before updating the delegate
             contained = new java.util.HashSet();
@@ -1022,10 +1022,10 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (backingStore != null && ownerOP != null)
+        if (backingStore != null && ownerSM != null)
         {
             boolean backingSuccess = true;
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 if (contained != null && !contained.isEmpty())
                 {
@@ -1033,7 +1033,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
                     for (Object element : contained)
                     {
                         backingSuccess = true;
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, backingStore, element, true));
+                        ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, true));
                     }
                 }
             }
@@ -1041,7 +1041,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             {
                 try
                 {
-                    backingSuccess = backingStore.removeAll(ownerOP, elements, size);
+                    backingSuccess = backingStore.removeAll(ownerSM, elements, size);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -1050,17 +1050,17 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
                 }
             }
 
-            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
+                ownerSM.getExecutionContext().processNontransactionalUpdate();
             }
 
             return backingSuccess;
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return delegateSuccess;
     }
@@ -1095,16 +1095,16 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         E backingObject = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 backingObject = delegateObject;
-                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, backingStore, index));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerSM, backingStore, index));
             }
             else
             {
                 try
                 {
-                    backingObject = backingStore.remove(ownerOP, index, size);
+                    backingObject = backingStore.remove(ownerSM, index, size);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -1114,9 +1114,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
 
         return backingStore != null ? backingObject : delegateObject;
@@ -1167,9 +1167,9 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return modified;
     }
@@ -1201,19 +1201,19 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         E delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new ListSetOperation(ownerOP, backingStore, index, element, allowDependentField));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListSetOperation(ownerSM, backingStore, index, element, allowDependentField));
             }
             else
             {
-                backingStore.set(ownerOP, index, element, allowDependentField);
+                backingStore.set(ownerSM, index, element, allowDependentField);
             }
         }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            ownerSM.getExecutionContext().processNontransactionalUpdate();
         }
         return delegateReturn;
     }

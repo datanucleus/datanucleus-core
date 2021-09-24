@@ -28,7 +28,7 @@ import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -86,7 +86,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
      * Convenience method to assert when this StoreManager is read-only and the specified object is attempting to be updated.
      * @param sm StateManager for the object
      */
-    public void assertReadOnlyForUpdateOfObject(ObjectProvider sm)
+    public void assertReadOnlyForUpdateOfObject(DNStateManager sm)
     {
         if (sm.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
         {

@@ -81,7 +81,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.types.containers.ArrayHandler;
 import org.datanucleus.store.types.containers.ArrayListHandler;
@@ -428,10 +428,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.types.TypeManager#createSCOInstance(org.datanucleus.state.ObjectProvider, org.datanucleus.metadata.AbstractMemberMetaData, java.lang.Class, java.lang.Object, boolean)
+     * @see org.datanucleus.store.types.TypeManager#createSCOInstance(org.datanucleus.state.DNStateManager, org.datanucleus.metadata.AbstractMemberMetaData, java.lang.Class, java.lang.Object, boolean)
      */
     @Override
-    public SCO createSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean replaceField)
+    public SCO createSCOInstance(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean replaceField)
     {
         if (value != null && value instanceof SCO)
         {
@@ -439,7 +439,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             if (replaceField)
             {
                 // Replace the field with this value
-                ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), value);
+                ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), value);
             }
             return (SCO) value;
         }
@@ -451,12 +451,12 @@ public class TypeManagerImpl implements TypeManager, Serializable
             // Use declared type of the field to define the wrapper type
             requiredType = mmd.getType();
         }
-        SCO sco = createSCOInstance(ownerOP, mmd, requiredType);
+        SCO sco = createSCOInstance(ownerSM, mmd, requiredType);
 
         if (replaceField)
         {
             // Replace the field in the owner with the wrapper before initialising it
-            ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), sco);
+            ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), sco);
         }
 
         // Initialise the SCO for use
@@ -477,31 +477,31 @@ public class TypeManagerImpl implements TypeManager, Serializable
     /**
      * Method to create a new SCO wrapper for the specified field replacing the old value with the new value. 
      * If the member value is a SCO already will just return the (new) value.
-     * @param ownerOP StateManager of the owner object
+     * @param ownerSM StateManager of the owner object
      * @param memberNumber The member number in the owner
      * @param newValue The value to initialise the wrapper with (if any) for this member
      * @param oldValue The previous value that we are replacing with this value
      * @param replaceFieldIfChanged Whether to replace the member in the object if wrapping the value
      * @return The wrapper (or original value if not wrappable)
      */
-    public Object wrapAndReplaceSCOField(ObjectProvider ownerOP, int memberNumber, Object newValue, Object oldValue, boolean replaceFieldIfChanged)
+    public Object wrapAndReplaceSCOField(DNStateManager ownerSM, int memberNumber, Object newValue, Object oldValue, boolean replaceFieldIfChanged)
     {
-        if (newValue == null || !ownerOP.getClassMetaData().getSCOMutableMemberFlags()[memberNumber])
+        if (newValue == null || !ownerSM.getClassMetaData().getSCOMutableMemberFlags()[memberNumber])
         {
             // We don't wrap null objects currently
             return newValue;
         }
 
-        if (!(newValue instanceof SCO) || ownerOP.getObject() != ((SCO)newValue).getOwner())
+        if (!(newValue instanceof SCO) || ownerSM.getObject() != ((SCO)newValue).getOwner())
         {
             // Not a SCO wrapper, or is a SCO wrapper but not owned by this object
-            AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
+            AbstractMemberMetaData mmd = ownerSM.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
             if (replaceFieldIfChanged)
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", 
-                        ownerOP.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : ownerOP.getInternalObjectId(), 
+                        ownerSM.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()) : ownerSM.getInternalObjectId(), 
                         mmd.getName()));
                 }
             }
@@ -512,19 +512,19 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 if (replaceFieldIfChanged)
                 {
                     // Replace the field with this value
-                    ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), newValue);
+                    ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), newValue);
                 }
                 return newValue;
             }
 
             // Create new wrapper of the required type
             Class requiredType = newValue.getClass();
-            SCO sco = createSCOInstance(ownerOP, mmd, requiredType);
+            SCO sco = createSCOInstance(ownerSM, mmd, requiredType);
 
             if (replaceFieldIfChanged)
             {
                 // Replace the field in the owner with the wrapper before initialising it
-                ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), sco);
+                ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), sco);
             }
 
             // Initialise the SCO for use, providing new and old values so the wrapper has the ability to do something intelligent
@@ -538,19 +538,19 @@ public class TypeManagerImpl implements TypeManager, Serializable
     /**
      * Method to create a new SCO wrapper for member type.
      * Will find a wrapper suitable for the instantiated type (if provided), otherwise suitable for the member metadata type.
-     * @param ownerOP ObjectProvider for the owning object
+     * @param ownerSM StateManager for the owning object
      * @param mmd The MetaData for the related member.
      * @param instantiatedType Type to instantiate the member as (if known), otherwise falls back to the type from metadata
      * @return The wrapper object of the required type
      * @throws NucleusUserException if an error occurred when creating the SCO instance
      */
-    private SCO createSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Class instantiatedType)
+    private SCO createSCOInstance(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType)
     {
         String typeName = (instantiatedType != null) ? instantiatedType.getName() : mmd.getTypeName();
 
         // Find the SCO wrapper type most suitable
-        StoreManager storeMgr = ownerOP.getExecutionContext().getStoreManager();
-        boolean backedWrapper = storeMgr.useBackedSCOWrapperForMember(mmd, ownerOP.getExecutionContext());
+        StoreManager storeMgr = ownerSM.getExecutionContext().getStoreManager();
+        boolean backedWrapper = storeMgr.useBackedSCOWrapperForMember(mmd, ownerSM.getExecutionContext());
         Class wrapperType = null;
         if (mmd.isSerialized())
         {
@@ -574,7 +574,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         // Create the SCO wrapper
         try
         {
-            return (SCO) ClassUtils.newInstance(wrapperType, new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, new Object[]{ownerOP, mmd});
+            return (SCO) ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
         }
         catch (UnsupportedOperationException uoe)
         {
@@ -583,7 +583,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             {
                 NucleusLogger.PERSISTENCE.warn("Creation of backed wrapper for " + mmd.getFullFieldName() + " unsupported, so trying simple wrapper");
                 wrapperType = getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName);
-                return (SCO) ClassUtils.newInstance(wrapperType, new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, new Object[]{ownerOP, mmd});
+                return (SCO) ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
             }
 
             throw uoe;

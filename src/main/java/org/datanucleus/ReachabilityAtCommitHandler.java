@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.NullifyRelationFieldManager;
 import org.datanucleus.store.fieldmanager.ReachabilityFieldManager;
 import org.datanucleus.util.Localiser;
@@ -179,7 +179,7 @@ public class ReachabilityAtCommitHandler
                         }
                         try
                         {
-                            ObjectProvider sm = ec.findObjectProvider(ec.findObject(ids[i], true, true, null));
+                            DNStateManager sm = ec.findStateManager(ec.findObject(ids[i], true, true, null));
 
                             if (!sm.isDeleted() && !currentReachableIds.contains(ids[i]))
                             {
@@ -232,7 +232,7 @@ public class ReachabilityAtCommitHandler
                         {
                             if (!objectIdsNotFound.contains(nonReachableIds[i]))
                             {
-                                ObjectProvider sm = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
+                                DNStateManager sm = ec.findStateManager(ec.findObject(nonReachableIds[i], true, true, null));
 
                                 if (!sm.getLifecycleState().isDeleted() && !ec.getApiAdapter().isDetached(sm.getObject()))
                                 {
@@ -255,7 +255,7 @@ public class ReachabilityAtCommitHandler
                         {
                             if (!objectIdsNotFound.contains(nonReachableIds[i]))
                             {
-                                ObjectProvider sm = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
+                                DNStateManager sm = ec.findStateManager(ec.findObject(nonReachableIds[i], true, true, null));
                                 if (!sm.isDeleted()) // If the object has since been deleted then no need to do anything
                                 {
                                     sm.makeTransientForReachability();

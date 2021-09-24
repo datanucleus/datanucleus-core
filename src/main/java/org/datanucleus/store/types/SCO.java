@@ -22,7 +22,7 @@ import org.datanucleus.FetchPlanState;
 /**
  * Representation of a wrapper/proxy for a mutable SCO type (e.g Date, Collection, Map).
  * An implementation of this interface must have a constructor with the arguments 
- * <i>{@link org.datanucleus.state.ObjectProvider} ownerOP</i>, <i>AbstractMemberMetaData mmd</i>.
+ * <i>{@link org.datanucleus.state.DNStateManager} ownerOP</i>, <i>AbstractMemberMetaData mmd</i>.
  * The constructor must be capable of taking nulls for these arguments to create a non-managed wrapper
  * which effectively just acts like an unwrapped object.
  * @param <T> The type of the field/property
