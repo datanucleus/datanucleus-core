@@ -18,7 +18,7 @@ __Support__ : [DataNucleus Support Page](http://www.datanucleus.org/support.html
 ## Persistence Process
 The primary classes involved in the persistence process are
 *ExecutionContext* - maps across to a PM/EM, and handles the transaction (ExecutionContextImpl)  
-*ObjectProvider* - manages access to a persistent object (StateManagerImpl)  
+*StateManager* - manages access to a persistent object (StateManagerImpl)  
 *StoreManager* - manages access to the datastore (see the datastore plugins, e.g RDBMSStoreManager)  
 *MetaDataManager* - manages the metadata for the class(es), so how it is persisted  
 
@@ -55,21 +55,21 @@ This means that multiple setters can be called on a single object and we get one
 
 #### persist
 Calls ExecutionContext.persistObject which calls EC.persistObjectWork.  
-Creates an ObjectProvider (StateManagerImpl - OP). Adds the object to EC.dirtyOPs.  
-Calls OP.makePersistent which calls OP.internalMakePersistent which will pass the persist through to the datastore plugin.  
+Creates a StateManager (StateManagerImpl - SM). Adds the object to EC.dirtyOPs.  
+Calls SM.makePersistent which calls SM.internalMakePersistent which will pass the persist through to the datastore plugin.  
 Calls PersistenceHandler.insertObject, which will do any necessary cascade persist (coming back through EC.persistObjectInternal, EC.indirectDirtyOPs).  
 
 
 #### remove
 Calls ExecutionContext.deleteObject, which calls ExecutionContext.deleteObjectWork.  
 This will add the object to EC.dirtyOPs.  
-Calls OP.deletePersistent.  
-Calls OP.internalDeletePersistent which will pass the delete through to the datastore plugin.  
+Calls SM.deletePersistent.  
+Calls SM.internalDeletePersistent which will pass the delete through to the datastore plugin.  
 Calls PersistenceHandler.deleteObject, which will do any necessary cascade delete (coming back through EC.deleteObjectInternal, EC.indirectDirtyOPs).  
 
 
 #### update field
-Calls OP.setXXXField which calls OP.updateField and, in turn, EC.makeDirty.  
+Calls SM.setXXXField which calls SM.updateField and, in turn, EC.makeDirty.  
 The update is then queued internally until EC.flushInternal is triggered (e.g 3 changes waiting).  
 
 
@@ -93,18 +93,18 @@ Call ExecutionContext.getOperationQueue() to see the operations that are queued 
 
 #### persist
 Calls ExecutionContext.persistObject which calls EC.persistObjectWork.  
-Creates an ObjectProvider (StateManagerImpl - OP). Adds the object to EC.dirtyOPs.  
+Creates a StateManager (StateManagerImpl - SM). Adds the object to EC.dirtyOPs.  
 Calls OP.makePersistent. Uses PersistFieldManager to process all reachable objects.  
 
 
 #### remove
 Calls ExecutionContext.deleteObject, which calls ExecutionContext.deleteObjectWork.  
-Creates an ObjectProvider as required. Adds the object to EC.dirtyOPs.  
-Calls OP.deletePersistent. Uses DeleteFieldManager to process all reachable objects.
+Creates a StateManager as required. Adds the object to EC.dirtyOPs.  
+Calls SM.deletePersistent. Uses DeleteFieldManager to process all reachable objects.
 
 
 #### update field
-Calls OP.setXXXField which calls OP.updateField and, in turn, EC.makeDirty.  
+Calls SM.setXXXField which calls SM.updateField and, in turn, EC.makeDirty.  
 The update is then queued internally until EC.flushInternal is triggered.  
 
 
@@ -289,7 +289,7 @@ All code for the queued operations are stored under _org.datanucleus.flush_.
 
 There are actually two sets of SCO wrappers in DataNucleus. The first set provide lazy loading, queueing, etc and have a "backing store" where the operations
 can be fed through to the datastore as they are made (for RDBMS). The second set are simple wrappers that intercept operations and mark the field as dirty in 
-the ObjectProvider. This second set are for use with datastores such as _neodatis_ that don't utilise backing stores and just want to know when the field is dirty
+the StateManager. This second set are for use with datastores such as _neodatis_ that don't utilise backing stores and just want to know when the field is dirty
 and hence should be written.
 
 All code for the backed SCO wrappers are stored under _org.datanucleus.store.types.wrappers.backed_.
