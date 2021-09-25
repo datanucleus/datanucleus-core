@@ -1,4 +1,10 @@
 <BODY>
-    Provides classes relating to the life cycle state of a persistable object. 
+    Provides classes relating to the life cycle state management of a persistable object. 
     Refer to section 5.5 of the JDO 1.0 specification for a description of this type of StateManager.
+    
+    The <I>org.datanucleus.enhancement.StateManager</I> definition of a StateManager is extended by <B>org.datanucleus.state.DNStateManager</B> 
+    providing the additional handling needed for participating in the persistence process.
+    
+    Each persistable object has a particular <I>org.datanucleus.state.LifeCycleState</I> and the associated states for each API allow transitioning between states
+    using the associated methods.
 </BODY>

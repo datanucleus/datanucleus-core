@@ -85,7 +85,6 @@ import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.LockManagerImpl;
 import org.datanucleus.state.LockMode;
-import org.datanucleus.state.NullCallbackHandler;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.FieldValues;
@@ -5932,5 +5931,27 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return opAssociatedValuesMapBySM.get(sm).containsKey(key);
         }
         return false;
+    }
+
+    /**
+     * Callback handler that does nothing. Provided for the case where the user wants to do bulk operations and isn't interested in callbacks.
+     */
+    public static class NullCallbackHandler implements CallbackHandler
+    {
+        public void setBeanValidationHandler(BeanValidationHandler handler)
+        {
+        }
+
+        public void addListener(Object listener, Class[] classes)
+        {
+        }
+
+        public void removeListener(Object listener)
+        {
+        }
+
+        public void close()
+        {
+        }
     }
 }
