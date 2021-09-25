@@ -303,9 +303,12 @@ All code for the simple SCO wrappers are stored under _org.datanucleus.store.typ
 
 #### MultiTenancy
 
-The handling for multi-tenancy code is present in each of the store plugins but is controlled from _org.datanucleus.PersistenceNucleusContextImpl_ with two methods
-* __isClassMultiTenant__ : returns whether a class should use a multi-tenancy discriminator
-* __getMultiTenancyId__ : return the tenancy id to populate for the current context.
+The handling for multi-tenancy code is present in each of the store plugins but is controlled from 
+
+* __org.datanucleus.ExecutionContext.getTenantId__ : returns the tenant id for the specified class (for any write operations, and optionally any read operations)
+* __org.datanucleus.PersistenceNucleusContext.getTenantReadIds__ : returns the tenant ids to use in any read operations (overriding the tenant id above when specified).
+
+The metadata of the class defines whether it has a tenancy discriminator (i.e you have to explicitly add the metadata to get a discriminator). 
 
 
 ### CDI Integration
