@@ -17,10 +17,12 @@ __Support__ : [DataNucleus Support Page](http://www.datanucleus.org/support.html
 
 ## Persistence Process
 The primary classes involved in the persistence process are
-*ExecutionContext* - maps across to a PM/EM, and handles the transaction (ExecutionContextImpl)  
-*StateManager* - manages access to a persistent object (StateManagerImpl)  
-*StoreManager* - manages access to the datastore (see the datastore plugins, e.g RDBMSStoreManager)  
-*MetaDataManager* - manages the metadata for the class(es), so how it is persisted  
+
+* *ExecutionContext* - maps across to a PM/EM, and handles the transaction (ExecutionContextImpl)  
+* *StateManager* - manages access to a persistent object (StateManagerImpl)  
+* *StoreManager* - manages access to the datastore (see the datastore plugins, e.g RDBMSStoreManager)  
+* *MetaDataManager* - manages the metadata for the class(es), so how it is persisted  
+
 
 ### Persistence : Retrieve of Objects
 
