@@ -57,17 +57,17 @@ This means that multiple setters can be called on a single object and we get one
 
 #### persist
 Calls ExecutionContext.persistObject which calls EC.persistObjectWork.  
-Creates a StateManager (StateManagerImpl - SM). Adds the object to EC.dirtyOPs.  
+Creates a StateManager (StateManagerImpl - SM). Adds the object to EC.dirtySMs.  
 Calls SM.makePersistent which calls SM.internalMakePersistent which will pass the persist through to the datastore plugin.  
-Calls PersistenceHandler.insertObject, which will do any necessary cascade persist (coming back through EC.persistObjectInternal, EC.indirectDirtyOPs).  
+Calls PersistenceHandler.insertObject, which will do any necessary cascade persist (coming back through EC.persistObjectInternal, EC.indirectDirtySMs).  
 
 
 #### remove
 Calls ExecutionContext.deleteObject, which calls ExecutionContext.deleteObjectWork.  
-This will add the object to EC.dirtyOPs.  
+This will add the object to EC.dirtySMs.  
 Calls SM.deletePersistent.  
 Calls SM.internalDeletePersistent which will pass the delete through to the datastore plugin.  
-Calls PersistenceHandler.deleteObject, which will do any necessary cascade delete (coming back through EC.deleteObjectInternal, EC.indirectDirtyOPs).  
+Calls PersistenceHandler.deleteObject, which will do any necessary cascade delete (coming back through EC.deleteObjectInternal, EC.indirectDirtySMs).  
 
 
 #### update field
@@ -95,13 +95,13 @@ Call ExecutionContext.getOperationQueue() to see the operations that are queued 
 
 #### persist
 Calls ExecutionContext.persistObject which calls EC.persistObjectWork.  
-Creates a StateManager (StateManagerImpl - SM). Adds the object to EC.dirtyOPs.  
-Calls OP.makePersistent. Uses PersistFieldManager to process all reachable objects.  
+Creates a StateManager (StateManagerImpl - SM). Adds the object to EC.dirtySMs.  
+Calls SM.makePersistent. Uses PersistFieldManager to process all reachable objects.  
 
 
 #### remove
 Calls ExecutionContext.deleteObject, which calls ExecutionContext.deleteObjectWork.  
-Creates a StateManager as required. Adds the object to EC.dirtyOPs.  
+Creates a StateManager as required. Adds the object to EC.dirtySMs.  
 Calls SM.deletePersistent. Uses DeleteFieldManager to process all reachable objects.
 
 
