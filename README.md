@@ -292,7 +292,7 @@ All code for the queued operations are stored under _org.datanucleus.flush_.
 
 There are actually two sets of SCO wrappers in DataNucleus. The first set provide lazy loading, queueing, etc and have a "backing store" where the operations
 can be fed through to the datastore as they are made (for RDBMS). The second set are simple wrappers that intercept operations and mark the field as dirty in 
-the StateManager. This second set are for use with datastores such as _neodatis_ that don't utilise backing stores and just want to know when the field is dirty
+the StateManager. This second set are for use with all (non-RDBMS) datastores that don't utilise backing stores and just want to know when the field is dirty
 and hence should be written.
 
 All code for the backed SCO wrappers are stored under _org.datanucleus.store.types.wrappers.backed_.
@@ -306,7 +306,8 @@ All code for the simple SCO wrappers are stored under _org.datanucleus.store.typ
 
 The handling for multi-tenancy code is present in each of the store plugins but is controlled from 
 
-* __org.datanucleus.ExecutionContext.getTenantId__ : returns the tenant id for the specified class (for any write operations, and optionally any read operations)
+* __org.datanucleus.metadata.AbstractClassMetaData.getMultitenancyMetaData__ : returns details of any multi-tenancy discriminator null if the class does not need it).
+* __org.datanucleus.ExecutionContext.getTenantId__ : returns the tenant id to use for multi-tenancy (for any write operations, and optionally any read operations)
 * __org.datanucleus.PersistenceNucleusContext.getTenantReadIds__ : returns the tenant ids to use in any read operations (overriding the tenant id above when specified).
 
 The metadata of the class defines whether it has a tenancy discriminator (i.e you have to explicitly add the metadata to get a discriminator). 
