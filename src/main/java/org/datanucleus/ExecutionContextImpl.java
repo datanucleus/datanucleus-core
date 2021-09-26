@@ -4563,23 +4563,23 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // Commit all enlisted StateManagers
             ApiAdapter api = getApiAdapter();
-            DNStateManager[] ops = enlistedSMCache.values().toArray(new DNStateManager[enlistedSMCache.size()]);
-            for (int i = 0; i < ops.length; ++i)
+            DNStateManager[] sms = enlistedSMCache.values().toArray(new DNStateManager[enlistedSMCache.size()]);
+            for (int i = 0; i < sms.length; ++i)
             {
                 try
                 {
                     // Perform any operations required after committing
                     // TODO this if is due to ops that can have lc == null, why?, should not be here then
-                    if (ops[i] != null && ops[i].getObject() != null &&
-                            (api.isPersistent(ops[i].getObject()) || api.isTransactional(ops[i].getObject())))
+                    if (sms[i] != null && sms[i].getObject() != null &&
+                            (api.isPersistent(sms[i].getObject()) || api.isTransactional(sms[i].getObject())))
                     {
-                        ops[i].postCommit(getTransaction());
+                        sms[i].postCommit(getTransaction());
 
                         // TODO Change this check so that we remove all objects that are no longer suitable for caching
-                        if (properties.getFrequentProperties().getDetachAllOnCommit() && api.isDetachable(ops[i].getObject()))
+                        if (properties.getFrequentProperties().getDetachAllOnCommit() && api.isDetachable(sms[i].getObject()))
                         {
                             // "DetachAllOnCommit" - Remove the object from the L1 cache since it is now detached
-                            removeStateManagerFromCache(ops[i]);
+                            removeStateManagerFromCache(sms[i]);
                         }
                     }
                 }

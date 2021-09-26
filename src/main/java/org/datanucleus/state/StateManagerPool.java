@@ -127,13 +127,10 @@ public class StateManagerPool
 
     public synchronized void cleanUp()
     {
-       DNStateManager sm;
        long now = System.currentTimeMillis();    
-       Set<DNStateManager> ops = recyclableSMs.keySet();
-       Iterator<DNStateManager> opIter = ops.iterator();
-       while (opIter.hasNext())
+       Set<DNStateManager> sms = recyclableSMs.keySet();
+       for (DNStateManager sm : sms)
        {
-           sm = opIter.next();
            if ((now - (recyclableSMs.get(sm)).longValue()) > expirationTime)
            {
                recyclableSMs.remove(sm);
