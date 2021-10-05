@@ -76,6 +76,7 @@ public class ClassUtils
      * @param parameters The parameters for the constructor
      * @return The object
      * @throws NucleusException If an error occurs creating the instance
+     * @param <T> Type of the new instance
      */
     public static <T> T newInstance(Class<T> type, Class[] parameterTypes, Object[] parameters)
     {
@@ -134,6 +135,7 @@ public class ClassUtils
      * @param cls The class
      * @param argTypes The constructor argument types. If we know we need a parameter yet don't know the type then this will have a null for that argument type.
      * @return The constructor
+     * @param <T> Type that the constructor is for
      */
     public static <T> Constructor<T> getConstructorWithArguments(Class<T> cls, Class[] argTypes)
     {
@@ -197,6 +199,7 @@ public class ClassUtils
      * @param argTypes The constructor argument types. If we know we need a parameter yet don't know the type then this will have a null for that argument type.
      * @param argTypeCheck Whether to check the type of the different arguments. Useful where we don't know the result type of an argument until processing results
      * @return The constructor
+     * @param <T> Type that the constructor is for
      */
     public static <T> Constructor<T> getConstructorWithArguments(Class<T> cls, Class[] argTypes, boolean[] argTypeCheck)
     {
