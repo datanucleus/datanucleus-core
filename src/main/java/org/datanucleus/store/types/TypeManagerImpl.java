@@ -126,7 +126,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     protected Map<String, JavaType> javaTypes = new ConcurrentHashMap<>();
     
     /** Map of ContainerHandlers, keyed by the container type class name. */
-    protected Map<Class, ? super ContainerHandler> containerHandlersByClass = new ConcurrentHashMap<>();
+    protected Map<Class, ContainerHandler> containerHandlersByClass = new ConcurrentHashMap<>();
 
     /** Map of TypeConverter keyed by their symbolic name. */
     protected Map<String, TypeConverter> typeConverterByName = new ConcurrentHashMap<>();
@@ -176,7 +176,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public Set<String> getSupportedSecondClassTypes()
     {
-        return new HashSet(javaTypes.keySet());
+        return Collections.unmodifiableSet(javaTypes.keySet());
     }
 
     /* (non-Javadoc)
@@ -201,8 +201,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
             }
             catch (Exception e)
             {
+                return false;
             }
-            return false;
         }
         return true;
     }
@@ -227,6 +227,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             return inputClassNames;
         }
+
         String[] restClasses = new String[inputClassNames.length - filteredClasses];
         int m = 0;
         for (int i = 0; i < inputClassNames.length; ++i)
@@ -372,7 +373,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
      * @see org.datanucleus.store.types.TypeManager#getWrapperTypeForType(java.lang.String)
      */
     @Override
-    public Class getWrapperTypeForType(String className)
+    public Class<? extends SCO> getWrapperTypeForType(String className)
     {
         if (className == null)
         {
@@ -624,9 +625,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
      * @param typeName Type name to try first
      * @return The wrapper type
      */
-    private Class getSimpleWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName)
+    private Class<? extends SCO> getSimpleWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName)
     {
-        Class wrapperType = getWrapperTypeForType(typeName);
+        Class<? extends SCO> wrapperType = getWrapperTypeForType(typeName);
         if (wrapperType == null)
         {
             // typeName not supported directly (no SCO wrapper for the precise type)
@@ -672,11 +673,11 @@ public class TypeManagerImpl implements TypeManager, Serializable
         ContainerHandler containerHandler = getContainerHandler(container.getClass());
         return containerHandler == null ? null : containerHandler.getAdapter(container);
     }
-    
+
     @Override
     public <H extends ContainerHandler> H getContainerHandler(Class containerClass)
     {
-        H containerHandler = (H) containerHandlersByClass.get(containerClass);
+        ContainerHandler containerHandler = containerHandlersByClass.get(containerClass);
         if (containerHandler == null)
         {
             // Try to find the container handler using the registered type
@@ -695,13 +696,13 @@ public class TypeManagerImpl implements TypeManager, Serializable
                     parameters = new Object[] {containerClass};
                 }
                 
-                containerHandler = (H) ClassUtils.newInstance(type.containerHandlerType, parameterTypes, parameters);
-                
+                containerHandler = ClassUtils.newInstance(type.containerHandlerType, parameterTypes, parameters);
+
                 containerHandlersByClass.put(containerClass, containerHandler);
             }
         }
 
-        return containerHandler;
+        return (H) containerHandler;
     }
 
     /* (non-Javadoc)
@@ -985,10 +986,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
         final Class genericType;
         final boolean embedded;
         final boolean dfg;
-        final Class wrapperType;
-        final Class wrapperTypeBacked;
+        final Class<? extends SCO> wrapperType;
+        final Class<? extends SCO> wrapperTypeBacked;
         String typeConverterName;
-        final Class containerHandlerType;
+        final Class<? extends ContainerHandler> containerHandlerType;
 
         public JavaType(Class cls, Class genericType, boolean embedded, boolean dfg, Class wrapperType, Class wrapperTypeBacked, Class containerHandlerType, String typeConverterName)
         {

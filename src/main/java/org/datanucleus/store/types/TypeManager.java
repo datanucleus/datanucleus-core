@@ -97,9 +97,9 @@ public interface TypeManager
     /**
      * Accessor for the SCO wrapper for the type
      * @param className The type
-     * @return SCO wrapper
+     * @return SCO wrapper type
      */
-    Class getWrapperTypeForType(String className);
+    Class<? extends SCO> getWrapperTypeForType(String className);
 
     /**
      * Accessor for the backing-store Second Class Wrapper class for the supplied class.
