@@ -38,7 +38,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class StateManagerFactoryImpl implements StateManagerFactory
 {
-    Class smClass = null;
+    Class<? extends DNStateManager> smClass = null;
 
     public static final Class[] STATE_MANAGER_CTR_ARG_CLASSES = new Class[] {ClassConstants.EXECUTION_CONTEXT, AbstractClassMetaData.class};
 
@@ -280,7 +280,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
 
     protected DNStateManager getStateManager(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        return (DNStateManager) ClassUtils.newInstance(smClass, STATE_MANAGER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
+        return ClassUtils.newInstance(smClass, STATE_MANAGER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
         // TODO Enable this when the pool is working in multithreaded mode [NUCCORE-1007]
 //        return smPool.checkOut(ec, cmd);
     }

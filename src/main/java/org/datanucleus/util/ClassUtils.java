@@ -65,7 +65,7 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 public class ClassUtils
 {
     /** caching for constructors - using caching, the perf is at least doubled **/
-    protected static final Map constructorsCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+    protected static final Map<String, Constructor> constructorsCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
     /**
      * Accessor for a new instance of an object.
@@ -77,9 +77,8 @@ public class ClassUtils
      * @return The object
      * @throws NucleusException If an error occurs creating the instance
      */
-    public static Object newInstance(Class type, Class[] parameterTypes, Object[] parameters)
+    public static <T> T newInstance(Class<T> type, Class[] parameterTypes, Object[] parameters)
     {
-        Object obj;
         try
         {
             StringBuilder name = new StringBuilder(""+type.getName());
@@ -90,13 +89,13 @@ public class ClassUtils
                     name.append("-").append(parameterTypes[i].getName());
                 }
             }
-            Constructor ctor = (Constructor)constructorsCache.get(name.toString());
+            Constructor ctor = constructorsCache.get(name.toString());
             if (ctor == null)
             {
                 ctor = type.getConstructor(parameterTypes);
                 constructorsCache.put(name.toString(), ctor);
             }
-            obj = ctor.newInstance(parameters);
+            return (T) ctor.newInstance(parameters);
         }
         catch (NoSuchMethodException e)
         {
@@ -127,7 +126,6 @@ public class ClassUtils
                 throw new NucleusException(Localiser.msg("030007", type.getName(), t)).setFatal();
             }
         }
-        return obj;
     }
 
     /**
@@ -137,7 +135,7 @@ public class ClassUtils
      * @param argTypes The constructor argument types. If we know we need a parameter yet don't know the type then this will have a null for that argument type.
      * @return The constructor
      */
-    public static Constructor getConstructorWithArguments(Class cls, Class[] argTypes)
+    public static <T> Constructor<T> getConstructorWithArguments(Class<T> cls, Class[] argTypes)
     {
         try
         {
@@ -200,7 +198,7 @@ public class ClassUtils
      * @param argTypeCheck Whether to check the type of the different arguments. Useful where we don't know the result type of an argument until processing results
      * @return The constructor
      */
-    public static Constructor getConstructorWithArguments(Class cls, Class[] argTypes, boolean[] argTypeCheck)
+    public static <T> Constructor<T> getConstructorWithArguments(Class<T> cls, Class[] argTypes, boolean[] argTypeCheck)
     {
         try
         {
@@ -612,21 +610,20 @@ public class ClassUtils
 
     /**
      * Method to check for a default constructor on a class.
-     * Particular relevance for JDO is the requirement for a default
-     * constructor on all Persistence-Capable classes. Doesn't check
-     * superclasses for the default constructor.
-     * @param the_class The class
+     * Particular relevance for JDO is the requirement for a default constructor on all Persistable classes. 
+     * Doesn't check superclasses for the default constructor.
+     * @param cls The class
      * @return Whether it has a default constructor
-     **/
-    public static boolean hasDefaultConstructor(Class the_class)
+     */
+    public static boolean hasDefaultConstructor(Class cls)
     {
-        if (the_class == null)
+        if (cls == null)
         {
             return false;
         }
         try
         {
-            the_class.getDeclaredConstructor();
+            cls.getDeclaredConstructor();
         }
         catch (Exception e)
         {
@@ -639,13 +636,13 @@ public class ClassUtils
     /**
      * Method to return the superclasses for a class.
      * The superclasses will be ordered.
-     * @param the_class The class
+     * @param cls The class
      * @return The superclass of this class.
      */
-    public static Collection<Class<?>> getSuperclasses(Class<?> the_class)
+    public static Collection<Class<?>> getSuperclasses(Class<?> cls)
     {
         List<Class<?>> result = new ArrayList<Class<?>>();
-        Class<?> superclass = the_class.getSuperclass();
+        Class<?> superclass = cls.getSuperclass();
         while (superclass != null)
         {
             result.add(superclass);
@@ -657,13 +654,13 @@ public class ClassUtils
     /**
      * Method to return the superinterfaces for a class.
      * The superinterfaces will be ordered and unique.
-     * @param the_class The class
+     * @param cls The class
      * @return The superinterfaces of this class.
      */
-    public static Collection<Class<?>> getSuperinterfaces(Class<?> the_class)
+    public static Collection<Class<?>> getSuperinterfaces(Class<?> cls)
     {
         List<Class<?>> result = new ArrayList<Class<?>>();
-        collectSuperinterfaces(the_class, result);
+        collectSuperinterfaces(cls, result);
         return result;
     }
 

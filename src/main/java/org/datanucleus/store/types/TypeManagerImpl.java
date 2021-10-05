@@ -551,7 +551,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         // Find the SCO wrapper type most suitable
         StoreManager storeMgr = ownerSM.getExecutionContext().getStoreManager();
         boolean backedWrapper = storeMgr.useBackedSCOWrapperForMember(mmd, ownerSM.getExecutionContext());
-        Class wrapperType = null;
+        Class<? extends SCO> wrapperType = null;
         if (mmd.isSerialized())
         {
             // If we have all elements serialised into a column then cannot have backing stores
@@ -574,7 +574,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         // Create the SCO wrapper
         try
         {
-            return (SCO) ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
+            return ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
         }
         catch (UnsupportedOperationException uoe)
         {
@@ -583,7 +583,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             {
                 NucleusLogger.PERSISTENCE.warn("Creation of backed wrapper for " + mmd.getFullFieldName() + " unsupported, so trying simple wrapper");
                 wrapperType = getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName);
-                return (SCO) ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
+                return ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
             }
 
             throw uoe;
@@ -597,7 +597,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
      * @param typeName Type name to try first
      * @return The wrapper type
      */
-    private Class getBackedWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName)
+    private Class<? extends SCO> getBackedWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName)
     {
         Class wrapperType = getWrappedTypeBackedForType(typeName);
         if (wrapperType == null)

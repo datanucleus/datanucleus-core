@@ -41,14 +41,14 @@ public class StateManagerPool
 
     private CleanUpThread cleaner;
 
-    private Class opClass;
+    private Class<? extends DNStateManager> smClass;
 
-    public StateManagerPool(int maxIdle, boolean reaperThread, Class opClass)
+    public StateManagerPool(int maxIdle, boolean reaperThread, Class<? extends DNStateManager> smClass)
     {
         this.maxIdle = maxIdle;
         this.expirationTime = 30000; // 30 seconds
         this.recyclableSMs = new ConcurrentHashMap<>();
-        this.opClass = opClass;
+        this.smClass = smClass;
 
         if (reaperThread)
         {
@@ -72,7 +72,7 @@ public class StateManagerPool
 
     protected DNStateManager create(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        return (DNStateManager) ClassUtils.newInstance(opClass, StateManagerFactoryImpl.STATE_MANAGER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
+        return ClassUtils.newInstance(smClass, StateManagerFactoryImpl.STATE_MANAGER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
     }
 
     public boolean validate(DNStateManager sm)

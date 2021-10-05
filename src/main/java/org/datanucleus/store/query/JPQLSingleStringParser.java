@@ -491,7 +491,7 @@ public class JPQLSingleStringParser
                             String subqueryStr = content.substring(i+1, endPosition).trim();
                             String subqueryVarName = "DN_SUBQUERY_" + subqueryNum;
 
-                            Query subquery = (Query)ClassUtils.newInstance(query.getClass(),
+                            Query subquery = ClassUtils.newInstance(query.getClass(),
                                 new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, String.class},
                                 new Object[] {query.getStoreManager(), query.getExecutionContext(), subqueryStr});
                             // TODO Set the type of the variable
