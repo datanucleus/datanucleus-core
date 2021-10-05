@@ -225,8 +225,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /** Loaded fields of the persistable instance when the instance is enlisted in the transaction. */
     protected boolean[] savedLoadedFields = null;
 
-    /** Image of the Persistable instance when the instance is enlisted in the transaction. */
-    protected Persistable savedImage = null;
+    /** Copy (shallow) of the Persistable instance when the instance is enlisted in the transaction. */
+    protected Persistable savedPC = null;
 
     private static final EnhancementHelper HELPER;
     static
@@ -279,7 +279,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         myVersion = null;
         transactionalVersion = null;
         persistenceFlags = 0;
-        savedImage = null;
+        savedPC = null;
 
         ec.setAttachDetachReferencedObject(this, null);
     }
@@ -2141,7 +2141,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
             throw myEC.getApiAdapter().getUserExceptionForException(Localiser.msg("026003"), null);
         }
-        else if (pc == savedImage)
+        else if (pc == savedPC)
         {
             return null;
         }
@@ -5901,8 +5901,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void saveFields()
     {
-        savedImage = myPC.dnNewInstance(this);
-        savedImage.dnCopyFields(myPC, cmd.getAllMemberPositions());
+        savedPC = myPC.dnNewInstance(this);
+        savedPC.dnCopyFields(myPC, cmd.getAllMemberPositions());
         savedPersistenceFlags = persistenceFlags;
         savedLoadedFields = loadedFields.clone();
     }
@@ -5912,7 +5912,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void clearSavedFields()
     {
-        savedImage = null;
+        savedPC = null;
         savedPersistenceFlags = 0;
         savedLoadedFields = null;
     }
@@ -5922,12 +5922,12 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void restoreFields()
     {
-        if (savedImage != null)
+        if (savedPC != null)
         {
             loadedFields = savedLoadedFields;
             persistenceFlags = savedPersistenceFlags;
             myPC.dnReplaceFlags();
-            myPC.dnCopyFields(savedImage, cmd.getAllMemberPositions());
+            myPC.dnCopyFields(savedPC, cmd.getAllMemberPositions());
 
             clearDirtyFlags();
             clearSavedFields();
@@ -6055,7 +6055,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 break;
         }
         log.debug("    savedLoadedFields=" + StringUtils.booleanArrayToString(savedLoadedFields));
-        log.debug("    savedImage = " + convertPCToString(savedImage, cmd));
+        log.debug("    savedImage = " + convertPCToString(savedPC, cmd));
     }
 
     /**
