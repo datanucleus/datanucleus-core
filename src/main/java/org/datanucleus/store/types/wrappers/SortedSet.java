@@ -434,19 +434,18 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            Iterator iter = elements.iterator();
-            while (iter.hasNext())
+            for (Object elem : elements)
             {
-                ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
         if (success)
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : elements)
+                for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem));
                 }
             }
             makeDirty();
@@ -580,11 +579,10 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
             if (ownerSM.getExecutionContext().getManageRelations())
             {
                 // Relationship management
-                Iterator iter = elements.iterator();
                 RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-                while (iter.hasNext())
+                for (Object elem : elements)
                 {
-                    relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                    relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
                 }
             }
 
@@ -592,19 +590,17 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
-                Iterator iter = elements.iterator();
-                while (iter.hasNext())
+                for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
                 // Perform the cascade delete
-                Iterator iter = elements.iterator();
-                while (iter.hasNext())
+                for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(elem);
                 }
             }
         }
@@ -648,19 +644,17 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue any cascade delete
-                Iterator iter = collToRemove.iterator();
-                while (iter.hasNext())
+                for (Object elem : collToRemove)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
                 // Perform the cascade delete
-                Iterator iter = collToRemove.iterator();
-                while (iter.hasNext())
+                for (Object elem : collToRemove)
                 {
-                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(elem);
                 }
             }
 

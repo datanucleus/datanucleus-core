@@ -497,11 +497,10 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            Iterator iter = elements.iterator();
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            while (iter.hasNext())
+            for (Object elem : elements)
             {
-                relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
 
@@ -535,11 +534,10 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            Iterator iter = elements.iterator();
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            while (iter.hasNext())
+            for (Object elem : elements)
             {
-                relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
 
@@ -579,11 +577,10 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            Iterator iter = delegate.iterator();
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            while (iter.hasNext())
+            for (Object elem : delegate)
             {
-                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
 
@@ -724,29 +721,26 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
             if (ownerSM.getExecutionContext().getManageRelations())
             {
                 // Relationship management
-                Iterator iter = elements.iterator();
                 RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-                while (iter.hasNext())
+                for (Object elem : elements)
                 {
-                    relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                    relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
                 }
             }
 
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                Iterator iter = elements.iterator();
-                while (iter.hasNext())
+                for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                Iterator iter = elements.iterator();
-                while (iter.hasNext())
+                for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
+                    ownerSM.getExecutionContext().deleteObjectInternal(elem);
                 }
             }
         }
