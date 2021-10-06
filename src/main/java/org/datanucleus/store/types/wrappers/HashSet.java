@@ -360,11 +360,10 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            Iterator iter = delegate.iterator();
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            while (iter.hasNext())
+            for (Object elem : delegate)
             {
-                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
 

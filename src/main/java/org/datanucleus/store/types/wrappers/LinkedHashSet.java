@@ -373,11 +373,10 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            Iterator iter = delegate.iterator();
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            while (iter.hasNext())
+            for (Object elem : delegate)
             {
-                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
 
