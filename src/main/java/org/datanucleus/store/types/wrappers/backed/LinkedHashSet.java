@@ -609,6 +609,16 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
      **/
     public void clear()
     {
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
+        {
+            // Relationship management
+            RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
+            for (Object elem : delegate)
+            {
+                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
+            }
+        }
+
         makeDirty();
         delegate.clear();
 
