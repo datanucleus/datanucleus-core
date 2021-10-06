@@ -729,11 +729,10 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
-            Iterator iter = elements.iterator();
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            while (iter.hasNext())
+            for (Object elem : elements)
             {
-                relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
 
@@ -906,11 +905,10 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
-            Iterator iter = elements.iterator();
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            while (iter.hasNext())
+            for (Object elem : elements)
             {
-                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
         }
 
