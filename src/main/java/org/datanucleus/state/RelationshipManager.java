@@ -18,6 +18,16 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.state;
 
+/**
+ * Manager for (bidirectional) relationships of an object (StateManager).
+ * Designed as a stand-alone process to run just before flush.
+ * Updates on bidirectional relations are registered during the persistence process. 
+ * Call to checkConsistency() will check for consistency and throw exceptions as appropriate.
+ * Call to process() will perform updates at the other side of the registered relations so all is consistent.
+ * 
+ * TODO Cater for Map put/remove calls
+ * TODO Consider sharing info with org.datanucleus.flush.OperationQueue which holds similar information (but only when optimistic)
+ */
 public interface RelationshipManager
 {
     /**

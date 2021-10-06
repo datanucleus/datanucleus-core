@@ -39,7 +39,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Manager for (bidirectional) relationships of a class.
+ * Manager for (bidirectional) relationships of an object (StateManager).
  * Designed as a stand-alone process to run just before flush.
  * Updates on bidirectional relations are registered during the persistence process. 
  * Call to checkConsistency() will check for consistency and throw exceptions as appropriate.
