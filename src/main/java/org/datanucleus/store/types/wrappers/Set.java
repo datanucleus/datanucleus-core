@@ -343,16 +343,16 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
 
     /**
      * Method to add a collection of elements.
-     * @param c The collection of elements to add.
+     * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
      **/
-    public boolean addAll(java.util.Collection<? extends E> c)
+    public boolean addAll(java.util.Collection<? extends E> elements)
     {
-        boolean success = delegate.addAll(c);
+        boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            for (Object element : c)
+            for (Object element : elements)
             {
                 ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
             }
@@ -361,7 +361,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : c)
+                for (Object element : elements)
                 {
                     ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }

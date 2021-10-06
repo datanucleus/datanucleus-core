@@ -558,10 +558,10 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
 
     /**
      * Method to add a collection to the HashSet.
-     * @param c The collection
+     * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection c)
+    public boolean addAll(Collection elements)
     {
         if (useCache)
         {
@@ -572,7 +572,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
         {
             // Relationship management
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            for (Object elem : c)
+            for (Object elem : elements)
             {
                 relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
@@ -583,7 +583,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : c)
+                for (Object element : elements)
                 {
                     ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
                 }
@@ -592,7 +592,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerSM, c, useCache ? delegate.size() : -1);
+                    backingSuccess = backingStore.addAll(ownerSM, elements, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -605,7 +605,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
         // to be inserted - otherwise jdoPreStore on this object would have been called before completing the addition
         makeDirty();
 
-        boolean delegateSuccess = delegate.addAll(c);
+        boolean delegateSuccess = delegate.addAll(elements);
 
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {

@@ -700,10 +700,10 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
 
     /**
      * Method to add a collection of elements.
-     * @param c The collection of elements to add.
+     * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
      **/
-    public boolean addAll(java.util.Collection c)
+    public boolean addAll(java.util.Collection elements)
     {
         if (useCache)
         {
@@ -713,7 +713,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         {
             // Relationship management
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            for (Object elem : c)
+            for (Object elem : elements)
             {
                 relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
@@ -724,7 +724,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : c)
+                for (Object element : elements)
                 {
                     ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
                 }
@@ -733,7 +733,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerSM, c, useCache ? delegate.size() : -1);
+                    backingSuccess = backingStore.addAll(ownerSM, elements, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -746,7 +746,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         // to be inserted - otherwise jdoPreStore on this object would have been called before completing the addition
         makeDirty();
 
-        boolean delegateSuccess = delegate.addAll(c);
+        boolean delegateSuccess = delegate.addAll(elements);
 
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {

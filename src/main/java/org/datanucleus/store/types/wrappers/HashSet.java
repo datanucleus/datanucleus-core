@@ -320,16 +320,16 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
 
     /**
      * Method to add a collection to the set.
-     * @param c The collection
+     * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection c)
+    public boolean addAll(Collection elements)
     {
-        boolean success = delegate.addAll(c);
+        boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            for (Object elem : c)
+            for (Object elem : elements)
             {
                 ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
@@ -338,7 +338,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : c)
+                for (Object element : elements)
                 {
                     ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }

@@ -343,16 +343,16 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
 
     /**
      * Method to add a collection of elements.
-     * @param c The collection of elements to add.
+     * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
      **/
-    public boolean addAll(java.util.Collection c)
+    public boolean addAll(java.util.Collection elements)
     {
-        boolean success = delegate.addAll(c);
+        boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
         {
             // Relationship management
-            for (Object elem : c)
+            for (Object elem : elements)
             {
                 ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
@@ -361,7 +361,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object elem : c)
+                for (Object elem : elements)
                 {
                     ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem));
                 }
