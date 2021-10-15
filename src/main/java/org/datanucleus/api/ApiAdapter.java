@@ -195,10 +195,81 @@ public interface ApiAdapter extends Serializable
 
     /**
      * Accessor for the object state.
-     * @param obj Object
+     * @param pc Persistable object
      * @return The state ("persistent-clean", "detached-dirty" etc)
      */
-    String getObjectState(Object obj);
+    default String getObjectState(Object pc)
+    {
+        if (pc == null)
+        {
+            return null;
+        }
+
+        if (isDetached(pc))
+        {
+            if (isDirty(pc))
+            {
+                // Detached Dirty
+                return "detached-dirty";
+            }
+            // Detached Not Dirty
+            return "detached-clean";
+        }
+
+        if (isPersistent(pc))
+        {
+            if (isTransactional(pc))
+            {
+                if (isDirty(pc))
+                {
+                    if (isNew(pc))
+                    {
+                        if (isDeleted(pc))
+                        {
+                            // Persistent Transactional Dirty New Deleted
+                            return "persistent-new-deleted";
+                        }
+                        // Persistent Transactional Dirty New Not Deleted
+                        return "persistent-new";
+                    }
+
+                    if (isDeleted(pc))
+                    {
+                        // Persistent Transactional Dirty Not New Deleted
+                        return "persistent-deleted";
+                    }
+                    // Persistent Transactional Dirty Not New Not Deleted
+                    return "persistent-dirty";
+                }
+
+                // Persistent Transactional Not Dirty
+                return "persistent-clean";
+            }
+
+            if (isDirty(pc))
+            {
+                // Persistent Nontransactional Dirty
+                return "persistent-nontransactional-dirty";
+            }
+            // Persistent Nontransactional Not Dirty
+            return "hollow/persistent-nontransactional";
+        }
+
+        if (isTransactional(pc))
+        {
+            if (isDirty(pc))
+            {
+                // Not Persistent Transactional Dirty
+                return "transient-dirty";
+            }
+
+            // Not Persistent Transactional Not Dirty
+            return "transient-clean";
+        }
+
+        // Not Persistent Not Transactional
+        return "transient";
+    }
 
     /**
      * Method to make the member of the persistable object dirty.
