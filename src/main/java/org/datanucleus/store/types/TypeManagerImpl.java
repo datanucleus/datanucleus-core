@@ -85,6 +85,8 @@ import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.types.containers.ArrayHandler;
 import org.datanucleus.store.types.containers.ArrayListHandler;
+import org.datanucleus.store.types.containers.ContainerAdapter;
+import org.datanucleus.store.types.containers.ContainerHandler;
 import org.datanucleus.store.types.containers.HashMapHandler;
 import org.datanucleus.store.types.containers.HashSetHandler;
 import org.datanucleus.store.types.containers.HashtableHandler;

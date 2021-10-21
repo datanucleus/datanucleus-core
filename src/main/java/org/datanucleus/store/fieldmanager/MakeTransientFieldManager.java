@@ -24,10 +24,10 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.ContainerAdapter;
 
 /**
  * Field Manager to handle the making transient of fields.

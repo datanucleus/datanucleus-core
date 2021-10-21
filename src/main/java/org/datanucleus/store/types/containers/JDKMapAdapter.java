@@ -22,8 +22,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.datanucleus.store.types.MapContainerAdapter;
-
 public class JDKMapAdapter<C extends Map<Object, Object>> implements MapContainerAdapter<C>
 {
     C container;

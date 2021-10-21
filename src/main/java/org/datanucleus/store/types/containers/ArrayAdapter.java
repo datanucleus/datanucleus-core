@@ -23,9 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.datanucleus.store.types.ElementContainerAdapter;
-import org.datanucleus.store.types.SequenceAdapter;
-
 public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>implements SequenceAdapter
 {
     List<Object> buffer;

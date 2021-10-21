@@ -25,10 +25,10 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.ContainerHandler;
 
 /**
  * Field Manager to handle loading all fields of all objects in the fetch plan.

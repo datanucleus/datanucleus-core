@@ -15,16 +15,29 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.types;
+package org.datanucleus.store.types.containers;
 
-/**
- * An adapter for container classes allowing DN to operate on them in a generic form instead of
- * depending directly on the JDK containers.
- * @param <C> The container class
- */
-public interface ContainerAdapter<C> extends Iterable<Object>
+public abstract class ElementContainerAdapter<C> implements ContainerAdapter<C>
 {
-    C getContainer();
+    protected C container;
+    
+    public ElementContainerAdapter(C container)
+    {
+        this.container = container;
+    }
 
-    void clear();
+    @Override
+    public C getContainer()
+    {
+        return container;
+    }
+    
+    protected void setContainer(C container)
+    {
+        this.container = container;
+    }
+    
+    public abstract void add(Object newElement);
+	
+    public abstract void remove(Object element);
 }

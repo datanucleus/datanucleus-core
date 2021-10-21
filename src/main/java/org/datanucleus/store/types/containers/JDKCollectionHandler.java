@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.types.ElementContainerAdapter;
 
 public class JDKCollectionHandler<C extends Collection> extends CollectionHandler<C>
 {

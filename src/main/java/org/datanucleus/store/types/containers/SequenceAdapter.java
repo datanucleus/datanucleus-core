@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.types;
+package org.datanucleus.store.types.containers;
 
 public interface SequenceAdapter
 {

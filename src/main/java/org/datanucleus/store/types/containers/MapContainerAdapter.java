@@ -15,29 +15,19 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.types;
+package org.datanucleus.store.types.containers;
 
-public abstract class ElementContainerAdapter<C> implements ContainerAdapter<C>
+import java.util.Map.Entry;
+
+public interface MapContainerAdapter<C extends Object> extends ContainerAdapter<C>
 {
-    protected C container;
-    
-    public ElementContainerAdapter(C container)
-    {
-        this.container = container;
-    }
+    Object put(Object key, Object value);
 
-    @Override
-    public C getContainer()
-    {
-        return container;
-    }
+    Object remove(Object key);
     
-    protected void setContainer(C container)
-    {
-        this.container = container;
-    }
-    
-    public abstract void add(Object newElement);
-	
-    public abstract void remove(Object element);
+    Iterable<Entry<Object, Object>> entries();
+
+    Iterable<Object> keys();
+
+    Iterable<Object> values();
 }

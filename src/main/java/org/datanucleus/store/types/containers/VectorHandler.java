@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.types.ElementContainerAdapter;
 
 public class VectorHandler extends JDKCollectionHandler<Vector>
 {

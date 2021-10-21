@@ -20,8 +20,6 @@ package org.datanucleus.store.types.containers;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.datanucleus.store.types.ElementContainerAdapter;
-
 public class JDKCollectionAdapter<C extends Collection> extends ElementContainerAdapter<C>
 {
     public JDKCollectionAdapter(C container)

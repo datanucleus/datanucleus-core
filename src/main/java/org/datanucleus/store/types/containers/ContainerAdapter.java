@@ -15,19 +15,16 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.types;
+package org.datanucleus.store.types.containers;
 
-import java.util.Map.Entry;
-
-public interface MapContainerAdapter<C extends Object> extends ContainerAdapter<C>
+/**
+ * An adapter for container classes allowing DN to operate on them in a generic form instead of
+ * depending directly on the JDK containers.
+ * @param <C> The container class
+ */
+public interface ContainerAdapter<C> extends Iterable<Object>
 {
-    Object put(Object key, Object value);
+    C getContainer();
 
-    Object remove(Object key);
-    
-    Iterable<Entry<Object, Object>> entries();
-
-    Iterable<Object> keys();
-
-    Iterable<Object> values();
+    void clear();
 }

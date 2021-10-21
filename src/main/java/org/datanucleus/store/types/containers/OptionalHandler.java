@@ -23,7 +23,6 @@ import java.util.Optional;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
-import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
 
 public class OptionalHandler extends CollectionHandler<Optional>

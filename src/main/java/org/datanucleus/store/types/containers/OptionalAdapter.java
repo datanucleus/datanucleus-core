@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 
-import org.datanucleus.store.types.ElementContainerAdapter;
-
 public class OptionalAdapter extends ElementContainerAdapter<Optional>
 {
     public OptionalAdapter(Optional optional)

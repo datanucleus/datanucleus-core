@@ -32,8 +32,6 @@ import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.ValueMetaData;
-import org.datanucleus.store.types.ContainerHandler;
-import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;

@@ -25,11 +25,11 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.types.ContainerHandler;
-import org.datanucleus.store.types.ElementContainerAdapter;
-import org.datanucleus.store.types.ElementContainerHandler;
-import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.ContainerHandler;
+import org.datanucleus.store.types.containers.ElementContainerAdapter;
+import org.datanucleus.store.types.containers.ElementContainerHandler;
+import org.datanucleus.store.types.containers.MapContainerAdapter;
 
 /**
  * Field manager that deletes all "dependent" PC objects referenced from the source object.

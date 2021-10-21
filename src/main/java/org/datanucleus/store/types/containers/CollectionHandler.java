@@ -32,8 +32,6 @@ import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.OrderMetaData;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.types.ElementContainerAdapter;
-import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;

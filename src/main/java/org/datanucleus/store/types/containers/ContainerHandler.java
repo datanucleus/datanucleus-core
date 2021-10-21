@@ -15,18 +15,19 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.types;
+package org.datanucleus.store.types.containers;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
+import org.datanucleus.store.types.TypeManager;
 
 /**
- * Provides support for SCO Containers types in DN. SCO Containers contain other FCOs or SCOs objects e.g.:
- * collections, maps and arrays. ContainerHandlers work as factories being responsible for instantiating new
- * container instances. They also provide the necessary metadata and related operations as well as the access
- * to the ContainerAdapter. One instance of the ContainerHandler can be across the types, whereas the
- * ContainerAdapter requires one instance their respective container instances.
+ * Provides support for SCO Containers types in DN. 
+ * SCO Containers contain other FCOs or SCOs objects e.g. collections, maps and arrays. 
+ * ContainerHandlers work as factories being responsible for instantiating new container instances. 
+ * They also provide the necessary metadata and related operations as well as the access to the ContainerAdapter. 
+ * One instance of the ContainerHandler can be across the types, whereas the ContainerAdapter requires one instance their respective container instances.
  * @param <C> The class of the container
  * @param <A> ContainerAdater that is returned by use
  */

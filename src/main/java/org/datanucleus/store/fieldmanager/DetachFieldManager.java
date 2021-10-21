@@ -31,12 +31,12 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.types.ContainerHandler;
-import org.datanucleus.store.types.ElementContainerAdapter;
-import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.ContainerHandler;
+import org.datanucleus.store.types.containers.ElementContainerAdapter;
+import org.datanucleus.store.types.containers.MapContainerAdapter;
 
 /**
  * FieldManager to handle the detachment of fields with persistable objects.

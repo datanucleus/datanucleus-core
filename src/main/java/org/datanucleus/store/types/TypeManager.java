@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
+import org.datanucleus.store.types.containers.ContainerAdapter;
+import org.datanucleus.store.types.containers.ContainerHandler;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**

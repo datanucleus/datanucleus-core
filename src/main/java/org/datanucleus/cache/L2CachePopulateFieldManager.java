@@ -32,15 +32,15 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
-import org.datanucleus.store.types.ElementContainerAdapter;
-import org.datanucleus.store.types.ElementContainerHandler;
-import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOUtils;
-import org.datanucleus.store.types.SequenceAdapter;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.ElementContainerAdapter;
+import org.datanucleus.store.types.containers.ElementContainerHandler;
+import org.datanucleus.store.types.containers.MapContainerAdapter;
 import org.datanucleus.store.types.containers.MapHandler;
+import org.datanucleus.store.types.containers.SequenceAdapter;
 import org.datanucleus.util.NucleusLogger;
 
 /**

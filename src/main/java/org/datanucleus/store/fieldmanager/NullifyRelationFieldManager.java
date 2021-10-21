@@ -20,8 +20,8 @@ package org.datanucleus.store.fieldmanager;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.ContainerAdapter;
 
 /**
  * Manager that nullifies any Collection/Map/PC fields of the object.

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.types.ElementContainerAdapter;
 
 public class ArrayListHandler extends JDKCollectionHandler<List>
 {

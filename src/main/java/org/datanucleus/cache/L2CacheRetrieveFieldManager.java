@@ -32,10 +32,10 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
-import org.datanucleus.store.types.ContainerHandler;
-import org.datanucleus.store.types.ElementContainerAdapter;
-import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.containers.ContainerHandler;
+import org.datanucleus.store.types.containers.ElementContainerAdapter;
+import org.datanucleus.store.types.containers.MapContainerAdapter;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.NucleusLogger;
 
