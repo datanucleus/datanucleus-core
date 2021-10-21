@@ -29,7 +29,7 @@ import org.datanucleus.store.types.TypeManager;
  * They also provide the necessary metadata and related operations as well as the access to the ContainerAdapter. 
  * One instance of the ContainerHandler can be across the types, whereas the ContainerAdapter requires one instance their respective container instances.
  * @param <C> The class of the container
- * @param <A> ContainerAdater that is returned by use
+ * @param <A> ContainerAdapter that is returned by use
  */
 public interface ContainerHandler<C, A extends ContainerAdapter<C>>
 {
