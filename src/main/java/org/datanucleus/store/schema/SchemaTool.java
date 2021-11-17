@@ -165,7 +165,6 @@ public class SchemaTool
         }
         if (cmd.hasOption(OPTION_SCHEMA_NAME))
         {
-            NucleusLogger.GENERAL.info(">> sch input = " + cmd.getOptionArg(OPTION_SCHEMA_NAME));
             tool.setSchemaName(cmd.getOptionArg(OPTION_SCHEMA_NAME));
         }
 
@@ -591,6 +590,13 @@ public class SchemaTool
                 // Add the properties for the unit
                 if (pumd.getProperties() != null)
                 {
+                    // Ignore (schema) properties that are not needed by SchemaTool
+                    pumd.getProperties().remove(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER);
+                    pumd.getProperties().remove(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_SCRIPT);
+                    pumd.getProperties().remove(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER);
+                    pumd.getProperties().remove(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_SCRIPT);
+                    pumd.getProperties().remove(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE);
+
                     props.putAll(pumd.getProperties());
                 }
             }
