@@ -486,10 +486,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // Remove it from any transaction
                     sm.disconnect();
                 }
-                else
-                {
-                    NucleusLogger.CACHE.error(">> EC.close L1Cache op IS NULL!");
-                }
             }
 
             cache.clear();
@@ -1567,7 +1563,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to evict all objects of the specified type (and optionaly its subclasses) that are present in the L1 cache.
+     * Method to evict all objects of the specified type (and optionally its subclasses) that are present in the L1 cache.
      * @param cls Type of persistable object
      * @param subclasses Whether to include subclasses
      */
@@ -1614,10 +1610,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (sm != null)
                 {
                     sm.evict();
-                }
-                else
-                {
-                    NucleusLogger.CACHE.error(">> EC.evictAllObjects L1Cache op IS NULL!");
                 }
             }
 
@@ -4253,10 +4245,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         }
                     }
                 }
-                else if (cachedSM == null)
-                {
-                    NucleusLogger.CACHE.error(">> EC.preCommit L1Cache op IS NULL!");
-                }
             }
         }
 
@@ -4484,7 +4472,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         while (smsIter.hasNext())
         {
             DNStateManager sm = smsIter.next();
-            Object pc = sm.getObject();
+            Object pc = sm!=null ? sm.getObject() : null;
             if (pc != null && !getApiAdapter().isDetached(pc) && !getApiAdapter().isDeleted(pc))
             {
                 // Load all fields (and sub-objects) in the FetchPlan
