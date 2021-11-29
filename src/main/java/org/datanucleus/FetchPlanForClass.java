@@ -120,14 +120,14 @@ public class FetchPlanForClass
      */
     public int getMaxRecursionDepthForMember(int memberNum)
     {
-        // Find fallback recursion depth for member in its class metadata definition
-        int recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
-        if (recursionDepth == AbstractMemberMetaData.UNDEFINED_RECURSION_DEPTH)
+        // Find fallback recursion depth for member using its class' metadata definition
+        Integer recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
+        if (recursionDepth == null)
         {
-            recursionDepth = AbstractMemberMetaData.DEFAULT_RECURSION_DEPTH;
+            recursionDepth = 1;
         }
 
-        // find FetchGroupMetaDatas that contain the field in question, and see if it has been overridden
+        // find FetchGroupMetaDatas that contain the member in question, and see if it has been overridden
         String memberName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getName();
         Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (FetchGroupMetaData fgmd : fetchGroupsContainingField)
@@ -140,10 +140,7 @@ public class FetchPlanForClass
                     if (fgmmd.getName().equals(memberName))
                     {
                         // TODO Add concept of "max" as per this method's name
-                        if (fgmmd.getRecursionDepth() != AbstractMemberMetaData.UNDEFINED_RECURSION_DEPTH)
-                        {
-                            recursionDepth = fgmmd.getRecursionDepth();
-                        }
+                        recursionDepth = fgmmd.getRecursionDepth();
                     }
                 }
             }
