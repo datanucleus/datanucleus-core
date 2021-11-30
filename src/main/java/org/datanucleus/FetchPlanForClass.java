@@ -114,21 +114,22 @@ public class FetchPlanForClass
     }
 
     /**
-     * Method to return the effective depth of this member number in the overall fetch plan.
+     * Method to return the recursion depth of this member number in the overall fetch plan.
      * @param memberNum Number of member in this class
-     * @return The (max) recursion depth
+     * @return The recursion depth
      */
-    public int getMaxRecursionDepthForMember(int memberNum)
+    public int getRecursionDepthForMember(int memberNum)
     {
-        // Find fallback recursion depth for member using its class' metadata definition
-        Integer recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
+        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
+
+        // Find fallback recursion depth for this member using its class' metadata definition
+        Integer recursionDepth = mmd.getRecursionDepth();
         if (recursionDepth == null)
         {
             recursionDepth = 1;
         }
 
-        // find FetchGroupMetaDatas that contain the member in question, and see if it has been overridden
-        String memberName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getName();
+        // What should we do with recursionDepth if the same member is specified in multiple fetch groups? e.g 1 in groupA, and 2 in groupB
         Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (FetchGroupMetaData fgmd : fetchGroupsContainingField)
         {
@@ -137,10 +138,10 @@ public class FetchPlanForClass
             {
                 for (FetchGroupMemberMetaData fgmmd : fgmmds)
                 {
-                    if (fgmmd.getName().equals(memberName))
+                    if (fgmmd.getName().equals(mmd.getName()))
                     {
-                        // TODO Add concept of "max" as per this method's name
                         recursionDepth = fgmmd.getRecursionDepth();
+                        break;
                     }
                 }
             }
@@ -425,10 +426,11 @@ public class FetchPlanForClass
             {
                 final int fieldNumber = fieldsInActualFetchPlan[i];
 
-                // if field in actual fetch plan was not previously loaded
+                // if member in actual fetch plan was not previously loaded
                 if (!loadedMembers[fieldNumber])
                 {
-                    if (cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).isDefaultFetchGroup() && fpGroups.contains(FetchPlan.DEFAULT))
+                    AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                    if (mmd.isDefaultFetchGroup() && fpGroups.contains(FetchPlan.DEFAULT))
                     {
                         // to call jdoPostLoad, field must be in default-fetch-group when DFG is active
                         result = Boolean.TRUE;
@@ -471,7 +473,7 @@ public class FetchPlanForClass
                             if (plan.dynamicGroups != null)
                             {
                                 // Dynamic Fetch groups
-                                String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+                                String fieldName = mmd.getName();
                                 Class cls = plan.clr.classForName(cmd.getFullClassName());
                                 for (Iterator<FetchGroup> it = plan.dynamicGroups.iterator(); it.hasNext();)
                                 {
@@ -508,19 +510,23 @@ public class FetchPlanForClass
         Set<FetchGroupMetaData> fetchGroups = new HashSet<>();
         if (fgmds != null)
         {
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
             for (FetchGroupMetaData fgmd : fgmds)
             {
-                Set<FetchGroupMemberMetaData> subFGmmds = fgmd.getMembers();
-                if (subFGmmds != null)
+                Set<FetchGroupMemberMetaData> fgmmds = fgmd.getMembers();
+                if (fgmmds != null)
                 {
-                    for (FetchGroupMemberMetaData subFGmmd : subFGmmds)
+                    for (FetchGroupMemberMetaData fgmmd : fgmmds)
                     {
-                        if (subFGmmd.getName().equals(cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getName()))
+                        if (fgmmd.getName().equals(mmd.getName()))
                         {
                             fetchGroups.add(fgmd);
+                            break;
                         }
                     }
                 }
+
+                // Check any sub-groups
                 Set<FetchGroupMetaData> subFGmds = fgmd.getFetchGroups();
                 if (subFGmds != null)
                 {
