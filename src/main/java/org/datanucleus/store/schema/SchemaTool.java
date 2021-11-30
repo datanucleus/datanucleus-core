@@ -597,6 +597,13 @@ public class SchemaTool
                     pumd.getProperties().remove(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_SCRIPT);
                     pumd.getProperties().remove(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE);
 
+                    // These have not had chance to be converted to the DN internal property since straight from persistence.xml
+                    pumd.getProperties().remove("javax.persistence.schema-generation.database.action");
+                    pumd.getProperties().remove("javax.persistence.schema-generation.create-script-source");
+                    pumd.getProperties().remove("javax.persistence.schema-generation.create-source");
+                    pumd.getProperties().remove("javax.persistence.schema-generation.drop-script-source");
+                    pumd.getProperties().remove("javax.persistence.schema-generation.drop-source");
+
                     props.putAll(pumd.getProperties());
                 }
             }
