@@ -33,11 +33,11 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Factory for StateManagera.
- * Makes use of a pool to allow reuse to save recreation of objects.
+ * Factory for StateManagers.
  */
 public class StateManagerFactoryImpl implements StateManagerFactory
 {
+    /** Class for the default StateManager type. */
     Class<? extends DNStateManager> smClass = null;
 
     public static final Class[] STATE_MANAGER_CTR_ARG_CLASSES = new Class[] {ClassConstants.EXECUTION_CONTEXT, AbstractClassMetaData.class};

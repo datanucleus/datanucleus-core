@@ -23,9 +23,12 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.FieldValues;
 
 /**
- * Factory for StateManagers. Whenever we have a persistable object that needs to be managed and the values
- * of its fields accessed/updated we associate the object with an StateManager. Should be implemented
- * by whichever type of StateManager we want to instantiate.
+ * Factory for StateManagers. 
+ * Whenever we have a persistable object that needs to be managed and the values of its fields accessed/updated we associate the object with a StateManager.
+ * <p>
+ * A user can specify the persistence property <b>datanucleus.stateManager.className</b> to define the StateManager class to instantiate, otherwise it will 
+ * instantiate either <i>org.datanucleus.state.StateManagerImpl</i>, 
+ * or the preferred StateManager required by the particular datastore (see <i>storeMgr.getDefaultStateManagerClassName()</i>).
  */
 public interface StateManagerFactory
 {
