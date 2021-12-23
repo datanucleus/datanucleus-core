@@ -48,6 +48,8 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     public StateManagerFactoryImpl(PersistenceNucleusContext nucCtx)
     {
         Configuration conf = nucCtx.getConfiguration();
+
+        // Load class for default StateManager
         String smClassName = conf.getStringProperty(PropertyNames.PROPERTY_STATE_MANAGER_CLASS_NAME);
         if (StringUtils.isWhitespace(smClassName))
         {
@@ -280,7 +282,9 @@ public class StateManagerFactoryImpl implements StateManagerFactory
 
     protected DNStateManager getStateManager(ExecutionContext ec, AbstractClassMetaData cmd)
     {
+        // TODO Potentially could allow SM class to use to be defined in the cmd
         return ClassUtils.newInstance(smClass, STATE_MANAGER_CTR_ARG_CLASSES, new Object[] {ec, cmd});
+
         // TODO Enable this when the pool is working in multithreaded mode [NUCCORE-1007]
 //        return smPool.checkOut(ec, cmd);
     }
