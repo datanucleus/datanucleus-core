@@ -406,7 +406,12 @@ public abstract class AbstractNamingFactory implements NamingFactory
         if (name.length() > length)
         {
             if (length < TRUNCATE_HASH_LENGTH)
+            {
                 throw new IllegalArgumentException("The length argument (=" + length + ") is less than HASH_LENGTH(=" + TRUNCATE_HASH_LENGTH + ")!");
+            }
+
+            // Always use lowercase form as basis for truncation (in case we are using JPQL and an alias was artificially stored in lower, and referenced in upper).
+//            name = name.toLowerCase();
 
             // Truncation is necessary so cut down to "maxlength-HASH_LENGTH" and add HASH_LENGTH chars hashcode
             int tailIndex = length - TRUNCATE_HASH_LENGTH;
@@ -414,14 +419,18 @@ public abstract class AbstractNamingFactory implements NamingFactory
 
             // We have to scale down the hash anyway, so we can simply ignore the sign
             if (tailHash < 0)
+            {
                 tailHash *= -1;
+            }
 
             // Scale the hash code down to the range 0 ... (HASH_RANGE - 1)
             tailHash %= TRUNCATE_HASH_RANGE;
 
             String suffix = Integer.toString(tailHash, Character.MAX_RADIX);
             if (suffix.length() > TRUNCATE_HASH_LENGTH)
+            {
                 throw new IllegalStateException("Calculated hash \"" + suffix + "\" has more characters than defined by HASH_LENGTH (=" + TRUNCATE_HASH_LENGTH + ")! This should never happen!");
+            }
 
             // we add prefix "0", if it's necessary
             if (suffix.length() < TRUNCATE_HASH_LENGTH)
@@ -429,7 +438,9 @@ public abstract class AbstractNamingFactory implements NamingFactory
                 StringBuilder sb = new StringBuilder(TRUNCATE_HASH_LENGTH);
                 sb.append(suffix);
                 while (sb.length() < TRUNCATE_HASH_LENGTH)
+                {
                     sb.insert(0, '0');
+                }
 
                 suffix = sb.toString();
             }
