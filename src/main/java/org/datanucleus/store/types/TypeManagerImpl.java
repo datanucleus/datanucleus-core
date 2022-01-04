@@ -111,9 +111,8 @@ import org.datanucleus.util.StringUtils;
 /**
  * Implementation of registry of java type support.
  * Provides information applicable to all datastores for how a field of a class is treated; 
- * whether it is by default persistent, whether it is by default embedded, whether it is in the DFG, 
- * and if it has a wrapper for SCO operations. Also stores whether the type can be converted to/from
- * a String (for datastores that don't provide storage natively).
+ * whether it is by default persistent, whether it is by default embedded, whether it is in the DFG, and if it has a wrapper for SCO operations. 
+ * Also stores whether the type can be converted to/from a String (for datastores that don't provide storage natively).
  * Uses the plugin mechanism extension-point "org.datanucleus.java_type".
  */
 public class TypeManagerImpl implements TypeManager, Serializable
@@ -153,6 +152,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     {
         this.nucCtx = nucCtx;
         this.clr = nucCtx.getClassLoaderResolver(null);
+
         loadJavaTypes(nucCtx.getPluginManager());
 
         // Load converters since if a type is otherwise not persistable but a converter is found, then the type becomes persistable, hence needs enhancing
@@ -216,21 +216,21 @@ public class TypeManagerImpl implements TypeManager, Serializable
     public String[] filterOutSupportedSecondClassNames(String[] inputClassNames)
     {
         // Filter out any "simple" type classes
-        int filteredClasses = 0;
+        int numFilteredClasses = 0;
         for (int i = 0; i < inputClassNames.length; ++i)
         {
             if (isSupportedSecondClassType(inputClassNames[i]))
             {
                 inputClassNames[i] = null;
-                ++filteredClasses;
+                ++numFilteredClasses;
             }
         }
-        if (filteredClasses == 0)
+        if (numFilteredClasses == 0)
         {
             return inputClassNames;
         }
 
-        String[] restClasses = new String[inputClassNames.length - filteredClasses];
+        String[] restClasses = new String[inputClassNames.length - numFilteredClasses];
         int m = 0;
         for (int i = 0; i < inputClassNames.length; ++i)
         {
@@ -390,7 +390,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
      * @see org.datanucleus.store.types.TypeManager#getWrappedTypeBackedForType(java.lang.String)
      */
     @Override
-    public Class getWrappedTypeBackedForType(String className)
+    public Class<? extends SCO> getWrappedTypeBackedForType(String className)
     {
         if (className == null)
         {
@@ -594,7 +594,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
     }
 
     /**
-     * Convenience method to return the backed wrapper type for the field definition. Wrapper is null if no backed wrapper is defined for the type.
+     * Convenience method to return the backed wrapper type for the field definition. 
+     * Wrapper is null if no backed wrapper is defined for the type.
      * @param declaredType Declared type of the field
      * @param instantiatedType Instantiated type of the field
      * @param typeName Type name to try first
@@ -621,7 +622,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
     }
 
     /**
-     * Convenience method to return the simple wrapper type for the field definition. Wrapper is null if no simple wrapper is defined for the type.
+     * Convenience method to return the simple wrapper type for the field definition. 
+     * Wrapper is null if no simple wrapper is defined for the type.
      * @param declaredType Declared type of the field
      * @param instantiatedType Instantiated type of the field
      * @param typeName Type name to try first
@@ -869,8 +871,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
     }
 
     /**
-     * Convenience method to return the JavaType for the specified class. If this class has a defined
-     * JavaType then returns it. If not then tries to find a superclass that is castable to the specified type.
+     * Convenience method to return the JavaType for the specified class. 
+     * If this class has a defined JavaType then returns it.
+     * If not then tries to find a superclass that is castable to the specified type.
      * @param cls The class required
      * @return The JavaType
      */
@@ -880,18 +883,17 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             return null;
         }
-        JavaType type = javaTypes.get(cls.getName());
-        if (type != null)
+
+        JavaType typeForClass = javaTypes.get(cls.getName());
+        if (typeForClass != null)
         {
-            return type;
+            return typeForClass;
         }
 
         // Not supported so try to find one that is supported that this class derives from
-        Collection supportedTypes = new HashSet(javaTypes.values());
-        Iterator iter = supportedTypes.iterator();
-        while (iter.hasNext())
+        Collection<JavaType> supportedTypes = new HashSet(javaTypes.values());
+        for (JavaType type : supportedTypes)
         {
-            type = (JavaType)iter.next();
             if (type.cls == cls && type.genericType == null)
             {
                 return type;
@@ -936,9 +938,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
     }
 
     /**
-     * Convenience method to return the JavaType for the specified class. If this class has a defined
-     * JavaType then returns it. If not then tries to find a superclass that is castable to the specified
-     * type.
+     * Convenience method to return the JavaType for the specified class. 
+     * If this class has a defined JavaType then returns it. 
+     * If not then tries to find a superclass that is castable to the specified type.
      * @param cls The class required
      * @param genericType Any generic type specified for the element
      * @return The JavaType
@@ -1090,8 +1092,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(ArrayList.class, null, false, false, org.datanucleus.store.types.wrappers.ArrayList.class, 
             org.datanucleus.store.types.wrappers.backed.ArrayList.class, ArrayListHandler.class, null);
 
-        String arrayListInnerType = "java.util.Arrays$ArrayList";
-        Class arrayListInnerTypeCls = clr.classForName(arrayListInnerType);
+        Class arrayListInnerTypeCls = clr.classForName("java.util.Arrays$ArrayList");
         addJavaType(arrayListInnerTypeCls, null, false, false, org.datanucleus.store.types.wrappers.List.class, org.datanucleus.store.types.wrappers.backed.List.class,
             org.datanucleus.store.types.containers.ArrayListHandler.class, null);
 
@@ -1162,35 +1163,20 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(Enum[].class, null, true, false, null, null, ArrayHandler.class, null);
         addJavaType(Object[].class, null, true, false, null, null, ArrayHandler.class, null);
 
-        // Map of java type priorities, keyed by the class name
-        final Map<String, Integer> javaTypePriorities = new HashMap<>();
-        
-        // Add on any plugin mechanism types
+        // Add on any java types from the plugin mechanism
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.java_type", null, null);
-        if (elems != null)
+        if (elems != null && elems.length > 0)
         {
+            final Map<String, Integer> javaTypePriorities = new HashMap<>(); // java type priority, keyed by class name
             for (int i=0; i<elems.length; i++)
             {
-                String javaName = elems[i].getAttribute("name").trim();
-                String genericTypeName = elems[i].getAttribute("generic-type");
                 String embeddedString = elems[i].getAttribute("embedded");
-                String dfgString = elems[i].getAttribute("dfg");
-                String priorityString = elems[i].getAttribute("priority");
-                String wrapperType = elems[i].getAttribute("wrapper-type");
-                String wrapperTypeBacked = elems[i].getAttribute("wrapper-type-backed");
-                String typeConverterName = elems[i].getAttribute("converter-name");
-                String containerHandlerType = elems[i].getAttribute("container-handler");
+                boolean embedded = (embeddedString != null && embeddedString.equalsIgnoreCase("true"));
 
-                boolean embedded = false;
-                if (embeddedString != null && embeddedString.equalsIgnoreCase("true"))
-                {
-                    embedded = true;
-                }
-                boolean dfg = false;
-                if (dfgString != null && dfgString.equalsIgnoreCase("true"))
-                {
-                    dfg = true;
-                }
+                String dfgString = elems[i].getAttribute("dfg");
+                boolean dfg = (dfgString != null && dfgString.equalsIgnoreCase("true"));
+
+                String priorityString = elems[i].getAttribute("priority");
                 int priority = 0;
                 if (priorityString != null && !StringUtils.isWhitespace(priorityString))
                 {
@@ -1204,31 +1190,19 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         priority = 0;
                     }
                 }
-                if (!StringUtils.isWhitespace(wrapperType))
-                {
-                    wrapperType = wrapperType.trim();
-                }
-                else
-                {
-                    wrapperType = null;
-                }
-                if (!StringUtils.isWhitespace(wrapperTypeBacked))
-                {
-                    wrapperTypeBacked = wrapperTypeBacked.trim();
-                }
-                else
-                {
-                    wrapperTypeBacked = null;
-                }
-                if (!StringUtils.isWhitespace(containerHandlerType))
-                {
-                    containerHandlerType = containerHandlerType.trim();
-                }
-                else
-                {
-                    containerHandlerType = null;
-                }
 
+                String wrapperType = elems[i].getAttribute("wrapper-type");
+                wrapperType = StringUtils.isWhitespace(wrapperType) ? null : wrapperType.trim();
+
+                String wrapperTypeBacked = elems[i].getAttribute("wrapper-type-backed");
+                wrapperTypeBacked = StringUtils.isWhitespace(wrapperTypeBacked) ? null : wrapperTypeBacked.trim();
+
+                String containerHandlerType = elems[i].getAttribute("container-handler");
+                containerHandlerType = StringUtils.isWhitespace(containerHandlerType) ? null : containerHandlerType.trim();
+
+                String javaName = elems[i].getAttribute("name").trim();
+                String genericTypeName = elems[i].getAttribute("generic-type");
+                String typeConverterName = elems[i].getAttribute("converter-name");
                 try
                 {
                     Class cls = clr.classForName(javaName);
@@ -1240,10 +1214,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         javaTypeName += "<" + genericTypeName + ">";
                     }
 
-                    // Register entries for a java type based on the "priority" flag,
-                    // where higher priority is allowed to override lower priority. 
+                    // Register entries for a java type based on the "priority" flag, where higher priority is allowed to override lower priority. 
                     boolean doRegister = !javaTypes.containsKey(javaTypeName);
-                    if(!doRegister)
+                    if (!doRegister)
                     {
                         // check whether new priority wins over already registered priority
                         final int priorityToBeat = Optional.ofNullable(javaTypePriorities.get(javaTypeName)).orElse(0);
@@ -1252,14 +1225,14 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
                     if (doRegister)
                     {
-                        Class wrapperClass = loadClass(mgr, elems, i, wrapperType, "016005");
-                        Class wrapperClassBacked = loadClass(mgr, elems, i, wrapperTypeBacked, "016005");
-                        Class containerHandlerClass = loadClass(mgr, elems, i, containerHandlerType, "016009");
+                        Class wrapperClass = loadClass(mgr, elems[i], wrapperType, "016005");
+                        Class wrapperClassBacked = loadClass(mgr, elems[i], wrapperTypeBacked, "016005");
+                        Class containerHandlerClass = loadClass(mgr, elems[i], containerHandlerType, "016009");
 
                         String typeName = cls.getName();
                         if (genericType != null)
                         {
-                            // "Collection<String>"
+                            // e.g "Collection<String>"
                             typeName += "<" + genericType.getName() + ">";
                         }
                         javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperClass, wrapperClassBacked, containerHandlerClass, typeConverterName));
@@ -1294,22 +1267,22 @@ public class TypeManagerImpl implements TypeManager, Serializable
         String typeName = cls.getName();
         if (genericType != null)
         {
-            // "Collection<String>"
+            // e.g "Collection<String>"
             typeName += "<" + genericType.getName() + ">";
         }
         javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperType, wrapperTypeBacked, containerHandlerType, typeConverterName));
     }
 
-    private Class loadClass(PluginManager mgr, ConfigurationElement[] elems, int i, String className, String messageKey)
+    private Class loadClass(PluginManager mgr, ConfigurationElement elem, String className, String messageKey)
     {
         Class result = null;
         if (className != null)
         {
             try
             {
-                result = mgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), className);
+                result = mgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), className);
             }
-            catch (NucleusException jpe)
+            catch (NucleusException ne)
             {
                 // Impossible to load the class implementation from this plugin
                 NucleusLogger.PERSISTENCE.error(Localiser.msg(messageKey, className));
@@ -1449,7 +1422,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.zoneddatetime-string", new org.datanucleus.store.types.converters.ZonedDateTimeStringConverter(), ZonedDateTime.class, String.class, false, null);
         registerConverter("dn.zoneddatetime-timestamp", new org.datanucleus.store.types.converters.ZonedDateTimeTimestampConverter(), ZonedDateTime.class, java.sql.Timestamp.class, false, null);
 
-        // Add on any plugin mechanism types
+        // Add on any type converters from the plugin mechanism
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.type_converter", null, null);
         if (elems != null)
         {
