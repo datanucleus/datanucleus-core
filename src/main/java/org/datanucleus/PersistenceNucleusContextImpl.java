@@ -21,12 +21,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +43,6 @@ import org.datanucleus.cache.WeakLevel2Cache;
 import org.datanucleus.enhancer.ImplementationCreator;
 import org.datanucleus.enhancer.ImplementationCreatorImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
-import org.datanucleus.exceptions.DatastoreInitialisationException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreUniqueLongId;
@@ -68,13 +65,10 @@ import org.datanucleus.properties.CorePropertyValidator;
 import org.datanucleus.properties.StringPropertyValidator;
 import org.datanucleus.state.StateManagerFactory;
 import org.datanucleus.state.StateManagerFactoryImpl;
-import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StoreManagerHelper;
 import org.datanucleus.store.autostart.AutoStartMechanism;
-import org.datanucleus.store.autostart.ClassesAutoStarter;
-import org.datanucleus.store.autostart.MetaDataAutoStarter;
-import org.datanucleus.store.autostart.XMLAutoStarter;
+import org.datanucleus.store.autostart.AutoStartMechanismUtils;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.schema.CurrentUserProvider;
 import org.datanucleus.store.schema.MultiTenancyProvider;
@@ -478,7 +472,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         String autoStartMechanism = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
         if (autoStartMechanism != null && !autoStartMechanism.equals("None"))
         {
-            initialiseAutoStart(clr);
+            String mode = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MODE);
+            starter = AutoStartMechanismUtils.createAutoStartMechanism(this, clr, autoStartMechanism, mode);
         }
 
         // B). Schema Generation
@@ -598,222 +593,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         identityManager = null;
 
         super.close();
-    }
-
-    /**
-     * Method to initialise the auto-start mechanism, loading up the classes
-     * from its store into memory so that we start from what is required to be loaded.
-     * @param clr The ClassLoaderResolver
-     * @throws DatastoreInitialisationException if an error occurs
-     */
-    protected void initialiseAutoStart(ClassLoaderResolver clr)
-    throws DatastoreInitialisationException
-    {
-        String autoStartMechanism = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
-        String mode = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MODE);
-
-        if ("Classes".equalsIgnoreCase(autoStartMechanism))
-        {
-            starter = new ClassesAutoStarter(storeMgr, clr);
-        }
-        else if ("XML".equalsIgnoreCase(autoStartMechanism))
-        {
-            try
-            {
-                starter = new XMLAutoStarter(storeMgr, clr);
-            }
-            catch (MalformedURLException mue)
-            {
-                NucleusLogger.PERSISTENCE.warn("Unable to create XML AutoStarter due to ", mue);
-                starter = null;
-            }
-        }
-        else if ("MetaData".equalsIgnoreCase(autoStartMechanism))
-        {
-            starter = new MetaDataAutoStarter(storeMgr, clr);
-        }
-        else
-        {
-            // Fallback to the plugin mechanism
-            String autoStarterClassName = getPluginManager().getAttributeValueForExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name");
-            if (autoStarterClassName != null)
-            {
-                Class[] argsClass = new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.CLASS_LOADER_RESOLVER};
-                Object[] args = new Object[] {storeMgr, clr};
-                try
-                {
-                    starter = (AutoStartMechanism) getPluginManager().createExecutableExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name", argsClass, args);
-                }
-                catch (Exception e)
-                {
-                    NucleusLogger.PERSISTENCE.error(StringUtils.getStringFromStackTrace(e));
-                }
-            }
-        }
-        if (starter == null)
-        {
-            return;
-        }
-
-        if (mode.equalsIgnoreCase("None"))
-        {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.NONE);
-        }
-        else if (mode.equalsIgnoreCase("Checked"))
-        {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.CHECKED);
-        }
-        else if (mode.equalsIgnoreCase("Quiet"))
-        {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.QUIET);
-        }
-        else if (mode.equalsIgnoreCase("Ignored"))
-        {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.IGNORED);
-        }
-
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("034005", autoStartMechanism));
-        }
-        boolean illegalState = false;
-        try
-        {
-            if (!starter.isOpen())
-            {
-                starter.open();
-            }
-            Collection existingData = starter.getAllClassData();
-            if (existingData != null && !existingData.isEmpty())
-            {
-                List classesNeedingAdding = new ArrayList();
-                Iterator existingDataIter = existingData.iterator();
-                while (existingDataIter.hasNext())
-                {
-                    StoreData data = (StoreData) existingDataIter.next();
-                    if (data.isFCO())
-                    {
-                        // Catch classes that don't exist (e.g in use by a different app)
-                        Class classFound = null;
-                        try
-                        {
-                            classFound = clr.classForName(data.getName());
-                        }
-                        catch (ClassNotResolvedException cnre)
-                        {
-                            if (data.getInterfaceName() != null)
-                            {
-                                try
-                                {
-                                    getImplementationCreator().newInstance(clr.classForName(data.getInterfaceName()), clr);
-                                    classFound = clr.classForName(data.getName());
-                                }
-                                catch (ClassNotResolvedException cnre2)
-                                {
-                                    // Do nothing
-                                }
-                            }
-                            // Thrown if class not found
-                        }
-
-                        if (classFound != null)
-                        {
-                            NucleusLogger.PERSISTENCE.info(Localiser.msg("032003", data.getName()));
-                            classesNeedingAdding.add(data.getName());
-                            if (data.getMetaData() == null)
-                            {
-                                // StoreData doesnt have its metadata set yet so load it
-                                // This ensures that the MetaDataManager always knows about these classes
-                                AbstractClassMetaData acmd = getMetaDataManager().getMetaDataForClass(classFound, clr);
-                                if (acmd != null)
-                                {
-                                    data.setMetaData(acmd);
-                                }
-                                else
-                                {
-                                    String msg = Localiser.msg("034004", data.getName());
-                                    if (starter.getMode() == AutoStartMechanism.Mode.CHECKED)
-                                    {
-                                        NucleusLogger.PERSISTENCE.error(msg);
-                                        throw new DatastoreInitialisationException(msg);
-                                    }
-                                    else if (starter.getMode() == AutoStartMechanism.Mode.IGNORED)
-                                    {
-                                        NucleusLogger.PERSISTENCE.warn(msg);
-                                    }
-                                    else if (starter.getMode() == AutoStartMechanism.Mode.QUIET)
-                                    {
-                                        NucleusLogger.PERSISTENCE.warn(msg);
-                                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("034001", data.getName()));
-                                        starter.deleteClass(data.getName());
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            String msg = Localiser.msg("034000", data.getName());
-                            if (starter.getMode() == AutoStartMechanism.Mode.CHECKED)
-                            {
-                                NucleusLogger.PERSISTENCE.error(msg);
-                                throw new DatastoreInitialisationException(msg);
-                            }
-                            else if (starter.getMode() == AutoStartMechanism.Mode.IGNORED)
-                            {
-                                NucleusLogger.PERSISTENCE.warn(msg);
-                            }
-                            else if (starter.getMode() == AutoStartMechanism.Mode.QUIET)
-                            {
-                                NucleusLogger.PERSISTENCE.warn(msg);
-                                NucleusLogger.PERSISTENCE.warn(Localiser.msg("034001", data.getName()));
-                                starter.deleteClass(data.getName());
-                            }
-                        }
-                    }
-                }
-                String[] classesToLoad = new String[classesNeedingAdding.size()];
-                Iterator classesNeedingAddingIter = classesNeedingAdding.iterator();
-                int n = 0;
-                while (classesNeedingAddingIter.hasNext())
-                {
-                    classesToLoad[n++] = (String)classesNeedingAddingIter.next();
-                }
-
-                // Load the classes into the StoreManager
-                try
-                {
-                    storeMgr.manageClasses(clr, classesToLoad);
-                }
-                catch (Exception e)
-                {
-                    // Exception while adding so some of the (referenced) classes dont exist
-                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("034002", e));
-
-                    // if an exception happens while loading AutoStart data, them we disable it, since it was unable to load the data from AutoStart. The memory state of AutoStart does
-                    // not represent the database, and if we don't disable it, we could think that the autostart store is empty, and we would try to insert new entries in
-                    // the autostart store that are already in there
-                    illegalState = true;
-
-                    // TODO Go back and add classes one-by-one to eliminate the class(es) with the problem
-                }
-            }
-        }
-        finally
-        {
-            if (starter.isOpen())
-            {
-                starter.close();
-            }
-            if (illegalState)
-            {
-                NucleusLogger.PERSISTENCE.warn(Localiser.msg("034003"));
-                starter = null;
-            }
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("034006", autoStartMechanism));
-            }
-        }
     }
 
     protected void logConfigurationDetails()
