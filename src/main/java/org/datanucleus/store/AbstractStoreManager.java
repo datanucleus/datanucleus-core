@@ -810,7 +810,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             if (idmd == null)
             {
                 // native
-                String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
+                String strategy = getValueGenerationStrategyForNative(cmd);
                 if (strategy.equalsIgnoreCase(ValueGenerationStrategy.IDENTITY.toString()))
                 {
                     return true;
@@ -825,7 +825,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 }
                 else if (idStrategy == ValueGenerationStrategy.NATIVE)
                 {
-                    String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
+                    String strategy = getValueGenerationStrategyForNative(cmd);
                     if (strategy.equalsIgnoreCase(ValueGenerationStrategy.IDENTITY.toString()))
                     {
                         return true;
@@ -847,7 +847,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             else if (mmd.getValueStrategy() == ValueGenerationStrategy.NATIVE)
             {
-                String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
+                String strategy = getValueGenerationStrategyForNative(mmd);
                 if (strategy.equalsIgnoreCase(ValueGenerationStrategy.IDENTITY.toString()))
                 {
                     return true;
@@ -857,67 +857,60 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getStrategyValue(org.datanucleus.ClassLoaderResolver, org.datanucleus.metadata.AbstractClassMetaData, int)
-     */
-    public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
+    @Override
+    public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, AbstractMemberMetaData mmd)
     {
         // Get the ValueGenerator for this member
-        ValueGenerator generator = getValueGeneratorForMember(ec.getClassLoaderResolver(), cmd, absoluteFieldNumber);
+        ValueGenerator generator = getValueGeneratorForMember(ec.getClassLoaderResolver(), cmd, mmd);
 
         // Get the next value from the ValueGenerator
-        Object oid = getNextValueForValueGenerator(generator, ec);
+        Object value = getNextValueForValueGenerator(generator, ec);
 
         // Do any necessary conversion of the value to the precise member type
-        AbstractMemberMetaData mmd = null;
-        String fieldName = null;
-        ValueGenerationStrategy strategy = null;
-        if (absoluteFieldNumber >= 0)
-        {
-            // real field
-            mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
-            fieldName = mmd.getFullFieldName();
-            strategy = mmd.getValueStrategy();
-        }
-        else
-        {
-            // datastore-identity surrogate field
-            fieldName = cmd.getFullClassName() + " (datastore id)";
-            strategy = cmd.getDatastoreIdentityMetaData().getValueStrategy();
-        }
-
         if (mmd != null)
         {
-            // replace the value of the id, but before convert the value to the field type if needed
             try
             {
-                Object convertedValue = TypeConversionHelper.convertTo(oid, mmd.getType());
+                Object convertedValue = TypeConversionHelper.convertTo(value, mmd.getType());
                 if (convertedValue == null)
                 {
-                    throw new NucleusException(Localiser.msg("040013", mmd.getFullFieldName(), oid)).setFatal();
+                    throw new NucleusException(Localiser.msg("040013", mmd.getFullFieldName(), value)).setFatal();
                 }
-                oid = convertedValue;
+                value = convertedValue;
             }
             catch (NumberFormatException nfe)
             {
-                throw new NucleusUserException("Value strategy created value="+oid+" type="+oid.getClass().getName() +
-                        " but field is of type "+mmd.getTypeName() + ". Use a different strategy or change the type of the field " + mmd.getFullFieldName());
+                throw new NucleusUserException("Value strategy created value="+value+" type="+value.getClass().getName() +
+                        " but field is of type " + mmd.getTypeName() + ". Use a different strategy or change the type of the field " + mmd.getFullFieldName());
             }
         }
 
         if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
         {
-            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040012", fieldName, strategy, generator.getClass().getName(), oid));
+            String fieldName = null;
+            ValueGenerationStrategy strategy = null;
+            if (mmd != null)
+            {
+                // real field
+                fieldName = mmd.getFullFieldName();
+                strategy = mmd.getValueStrategy();
+            }
+            else
+            {
+                // datastore-identity surrogate field
+                fieldName = cmd.getFullClassName() + " (datastore id)";
+                strategy = cmd.getDatastoreIdentityMetaData().getValueStrategy();
+            }
+            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040012", fieldName, strategy, generator.getClass().getName(), value));
         }
 
-        return oid;
+        return value;
     }
 
-    protected synchronized ValueGenerator getValueGeneratorForMember(ClassLoaderResolver clr, AbstractClassMetaData cmd, int absoluteFieldNumber)
+    protected synchronized ValueGenerator getValueGeneratorForMember(ClassLoaderResolver clr, AbstractClassMetaData cmd, AbstractMemberMetaData mmd)
     {
-        String memberKey = valueGenerationMgr.getMemberKey(cmd, absoluteFieldNumber);
-
         // Check if we have a ValueGenerator already created for this member
+        String memberKey = (mmd != null) ? valueGenerationMgr.getMemberKey(mmd) : valueGenerationMgr.getMemberKey(cmd);
         ValueGenerator generator = valueGenerationMgr.getValueGeneratorForMemberKey(memberKey);
         if (generator != null)
         {
@@ -926,41 +919,37 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // No ValueGenerator registered for this memberKey, so need to determine which to use and create it as required.
-        String fieldName = null;
+        String memberName = null; // Used for logging
         ValueGenerationStrategy strategy = null;
         String sequence = null;
         String valueGeneratorName = null;
-        if (absoluteFieldNumber >= 0)
+        if (mmd != null)
         {
             // real field
-            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
-            fieldName = mmd.getFullFieldName();
+            memberName = mmd.getFullFieldName();
             strategy = mmd.getValueStrategy();
+            if (strategy.equals(ValueGenerationStrategy.NATIVE))
+            {
+                strategy = ValueGenerationStrategy.getIdentityStrategy(getValueGenerationStrategyForNative(mmd));
+            }
             sequence = mmd.getSequence();
             valueGeneratorName = mmd.getValueGeneratorName();
         }
         else
         {
             // datastore-identity surrogate field
-            fieldName = cmd.getFullClassName() + " (datastore id)";
+            memberName = cmd.getFullClassName() + " (datastore id)";
             strategy = cmd.getDatastoreIdentityMetaData().getValueStrategy();
+            if (strategy.equals(ValueGenerationStrategy.NATIVE))
+            {
+                strategy = ValueGenerationStrategy.getIdentityStrategy(getValueGenerationStrategyForNative(cmd));
+            }
             sequence = cmd.getDatastoreIdentityMetaData().getSequence();
             valueGeneratorName = cmd.getDatastoreIdentityMetaData().getValueGeneratorName();
         }
 
-        String strategyName = strategy.toString();
-        if (strategy.equals(ValueGenerationStrategy.CUSTOM))
-        {
-            // Using a "custom" generator
-            strategyName = strategy.getCustomName();
-        }
-        else if (strategy.equals(ValueGenerationStrategy.NATIVE))
-        {
-            strategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
-            strategy = ValueGenerationStrategy.getIdentityStrategy(strategyName);
-        }
-
-        // Check for this strategy being a "unique" ValueGenerator, and created if not yet present
+        // Check for the strategyName being a known "unique" ValueGenerator, and register it if not yet done
+        String strategyName = strategy.equals(ValueGenerationStrategy.CUSTOM) ? strategy.getCustomName() : strategy.toString();
         generator = valueGenerationMgr.getUniqueValueGeneratorByName(strategyName);
         if (generator != null)
         {
@@ -986,7 +975,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 tableGeneratorMetaData = getMetaDataManager().getMetaDataForTableGenerator(clr, valueGeneratorName);
                 if (tableGeneratorMetaData == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("040014", fieldName, valueGeneratorName));
+                    throw new NucleusUserException(Localiser.msg("040014", memberName, valueGeneratorName));
                 }
             }
             else if (strategy == ValueGenerationStrategy.SEQUENCE)
@@ -994,7 +983,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 sequenceMetaData = getMetaDataManager().getMetaDataForSequence(clr, valueGeneratorName);
                 if (sequenceMetaData == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("040015", fieldName, valueGeneratorName));
+                    throw new NucleusUserException(Localiser.msg("040015", memberName, valueGeneratorName));
                 }
             }
         }
@@ -1005,58 +994,29 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             if (sequenceMetaData == null)
             {
                 // No <sequence> defining the datastore sequence name, so fallback to this name directly in the datastore
-                NucleusLogger.VALUEGENERATION.info("Member " + fieldName + " has been specified to use sequence '" + sequence +
+                NucleusLogger.VALUEGENERATION.info("Member " + memberName + " has been specified to use sequence '" + sequence +
                         "' but there is no <sequence> specified in the MetaData. Falling back to use a sequence in the datastore with this name directly.");
             }
         }
-        Properties props = getPropertiesForValueGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
+
+        Properties props = getPropertiesForValueGenerator(cmd, mmd != null ? mmd.getAbsoluteFieldNumber() : -1, clr, sequenceMetaData, tableGeneratorMetaData);
+
         return valueGenerationMgr.createAndRegisterValueGenerator(memberKey, strategyName, props);
     }
 
     /**
-     * Method defining which value-strategy to use when the user specifies "native". This will return as follows
+     * Method defining which value-strategy to use when the user specifies "native" on datastore-identity. 
+     * This will return as follows
      * <ul>
-     * <li>If your field is Numeric-based (or datastore-id with numeric or no jdbc-type) then chooses the
-     * first one that is supported of "identity", "sequence", "increment", otherwise exception.</li>
+     * <li>If your field is Numeric-based (or no jdbc-type) then chooses the first one that is supported of "identity", "sequence", "increment", otherwise exception.</li>
      * <li>Otherwise your field is String-based then chooses "uuid-hex".</li>
      * </ul>
      * If your store plugin requires something else then override this
      * @param cmd Class requiring the strategy
-     * @param absFieldNumber Field of the class
      * @return The strategy used when "native" is specified
      */
-    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd)
     {
-        if (absFieldNumber >= 0)
-        {
-            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absFieldNumber);
-            Class type = mmd.getType();
-            if (String.class.isAssignableFrom(type))
-            {
-                return ValueGenerationStrategy.UUIDHEX.toString(); // TODO Do we really want this when we have "uuid"?
-            }
-            else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class || type== BigInteger.class)
-            {
-                if (supportsValueGenerationStrategy(ValueGenerationStrategy.IDENTITY.toString()))
-                {
-                    return ValueGenerationStrategy.IDENTITY.toString();
-                }
-                else if (supportsValueGenerationStrategy(ValueGenerationStrategy.SEQUENCE.toString()) && mmd.getSequence() != null)
-                {
-                    return ValueGenerationStrategy.SEQUENCE.toString();
-                }
-                else if (supportsValueGenerationStrategy(ValueGenerationStrategy.INCREMENT.toString()))
-                {
-                    return ValueGenerationStrategy.INCREMENT.toString();
-                }
-                throw new NucleusUserException("This datastore provider doesn't support numeric native strategy for member " + mmd.getFullFieldName());
-            }
-            else
-            {
-                throw new NucleusUserException("This datastore provider doesn't support native strategy for field of type " + type.getName());
-            }
-        }
-
         DatastoreIdentityMetaData idmd = cmd.getBaseDatastoreIdentityMetaData();
         if (idmd != null && idmd.getColumnMetaData() != null)
         {
@@ -1080,6 +1040,44 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             return ValueGenerationStrategy.INCREMENT.toString();
         }
         throw new NucleusUserException("This datastore provider doesn't support numeric native strategy for class " + cmd.getFullClassName());
+    }
+
+    /**
+     * Method defining which value-strategy to use when the user specifies "native" on a member. 
+     * This will return as follows
+     * <ul>
+     * <li>If your field is Numeric-based then chooses the first one that is supported of "identity", "sequence", "increment", otherwise exception.</li>
+     * <li>Otherwise your field is String-based then chooses "uuid-hex".</li>
+     * </ul>
+     * If your store plugin requires something else then override this
+     * @param mmd Member requiring the strategy
+     * @return The strategy used when "native" is specified
+     */
+    public String getValueGenerationStrategyForNative(AbstractMemberMetaData mmd)
+    {
+        Class type = mmd.getType();
+        if (String.class.isAssignableFrom(type))
+        {
+            return ValueGenerationStrategy.UUIDHEX.toString(); // TODO Do we really want this when we have "uuid"?
+        }
+        else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class || type== BigInteger.class)
+        {
+            if (supportsValueGenerationStrategy(ValueGenerationStrategy.IDENTITY.toString()))
+            {
+                return ValueGenerationStrategy.IDENTITY.toString();
+            }
+            else if (supportsValueGenerationStrategy(ValueGenerationStrategy.SEQUENCE.toString()) && mmd.getSequence() != null)
+            {
+                return ValueGenerationStrategy.SEQUENCE.toString();
+            }
+            else if (supportsValueGenerationStrategy(ValueGenerationStrategy.INCREMENT.toString()))
+            {
+                return ValueGenerationStrategy.INCREMENT.toString();
+            }
+            throw new NucleusUserException("This datastore provider doesn't support numeric native strategy for member " + mmd.getFullFieldName());
+        }
+
+        throw new NucleusUserException("This datastore provider doesn't support native strategy for field of type " + type.getName());
     }
 
     /**
@@ -1139,6 +1137,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         // Set up the default properties available for all value generators
         Properties properties = new Properties();
+        properties.setProperty(ValueGenerator.PROPERTY_CLASS_NAME, cmd.getFullClassName());
+        properties.put(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
+
         AbstractMemberMetaData mmd = null;
         ValueGenerationStrategy strategy = null;
         String sequence = null;
@@ -1148,8 +1149,22 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             // real field
             mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
             strategy = mmd.getValueStrategy();
+            if (strategy.equals(ValueGenerationStrategy.NATIVE))
+            {
+                strategy = ValueGenerationStrategy.getIdentityStrategy(getValueGenerationStrategyForNative(mmd));
+            }
+
             sequence = mmd.getSequence();
+            if (sequence != null)
+            {
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
+            }
             extensions = mmd.getExtensions();
+            if (extensions != null)
+            {
+                properties.putAll(extensions);
+            }
+            properties.setProperty(ValueGenerator.PROPERTY_FIELD_NAME, mmd.getFullFieldName());
         }
         else
         {
@@ -1157,104 +1172,94 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             // always use the root IdentityMetaData since the root class defines the identity
             DatastoreIdentityMetaData idmd = cmd.getBaseDatastoreIdentityMetaData();
             strategy = idmd.getValueStrategy();
+            if (strategy.equals(ValueGenerationStrategy.NATIVE))
+            {
+                strategy = ValueGenerationStrategy.getIdentityStrategy(getValueGenerationStrategyForNative(cmd));
+            }
+
             sequence = idmd.getSequence();
+            if (sequence != null)
+            {
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
+            }
             extensions = idmd.getExtensions();
+            if (extensions != null)
+            {
+                properties.putAll(extensions);
+            }
         }
 
-        properties.setProperty(ValueGenerator.PROPERTY_CLASS_NAME, cmd.getFullClassName());
-        properties.put(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
-        if (mmd != null)
+        if (strategy == ValueGenerationStrategy.INCREMENT)
         {
-            properties.setProperty(ValueGenerator.PROPERTY_FIELD_NAME, mmd.getFullFieldName());
-        }
-        if (sequence != null)
-        {
-            properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
-        }
+            if (tablegenmd != null)
+            {
+                // User has specified a TableGenerator (JPA)
+                properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
+                properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
 
-        // Add any extension properties
-        if (extensions != null)
-        {
-            properties.putAll(extensions);
-        }
-
-        if (strategy.equals(ValueGenerationStrategy.NATIVE))
-        {
-            String realStrategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
-            strategy = ValueGenerationStrategy.getIdentityStrategy(realStrategyName);
-        }
-
-        if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd != null)
-        {
-            // User has specified a TableGenerator (JPA)
-            properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
-            properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
-
-            if (tablegenmd.getTableName() != null)
-            {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
-            }
-            if (tablegenmd.getCatalogName() != null)
-            {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
-            }
-            if (tablegenmd.getSchemaName() != null)
-            {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
-            }
-            if (tablegenmd.getPKColumnName() != null)
-            {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
-            }
-            if (tablegenmd.getPKColumnName() != null)
-            {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
-            }
-
-            if (tablegenmd.getPKColumnValue() != null)
-            {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
-            }
-        }
-        else if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd == null)
-        {
-            if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
-            {
-                // Use default allocation size
-                properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
-            }
-        }
-        else if (strategy == ValueGenerationStrategy.SEQUENCE && seqmd != null)
-        {
-            // User has specified a SequenceGenerator (JDO/JPA)
-            if (seqmd.getDatastoreSequence() != null)
-            {
-                if (seqmd.getInitialValue() >= 0)
+                if (tablegenmd.getTableName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
                 }
-                if (seqmd.getAllocationSize() > 0)
+                if (tablegenmd.getCatalogName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
                 }
-                else
+                if (tablegenmd.getSchemaName() != null)
                 {
-                    // Use default allocation size
-                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE));
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
                 }
-                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
-
-                // Add on any extensions specified on the sequence
-                Map<String, String> seqExtensions = seqmd.getExtensions();
-                if (seqExtensions != null)
+                if (tablegenmd.getPKColumnName() != null)
                 {
-                    properties.putAll(seqExtensions);
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
+                }
+                if (tablegenmd.getValueColumnName() != null)
+                {
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
+                }
+                if (tablegenmd.getPKColumnValue() != null)
+                {
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
                 }
             }
             else
             {
-                // JDO Factory-based sequence generation
-                // TODO Support this
+                if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
+                {
+                    // Use default allocation size
+                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
+                }
+            }
+        }
+        else if (strategy == ValueGenerationStrategy.SEQUENCE)
+        {
+            if (seqmd != null)
+            {
+                // User has specified a SequenceGenerator (JDO/JPA)
+                if (seqmd.getDatastoreSequence() != null)
+                {
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
+                    if (seqmd.getInitialValue() >= 0)
+                    {
+                        properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
+                    }
+                    if (seqmd.getAllocationSize() > 0)
+                    {
+                        properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
+                    }
+                    else
+                    {
+                        // Use default allocation size
+                        properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE));
+                    }
+
+                    // Add on any extensions specified on the sequence
+                    Map<String, String> seqExtensions = seqmd.getExtensions();
+                    if (seqExtensions != null)
+                    {
+                        properties.putAll(seqExtensions);
+                    }
+                }
             }
         }
         return properties;

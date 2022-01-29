@@ -295,21 +295,27 @@ public interface StoreManager
     boolean isValueGenerationStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber);
 
     /**
-     * Method to retrieve the value for a value generation strategy for a particular field.
+     * Method to retrieve the value for a value generation strategy for a particular field or datastore-identity.
      * @param ec execution context
      * @param cmd AbstractClassMetaData for the class
-     * @param absoluteFieldNumber The field number
+     * @param mmd MetaData for the member when this is for a member (or null for datastore-identity)
      * @return The generated value
      */
-    Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber);
+    Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, AbstractMemberMetaData mmd);
 
     /**
-     * Method defining which value-strategy to use when the user specifies "native"/"auto".
+     * Method defining which value-strategy to use when the user specifies "native"/"auto" on datastore-identity.
      * @param cmd Class requiring the strategy
-     * @param absFieldNumber Field of the class
      * @return The value generation strategy used when "native"/"auto" is specified
      */
-    String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber);
+    String getValueGenerationStrategyForNative(AbstractClassMetaData cmd);
+
+    /**
+     * Method defining which value-strategy to use when the user specifies "native"/"auto" on a member
+     * @param mmd Member requiring the strategy
+     * @return The value generation strategy used when "native"/"auto" is specified
+     */
+    String getValueGenerationStrategyForNative(AbstractMemberMetaData mmd);
 
     /**
      * Accessor for the API adapter.

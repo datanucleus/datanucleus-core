@@ -20,6 +20,7 @@ package org.datanucleus.store.valuegenerator;
 import java.util.Properties;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.AbstractMemberMetaData;
 
 /**
  * Manager for the creation of ValueGenerators.
@@ -65,12 +66,18 @@ public interface ValueGenerationManager
     ValueGenerator getUniqueValueGeneratorByName(String name);
 
     /**
-     * Simple way of generating a member "key" for use in lookups.
-     * @param cmd Metadata for the class
-     * @param fieldNumber The field number (absolute). -1 if datastore-id surrogate member.
+     * Simple way of generating a member "key" for use in lookups for datastore-identity.
+     * @param cmd Metadata for the class using datastore-identity
      * @return The member "key" to use
      */
-    String getMemberKey(AbstractClassMetaData cmd, int fieldNumber);
+    String getMemberKey(AbstractClassMetaData cmd);
+
+    /**
+     * Simple way of generating a member "key" for use in lookups.
+     * @param mmd Metadata for the member
+     * @return The member "key" to use
+     */
+    String getMemberKey(AbstractMemberMetaData mmd);
 
     /**
      * Method to create and register a generator of the specified strategy, for the specified memberKey.

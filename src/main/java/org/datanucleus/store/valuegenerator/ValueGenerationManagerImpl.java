@@ -153,18 +153,15 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
         return uniqueGeneratorsByName.get(name);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.valuegenerator.ValueGenerationManager#getMemberKey(org.datanucleus.metadata.AbstractClassMetaData, int)
-     */
     @Override
-    public String getMemberKey(AbstractClassMetaData cmd, int fieldNumber)
+    public String getMemberKey(AbstractClassMetaData cmd)
     {
-        if (fieldNumber < 0)
-        {
-            return cmd.getFullClassName() + " (datastore id)";
-        }
+        return cmd.getFullClassName() + " (datastore id)";
+    }
 
-        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+    @Override
+    public String getMemberKey(AbstractMemberMetaData mmd)
+    {
         return mmd.getFullFieldName();
     }
 

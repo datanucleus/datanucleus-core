@@ -3928,7 +3928,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Populate any strategy value for the "datastore-identity" element
-            return nucCtx.getIdentityManager().getDatastoreId(cmd.getFullClassName(), getStoreManager().getValueGenerationStrategyValue(this, cmd, -1));
+            return nucCtx.getIdentityManager().getDatastoreId(cmd.getFullClassName(), getStoreManager().getValueGenerationStrategyValue(this, cmd, null));
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {

@@ -751,7 +751,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 if (applyStrategy)
                 {
                     // Apply a strategy value for this field
-                    Object obj = getStoreManager().getValueGenerationStrategyValue(myEC, cmd, fieldNumber);
+                    Object obj = getStoreManager().getValueGenerationStrategyValue(myEC, cmd, mmd);
                     this.replaceField(fieldNumber, obj);
                 }
             }
@@ -3523,11 +3523,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             int[] pkMemberNumbers = cmd.getPKMemberPositions();
             for (int i=0;i<pkMemberNumbers.length;i++)
             {
-                int fieldNumber = pkMemberNumbers[i];
-                AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                int pkMemberNumber = pkMemberNumbers[i];
+                AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberNumber);
                 if (fmd.isPrimaryKey())
                 {
-                    if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, fieldNumber))
+                    if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumber))
                     {
                         idSetInDatastore = true;
                         break;
@@ -3538,7 +3538,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                         // Only 1 PK field and after preStore callback, so check that it is set
                         try
                         {
-                            if (this.provideField(fieldNumber) == null)
+                            if (this.provideField(pkMemberNumber) == null)
                             {
                                 // Cannot have sole PK field as null
                                 throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), fmd.getName())).setFatal();
@@ -3595,14 +3595,15 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             {
                 myID = null;
 
-                int fieldCount = cmd.getMemberCount();
-                for (int fieldNumber = 0; fieldNumber < fieldCount; fieldNumber++)
+                int[] pkMemberNumbers = cmd.getPKMemberPositions();
+                for (int i=0;i<pkMemberNumbers.length;i++)
                 {
-                    AbstractMemberMetaData fmd=cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                    if (fmd.isPrimaryKey() && getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, fieldNumber))
+                    int pkMemberNumber = pkMemberNumbers[i];
+                    AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberNumber);
+                    if (pkMmd.isPrimaryKey() && getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumber))
                     {
                         //replace the value of the id, but before convert the value to the field type if needed
-                        replaceField(myPC, fieldNumber, TypeConversionHelper.convertTo(id, fmd.getType()), false);
+                        replaceField(myPC, pkMemberNumber, TypeConversionHelper.convertTo(id, pkMmd.getType()), false);
                     }
                 }
             }
@@ -3668,10 +3669,10 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS &&
                     myLC.stateType() == LifeCycleState.P_NEW)
                 {
-                    int[] pkFieldNumbers = cmd.getPKMemberPositions();
-                    for (int i = 0; i < pkFieldNumbers.length; i++)
+                    int[] pkMemberNumbers = cmd.getPKMemberPositions();
+                    for (int i = 0; i < pkMemberNumbers.length; i++)
                     {
-                        if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkFieldNumbers[i]))
+                        if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumbers[i]))
                         {
                             flush();
                             break;

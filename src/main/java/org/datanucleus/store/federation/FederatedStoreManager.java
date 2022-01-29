@@ -387,23 +387,28 @@ public class FederatedStoreManager implements StoreManager
         return primaryStoreMgr.getQueryCacheKey();
     }
 
-    public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
+    @Override
+    public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, AbstractMemberMetaData mmd)
     {
-        return getStoreManagerForClass(cmd).getValueGenerationStrategyValue(ec, cmd, absoluteFieldNumber);
+        return getStoreManagerForClass(cmd).getValueGenerationStrategyValue(ec, cmd, mmd);
     }
 
+    @Override
     public boolean isValueGenerationStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber)
     {
         return getStoreManagerForClass(cmd).isValueGenerationStrategyDatastoreAttributed(cmd, absFieldNumber);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getValueGenerationStrategyForNative(org.datanucleus.metadata.AbstractClassMetaData, int)
-     */
     @Override
-    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd)
     {
-        return primaryStoreMgr.getValueGenerationStrategyForNative(cmd, absFieldNumber);
+        return primaryStoreMgr.getValueGenerationStrategyForNative(cmd);
+    }
+
+    @Override
+    public String getValueGenerationStrategyForNative(AbstractMemberMetaData mmd)
+    {
+        return primaryStoreMgr.getValueGenerationStrategyForNative(mmd);
     }
 
     public Collection<String> getSubClassesForClass(String className, boolean includeDescendents, ClassLoaderResolver clr)
