@@ -1194,40 +1194,41 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             if (tablegenmd != null)
             {
                 // User has specified a TableGenerator (JPA)
-                properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
-                properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
+                properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
+                properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
 
                 if (tablegenmd.getTableName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
                 }
                 if (tablegenmd.getCatalogName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
                 }
                 if (tablegenmd.getSchemaName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
                 }
                 if (tablegenmd.getPKColumnName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
                 }
                 if (tablegenmd.getValueColumnName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
                 }
                 if (tablegenmd.getPKColumnValue() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
                 }
             }
             else
             {
+                // Set some defaults
                 if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
                 {
                     // Use default allocation size
-                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
                 }
             }
         }
@@ -1236,30 +1237,50 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             if (seqmd != null)
             {
                 // User has specified a SequenceGenerator (JDO/JPA)
+                if (seqmd.getSchemaName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, seqmd.getSchemaName());
+                }
+                if (seqmd.getCatalogName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, seqmd.getCatalogName());
+                }
                 if (seqmd.getDatastoreSequence() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
-                    if (seqmd.getInitialValue() >= 0)
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
+                }
+                else
+                {
+                    // Add fallback of the sequence name
+                    if (seqmd.getName() != null)
                     {
-                        properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
-                    }
-                    if (seqmd.getAllocationSize() > 0)
-                    {
-                        properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
-                    }
-                    else
-                    {
-                        // Use default allocation size
-                        properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE));
-                    }
-
-                    // Add on any extensions specified on the sequence
-                    Map<String, String> seqExtensions = seqmd.getExtensions();
-                    if (seqExtensions != null)
-                    {
-                        properties.putAll(seqExtensions);
+                        properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqmd.getName());
                     }
                 }
+                if (seqmd.getInitialValue() >= 0)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
+                }
+                if (seqmd.getAllocationSize() > 0)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
+                }
+                else
+                {
+                    // Use default allocation size
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE));
+                }
+
+                // Add on any extensions specified on the sequence
+                Map<String, String> seqExtensions = seqmd.getExtensions();
+                if (seqExtensions != null)
+                {
+                    properties.putAll(seqExtensions);
+                }
+            }
+            else
+            {
+                // Set some defaults
             }
         }
         return properties;
