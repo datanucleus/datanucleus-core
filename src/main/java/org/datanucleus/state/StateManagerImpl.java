@@ -3524,31 +3524,29 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             for (int i=0;i<pkMemberNumbers.length;i++)
             {
                 int pkMemberNumber = pkMemberNumbers[i];
-                AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberNumber);
-                if (fmd.isPrimaryKey())
-                {
-                    if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumber))
-                    {
-                        idSetInDatastore = true;
-                        break;
-                    }
+                AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberNumber);
 
-                    if (pkMemberNumbers.length == 1 && afterPreStore)
+                if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumber))
+                {
+                    idSetInDatastore = true;
+                    break;
+                }
+
+                if (pkMemberNumbers.length == 1 && afterPreStore)
+                {
+                    // Only 1 PK field and after preStore callback, so check that it is set
+                    try
                     {
-                        // Only 1 PK field and after preStore callback, so check that it is set
-                        try
+                        if (this.provideField(pkMemberNumber) == null)
                         {
-                            if (this.provideField(pkMemberNumber) == null)
-                            {
-                                // Cannot have sole PK field as null
-                                throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), fmd.getName())).setFatal();
-                            }
+                            // Cannot have sole PK field as null
+                            throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), pkMmd.getName())).setFatal();
                         }
-                        catch (Exception e)
-                        {
-                            // StateManager maybe not yet connected to the object
-                            return;
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // StateManager maybe not yet connected to the object
+                        return;
                     }
                 }
             }
@@ -3658,13 +3656,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            // Note that we always create a new application identity since it is mutable and we can't allow
-            // the user to change it. The only drawback of this is that we *must* have the relevant fields
-            // set when this method is called, so that the identity can be generated.
+            // Note that we always create a new application identity since it is mutable and we can't allow the user to change it. 
+            // The only drawback of this is that we *must* have the relevant fields set when this method is called, so that the identity can be generated.
             if (!isFlushing())
             {
-                // Flush any datastore changes so that we have all necessary fields populated
-                // only if the datastore generates the field numbers
+                // Flush any datastore changes so that we have all necessary fields populated only if the datastore generates the field numbers
                 if (!isFlushedNew() &&
                     activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS &&
                     myLC.stateType() == LifeCycleState.P_NEW)

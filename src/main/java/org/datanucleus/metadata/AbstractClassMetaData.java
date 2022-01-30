@@ -1245,6 +1245,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     if (storeMgr.isValueGenerationStrategyDatastoreAttributed(this, pkMemberPositions[i]))
                     {
                         pkIsDatastoreAttributed = true;
+                        break;
                     }
                 }
             }
