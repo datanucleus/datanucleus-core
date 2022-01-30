@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -612,7 +613,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         String[] filteredClassNames = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames);
 
         // Find the ClassMetaData for these classes and all referenced by these classes
-        for (AbstractClassMetaData cmd : getMetaDataManager().getReferencedClasses(filteredClassNames, clr))
+        List<AbstractClassMetaData> refClasses = getMetaDataManager().getReferencedClasses(filteredClassNames, clr);
+        for (AbstractClassMetaData cmd : refClasses)
         {
             if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
@@ -1089,7 +1091,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     protected Object getNextValueForValueGenerator(ValueGenerator generator, final ExecutionContext ec)
     {
-        Object oid = null;
+        Object value = null;
         synchronized (generator)
         {
             // Get the next value for this generator for this ExecutionContext
@@ -1115,9 +1117,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 ((AbstractConnectedGenerator)generator).setConnectionProvider(connProvider);
             }
 
-            oid = generator.next();
+            value = generator.next();
         }
-        return oid;
+        return value;
     }
 
     /**
