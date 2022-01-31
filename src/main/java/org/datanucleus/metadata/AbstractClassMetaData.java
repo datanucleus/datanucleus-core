@@ -200,6 +200,14 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Flags of the default-fetch-group state for all fields/properties. */
     protected boolean[] dfgMemberFlags;
 
+    /** Positions of fields/properties that require value-generation to be assigned (non-null strategy). */
+    protected int[] valueGenerationMemberPositions;
+
+    protected int createTimestampMemberPosition;
+    protected int updateTimestampMemberPosition;
+    protected int createUserMemberPosition;
+    protected int updateUserMemberPosition;
+
     /** Positions of the SCO mutable fields/properties (inc superclasses). */
     protected int[] scoMutableMemberPositions;
 
@@ -1438,9 +1446,10 @@ public abstract class AbstractClassMetaData extends MetaData
         scoMutableMemberFlags = new boolean[memberCount];
         nonPkMemberFlags = new boolean[memberCount];
 
-        int pkFieldCount=0;
-        int dfgFieldCount=0;
-        int scmFieldCount=0;
+        int pkFieldCount = 0;
+        int dfgFieldCount = 0;
+        int scmFieldCount = 0;
+        int valueGenFieldCount = 0;
         for (int i=0;i<memberCount;i++)
         {
             AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePositionInternal(i);
@@ -1461,6 +1470,28 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 scoMutableMemberFlags[i] = true;
                 scmFieldCount++;
+            }
+            if (mmd.getValueStrategy() != null)
+            {
+                valueGenFieldCount++;
+            }
+
+            // Note : Single member only per class
+            if (mmd.isCreateTimestamp())
+            {
+                createTimestampMemberPosition = i;
+            }
+            if (mmd.isUpdateTimestamp())
+            {
+                updateTimestampMemberPosition = i;
+            }
+            if (mmd.isCreateUser())
+            {
+                createUserMemberPosition = i;
+            }
+            if (mmd.isUpdateUser())
+            {
+                updateUserMemberPosition = i;
             }
         }
  
@@ -1513,6 +1544,19 @@ public abstract class AbstractClassMetaData extends MetaData
             if (scoMutableMemberFlags[i])
             {
                 scoMutableMemberPositions[scmNum++] = i;
+            }
+        }
+
+        if (valueGenFieldCount > 0)
+        {
+            valueGenerationMemberPositions = new int[valueGenFieldCount];
+            for (int i=0,valGenNum=0;i<memberCount;i++)
+            {
+                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePositionInternal(i);
+                if (mmd.getValueStrategy() != null)
+                {
+                    valueGenerationMemberPositions[valGenNum++] = i;
+                }
             }
         }
     }
@@ -2401,6 +2445,33 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         checkInitialised();
         return nonPkMemberFlags;
+    }
+
+    /**
+     * Accessor for the member positions which require value generation processing (non-null strategy).
+     * @return The member positions that will have a value generated.
+     */
+    public int[] getValueGenerationMemberPositions()
+    {
+        return valueGenerationMemberPositions;
+    }
+
+    public int getCreateTimestampMemberPosition()
+    {
+        return createTimestampMemberPosition;
+    }
+    public int getUpdateTimestampMemberPosition()
+    {
+        return updateTimestampMemberPosition;
+    }
+
+    public int getCreateUserMemberPosition()
+    {
+        return createUserMemberPosition;
+    }
+    public int getUpdateUserMemberPosition()
+    {
+        return updateUserMemberPosition;
     }
 
     /**

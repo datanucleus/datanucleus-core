@@ -70,7 +70,6 @@ import org.datanucleus.identity.IdentityReference;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
@@ -494,7 +493,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         saveFields();
 
         // Populate all fields that have "value-strategy" and are not datastore populated
-        populateValueGenerationFields();
+        populateValueGenerationMembers();
 
         if (preInsertChanges != null)
         {
@@ -609,7 +608,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         myPC.dnReplaceFlags();
 
         // Populate all fields that have "value-strategy" and are not datastore populated
-        populateValueGenerationFields();
+        populateValueGenerationMembers();
 
         // Set the identity
         setIdentity(false);
@@ -719,40 +718,42 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     }
 
     /**
-     * Convenience method to populate all fields in the PC object that need their value generating (according to metadata) and that aren't datastore-attributed. 
-     * This applies not just to PK fields (main use-case) but also to any other field (DN extension). 
-     * Fields can be populated only if they are null dependent on metadata. 
+     * Convenience method to populate all members in the PC object that need their value generating (according to metadata) and that aren't datastore-attributed. 
+     * This applies not just to PK members (main use-case) but also to any other member (DN extension). 
+     * Members can be populated only if they are null, dependent on metadata. 
      * This method is called once on a PC object, when makePersistent is called.
      */
-    private void populateValueGenerationFields()
+    private void populateValueGenerationMembers()
     {
-        int totalFieldCount = cmd.getNoOfInheritedManagedMembers() + cmd.getNoOfManagedMembers();
-
-        for (int fieldNumber=0; fieldNumber<totalFieldCount; fieldNumber++)
+        int[] valueGenMemberPositions = cmd.getValueGenerationMemberPositions();
+        if (valueGenMemberPositions != null)
         {
-            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            ValueGenerationStrategy strategy = mmd.getValueStrategy();
-
-            // Check for the strategy, and if it is a datastore attributed strategy
-            if (strategy != null && !getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, fieldNumber))
+            for (int i=0;i<valueGenMemberPositions.length;i++)
             {
-                // Assign the strategy value where required.
-                // Default JDO/JPA behaviour is to always provide a strategy value when it is marked as using a strategy
-                boolean applyStrategy = true;
-                if (!mmd.getType().isPrimitive() &&
-                    mmd.hasExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL) &&
-                    mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL).equalsIgnoreCase("false") &&
-                    this.provideField(fieldNumber) != null)
-                {
-                    // extension to only provide a value-strategy value where the field is null at persistence.
-                    applyStrategy = false;
-                }
+                int memberPos = valueGenMemberPositions[i];
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberPos);
 
-                if (applyStrategy)
+                // Check for the strategy (not really required now TODO Remove check), and if it is a datastore attributed strategy
+                if (mmd.getValueStrategy() != null && !getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, memberPos))
                 {
-                    // Apply a strategy value for this field
-                    Object obj = getStoreManager().getValueGenerationStrategyValue(myEC, cmd, mmd);
-                    this.replaceField(fieldNumber, obj);
+                    // Assign the strategy value where required.
+                    // Default JDO/JPA behaviour is to always provide a strategy value when it is marked as using a strategy
+                    boolean applyStrategy = true;
+                    if (!mmd.getType().isPrimitive() &&
+                        mmd.hasExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL) &&
+                        mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL).equalsIgnoreCase("false") &&
+                        this.provideField(memberPos) != null)
+                    {
+                        // extension to only provide a value-strategy value where the field is null at persistence.
+                        applyStrategy = false;
+                    }
+
+                    if (applyStrategy)
+                    {
+                        // Apply a strategy value for this field
+                        Object obj = getStoreManager().getValueGenerationStrategyValue(myEC, cmd, mmd);
+                        this.replaceField(memberPos, obj);
+                    }
                 }
             }
         }
