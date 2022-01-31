@@ -203,10 +203,10 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Positions of fields/properties that require value-generation to be assigned (non-null strategy). */
     protected int[] valueGenerationMemberPositions;
 
-    protected int createTimestampMemberPosition;
-    protected int updateTimestampMemberPosition;
-    protected int createUserMemberPosition;
-    protected int updateUserMemberPosition;
+    protected int createTimestampMemberPosition = -1;
+    protected int updateTimestampMemberPosition = -1;
+    protected int createUserMemberPosition = -1;
+    protected int updateUserMemberPosition = -1;
 
     /** Positions of the SCO mutable fields/properties (inc superclasses). */
     protected int[] scoMutableMemberPositions;
