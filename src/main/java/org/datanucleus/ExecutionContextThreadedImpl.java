@@ -55,7 +55,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
      * Accessor for the context lock object. 
      * @return The lock object
      */
-    public Lock getLock()
+    public final Lock getLock()
     {
         if (lock == null)
         {
