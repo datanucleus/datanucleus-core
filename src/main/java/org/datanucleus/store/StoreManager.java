@@ -171,11 +171,31 @@ public interface StoreManager
 
     FlushProcess getFlushProcess();
 
-    NamingFactory getNamingFactory();
-
     QueryManager getQueryManager();
 
+    NamingFactory getNamingFactory();
+
     StoreSchemaHandler getSchemaHandler();
+
+    /**
+     * Method to return the default "catalog" name for this datastore, if it supports the concept.
+     * With most RDBMS, when we just issue an INSERT statement it will be created in the default catalog/schema for the connection.
+     * @return Default catalog name
+     */
+    default String getDefaultCatalogName()
+    {
+        return null;
+    }
+
+    /**
+     * Method to return the default "schema" name for this datastore, if it supports the concept.
+     * With most RDBMS, when we just issue an INSERT statement it will be created in the default catalog/schema for the connection.
+     * @return Default schema name
+     */
+    default String getDefaultSchemaName()
+    {
+        return null;
+    }
 
     StoreData getStoreDataForClass(String className);
 
