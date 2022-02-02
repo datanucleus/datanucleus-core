@@ -56,7 +56,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
      * Accessor for the context lock object. 
      * @return The lock object
      */
-    public final Lock getLock()
+    protected final Lock getLock()
     {
         if (lock == null)
         {
@@ -65,11 +65,14 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         return lock;
     }
 
-    public void lock()
+    @Override
+    public void threadLock()
     {
         getLock().lock();
     }
-    public void unlock()
+
+    @Override
+    public void threadUnlock()
     {
         getLock().unlock();
     }

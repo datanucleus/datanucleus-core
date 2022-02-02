@@ -37,8 +37,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.BitSet;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.DetachState;
@@ -206,9 +204,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /** indicators for which fields are currently loaded in the persistable instance. */
     protected boolean[] loadedFields;
 
-    /** Lock object to synchronise execution when reading/writing fields. */
-    protected Lock lock = null;
-
     /** state for transitions of activities. */
     protected ActivityState activity;
 
@@ -270,7 +265,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         loadedFields = new boolean[fieldCount];
         dirty = false;
         myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
-        lock = new ReentrantLock();
         savedPersistenceFlags = 0;
         savedLoadedFields = null;
         objectType = 0;
@@ -515,8 +509,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     {
                         if (myEC.getMultithreaded())
                         {
-                            myEC.getLock().lock();
-                            lock.lock();
+                            myEC.threadLock();
                         }
 
                         FieldManager prevFM = currFM;
@@ -545,8 +538,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     {
                         if (myEC.getMultithreaded())
                         {
-                            lock.unlock();
-                            myEC.getLock().unlock();
+                            myEC.threadUnlock();
                         }
                     }
                 }
@@ -1020,8 +1012,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                myEC.getLock().lock();
-                lock.lock();
+                myEC.threadLock();
             }
 
             preStateChange();
@@ -1038,8 +1029,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                lock.unlock();
-                myEC.getLock().unlock();
+                myEC.threadUnlock();
             }
         }
     }
@@ -1053,8 +1043,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                myEC.getLock().lock();
-                lock.lock();
+                myEC.threadLock();
             }
 
             preStateChange();
@@ -1071,8 +1060,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                lock.unlock();
-                myEC.getLock().unlock();
+                myEC.threadUnlock();
             }
         }
     }
@@ -2451,8 +2439,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                myEC.getLock().lock();
-                lock.lock();
+                myEC.threadLock();
             }
 
             FieldManager prevFM = currFM;
@@ -2471,8 +2458,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                lock.unlock();
-                myEC.getLock().unlock();
+                myEC.threadUnlock();
             }
         }
 
@@ -2490,8 +2476,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                myEC.getLock().lock();
-                lock.lock();
+                myEC.threadLock();
             }
 
             FieldManager prevFM = currFM;
@@ -2510,8 +2495,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                lock.unlock();
-                myEC.getLock().unlock();
+                myEC.threadUnlock();
             }
         }
     }
@@ -3205,8 +3189,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                myEC.getLock().lock();
-                lock.lock();
+                myEC.threadLock();
             }
 
             // Update the field in our PC object
@@ -3227,8 +3210,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                lock.unlock();
-                myEC.getLock().unlock();
+                myEC.threadUnlock();
             }
         }
     }
@@ -4252,8 +4234,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                myEC.getLock().lock();
-                lock.lock();
+                myEC.threadLock();
             }
 
             FieldManager prevFM = currFM;
@@ -4304,8 +4285,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                lock.unlock();
-                myEC.getLock().unlock();
+                myEC.threadUnlock();
             }
         }
     }
@@ -4332,8 +4312,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                myEC.getLock().lock();
-                lock.lock();
+                myEC.threadLock();
             }
 
             FieldManager prevFM = currFM;
@@ -4362,8 +4341,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (myEC.getMultithreaded())
             {
-                lock.unlock();
-                myEC.getLock().unlock();
+                myEC.threadUnlock();
             }
         }
     }

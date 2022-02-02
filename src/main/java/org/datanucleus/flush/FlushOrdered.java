@@ -53,7 +53,7 @@ public class FlushOrdered implements FlushProcess
         {
             if (ec.getMultithreaded()) // Why lock here? should be on overall flush
             {
-                ec.getLock().lock();
+                ec.threadLock();
             }
 
             if (primaryOPs != null)
@@ -71,7 +71,7 @@ public class FlushOrdered implements FlushProcess
         {
             if (ec.getMultithreaded())
             {
-                ec.getLock().unlock();
+                ec.threadUnlock();
             }
         }
 

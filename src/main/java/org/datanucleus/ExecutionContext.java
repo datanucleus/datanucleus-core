@@ -20,7 +20,6 @@ package org.datanucleus;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.Level1Cache;
@@ -865,13 +864,19 @@ public interface ExecutionContext extends ExecutionContextReference
     String getCurrentUser();
 
     /**
-     * Accessor for the lock object for this ExecutionContext.
-     * @return The lock object
+     * Method to lock this ExecutionContext for threading
      */
-    default Lock getLock()
+    default void threadLock()
     {
-        // No locking with default ExecutionContext (single-threaded).
-        return null;
+        return;
+    }
+
+    /**
+     * Method to unlock this ExecutionContext for threading
+     */
+    default void threadUnlock()
+    {
+        return;
     }
 
     /**
