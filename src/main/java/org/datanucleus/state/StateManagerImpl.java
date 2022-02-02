@@ -2001,35 +2001,19 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         myEC.addStateManagerToCache(this);
     }
 
-    /**
-     * Method to set an associated value stored with this object.
-     * This is for a situation such as in ORM where this object can have an "external" foreign-key
-     * provided by an owning object (e.g 1-N uni relation and this is the element with no knowledge
-     * of the owner, so the associated value is the FK value).
-     * @param key Key for the value
-     * @param value The associated value
-     */
+    @Override
     public void setAssociatedValue(Object key, Object value)
     {
         myEC.setStateManagerAssociatedValue(this, key, value);
     }
 
-    /**
-     * Accessor for an associated value stored with this object.
-     * This is for a situation such as in ORM where this object can have an "external" foreign-key
-     * provided by an owning object (e.g 1-N uni relation and this is the element with no knowledge
-     * of the owner, so the associated value is the FK value).
-     * @param key Key for the value
-     * @return The associated value
-     */
+    @Override
     public Object getAssociatedValue(Object key)
     {
         return myEC.getStateManagerAssociatedValue(this, key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.state.DNStateManager#removeAssociatedValue(java.lang.Object)
-     */
+    @Override
     public void removeAssociatedValue(Object key)
     {
         myEC.removeStateManagerAssociatedValue(this, key);
