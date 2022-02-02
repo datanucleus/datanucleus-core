@@ -3643,16 +3643,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     }
                 }
             }
-
-            // All id classes are assumed to be immutable
-            return myID;
-/*            if (cmd.usesSingleFieldIdentityClass())
-            {
-                // SingleFieldIdentity classes are immutable. Note, they could be changed using reflection but prohibited by JDO spec
-                return myID;
-            }
-            // TODO Do we really need to create a new "id" when we have one already?
-            return myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);*/
         }
 
         return myID;

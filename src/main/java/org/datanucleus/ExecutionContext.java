@@ -130,7 +130,7 @@ public interface ExecutionContext extends ExecutionContextReference
     ClassLoaderResolver getClassLoaderResolver();
 
     /**
-     * Accessor for the lock manager for this execution context.
+     * Accessor for the lock manager for objects in this execution context.
      * @return The lock manager
      */
     LockManager getLockManager();
