@@ -1569,7 +1569,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void evictObjects(Class cls, boolean subclasses)
     {
-        if (cache != null)
+        if (cache != null && !cache.isEmpty())
         {
             Set<DNStateManager> smsToEvict = new HashSet<>(cache.values());
             for (DNStateManager sm : smsToEvict)
@@ -2546,21 +2546,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (api.isDetached(pc))
         {
             // Detached, so migrate to attached
-            if (cache != null)
+            DNStateManager l1CachedSM = (cache != null) ? cache.get(id) : null;
+            if (l1CachedSM != null && l1CachedSM.getObject() != pc)
             {
-                DNStateManager l1CachedSM = cache.get(id);
-                if (l1CachedSM != null && l1CachedSM.getObject() != pc)
-                {
-                    // attached object with the same id already present in the L1 cache so cannot attach in-situ
-                    throw new NucleusUserException(Localiser.msg("010017", IdentityUtils.getPersistableIdentityForId(id)));
-                }
+                // attached object with the same id already present in the L1 cache so cannot attach in-situ
+                throw new NucleusUserException(Localiser.msg("010017", IdentityUtils.getPersistableIdentityForId(id)));
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("010016", IdentityUtils.getPersistableIdentityForId(id)));
             }
-
             nucCtx.getStateManagerFactory().newForDetached(this, pc, id, api.getVersionForObject(pc)).attach(sco);
         }
         else
@@ -3166,7 +3162,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // Check whether this is cached against the unique key
         CacheUniqueKey uniKey = new CacheUniqueKey(cls.getName(), memberNames, memberValues);
-        DNStateManager sm = cache.getUnique(uniKey);
+        DNStateManager sm = (cache != null) ? cache.getUnique(uniKey) : null;
         if (sm == null && l2CacheEnabled)
         {
             if (NucleusLogger.CACHE.isDebugEnabled())
