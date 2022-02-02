@@ -42,6 +42,8 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     /** Lock object for use during commit/rollback/evict, to prevent any further field accesses. */
     protected Lock lock;
 
+    int lockCounter = 0;
+
     /**
      * @param ctx NucleusContext
      * @param owner Owner object (PM, EM)
@@ -66,15 +68,23 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     }
 
     @Override
-    public void threadLock()
+    public synchronized void threadLock()
     {
-        getLock().lock();
+        if (lockCounter == 0)
+        {
+            getLock().lock();
+        }
+        lockCounter++;
     }
 
     @Override
-    public void threadUnlock()
+    public synchronized void threadUnlock()
     {
-        getLock().unlock();
+        lockCounter--;
+        if (lockCounter == 0)
+        {
+            getLock().unlock();
+        }
     }
 
     /**
