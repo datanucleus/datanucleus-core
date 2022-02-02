@@ -216,10 +216,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private Map<DNStateManager, List<EmbeddedOwnerRelation>> smEmbeddedInfoByEmbedded = null;
 
     /**
-     * Map of associated values for StateManager. This can contain anything really and is down to the StoreManager to define. 
+     * Map of associated values per StateManager. This can contain anything really and is down to the StoreManager to define. 
      * For example RDBMS datastores typically put external FK info in here keyed by the mapping of the field to which it pertains.
      */
-    protected Map<DNStateManager, Map<?,?>> opAssociatedValuesMapBySM = null;
+    protected Map<DNStateManager, Map<?,?>> stateManagerAssociatedValuesMap = null;
 
     /** Handler for "managed relations" at flush/commit. */
     private ManagedRelationsHandler managedRelationsHandler = null;
@@ -558,10 +558,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             smEmbeddedInfoByEmbedded.clear();
             smEmbeddedInfoByEmbedded = null;
         }
-        if (opAssociatedValuesMapBySM != null)
+        if (stateManagerAssociatedValuesMap != null)
         {
-            opAssociatedValuesMapBySM.clear();
-            opAssociatedValuesMapBySM = null;
+            stateManagerAssociatedValuesMap.clear();
+            stateManagerAssociatedValuesMap = null;
         }
 
         l2CacheObjectsToEvictUponRollback = null;
@@ -1302,9 +1302,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 smEmbeddedInfoByOwner.remove(sm);
             }
         }
-        if (opAssociatedValuesMapBySM != null)
+        if (stateManagerAssociatedValuesMap != null)
         {
-            opAssociatedValuesMapBySM.remove(sm);
+            stateManagerAssociatedValuesMap.remove(sm);
         }
         setAttachDetachReferencedObject(sm, null);
     }
@@ -5858,23 +5858,23 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void setStateManagerAssociatedValue(DNStateManager sm, Object key, Object value)
     {
-        Map opMap = null;
-        if (opAssociatedValuesMapBySM == null)
+        Map valueMap = null;
+        if (stateManagerAssociatedValuesMap == null)
         {
-            opAssociatedValuesMapBySM = new HashMap<>();
-            opMap = new HashMap();
-            opAssociatedValuesMapBySM.put(sm, opMap);
+            stateManagerAssociatedValuesMap = new HashMap<>();
+            valueMap = new HashMap();
+            stateManagerAssociatedValuesMap.put(sm, valueMap);
         }
         else
         {
-            opMap = opAssociatedValuesMapBySM.get(sm);
-            if (opMap == null)
+            valueMap = stateManagerAssociatedValuesMap.get(sm);
+            if (valueMap == null)
             {
-                opMap = new HashMap();
-                opAssociatedValuesMapBySM.put(sm, opMap);
+                valueMap = new HashMap();
+                stateManagerAssociatedValuesMap.put(sm, valueMap);
             }
         }
-        opMap.put(key, value);
+        valueMap.put(key, value);
     }
 
     /* (non-Javadoc)
@@ -5882,12 +5882,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public Object getStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
-        if (opAssociatedValuesMapBySM == null)
+        if (stateManagerAssociatedValuesMap == null)
         {
             return null;
         }
-        Map opMap = opAssociatedValuesMapBySM.get(sm);
-        return opMap == null ? null : opMap.get(key);
+        Map valueMap = stateManagerAssociatedValuesMap.get(sm);
+        return valueMap == null ? null : valueMap.get(key);
     }
 
     /* (non-Javadoc)
@@ -5895,12 +5895,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void removeStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
-        if (opAssociatedValuesMapBySM != null)
+        if (stateManagerAssociatedValuesMap != null)
         {
-            Map opMap = opAssociatedValuesMapBySM.get(sm);
-            if (opMap != null)
+            Map valueMap = stateManagerAssociatedValuesMap.get(sm);
+            if (valueMap != null)
             {
-                opMap.remove(key);
+                valueMap.remove(key);
             }
         }
     }
@@ -5910,9 +5910,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public boolean containsStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
-        if (opAssociatedValuesMapBySM != null && opAssociatedValuesMapBySM.containsKey(sm))
+        if (stateManagerAssociatedValuesMap != null && stateManagerAssociatedValuesMap.containsKey(sm))
         {
-            return opAssociatedValuesMapBySM.get(sm).containsKey(key);
+            return stateManagerAssociatedValuesMap.get(sm).containsKey(key);
         }
         return false;
     }
