@@ -39,7 +39,7 @@ import org.datanucleus.store.Extent;
 public class ExecutionContextThreadedImpl extends ExecutionContextImpl
 {
     /** Lock object for use during commit/rollback/evict, to prevent any further field accesses. */
-    protected Lock lock;
+    private Lock lock;
 
     /**
      * @param ctx NucleusContext
@@ -49,15 +49,18 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     public ExecutionContextThreadedImpl(PersistenceNucleusContext ctx, Object owner, Map<String, Object> options)
     {
         super(ctx, owner, options);
-        this.lock = new ReentrantLock();
     }
 
     /**
      * Accessor for the context lock object. 
      * @return The lock object
      */
-    public Lock getLock()
+    public final Lock getLock()
     {
+        if (lock == null)
+        {
+            lock = new ReentrantLock();
+        }
         return lock;
     }
 
@@ -74,13 +77,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.processNontransactionalUpdate();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -88,13 +91,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.enlistInTransaction(sm);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -102,13 +105,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.evictFromTransaction(sm);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -116,13 +119,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.addObjectProviderToCache(op);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -130,13 +133,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.removeObjectProviderFromCache(op);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -144,13 +147,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             return super.findObjectProvider(pc);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -158,13 +161,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.close();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -172,13 +175,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.evictObject(obj);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -186,13 +189,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.refreshObject(obj);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -200,13 +203,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.retrieveObject(obj, fgOnly);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -214,13 +217,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             return super.persistObject(obj, merging);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -228,13 +231,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             return super.persistObjects(objs);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -242,13 +245,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.deleteObject(obj);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -256,13 +259,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.deleteObjects(objs);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -270,13 +273,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.makeObjectTransient(obj, state);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -284,13 +287,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.makeObjectTransactional(obj);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -298,13 +301,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.attachObject(ownerOP, pc, sco);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -312,13 +315,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             return super.attachObjectCopy(ownerOP, pc, sco);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -326,13 +329,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.detachObject(state, obj);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -340,13 +343,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.detachObjects(state, objs);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -354,13 +357,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             return super.detachObjectCopy(state, pc);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -368,13 +371,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.clearDirty(op);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -382,13 +385,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.clearDirty();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -401,13 +404,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
 
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.evictAllObjects();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -415,13 +418,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.markDirty(op, directUpdate);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -429,13 +432,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.flush();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -443,13 +446,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.flushInternal(flushToDatastore);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -457,13 +460,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.replaceObjectId(pc, oldID, newID);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -471,13 +474,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             return super.getExtent(pcClass, subclasses);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -485,13 +488,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.evictObjects(cls, subclasses);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -499,13 +502,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.refreshAllObjects();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -513,13 +516,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             return super.getObjectsToBeFlushed();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -527,13 +530,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.postBegin();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -541,13 +544,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.preCommit();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -555,13 +558,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.postCommit();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -569,13 +572,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.preRollback();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -583,13 +586,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     {
         try
         {
-            lock.lock();
+            getLock().lock();
 
             super.postRollback();
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 }
