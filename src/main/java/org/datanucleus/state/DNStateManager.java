@@ -20,6 +20,7 @@ package org.datanucleus.state;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.enhancement.StateManager;
@@ -164,6 +165,12 @@ public interface DNStateManager<T> extends StateManager
     ExecutionContext getExecutionContext();
 
     StoreManager getStoreManager();
+
+    /**
+     * Accessor for the FetchPlan for this class.
+     * @return The FetchPlanForClass to be used on all fetches
+     */
+    FetchPlanForClass getFetchPlanForClass();
 
     /**
      * Accessor for the persistable object being managed.

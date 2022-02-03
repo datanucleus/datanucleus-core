@@ -751,28 +751,34 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
     }
 
+    @Override
     public AbstractClassMetaData getClassMetaData()
     {
         return cmd;
     }
 
+    @Override
     public ExecutionContext getExecutionContext()
     {
         return myEC;
     }
 
-    /**
-     * Accessor for the ExecutionContextReference for the StateManager implementation.
-     * @return The ExecutionContextReference that owns this instance
-     */
+    @Override
     public ExecutionContextReference getExecutionContextReference()
     {
         return myEC;
     }
 
+    @Override
     public StoreManager getStoreManager()
     {
         return myEC.getNucleusContext().isFederated() ? ((FederatedStoreManager)myEC.getStoreManager()).getStoreManagerForClass(cmd) : myEC.getStoreManager();
+    }
+
+    @Override
+    public FetchPlanForClass getFetchPlanForClass()
+    {
+        return myFP;
     }
 
     public LifeCycleState getLifecycleState()
