@@ -40,11 +40,11 @@ import org.datanucleus.transaction.Transaction;
  */
 public interface DNStateManager<T> extends StateManager
 {
-    /**
-     * Key prefix under which the original value of a field is stored in the entity (nondurable objects).
-     * This value is set if a field is updated using a setter.
-     */
+    /** Key prefix under which the original value of a field is stored in the entity (NonDurable objects). Set if a member is updated using a setter. */
     public static final String ORIGINAL_FIELD_VALUE_KEY_PREFIX = "FIELD_VALUE.ORIGINAL.";
+
+    /** Key prefix under which we store member (identity) value when just retrieving a FK. Member number is then appended to this prefix. */
+    public static final String MEMBER_VALUE_STORED_PREFIX = "MEMBER_VALUE.STORED.";
 
     /** PC **/
     public static short PC = 0;

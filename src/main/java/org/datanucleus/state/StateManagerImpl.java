@@ -4061,8 +4061,18 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 }
                 else if (!beingDeleted && myFP.hasMember(fieldNumber))
                 {
-                    // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
-                    loadUnloadedFieldsInFetchPlan();
+                    Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+                    if (memberValue != null)
+                    {
+                        // Instantiate object using the stored "id" value
+                        Object member = myEC.findObject(memberValue, false);
+                        replaceField(myPC, fieldNumber, member);
+                    }
+                    else
+                    {
+                        // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
+                        loadUnloadedFieldsInFetchPlan();
+                    }
                 }
                 else
                 {
