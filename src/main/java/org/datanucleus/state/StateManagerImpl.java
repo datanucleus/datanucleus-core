@@ -4061,12 +4061,16 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 }
                 else if (!beingDeleted && myFP.hasMember(fieldNumber))
                 {
-                    Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-                    if (memberValue != null)
+                    if (containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber))
                     {
-                        // Instantiate object using the stored "id" value
-                        Object member = myEC.findObject(memberValue, false);
-                        replaceField(myPC, fieldNumber, member);
+                        // Instantiate object using the stored "id" value, and remove associated value
+                        Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+                        if (memberValue != null)
+                        {
+                            Object member = myEC.findObject(memberValue, false);
+                            replaceField(myPC, fieldNumber, member);
+                        }
+                        removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
                     }
                     else
                     {

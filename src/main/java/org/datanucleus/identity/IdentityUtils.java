@@ -362,6 +362,11 @@ public class IdentityUtils
                 pkFieldValues[i] = resultsFM.fetchObjectField(pkFieldNums[i]);
             }
         }
+        if (pkFieldValues[0] == null)
+        {
+            // Null identity, so represents null
+            return null;
+        }
 
         Class idClass = ec.getClassLoaderResolver().classForName(cmd.getObjectidClass());
         if (cmd.usesSingleFieldIdentityClass())
