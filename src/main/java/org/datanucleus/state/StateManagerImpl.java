@@ -4080,8 +4080,22 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 }
                 else
                 {
-                    // Just load this field
-                    loadSpecifiedFields(new int[] {fieldNumber});
+                    if (containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber))
+                    {
+                        // Instantiate object using the stored "id" value, and remove associated value
+                        Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+                        if (memberValue != null)
+                        {
+                            Object member = myEC.findObject(memberValue, false);
+                            replaceField(myPC, fieldNumber, member);
+                        }
+                        removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+                    }
+                    else
+                    {
+                        // Just load this field
+                        loadSpecifiedFields(new int[] {fieldNumber});
+                    }
                 }
             }
 
