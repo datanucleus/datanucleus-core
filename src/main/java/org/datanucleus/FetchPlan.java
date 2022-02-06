@@ -88,8 +88,8 @@ public class FetchPlan implements Serializable
     /** Options to be used during detachment. Spec 12.7 says that the default is DETACH_LOAD_FIELDS. */
     int detachmentOptions = FetchPlan.DETACH_LOAD_FIELDS;
 
-    /** Managed class keyed by ClassMetaData **/
-    final transient Map<String, FetchPlanForClass> managedClass = new HashMap<>();
+    /** FetchPlanForClass keyed by the class name. **/
+    final transient Map<String, FetchPlanForClass> fetchPlansByClassName = new HashMap<>();
 
     /** Maximum depth to fetch from the root object. */
     int maxFetchDepth = 1;
@@ -135,7 +135,7 @@ public class FetchPlan implements Serializable
      */
     private void markDirty()
     {
-        Iterator<FetchPlanForClass> it = managedClass.values().iterator();
+        Iterator<FetchPlanForClass> it = fetchPlansByClassName.values().iterator();
         while (it.hasNext())
         {
             it.next().markDirty();
@@ -149,11 +149,11 @@ public class FetchPlan implements Serializable
      */
     public synchronized FetchPlanForClass getFetchPlanForClass(AbstractClassMetaData cmd)
     {
-        FetchPlanForClass fpClass = managedClass.get(cmd.getFullClassName());
+        FetchPlanForClass fpClass = fetchPlansByClassName.get(cmd.getFullClassName());
         if (fpClass == null)
         {
             fpClass = new FetchPlanForClass(cmd, this);
-            managedClass.put(cmd.getFullClassName(), fpClass);
+            fetchPlansByClassName.put(cmd.getFullClassName(), fpClass);
         }
         return fpClass;
     }
@@ -378,11 +378,9 @@ public class FetchPlan implements Serializable
      */
     public void notifyFetchGroupChange(FetchGroup group)
     {
-        Collection fpClasses = managedClass.values();
-        Iterator iter = fpClasses.iterator();
-        while (iter.hasNext())
+        Collection<FetchPlanForClass> fpClasses = fetchPlansByClassName.values();
+        for (FetchPlanForClass fpClass : fpClasses)
         {
-            FetchPlanForClass fpClass = (FetchPlanForClass)iter.next();
             Class cls = clr.classForName(fpClass.cmd.getFullClassName());
             if (cls.isAssignableFrom(group.getType()) || group.getType().isAssignableFrom(cls))
             {
@@ -575,12 +573,12 @@ public class FetchPlan implements Serializable
             fp.dynamicGroups = new HashSet<>(dynamicGroups);
         }
 
-        for (Iterator<Map.Entry<String, FetchPlanForClass>> it = this.managedClass.entrySet().iterator(); it.hasNext();)
+        for (Iterator<Map.Entry<String, FetchPlanForClass>> it = this.fetchPlansByClassName.entrySet().iterator(); it.hasNext();)
         {
             Map.Entry<String, FetchPlanForClass> entry = it.next();
             String className = entry.getKey();
             FetchPlanForClass fpcls = entry.getValue();
-            fp.managedClass.put(className, fpcls.getCopy(fp));
+            fp.fetchPlansByClassName.put(className, fpcls.getCopy(fp));
         }
         fp.fetchSize = this.fetchSize;
         return fp;
@@ -637,7 +635,7 @@ public class FetchPlan implements Serializable
 
     public String toStringWithClasses()
     {
-        return "FetchPlan " + groups.toString() + " classes=" + StringUtils.collectionToString(Collections.unmodifiableCollection(managedClass.values()));
+        return "FetchPlan " + groups.toString() + " classes=" + StringUtils.collectionToString(Collections.unmodifiableCollection(fetchPlansByClassName.values()));
     }
 
     public String toString()

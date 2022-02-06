@@ -51,9 +51,10 @@ public class FetchPlanForClass
     /** Whether the record is dirty and needs the fields recalculating. */
     boolean dirty = true;
 
+    Map<Integer, Integer> recursionDepthByMemberNumber = new HashMap<>();
+
     /** 
-     * Cache of fetch groups by member number, as calculating them in getFetchGroupsForMemberNumber() 
-     * is O(n^2) Map<Integer, Set<FetchGroupMetaData>>
+     * Cache of fetch groups by member number, as calculating them in getFetchGroupsForMemberNumber() is O(n^2) Map<Integer, Set<FetchGroupMetaData>>
      */
     private Map<Integer, Set<FetchGroupMetaData>> fetchGroupsByMemberNumber = null;
 
@@ -98,6 +99,11 @@ public class FetchPlanForClass
         plan.invalidateCachedIsToCallPostLoadFetchPlan(cmd);
     }
 
+    /**
+     * Returns a copy of this object with all settings initialised.
+     * Used when a Query has to have its own FetchPlan, so takes a copy of that of the ExecutionContext.
+     * @return the FetchPlanForClass copy
+     */
     FetchPlanForClass getCopy(FetchPlan fp)
     {
         FetchPlanForClass fpCopy = new FetchPlanForClass(cmd, fp);
@@ -120,16 +126,27 @@ public class FetchPlanForClass
      */
     public int getRecursionDepthForMember(int memberNum)
     {
+        if (dirty)
+        {
+            recursionDepthByMemberNumber.clear();
+        }
+
+        Integer recursionDepth = recursionDepthByMemberNumber.get(memberNum);
+        if (recursionDepth != null)
+        {
+            return recursionDepth;
+        }
+
         AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
 
         // Find fallback recursion depth for this member using its class' metadata definition
-        Integer recursionDepth = mmd.getRecursionDepth();
+        recursionDepth = mmd.getRecursionDepth();
         if (recursionDepth == null)
         {
             recursionDepth = 1;
         }
 
-        // What should we do with recursionDepth if the same member is specified in multiple fetch groups? e.g 1 in groupA, and 2 in groupB
+        // TODO What should we do with recursionDepth if the same member is specified in multiple fetch groups? e.g 1 in groupA, and 2 in groupB
         Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (FetchGroupMetaData fgmd : fetchGroupsContainingField)
         {
@@ -146,6 +163,9 @@ public class FetchPlanForClass
                 }
             }
         }
+
+        recursionDepthByMemberNumber.put(memberNum, recursionDepth);
+
         return recursionDepth;
     }
 
