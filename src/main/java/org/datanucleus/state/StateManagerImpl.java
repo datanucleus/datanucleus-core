@@ -4061,18 +4061,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 }
                 else if (!beingDeleted && myFP.hasMember(fieldNumber))
                 {
-                    if (containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber))
-                    {
-                        // Instantiate object using the stored "id" value, and remove associated value
-                        Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-                        if (memberValue != null)
-                        {
-                            Object member = myEC.findObject(memberValue, false);
-                            replaceField(myPC, fieldNumber, member);
-                        }
-                        removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-                    }
-                    else
+                    if (!checkForAndRetrieveStoredValue(fieldNumber))
                     {
                         // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
                         loadUnloadedFieldsInFetchPlan();
@@ -4080,18 +4069,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 }
                 else
                 {
-                    if (containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber))
-                    {
-                        // Instantiate object using the stored "id" value, and remove associated value
-                        Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-                        if (memberValue != null)
-                        {
-                            Object member = myEC.findObject(memberValue, false);
-                            replaceField(myPC, fieldNumber, member);
-                        }
-                        removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-                    }
-                    else
+                    if (!checkForAndRetrieveStoredValue(fieldNumber))
                     {
                         // Just load this field
                         loadSpecifiedFields(new int[] {fieldNumber});
@@ -4108,6 +4086,26 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             // Convert into an exception suitable for the current API since this is called from a user update of a field
             throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
         }
+    }
+
+    /**
+     * Convenience method to check whether the specified field number has a (FK) identity value stored for later loading, and set the field value accordingly.
+     * @param fieldNumber The absolute field number
+     * @return Whether the field (FK) value was stored
+     */
+    protected boolean checkForAndRetrieveStoredValue(int fieldNumber)
+    {
+        boolean hasStored = containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+        if (hasStored)
+        {
+            // Instantiate object using the stored "id" value, and remove associated value
+            Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+            Object member = myEC.findObject(memberValue, false);
+            // TODO What if the related object is not found, or deleted? (i.e deleted the other end but not set the FK!)
+            replaceField(myPC, fieldNumber, member);
+            removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+        }
+        return hasStored;
     }
 
     /**
