@@ -3084,13 +3084,13 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             getArray().getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
-    
+
     /**
-     *  Calculate wether this field should be a second class mutable field.
-     *  This calculation is a bit expensive.
+     *  Calculate whether this field should be a second class mutable field.
+     *  Allows override via extension "is-second-class", otherwise uses TypeManager.isSecondClassMutable().
      *  Please note that this data will be cached in {@link AbstractClassMetaData#scoMutableMemberFlags}.
      *  @param mmgr MetaData manager
-     *  @return wether this field should be a second class mutable field.
+     *  @return whether this field should be regarded as a second class mutable field.
      */
     public boolean calcIsSecondClassMutable(MetaDataManager mmgr)
     {
@@ -3114,10 +3114,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 // Invalid value
                 throw new InvalidMetaDataException("044002", "is-second-class", "true/false/default", isSecondClass);
             }
-        }
-        else
-        {
-            // fall through to default behaviour
         }
 
         return mmgr.getNucleusContext().getTypeManager().isSecondClassMutableType(getTypeName());

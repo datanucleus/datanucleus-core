@@ -70,26 +70,25 @@ import org.datanucleus.util.StringUtils;
  * <li>Load explicitly via API calls. This happens when handling persistence for a persistence-unit for example since we know what classes/mapping is involved. 
  * It is also the case with the enhancer where we know what classes to enhance so we load the metadata first</li>
  * </ul>
- * <P>
+ * The property <B>allowMetaDataLoad</B> is used to distinguish which of these is permitted.
+ * Similarly there are only certain methods that are available to load metadata during operation. The <B>updateLock</B> is used to lock
+ * access on these methods.
+ * <p>
  * Acts as a registry of metadata so that metadata files don't need to be parsed multiple times. MetaData is stored as a FileMetaData, which contains
  * PackageMetaData, which contains ClassMetaData, and so on. This maps exactly to the users model of their metadata. The users access point is 
  * <B>getMetaDataForClass()</B> which will check the known classes without metadata, then check the existing registered metdata, then check the 
  * valid locations for metdata files. This way, the metadata is managed from this single point.
- * </P>
- * <P>
+ * <p>
  * Maintains a list of all classes that have been checked for MetaData and don't have any available. This avoids the needs to look up MetaData multiple times 
  * finding the same result. Currently this list is for all ClassMetaData objects keyed by the class name.
- * </P>
- * <P>
+ * <p>
  * Users can register interest in knowing when metadata for classes are loaded by registering a listener using the <i>addListener</i> method. 
  * This will then notify the listener when metadata for any class is initialised. This provides the opportunity to reject the metadata where particular features are
  * not supported. For example a StoreManager could register a listener where it doesn't support datastore identity and throw an InvalidMetaDataException. 
  * This would then filter back out to the user for the operation they invoked
- * </P>
- * <P>
+ * <p>
  * MetaDataManager is intended to be thread-safe. All maps are ConcurrentHashMap to provide basic multithread usage.
  * In addition all mutating methods make use of an update "lock" so that only one thread can update the metadata definition at any time.
- * </P>
  */
 public abstract class MetaDataManagerImpl implements Serializable, MetaDataManager
 {
@@ -319,12 +318,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             listeners = null;
         }
     }
-
-    /*public XmlMetaDataParser getXmlMetaDataParser(boolean validate)
-    {
-        // TODO Support access to "metaDataParser" to avoid creating multiple
-        return new XmlMetaDataParser(this, nucleusContext.getPluginManager(), validate);
-    }*/
 
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#registerListener(org.datanucleus.metadata.MetaDataListener)
@@ -1658,8 +1651,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     initialiseAbstractClassMetaData(cmd, clr);
                 }
 
-                // Make sure all FileMetaData that were subsequently loaded as a result of this call are
-                // all initialised before return
+                // Make sure all FileMetaData that were subsequently loaded as a result of this call are all initialised before return
                 if (!utilisedFileMetaData.isEmpty())
                 {
                     // Pass 1 - initialise anything loaded during the initialise of the requested class
@@ -1939,26 +1931,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
     }
 
-    /**
-     * Load up and add any O/R mapping info for the specified class to the stored ClassMetaData (if supported).
-     * This implementation does nothing so if ORM files are supported then this should be overridden by subclasses.
-     * Is package-access so that is only accessible by MetaData classes.
-     * @param c The class
-     * @param clr ClassLoader resolver
-     */
+    @Override
     public void addORMDataToClass(Class c, ClassLoaderResolver clr)
     {
         // Default to doing nothing. Specified in subclasses if they support it
         return;
     }
 
-    /**
-     * Load up and add any annotations mapping info for the specified class to the stored ClassMetaData.
-     * Is package-access so that is only accessible by MetaData classes.
-     * @param c The class
-     * @param cmd the metadata to add annotation to
-     * @param clr ClassLoader resolver
-     */
+    @Override
     public void addAnnotationsDataToClass(Class c, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         if (allowAnnotations)
@@ -2202,15 +2182,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#isPersistentDefinitionImplementation(java.lang.String)
-     */
-    @Override
-    public boolean isPersistentDefinitionImplementation(String implName)
-    {
-        return false;
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#getImplementationNameForPersistentInterface(java.lang.String)
      */
     @Override
@@ -2220,11 +2191,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getClassMetaDataForImplementationOfPersistentInterface(java.lang.String)
+    /**
+     * Accessor for the metadata for the implementation of the specified "persistent-interface".
+     * @param interfaceName The name of the persistent interface
+     * @return The ClassMetaData of the implementation class
      */
-    @Override
-    public ClassMetaData getClassMetaDataForImplementationOfPersistentInterface(String interfaceName)
+    protected ClassMetaData getClassMetaDataForImplementationOfPersistentInterface(String interfaceName)
     {
         // Default to not supporting "persistent-interface"s
         return null;
@@ -2259,15 +2231,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      */
     protected abstract FileMetaData parseXmlFile(URL fileURL);
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#registerFile(java.lang.String, org.datanucleus.metadata.FileMetaData, org.datanucleus.ClassLoaderResolver)
-     */
     @Override
     public abstract void registerFile(String fileURLString, FileMetaData filemd, ClassLoaderResolver clr);
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#registerDiscriminatorValueForClass(org.datanucleus.metadata.AbstractClassMetaData, java.lang.String)
-     */
     @Override
     public void registerDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue)
     {
@@ -2281,9 +2247,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         lookup.addValue(cmd.getFullClassName(), discrimValue);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getClassNameForDiscriminatorValueWithRoot(org.datanucleus.metadata.AbstractClassMetaData, java.lang.String)
-     */
     @Override
     public String getClassNameForDiscriminatorValueWithRoot(AbstractClassMetaData rootCmd, String discrimValue)
     {
@@ -2295,11 +2258,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getDiscriminatorValueForClass(org.datanucleus.metadata.AbstractClassMetaData, java.lang.String)
-     */
     @Override
-    public String getDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue)
+    public String getDiscriminatorValueForClass(AbstractClassMetaData cmd)
     {
         AbstractClassMetaData rootCmd = cmd.getBaseAbstractClassMetaData();
         DiscriminatorLookup lookup = discriminatorLookupByRootClassName.get(rootCmd.getFullClassName());
@@ -2349,10 +2309,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         return null;
     }
 
-    /**
-     * Convenience method to register all sequences found in the passed file.
-     * @param filemd MetaData for the file
-     */
+    @Override
     public void registerSequencesForFile(FileMetaData filemd)
     {
         // Register all sequences for the packages in this file
@@ -2381,10 +2338,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
     }
 
-    /**
-     * Convenience method to register all table generators found in the passed file.
-     * @param filemd MetaData for the file
-     */
+    @Override
     public void registerTableGeneratorsForFile(FileMetaData filemd)
     {
         // Register all table generators for the packages in this file
@@ -2415,7 +2369,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /**
-     * Convenience method to register all table generators found in the passed file.
+     * Convenience method to register the query result metadata for the provided file.
      * @param filemd MetaData for the file
      */
     protected void registerQueryResultMetaDataForFile(FileMetaData filemd)
@@ -2925,10 +2879,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
     }
 
-    /**
-     * Method called (by AbstractClassMetaData.initialise()) when a class has its metadata initialised.
-     * @param cmd Metadata that has been initialised
-     */
+    @Override
     public void abstractClassMetaDataInitialised(AbstractClassMetaData cmd)
     {
         if (cmd.getIdentityType() == IdentityType.APPLICATION && !cmd.usesSingleFieldIdentityClass())

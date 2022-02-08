@@ -263,9 +263,9 @@ public class XmlMetaDataParser extends DefaultHandler
                     {
                         // "persistence.xml"
                         handler = new PersistenceXmlMetaDataHandler(mgr, filename, entityResolver);
-                    } 
-                    else 
-                    {                        
+                    }
+                    else
+                    {
                         // Fallback to the plugin mechanism for other MetaData handlers
                         Class[] argTypes = new Class[]{ClassConstants.METADATA_MANAGER, ClassConstants.JAVA_LANG_STRING, EntityResolver.class};
                         Object[] argValues = new Object[]{mgr, filename, entityResolver};

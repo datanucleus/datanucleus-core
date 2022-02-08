@@ -49,10 +49,17 @@ public interface MetaDataManager
 
     AnnotationManager getAnnotationManager();
 
- //   XmlMetaDataParser getXmlMetaDataParser(boolean validate);
-
+    /**
+     * Method to return the prefix applied to all enhancer method names
+     * @return The enhancer method name prefix (e.g "dn")
+     */
     String getEnhancedMethodNamePrefix();
 
+    /**
+     * Method to return whether the specified member is an enhancer-provided member.
+     * @param memberName Name of the member
+     * @return Whether it was added by the enhancer (e.g prefix "dn")
+     */
     boolean isEnhancerField(String memberName);
 
     /**
@@ -107,7 +114,7 @@ public interface MetaDataManager
     boolean isEnhancing();
 
     /**
-     * Method to load up all metadata defined by the specified metadata files.
+     * Initialisation method to load up all metadata defined by the specified metadata files.
      * Metadata files can be absolute/relative filenames, or can be resources in the CLASSPATH.
      * @param metadataFiles The metadata files
      * @param loader ClassLoader to use in loading the metadata (if any)
@@ -117,7 +124,7 @@ public interface MetaDataManager
     FileMetaData[] loadMetaDataFiles(String[] metadataFiles, ClassLoader loader);
 
     /**
-     * Method to load up all metadata for the specified classes.
+     * Initialisation method to load up all metadata for the specified classes.
      * @param classNames The class names
      * @param loader ClassLoader to use in loading the classes (if any)
      * @return Array of the FileMetaData that is managed
@@ -211,7 +218,7 @@ public interface MetaDataManager
     AbstractClassMetaData getMetaDataForClass(String className, ClassLoaderResolver clr);
 
     /**
-     * Main accessor for the MetaData for a class.
+     * Primary accessor for the MetaData for a class.
      * All MetaData returned from this method will be initialised and ready for full use.
      * @param c The class to find MetaData for
      * @param clr the ClassLoaderResolver
@@ -236,6 +243,7 @@ public interface MetaDataManager
     /**
      * Method to access the (already known) metadata for the specified class.
      * If the class is not yet known about it returns null.
+     * Only used by org.datanucleus.metadata classes.
      * @param className Name of the class
      * @return MetaData for the class
      */
@@ -244,6 +252,7 @@ public interface MetaDataManager
     /**
      * Method to access the (already known) metadata for the field/property of the specified class.
      * If the class (or this field/property) is not yet known about it returns null.
+     * Only used by org.datanucleus.metadata classes.
      * @param className Name of the class
      * @param memberName Name of the field/property
      * @return MetaData for the field/property
@@ -390,25 +399,11 @@ public interface MetaDataManager
     boolean isPersistentInterfaceImplementation(String interfaceName, String implName);
 
     /**
-     * Convenience method to return if the passed class name is an implementation of a "persistent definition".
-     * @param implName The implementation name
-     * @return Whether it is a (DataNucleus-generated) impl of the persistent interface or abstract class
-     */
-    boolean isPersistentDefinitionImplementation(String implName);
-
-    /**
      * Accessor for the implementation name for the specified "persistent-interface".
      * @param interfaceName The name of the persistent interface
      * @return The name of the implementation class
      */
     String getImplementationNameForPersistentInterface(String interfaceName);
-
-    /**
-     * Accessor for the metadata for the implementation of the specified "persistent-interface".
-     * @param interfaceName The name of the persistent interface
-     * @return The ClassMetaData of the implementation class
-     */
-    ClassMetaData getClassMetaDataForImplementationOfPersistentInterface(String interfaceName);
 
     /**
      * Method to take the FileMetaData and register the relevant parts of it with the assorted caches provided.
@@ -419,10 +414,27 @@ public interface MetaDataManager
      */
     void registerFile(String fileURLString, FileMetaData filemd, ClassLoaderResolver clr);
 
+    /**
+     * Method to return the class name that uses the provided discriminator value using the specified root class to search from.
+     * @param rootCmd The root class
+     * @param discrimValue The discriminator value
+     * @return The class using this value
+     */
     String getClassNameForDiscriminatorValueWithRoot(AbstractClassMetaData rootCmd, String discrimValue);
 
-    String getDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue);
+    /**
+     * Method to return the discriminator value used by the specified class.
+     * @param cmd Class to search for
+     * @return The discriminator value used by this class
+     */
+    String getDiscriminatorValueForClass(AbstractClassMetaData cmd);
 
+    /**
+     * Method to return the class name that uses the specified discriminator value for the specified discriminator.
+     * @param discrimValue Discriminator value
+     * @param dismd The discriminator metadata
+     * @return The class name (or null if not found)
+     */
     String getClassNameFromDiscriminatorValue(String discrimValue, DiscriminatorMetaData dismd);
 
     /**
@@ -435,7 +447,7 @@ public interface MetaDataManager
     List<AbstractClassMetaData> getReferencedClasses(String[] classNames, ClassLoaderResolver clr);
 
     /**
-     * Utility to return if this field is persistable.
+     * Utility to return if this field is of a persistable type.
      * @param type Type of the field (for when "type" is not yet set)
      * @return Whether the field type is persistable.
      */
@@ -443,7 +455,7 @@ public interface MetaDataManager
 
     /**
      * Method to register a persistent interface and its implementation with the MetaData system.
-     * This is called by the JDOImplementationCreator.
+     * This is called by the JDO ImplementationCreator.
      * @param imd MetaData for the interface
      * @param implClass The implementation class
      * @param clr ClassLoader Resolver to use
@@ -452,7 +464,7 @@ public interface MetaDataManager
 
     /**
      * Method to register the metadata for an implementation of a persistent abstract class.
-     * This is called by the JDOImplementationCreator.
+     * This is called by the JDO ImplementationCreator.
      * @param cmd MetaData for the abstract class
      * @param implClass The implementation class
      * @param clr ClassLoader resolver
@@ -461,10 +473,46 @@ public interface MetaDataManager
 
     // These methods are part of the internal load process so ought to be protected/private
 
+    /**
+     * Load up and add any O/R mapping info for the specified class to the stored ClassMetaData (if supported).
+     * Only to be invoked by ClassMetaData, InterfaceMetaData.
+     * @param c The class
+     * @param clr ClassLoader resolver
+     */
     void addORMDataToClass(Class c, ClassLoaderResolver clr);
+
+    /**
+     * Load up and add any annotations mapping info for the specified class to the stored ClassMetaData.
+     * Only to be invoked by ClassMetaData, InterfaceMetaData.
+     * @param c The class
+     * @param cmd the metadata to add annotation to
+     * @param clr ClassLoader resolver
+     */
     void addAnnotationsDataToClass(Class c, AbstractClassMetaData cmd, ClassLoaderResolver clr);
-    void abstractClassMetaDataInitialised(AbstractClassMetaData acmd);
+
+    /**
+     * Method called (by AbstractClassMetaData.initialise()) when a class/interface has its metadata initialised.
+     * Only to be invoked by ClassMetaData, InterfaceMetaData.
+     * @param cmd Metadata that has been initialised
+     */
+    void abstractClassMetaDataInitialised(AbstractClassMetaData cmd);
+
+    /**
+     * Convenience method to register all sequences found in the passed file.
+     * @param filemd MetaData for the file
+     */
     void registerSequencesForFile(FileMetaData filemd);
+
+    /**
+     * Convenience method to register all table generators found in the passed file.
+     * @param filemd MetaData for the file
+     */
     void registerTableGeneratorsForFile(FileMetaData filemd);
+
+    /**
+     * Convenience method to register the discriminator value used by the specified class for easy lookup.
+     * @param cmd Metadata for the class
+     * @param discrimValue The discriminator value
+     */
     void registerDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue);
 }
