@@ -145,9 +145,9 @@ public class MetaDataMerger
             if (primVermd != null)
             {
                 // Merge bit by bit
-                if (ormVermd.getVersionStrategy() != null)
+                if (ormVermd.getStrategy() != null)
                 {
-                    primVermd.setStrategy(ormVermd.getVersionStrategy());
+                    primVermd.setStrategy(ormVermd.getStrategy());
                 }
                 if (ormVermd.getColumnName() != null)
                 {

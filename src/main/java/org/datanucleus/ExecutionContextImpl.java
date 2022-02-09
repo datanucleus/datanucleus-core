@@ -4229,9 +4229,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     VersionMetaData vermd = cachedSM.getClassMetaData().getVersionMetaDataForClass();
                     if (vermd != null)
                     {
-                        if (vermd.getFieldName() != null)
+                        if (vermd.getMemberName() != null)
                         {
-                            cachedSM.makeDirty((Persistable) cachedSM.getObject(), vermd.getFieldName());
+                            cachedSM.makeDirty((Persistable) cachedSM.getObject(), vermd.getMemberName());
                             dirtySMs.add(cachedSM);
                         }
                         else
@@ -4827,9 +4827,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             cachedPC.setVersion(sm.getTransactionalVersion());
             VersionMetaData vermd = sm.getClassMetaData().getVersionMetaDataForClass();
             int versionFieldNum = -1;
-            if (vermd != null && vermd.getFieldName() != null)
+            if (vermd != null && vermd.getMemberName() != null)
             {
-                versionFieldNum = sm.getClassMetaData().getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                versionFieldNum = sm.getClassMetaData().getMetaDataForMember(vermd.getMemberName()).getAbsoluteFieldNumber();
             }
 
             BitSet fieldsToUpdateBitSet = l2CacheTxFieldsToUpdateById.get(sm.getInternalObjectId());

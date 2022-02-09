@@ -38,7 +38,7 @@ import org.datanucleus.util.StringUtils;
  * There are two forms of version storage.
  * <ul>
  * <li>Surrogate column - the default in JDO, using the column/columns/index info in this class</li>
- * <li>Defined field - the default in JPA. This uses the "fieldName" info only</li>
+ * <li>Defined member - the default in JPA. This uses the "memberName" info only</li>
  * </ul>
  */
 public class VersionMetaData extends MetaData
@@ -60,8 +60,8 @@ public class VersionMetaData extends MetaData
     /** Indexed value. */
     protected IndexedValue indexed = null;
 
-    /** Name of the field that contains the version (if not generating a surrogate column). */
-    protected String fieldName = null;
+    /** Name of the member that contains the version (if not generating a surrogate column). */
+    protected String memberName = null;
 
     public VersionMetaData()
     {
@@ -81,12 +81,12 @@ public class VersionMetaData extends MetaData
             String val = getValueForExtension(MetaData.EXTENSION_CLASS_VERSION_FIELD_NAME);
             if (!StringUtils.isWhitespace(val))
             {
-                this.fieldName = val;
+                this.memberName = val;
                 this.columnName = null;
             }
         }
 
-        if (fieldName == null)
+        if (memberName == null)
         {
             // Cater for user specifying column name, or column
             if (columnMetaData == null && columnName != null)
@@ -112,7 +112,7 @@ public class VersionMetaData extends MetaData
         {
             if (getParent() instanceof AbstractClassMetaData)
             {
-                AbstractMemberMetaData vermmd = ((AbstractClassMetaData)getParent()).getMetaDataForMember(fieldName);
+                AbstractMemberMetaData vermmd = ((AbstractClassMetaData)getParent()).getMetaDataForMember(memberName);
                 if (vermmd != null)
                 {
                     if (java.util.Date.class.isAssignableFrom(vermmd.getType()))
@@ -163,8 +163,7 @@ public class VersionMetaData extends MetaData
         return colmd;
     }
 
-    // TODO Rename to getStrategy for consistency
-    public final VersionStrategy getVersionStrategy()
+    public final VersionStrategy getStrategy()
     {
         return versionStrategy;
     }
@@ -228,14 +227,14 @@ public class VersionMetaData extends MetaData
         return this;
     }
 
-    public final String getFieldName() // TODO Change to memberName
+    public final String getMemberName()
     {
-        return fieldName;
+        return memberName;
     }
 
-    public VersionMetaData setFieldName(String fieldName)
+    public VersionMetaData setMemberName(String memberName)
     {
-        this.fieldName = fieldName;
+        this.memberName = memberName;
         return this;
     }
 
@@ -243,9 +242,9 @@ public class VersionMetaData extends MetaData
     {
         StringBuilder str = new StringBuilder("VersionMetaData[");
         str.append("strategy=").append(versionStrategy);
-        if (fieldName != null)
+        if (memberName != null)
         {
-            str.append(", field=").append(fieldName);
+            str.append(", field=").append(memberName);
         }
         if (columnMetaData != null)
         {

@@ -515,7 +515,7 @@ public class CompleteClassTable implements Table
         if (vermd != null)
         {
             // Add surrogate version column
-            if (vermd.getFieldName() == null)
+            if (vermd.getMemberName() == null)
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.VERSION_COLUMN);
                 ColumnImpl col = addColumn(null, colName, ColumnType.VERSION_COLUMN);

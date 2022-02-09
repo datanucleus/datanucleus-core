@@ -3546,7 +3546,7 @@ public abstract class AbstractClassMetaData extends MetaData
     public final boolean isVersioned()
     {
         VersionMetaData vermd = getVersionMetaDataForClass();
-        if (vermd != null && vermd.getVersionStrategy() != null && vermd.getVersionStrategy() != VersionStrategy.NONE)
+        if (vermd != null && vermd.getStrategy() != null && vermd.getStrategy() != VersionStrategy.NONE)
         {
             return true;
         }

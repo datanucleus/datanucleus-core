@@ -228,7 +228,7 @@ public class LockManagerImpl implements LockManager
             return null;
         }
 
-        VersionStrategy versionStrategy = vermd.getVersionStrategy();
+        VersionStrategy versionStrategy = vermd.getStrategy();
         if (versionStrategy == null)
         {
             return null;
@@ -238,9 +238,9 @@ public class LockManagerImpl implements LockManager
             if (currentVersion == null)
             {
                 // Set an initial value, using numeric as the basis
-                if (vermd.getFieldName() != null)
+                if (vermd.getMemberName() != null)
                 {
-                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getMemberName());
                     if (verMmd.getType() == Integer.class || verMmd.getType() == int.class)
                     {
                         return Integer.valueOf(1);
@@ -257,9 +257,9 @@ public class LockManagerImpl implements LockManager
         }
         else if (versionStrategy == VersionStrategy.DATE_TIME)
         {
-            if (vermd.getFieldName() != null)
+            if (vermd.getMemberName() != null)
             {
-                AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getMemberName());
                 if (Calendar.class.isAssignableFrom(verMmd.getType()))
                 {
                     return Calendar.getInstance();
@@ -291,9 +291,9 @@ public class LockManagerImpl implements LockManager
                     initValue = Integer.valueOf(vermd.getValueForExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE));
                 }
 
-                if (vermd.getFieldName() != null)
+                if (vermd.getMemberName() != null)
                 {
-                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getMemberName());
                     if (verMmd.getType() == Integer.class || verMmd.getType() == int.class)
                     {
                         return initValue;

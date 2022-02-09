@@ -1496,9 +1496,9 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         if (cmd.isVersioned())
         {
             VersionMetaData vermd = cmd.getVersionMetaDataForClass();
-            if (vermd != null && vermd.getFieldName() != null)
+            if (vermd != null && vermd.getMemberName() != null)
             {
-                int verFieldNum = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                int verFieldNum = cmd.getMetaDataForMember(vermd.getMemberName()).getAbsoluteFieldNumber();
                 boolean versionPresent = false;
                 for (int i=0;i<fieldNumbers.length;i++)
                 {
@@ -2268,13 +2268,13 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             {
                 // If the object is versioned and no version is loaded (e.g obtained via findObject without loading fields) and in a state where we need it then pull in the version
                 VersionMetaData vermd = cmd.getVersionMetaDataForClass();
-                if (vermd != null && vermd.getVersionStrategy() != VersionStrategy.NONE)
+                if (vermd != null && vermd.getStrategy() != VersionStrategy.NONE)
                 {
                     if (myLC.stateType() == LifeCycleState.P_CLEAN || myLC.stateType() == LifeCycleState.HOLLOW) // Add other states?
                     {
-                        if (vermd.getFieldName() != null)
+                        if (vermd.getMemberName() != null)
                         {
-                            AbstractMemberMetaData verMmd = cmd.getMetaDataForMember(vermd.getFieldName());
+                            AbstractMemberMetaData verMmd = cmd.getMetaDataForMember(vermd.getMemberName());
                             loadFieldFromDatastore(verMmd.getAbsoluteFieldNumber());
                         }
                         else
