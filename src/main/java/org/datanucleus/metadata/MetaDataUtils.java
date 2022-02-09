@@ -1168,7 +1168,7 @@ public class MetaDataUtils
                     EmbeddedMetaData embmd = ownerMmd.getElementMetaData().getEmbeddedMetaData();
                     if (embmd != null)
                     {
-                        AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
+                        List<AbstractMemberMetaData> embMmds = embmd.getMemberMetaData();
                         if (embMmds != null)
                         {
                             for (AbstractMemberMetaData embMmd : embMmds)
@@ -1188,15 +1188,15 @@ public class MetaDataUtils
                 else if (ownerMmd.getEmbeddedMetaData() != null)
                 {
                     // Is this a nested embedded (from JDO definition) with specification for this field?
-                    AbstractMemberMetaData[] embMmds = ownerMmd.getEmbeddedMetaData().getMemberMetaData();
+                    List<AbstractMemberMetaData> embMmds = ownerMmd.getEmbeddedMetaData().getMemberMetaData();
                     if (embMmds != null)
                     {
-                        for (int i=0;i<embMmds.length;i++)
+                        for (AbstractMemberMetaData embMmd : embMmds)
                         {
-                            if (embMmds[i].getName().equals(mmd.getName()))
+                            if (embMmd.getName().equals(mmd.getName()))
                             {
                                 // Does it have an <embedded> block?
-                                return embMmds[i].getEmbeddedMetaData() != null;
+                                return embMmd.getEmbeddedMetaData() != null;
                             }
                         }
                     }

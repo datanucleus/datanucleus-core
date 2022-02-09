@@ -842,7 +842,7 @@ public class CompleteClassTable implements Table
             AbstractMemberMetaData embmdMmd = null;
             if (embmd != null)
             {
-                AbstractMemberMetaData[] embmdMmds = embmd.getMemberMetaData();
+                List<AbstractMemberMetaData> embmdMmds = embmd.getMemberMetaData();
                 if (embmdMmds != null)
                 {
                     for (AbstractMemberMetaData thisMmd : embmdMmds)

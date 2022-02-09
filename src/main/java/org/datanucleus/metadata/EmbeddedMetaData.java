@@ -38,16 +38,15 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * This element specifies the mapping for an embedded type. It contains multiple field elements, 
- * one for each field in the type.
+ * This element specifies the mapping for an embedded type. 
+ * It contains multiple field elements, one for each field in the type.
  * <P>
- * The <B>null-indicator-column</B> optionally identifies the name of the column used to indicate 
- * whether the embedded instance is null. By default, if the value of this column is null, then the
- * embedded instance is null. This column might be mapped to a field of the embedded instance but 
- * might be a synthetic column for the sole purpose of indicating a null reference.
- * The <B>null-indicator-value</B> specifies the value to indicate that the embedded instance is null. 
+ * The <B>nullIndicatorColumn</B> optionally identifies the name of the column used to indicate whether the embedded instance is null. 
+ * By default, if the value of this column is null, then the embedded instance is null. 
+ * This column might be mapped to a field of the embedded instance but might be a synthetic column for the sole purpose of indicating a null reference.
+ * The <B>nullIndicatorValue</B> specifies the value to indicate that the embedded instance is null. 
  * This is only used for non-nullable columns.
- * If <B>null-indicator-column</B> is omitted, then the embedded instance is assumed always to exist.
+ * If <B>nullIndicatorColumn</B> is omitted, then the embedded instance is assumed always to exist.
  */
 public class EmbeddedMetaData extends MetaData
 {
@@ -65,11 +64,8 @@ public class EmbeddedMetaData extends MetaData
     /** Discriminator for use when embedding objects with inheritance. */
     protected DiscriminatorMetaData discriminatorMetaData;
 
-    /** Fields/properties of the embedded object. */
+    /** Member definition of the embedded object. */
     protected final List<AbstractMemberMetaData> members = new ArrayList();
-
-    // TODO Drop this and just use "members" above
-    protected AbstractMemberMetaData memberMetaData[];
 
     /**
      * Constructor to create a copy of the passed metadata.
@@ -81,15 +77,16 @@ public class EmbeddedMetaData extends MetaData
         this.ownerMember = embmd.ownerMember;
         this.nullIndicatorColumn = embmd.nullIndicatorColumn;
         this.nullIndicatorValue = embmd.nullIndicatorValue;
-        for (int i=0;i<embmd.members.size();i++)
+        List<AbstractMemberMetaData> embmdMmds = embmd.members;
+        for (AbstractMemberMetaData embmdMmd : embmdMmds)
         {
-            if (embmd.members.get(i) instanceof FieldMetaData)
+            if (embmdMmd instanceof FieldMetaData)
             {
-                addMember(new FieldMetaData(this, embmd.members.get(i)));
+                addMember(new FieldMetaData(this, embmdMmd));
             }
             else
             {
-                addMember(new PropertyMetaData(this, (PropertyMetaData)embmd.members.get(i)));
+                addMember(new PropertyMetaData(this, (PropertyMetaData)embmdMmd));
             }
         }
     }
@@ -234,7 +231,7 @@ public class EmbeddedMetaData extends MetaData
             // TODO Cater for properties in the populating class when the user defines using setters
 
             // Get all (reflected) fields in the populating class
-            Field[] cls_fields=embeddedClass.getDeclaredFields();
+            Field[] cls_fields = embeddedClass.getDeclaredFields();
             for (int i=0;i<cls_fields.length;i++)
             {
                 // Limit to fields in this class, that aren't enhanced fields that aren't inner class fields, and that aren't static
@@ -309,7 +306,7 @@ public class EmbeddedMetaData extends MetaData
                         {
                             // Add a default PropertyMetaData for this field.
                             NucleusLogger.METADATA.debug(Localiser.msg("044060", apmd.getClassName(), fieldName));
-                            PropertyMetaData pmd=new PropertyMetaData(this, fieldName);
+                            PropertyMetaData pmd = new PropertyMetaData(this, fieldName);
                             members.add(pmd);
                             memberNames.add(pmd.getName());
                             Collections.sort(members);
@@ -325,59 +322,58 @@ public class EmbeddedMetaData extends MetaData
         }
         Collections.sort(members);
 
-        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
-        while (memberIter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            Class embFmdClass = embeddedClass;
-            AbstractMemberMetaData fieldFmd = memberIter.next();
-            if (!fieldFmd.fieldBelongsToClass())
+            Class embMmdClass = embeddedClass;
+            if (!mmd.fieldBelongsToClass())
             {
                 try
                 {
-                    embFmdClass = clr.classForName(fieldFmd.getClassName(true));
+                    embMmdClass = clr.classForName(mmd.getClassName(true));
                 }
                 catch (ClassNotResolvedException cnre)
                 {
                     // Maybe the user specified just "classBasicName.fieldName", so try with package name of this
-                    String fieldClsName = embeddedClass.getPackage().getName() + "." + fieldFmd.getClassName(true);
-                    fieldFmd.setClassName(fieldClsName);
-                    embFmdClass = clr.classForName(fieldClsName);
+                    String fieldClsName = embeddedClass.getPackage().getName() + "." + mmd.getClassName(true);
+                    mmd.setClassName(fieldClsName);
+                    embMmdClass = clr.classForName(fieldClsName);
                 }
             }
-            if (fieldFmd instanceof FieldMetaData)
+
+            if (mmd instanceof FieldMetaData)
             {
                 Field cls_field = null;
                 try
                 {
-                    cls_field = embFmdClass.getDeclaredField(fieldFmd.getName());
+                    cls_field = embMmdClass.getDeclaredField(mmd.getName());
                 }
                 catch (Exception e)
                 {
                     // MetaData field doesn't exist in the class!
-                    throw new InvalidMemberMetaDataException("044071", embFmdClass.getName(), fieldFmd.getName());
+                    throw new InvalidMemberMetaDataException("044071", embMmdClass.getName(), mmd.getName());
                 }
-                fieldFmd.populate(clr, cls_field, null, primary, mmgr);
+                mmd.populate(clr, cls_field, null, primary, mmgr);
             }
             else
             {
-                Method cls_method = null;
+                Method clsMethod = null;
                 try
                 {
-                    cls_method = embFmdClass.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(fieldFmd.getName(),true));
+                    clsMethod = embMmdClass.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),true));
                 }
                 catch(Exception e)
                 {
                     try
                     {
-                        cls_method = embFmdClass.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(fieldFmd.getName(),false));
+                        clsMethod = embMmdClass.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),false));
                     }
                     catch (Exception e2)
                     {
                         // MetaData field doesn't exist in the class!
-                        throw new InvalidMemberMetaDataException("044071", embFmdClass.getName(), fieldFmd.getName());
+                        throw new InvalidMemberMetaDataException("044071", embMmdClass.getName(), mmd.getName());
                     }
                 }
-                fieldFmd.populate(clr, null, cls_method, primary, mmgr);
+                mmd.populate(clr, null, clsMethod, primary, mmgr);
             }
         }
 
@@ -405,11 +401,9 @@ public class EmbeddedMetaData extends MetaData
      */
     public void initialise(ClassLoaderResolver clr)
     {
-        memberMetaData = new AbstractMemberMetaData[members.size()];
-        for (int i=0; i<memberMetaData.length; i++)
+        for (AbstractMemberMetaData mmd : members)
         {
-            memberMetaData[i] = members.get(i);
-            memberMetaData[i].initialise(clr);
+            mmd.initialise(clr);
         }
 
         if (discriminatorMetaData != null)
@@ -424,9 +418,9 @@ public class EmbeddedMetaData extends MetaData
      * Accessor for metadata for the embedded members.
      * @return Returns the metadata for any defined members.
      */
-    public final AbstractMemberMetaData[] getMemberMetaData()
+    public final List<AbstractMemberMetaData> getMemberMetaData()
     {
-        return memberMetaData;
+        return members;
     }
 
     public final String getOwnerMember()
@@ -486,9 +480,9 @@ public class EmbeddedMetaData extends MetaData
     }
 
     /**
-     * Method to add a field/property to the embedded definition.
-     * Rejects the addition of duplicate named fields/properties.
-     * @param mmd Meta-Data for the field/property.
+     * Method to add a member to the embedded definition.
+     * Rejects the addition of duplicate named members, or when we have already initialised this embedded definition.
+     * @param mmd Meta-Data for the member
      */
     public void addMember(AbstractMemberMetaData mmd)
     {
@@ -501,15 +495,16 @@ public class EmbeddedMetaData extends MetaData
         {
             throw new InvalidMemberMetaDataException("044108", mmd.getClassName(), mmd.getName());
         }
-        Iterator<AbstractMemberMetaData> iter = members.iterator();
-        while (iter.hasNext())
+
+        // Check for existence of this member (name) already
+        for (AbstractMemberMetaData md : members)
         {
-            AbstractMemberMetaData md = iter.next();
             if (mmd.getName().equals(md.getName()))
             {
                 throw new InvalidMemberMetaDataException("044112", mmd.getClassName(), mmd.getName());
             }
         }
+
         members.add(mmd);
         mmd.parent = this;
     }
@@ -541,19 +536,18 @@ public class EmbeddedMetaData extends MetaData
     public String toString()
     {
         StringBuilder str = new StringBuilder(super.toString());
-        if (memberMetaData != null)
+        str.append(" [" + members.size() + " members] (");
+        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
+        while (memberIter.hasNext())
         {
-            str.append(" [" + memberMetaData.length + " members] (");
-            for (int i=0;i<memberMetaData.length;i++)
+            AbstractMemberMetaData mmd = memberIter.next();
+            str.append(mmd.getName());
+            if (memberIter.hasNext())
             {
-                if (i > 0)
-                {
-                    str.append(", ");
-                }
-                str.append(memberMetaData[i].getName());
+                str.append(",");
             }
-            str.append(")");
         }
+        str.append(")");
         return str.toString();
     }
 }

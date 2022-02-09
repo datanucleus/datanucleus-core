@@ -1574,10 +1574,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             {
                 c = (clr == null) ? Class.forName(className) : clr.classForName(className, null, false);
             }
-            catch (ClassNotFoundException cnfe)
-            {
-            }
-            catch (ClassNotResolvedException cnre)
+            catch (ClassNotFoundException | ClassNotResolvedException cne)
             {
             }
             if (c == null)

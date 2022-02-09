@@ -182,24 +182,24 @@ public abstract class AbstractNamingFactory implements NamingFactory
             int mmdNo = 1;
             while (!checked)
             {
-                AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
-                if (embMmds == null || embMmds.length == 0)
+                List<AbstractMemberMetaData> embMmds = embmd.getMemberMetaData();
+                if (embMmds == null || embMmds.isEmpty())
                 {
                     break;
                 }
 
                 boolean checkedEmbmd = false;
                 boolean foundEmbmd = false;
-                for (int i=0;i<embMmds.length;i++)
+                for (AbstractMemberMetaData embMmd : embMmds)
                 {
-                    if (embMmds[i].getFullFieldName().equals(mmds.get(mmdNo).getFullFieldName()))
+                    if (embMmd.getFullFieldName().equals(mmds.get(mmdNo).getFullFieldName()))
                     {
                         foundEmbmd = true;
                         if (mmds.size() == mmdNo+1)
                         {
                             // Found last embedded field, so use column data if present
                             checked = true;
-                            ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
+                            ColumnMetaData[] colmds = embMmd.getColumnMetaData();
                             if (colmds != null && colmds.length > colPosition && !StringUtils.isWhitespace(colmds[colPosition].getName()))
                             {
                                 String colName = colmds[colPosition].getName();
@@ -212,24 +212,24 @@ public abstract class AbstractNamingFactory implements NamingFactory
                             checkedEmbmd = true;
                             mmdNo++;
                             embmd = null;
-                            if (embMmds[i].hasCollection() || embMmds[i].hasArray())
+                            if (embMmd.hasCollection() || embMmd.hasArray())
                             {
-                                if (embMmds[i].getElementMetaData() != null)
+                                if (embMmd.getElementMetaData() != null)
                                 {
-                                    embmd = embMmds[i].getElementMetaData().getEmbeddedMetaData();
+                                    embmd = embMmd.getElementMetaData().getEmbeddedMetaData();
                                 }
                             }
-                            else if (embMmds[i].hasMap())
+                            else if (embMmd.hasMap())
                             {
                                 // TODO Cater for embedded map key OR values ... this just assumes the value, but could be the key
-                                if (embMmds[i].getValueMetaData() != null)
+                                if (embMmd.getValueMetaData() != null)
                                 {
-                                    embmd = embMmds[i].getValueMetaData().getEmbeddedMetaData();
+                                    embmd = embMmd.getValueMetaData().getEmbeddedMetaData();
                                 }
                             }
                             else
                             {
-                                embmd = embMmds[i].getEmbeddedMetaData();
+                                embmd = embMmd.getEmbeddedMetaData();
                             }
 
                             if (embmd == null)

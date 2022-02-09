@@ -567,28 +567,27 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             containerHandler.populateMetaData(clr, primary, this);
         }
 
-        // Update "default-fetch-group" according to type
-        if (defaultFetchGroup == null && persistenceModifier.equals(FieldPersistenceModifier.NONE))
+        if (defaultFetchGroup == null)
         {
-            defaultFetchGroup = Boolean.FALSE;
-        }
-        else if (defaultFetchGroup == null && persistenceModifier.equals(FieldPersistenceModifier.TRANSACTIONAL))
-        {
-            defaultFetchGroup = Boolean.FALSE;
-        }
-        else if (defaultFetchGroup == null)
-        {
-            defaultFetchGroup = Boolean.FALSE;
-            if (!primaryKey.equals(Boolean.TRUE))
+            // Provide default DFG setting according to type
+            if (persistenceModifier.equals(FieldPersistenceModifier.NONE) || persistenceModifier.equals(FieldPersistenceModifier.TRANSACTIONAL))
             {
-                if (hasContainer() && containerHandler != null)
+                defaultFetchGroup = Boolean.FALSE;
+            }
+            else
+            {
+                defaultFetchGroup = Boolean.FALSE;
+                if (!primaryKey.equals(Boolean.TRUE))
                 {
-                    defaultFetchGroup = containerHandler.isDefaultFetchGroup(clr, typeMgr, this);
-                }
-                else if (typeMgr.isDefaultFetchGroup(getType()))
-                {
-                    // If still not determined rely on the type
-                    defaultFetchGroup = Boolean.TRUE;
+                    if (hasContainer() && containerHandler != null)
+                    {
+                        defaultFetchGroup = containerHandler.isDefaultFetchGroup(clr, typeMgr, this);
+                    }
+                    else if (typeMgr.isDefaultFetchGroup(getType()))
+                    {
+                        // Still not determined so rely on the type
+                        defaultFetchGroup = Boolean.TRUE;
+                    }
                 }
             }
         }
@@ -630,7 +629,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 serialized = Boolean.TRUE;
             }
         }
-        
+
         if (!mmgr.isDefaultNullable() && !hasContainer())
         {
             // Find column metadata definition, creating one if not specified
@@ -648,7 +647,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 colMmd.setAllowsNull(Boolean.FALSE);
             }
         }
-        
+
         if (this.containerMetaData != null && this.dependent != null)
         {
             // Check for invalid dependent field specifications
