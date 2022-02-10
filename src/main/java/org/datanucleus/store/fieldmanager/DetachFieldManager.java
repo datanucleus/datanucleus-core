@@ -114,27 +114,27 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
             if (mmd.hasContainer())
             {
                 // 1-N, M-N Container
-                detachedValue = processContainer(fieldNumber, value, mmd);
+                detachedValue = processContainer(mmd, value);
             }
             else
             {
-                detachedValue = processField(fieldNumber, value, mmd);
+                detachedValue = processField(mmd, value);
             }
         }
         return detachedValue;
     }
 
-    private Object processField(int fieldNumber, Object value, AbstractMemberMetaData mmd)
+    private Object processField(AbstractMemberMetaData mmd, Object value)
     {
         RelationType relType = mmd.getRelationType(sm.getExecutionContext().getClassLoaderResolver());
         if (relType == RelationType.NONE)
         {
-            if (secondClassMutableFields[fieldNumber])
+            if (secondClassMutableFields[mmd.getAbsoluteFieldNumber()])
             {
                 if (!(value instanceof SCO))
                 {
                     // Replace with SCO so we can work with it
-                    value = SCOUtils.wrapSCOField(sm, fieldNumber, value, true);
+                    value = SCOUtils.wrapSCOField(sm, mmd.getAbsoluteFieldNumber(), value, true);
                 }
 
                 // Other SCO
@@ -143,7 +143,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     return ((SCO) value).detachCopy(state);
                 }
 
-                return SCOUtils.detachAsWrapped(sm) ? value : SCOUtils.unwrapSCOField(sm, fieldNumber, (SCO)value);
+                return SCOUtils.detachAsWrapped(sm) ? value : SCOUtils.unwrapSCOField(sm, mmd.getAbsoluteFieldNumber(), (SCO)value);
             }
         }
         else
@@ -163,7 +163,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         return value;
     }
         
-    private Object processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    private Object processContainer(AbstractMemberMetaData mmd, Object container)
     {
         Object detachedContainer;
 
@@ -172,11 +172,11 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
 
         if (mmd.hasMap())
         {
-            detachedContainer = processMapContainer(fieldNumber, container, mmd, containerHandler);
+            detachedContainer = processMapContainer(mmd.getAbsoluteFieldNumber(), container, mmd, containerHandler);
         }
         else
         {
-            detachedContainer = processElementContainer(fieldNumber, container, mmd, containerHandler);
+            detachedContainer = processElementContainer(mmd.getAbsoluteFieldNumber(), container, mmd, containerHandler);
         }
 
         if (!mmd.hasArray())
@@ -186,7 +186,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
             if (SCOUtils.detachAsWrapped(sm))
             {
                 // Try to wrap the field, if possible, replacing it since it will be returned as wrapped
-                wrappedContainer = SCOUtils.wrapSCOField(sm, fieldNumber, detachedContainer, true);
+                wrappedContainer = SCOUtils.wrapSCOField(sm, mmd.getAbsoluteFieldNumber(), detachedContainer, true);
 
                 // Return the wrapped, if mutable, otherwise just the immutable value
                 detachedContainer = wrappedContainer;
@@ -195,12 +195,12 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
             {
                 // Try to wrap the field, if possible, just to be able to unset the owner, so don't
                 // replace it
-                wrappedContainer = SCOUtils.wrapSCOField(sm, fieldNumber, detachedContainer, false);
+                wrappedContainer = SCOUtils.wrapSCOField(sm, mmd.getAbsoluteFieldNumber(), detachedContainer, false);
                 
                 // The container can be already an SCO so unwrap it if necessary
                 if (detachedContainer instanceof SCO)
                 {
-                    detachedContainer = SCOUtils.unwrapSCOField(sm, fieldNumber, (SCO) detachedContainer);
+                    detachedContainer = SCOUtils.unwrapSCOField(sm, mmd.getAbsoluteFieldNumber(), (SCO) detachedContainer);
                 }
             }
 

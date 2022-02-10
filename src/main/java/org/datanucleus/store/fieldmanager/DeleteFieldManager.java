@@ -99,17 +99,17 @@ public class DeleteFieldManager extends AbstractFieldManager
             {
                 if (mmd.hasContainer())
                 {
-                    processContainer(fieldNumber, value, mmd, ec, relationType);
+                    processContainer(mmd, value, ec, relationType);
                 }
                 else
                 {
-                    processSingleValue(value, mmd, ec, relationType);
+                    processSingleValue(mmd, value, ec, relationType);
                 }
             }
         }
     }
 
-    private void processSingleValue(Object value, AbstractMemberMetaData mmd, ExecutionContext ec, RelationType relationType)
+    private void processSingleValue(AbstractMemberMetaData mmd, Object value, ExecutionContext ec, RelationType relationType)
     {
         // Process PC fields
         if (mmd.isDependent())
@@ -146,22 +146,22 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
     }
     
-    private void processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd, ExecutionContext ec, RelationType relationType)
+    private void processContainer(AbstractMemberMetaData mmd, Object container, ExecutionContext ec, RelationType relationType)
     {
         TypeManager typeManager = sm.getExecutionContext().getTypeManager();
         ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
 
         if (mmd.hasMap())
         {
-            processMapContainer(fieldNumber, container, mmd, containerHandler);
+            processMapContainer(mmd, container, containerHandler);
         }
         else
         {
-            processElementContainer(fieldNumber, container, mmd, containerHandler, ec, relationType);
+            processElementContainer(mmd, container, containerHandler, ec, relationType);
         }
     }
     
-    private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd, ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
+    private void processMapContainer(AbstractMemberMetaData mmd, Object container, ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
     {
         boolean dependentKey = mmd.getMap().isDependentKey();
         boolean dependentValue = mmd.getMap().isDependentValue();
@@ -214,7 +214,7 @@ public class DeleteFieldManager extends AbstractFieldManager
         // TODO Handle nulling of bidirs - Isn't being done by the relationship manager already?
     }
 
-    private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
+    private void processElementContainer(AbstractMemberMetaData mmd, Object container, 
             ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler, ExecutionContext ec, RelationType relationType)
     {
         if (mmd.isCascadeRemoveOrphans() || (mmd.getCollection() != null && mmd.getCollection().isDependentElement()) || 

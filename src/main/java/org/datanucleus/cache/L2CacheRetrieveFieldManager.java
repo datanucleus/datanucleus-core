@@ -171,16 +171,16 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         }
 
         AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        return mmd.hasContainer() ? processContainerField(fieldNumber, value, mmd) : processField(fieldNumber, value, mmd);
+        return mmd.hasContainer() ? processContainerField(mmd, value) : processField(mmd, value);
     }
 
-    private Object processContainerField(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    private Object processContainerField(AbstractMemberMetaData mmd, Object container)
     {
         ContainerHandler containerHandler = sm.getExecutionContext().getTypeManager().getContainerHandler(mmd.getType());
-        return mmd.hasMap() ? processMapContainer(fieldNumber, container, mmd, containerHandler) : processElementContainer(fieldNumber, container, mmd, containerHandler);
+        return mmd.hasMap() ? processMapContainer(mmd, container, containerHandler) : processElementContainer(mmd, container, containerHandler);
     }
 
-    private Object processMapContainer(int fieldNumber, Object cachedMapContainer, AbstractMemberMetaData mmd, ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
+    private Object processMapContainer(AbstractMemberMetaData mmd, Object cachedMapContainer, ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
     {
         // Map field, with fieldValue being Map<OID, OID>
         try
@@ -202,7 +202,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 {
                     if (keyIsEmbedded || keyIsSerialised || mmd.isSerialized())
                     {
-                        mapKey = convertCachedPCToPersistable((CachedPC)entry.getKey(), fieldNumber);
+                        mapKey = convertCachedPCToPersistable((CachedPC)entry.getKey(), mmd.getAbsoluteFieldNumber());
                     }
                     else
                     {
@@ -222,7 +222,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                     {
                         if (valueIsEmbedded || valueIsSerialised || mmd.isSerialized())
                         {
-                            mapValue = convertCachedPCToPersistable((CachedPC)entry.getValue(), fieldNumber);
+                            mapValue = convertCachedPCToPersistable((CachedPC)entry.getValue(), mmd.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -238,7 +238,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 fieldMapContainerAdapter.put(mapKey, mapValue);
             }
 
-            return SCOUtils.wrapSCOField(sm, fieldNumber, fieldMapContainerAdapter.getContainer(), true);
+            return SCOUtils.wrapSCOField(sm, mmd.getAbsoluteFieldNumber(), fieldMapContainerAdapter.getContainer(), true);
         }
         catch (Exception e)
         {
@@ -247,14 +247,14 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             {
                 fieldsNotLoaded = new ArrayList<Integer>();
             }
-            fieldsNotLoaded.add(fieldNumber);
+            fieldsNotLoaded.add(mmd.getAbsoluteFieldNumber());
             NucleusLogger.CACHE.error("Exception thrown creating value for" + " field " + mmd.getFullFieldName() + " of type " + cachedMapContainer.getClass().getName(), e);
      
             return null;
         }
     }
 
-    private Object processElementContainer(int fieldNumber, Object cachedContainer, AbstractMemberMetaData mmd, ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
+    private Object processElementContainer(AbstractMemberMetaData mmd, Object cachedContainer, ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
     {
         try
         {
@@ -317,7 +317,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 }
             }   
             
-            return SCOUtils.wrapSCOField(sm, fieldNumber, fieldContainerAdapter.getContainer(), true);
+            return SCOUtils.wrapSCOField(sm, mmd.getAbsoluteFieldNumber(), fieldContainerAdapter.getContainer(), true);
         }
         catch (Exception e)
         {
@@ -326,18 +326,18 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             {
                 fieldsNotLoaded = new ArrayList<Integer>();
             }
-            fieldsNotLoaded.add(fieldNumber);
+            fieldsNotLoaded.add(mmd.getAbsoluteFieldNumber());
             NucleusLogger.CACHE.error("Exception thrown creating value for field " + mmd.getFullFieldName() + " of type " + cachedContainer.getClass().getName(), e);
             return null;
         }
     }
 
-    private Object processField(int fieldNumber, Object value, AbstractMemberMetaData mmd)
+    private Object processField(AbstractMemberMetaData mmd, Object value)
     {
         RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
         if (relType == RelationType.NONE)
         {
-            return SCOUtils.wrapSCOField(sm, fieldNumber, SCOUtils.copyValue(value), true);
+            return SCOUtils.wrapSCOField(sm, mmd.getAbsoluteFieldNumber(), SCOUtils.copyValue(value), true);
         }
         
         if (mmd.isSerialized() || MetaDataUtils.isMemberEmbedded(mmd, relType, ec.getClassLoaderResolver(), ec.getMetaDataManager()))
@@ -363,7 +363,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             {
                 fieldsNotLoaded = new ArrayList<Integer>();
             }
-            fieldsNotLoaded.add(fieldNumber);
+            fieldsNotLoaded.add(mmd.getAbsoluteFieldNumber());
             return null;
         }
     }

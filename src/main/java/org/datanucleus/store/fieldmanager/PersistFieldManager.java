@@ -89,6 +89,8 @@ public class PersistFieldManager extends AbstractFieldManager
     {
         if (value != null)
         {
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+
             if (replaceSCOsWithWrappers)
             {
                 // Replace any SCO field that isn't already a wrapper, with its wrapper object
@@ -100,8 +102,6 @@ public class PersistFieldManager extends AbstractFieldManager
                 }
             }
 
-            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-
             if (mmd.isCascadePersist())
             {
                 ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
@@ -111,7 +111,7 @@ public class PersistFieldManager extends AbstractFieldManager
                 {
                     if (mmd.hasContainer())
                     {
-                        processContainer(fieldNumber, value, mmd);
+                        processContainer(value, mmd);
                     }
                     else
                     {
@@ -130,19 +130,19 @@ public class PersistFieldManager extends AbstractFieldManager
         }
     }
 
-    private void  processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    private void  processContainer(Object container, AbstractMemberMetaData mmd)
     {
         if (mmd.hasMap())
         {
-            processMapContainer(fieldNumber, container, mmd);
+            processMapContainer(mmd, container);
         }
         else
         {
-            processElementContainer(fieldNumber, container, mmd);
+            processElementContainer(mmd, container);
         }
     }
 
-    private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    private void processMapContainer(AbstractMemberMetaData mmd, Object container)
     {
     	TypeManager typeManager = sm.getExecutionContext().getTypeManager();
     	ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler = typeManager.getContainerHandler(mmd.getType());
@@ -161,14 +161,14 @@ public class PersistFieldManager extends AbstractFieldManager
             {
                 // Persist (or attach) the key
                 int mapKeyObjectType = mmd.getMap().isEmbeddedKey() || mmd.getMap().isSerializedKey() ? DNStateManager.EMBEDDED_MAP_KEY_PC : DNStateManager.PC;
-                newMapKey = processPersistable(mapKey, fieldNumber, mapKeyObjectType);
+                newMapKey = processPersistable(mapKey, mmd.getAbsoluteFieldNumber(), mapKeyObjectType);
             }
 
             if (api.isPersistable(mapValue))
             {
                 // Persist (or attach) the value
                 int mapValueObjectType = mmd.getMap().isEmbeddedValue() || mmd.getMap().isSerializedValue() ? DNStateManager.EMBEDDED_MAP_VALUE_PC : DNStateManager.PC;
-                newMapValue = processPersistable(mapValue, fieldNumber, mapValueObjectType);
+                newMapValue = processPersistable(mapValue, mmd.getAbsoluteFieldNumber(), mapValueObjectType);
             }
 
             if (newMapKey != mapKey || newMapValue != mapValue)
@@ -208,7 +208,7 @@ public class PersistFieldManager extends AbstractFieldManager
         }
     }
 
-    private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    private void processElementContainer(AbstractMemberMetaData mmd, Object container)
     {
     	TypeManager typeManager = sm.getExecutionContext().getTypeManager();
     	ElementContainerHandler<Object, ElementContainerAdapter<Object>> elementContainerHandler = typeManager.getContainerHandler(mmd.getType());
@@ -251,7 +251,7 @@ public class PersistFieldManager extends AbstractFieldManager
             {
                 if (api.isPersistable(element))
                 {
-                    processPersistable(element, fieldNumber, objectType);
+                    processPersistable(element, mmd.getAbsoluteFieldNumber(), objectType);
                 }
             }
         }

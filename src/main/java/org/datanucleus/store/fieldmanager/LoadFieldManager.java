@@ -85,7 +85,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
             {
                 if (mmd.hasContainer())
                 {
-                    value = processContainer(fieldNumber, value, mmd);
+                    value = processContainer(mmd, value);
                 }
                 else
                 {
@@ -98,7 +98,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
         return value;
     }
     
-    private Object processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    private Object processContainer(AbstractMemberMetaData mmd, Object container)
     {
         Object wrappedContainer = container;
 
@@ -111,7 +111,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
             if (!(container instanceof SCO))
             {
                 // Replace with SCO
-                wrappedContainer = SCOUtils.wrapSCOField(sm, fieldNumber, container, true);
+                wrappedContainer = SCOUtils.wrapSCOField(sm, mmd.getAbsoluteFieldNumber(), container, true);
             }
         }
 

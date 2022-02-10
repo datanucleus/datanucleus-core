@@ -41,8 +41,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
      * @param fpClass Fetch Plan for the class of this instance
      * @param state State object to hold any pertinent controls for the fetchplan process
      */
-    public MakeTransientFieldManager(DNStateManager sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, 
-            FetchPlanState state)
+    public MakeTransientFieldManager(DNStateManager sm, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state)
     {
         super(sm, secondClassMutableFields, fpClass, state);
     }
@@ -102,7 +101,8 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
                 }
             }
             
-            if (value instanceof SCO){
+            if (value instanceof SCO)
+            {
                 ((SCO)value).unsetOwner(); 
             }
         }
