@@ -187,7 +187,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
     public java.util.HashSet detachCopy(FetchPlanState state)
     {
         java.util.HashSet detached = new java.util.HashSet();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

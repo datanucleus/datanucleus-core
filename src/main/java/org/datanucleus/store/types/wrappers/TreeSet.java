@@ -216,7 +216,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
         {
             detached = new java.util.TreeSet();
         }
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

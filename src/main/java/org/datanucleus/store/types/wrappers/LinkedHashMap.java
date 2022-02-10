@@ -198,7 +198,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V> implement
     public java.util.LinkedHashMap detachCopy(FetchPlanState state)
     {
         java.util.LinkedHashMap detached = new java.util.LinkedHashMap();
-        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM.getExecutionContext(), entrySet(), state, detached);
         return detached;
     }
 

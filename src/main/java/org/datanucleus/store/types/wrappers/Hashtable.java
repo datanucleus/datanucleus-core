@@ -197,7 +197,7 @@ public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap
     public java.util.Hashtable detachCopy(FetchPlanState state)
     {
         java.util.Hashtable detached = new java.util.Hashtable();
-        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM.getExecutionContext(), entrySet(), state, detached);
         return detached;
     }
 

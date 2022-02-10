@@ -191,7 +191,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     public java.util.ArrayList detachCopy(FetchPlanState state)
     {
         java.util.ArrayList detached = new java.util.ArrayList();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

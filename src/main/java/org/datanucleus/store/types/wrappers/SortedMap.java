@@ -216,7 +216,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
     public java.util.SortedMap detachCopy(FetchPlanState state)
     {
         java.util.SortedMap detached = new java.util.TreeMap();
-        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM.getExecutionContext(), entrySet(), state, detached);
         return detached;
     }
 

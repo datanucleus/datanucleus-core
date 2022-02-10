@@ -187,7 +187,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
     public java.util.Collection detachCopy(FetchPlanState state)
     {
         java.util.Collection detached = new java.util.HashSet();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

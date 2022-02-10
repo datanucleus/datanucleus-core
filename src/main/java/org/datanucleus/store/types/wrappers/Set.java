@@ -188,7 +188,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
     public java.util.Set detachCopy(FetchPlanState state)
     {
         java.util.Set detached = new java.util.HashSet();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

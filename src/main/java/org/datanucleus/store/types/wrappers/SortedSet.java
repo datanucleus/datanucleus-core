@@ -214,7 +214,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
         {
             detached = new java.util.TreeSet();
         }
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

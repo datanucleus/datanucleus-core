@@ -200,7 +200,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
     public java.util.Map detachCopy(FetchPlanState state)
     {
         java.util.Map detached = new java.util.HashMap();
-        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM.getExecutionContext(), entrySet(), state, detached);
         return detached;
     }
 

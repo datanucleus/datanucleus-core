@@ -191,7 +191,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
     public java.util.LinkedList detachCopy(FetchPlanState state)
     {
         java.util.LinkedList detached = new java.util.LinkedList();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

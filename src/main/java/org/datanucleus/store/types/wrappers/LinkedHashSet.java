@@ -187,7 +187,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
     public java.util.LinkedHashSet detachCopy(FetchPlanState state)
     {
         java.util.LinkedHashSet detached = new java.util.LinkedHashSet();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

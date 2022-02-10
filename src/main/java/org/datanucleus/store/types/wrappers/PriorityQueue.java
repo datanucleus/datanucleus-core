@@ -203,7 +203,7 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     public java.util.PriorityQueue detachCopy(FetchPlanState state)
     {
         java.util.PriorityQueue detached = new java.util.PriorityQueue();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

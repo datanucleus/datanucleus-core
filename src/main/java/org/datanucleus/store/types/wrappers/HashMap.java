@@ -200,7 +200,7 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
     public java.util.HashMap detachCopy(FetchPlanState state)
     {
         java.util.HashMap detached = new java.util.HashMap();
-        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM.getExecutionContext(), entrySet(), state, detached);
         return detached;
     }
 

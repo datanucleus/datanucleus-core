@@ -194,7 +194,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
     public java.util.Vector detachCopy(FetchPlanState state)
     {
         java.util.Vector detached = new java.util.Vector();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

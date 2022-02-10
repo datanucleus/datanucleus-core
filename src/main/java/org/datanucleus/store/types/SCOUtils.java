@@ -319,25 +319,25 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a map field has keys without their own identity. Checks if the keys are
-     * embedded in a join table, or in the main table, or serialised.
-     * @param fmd MetaData for the field
+     * Convenience method to return if a map member has keys without their own identity. 
+     * Checks if the keys are embedded in a join table, or in the main table, or serialised.
+     * @param mmd MetaData for the member
      * @return Whether the keys have their own identity or not
      */
-    public static boolean mapHasKeysWithoutIdentity(AbstractMemberMetaData fmd)
+    public static boolean mapHasKeysWithoutIdentity(AbstractMemberMetaData mmd)
     {
         boolean keysWithoutIdentity = false;
-        if (fmd.isSerialized())
+        if (mmd.isSerialized())
         {
             // Keys (and values) serialised into main table
             keysWithoutIdentity = true;
         }
-        else if (fmd.getKeyMetaData() != null && fmd.getKeyMetaData().getEmbeddedMetaData() != null && fmd.getJoinMetaData() != null)
+        else if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null && mmd.getJoinMetaData() != null)
         {
             // Keys embedded in join table using embedded mapping
             keysWithoutIdentity = true;
         }
-        else if (fmd.getMap() != null && fmd.getMap().isEmbeddedKey())
+        else if (mmd.getMap() != null && mmd.getMap().isEmbeddedKey())
         {
             // Keys are embedded (either serialised, or embedded in join table)
             keysWithoutIdentity = true;
@@ -347,25 +347,25 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a map field has values without their own identity. Checks if the values
-     * are embedded in a join table, or in the main table, or serialised.
-     * @param fmd MetaData for the field
+     * Convenience method to return if a map member has values without their own identity. 
+     * Checks if the values are embedded in a join table, or in the main table, or serialised.
+     * @param mmd MetaData for the member
      * @return Whether the values have their own identity or not
      */
-    public static boolean mapHasValuesWithoutIdentity(AbstractMemberMetaData fmd)
+    public static boolean mapHasValuesWithoutIdentity(AbstractMemberMetaData mmd)
     {
         boolean valuesWithoutIdentity = false;
-        if (fmd.isSerialized())
+        if (mmd.isSerialized())
         {
             // Values (and keys) serialised into main table
             valuesWithoutIdentity = true;
         }
-        else if (fmd.getValueMetaData() != null && fmd.getValueMetaData().getEmbeddedMetaData() != null && fmd.getJoinMetaData() != null)
+        else if (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null && mmd.getJoinMetaData() != null)
         {
             // Values embedded in join table using embedded mapping
             valuesWithoutIdentity = true;
         }
-        else if (fmd.getMap() != null && fmd.getMap().isEmbeddedValue())
+        else if (mmd.getMap() != null && mmd.getMap().isEmbeddedValue())
         {
             // Values are embedded (either serialised, or embedded in join table)
             valuesWithoutIdentity = true;
@@ -375,15 +375,15 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a collection field has the elements serialised into the table of the
-     * field as a single BLOB. This is really for use within an RDBMS context.
-     * @param fmd MetaData for the field
+     * Convenience method to return if a collection member has the elements serialised into the table of the field as a single BLOB. 
+     * This is really for use within an RDBMS context.
+     * @param mmd MetaData for the member
      * @return Whether the elements are serialised (either explicitly or implicitly)
      */
-    public static boolean collectionHasSerialisedElements(AbstractMemberMetaData fmd)
+    public static boolean collectionHasSerialisedElements(AbstractMemberMetaData mmd)
     {
-        boolean serialised = fmd.isSerialized();
-        if (fmd.getCollection() != null && fmd.getCollection().isEmbeddedElement() && fmd.getJoinMetaData() == null)
+        boolean serialised = mmd.isSerialized();
+        if (mmd.getCollection() != null && mmd.getCollection().isEmbeddedElement() && mmd.getJoinMetaData() == null)
         {
             // Elements are embedded but no join table so we serialise
             serialised = true;
@@ -393,24 +393,23 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if an array field has the elements stored into the table of the field as a
-     * single (BLOB) column.
-     * @param fmd MetaData for the field
+     * Convenience method to return if an array member has the elements stored into the table of the field as a single (BLOB) column.
+     * @param mmd MetaData for the member
      * @param mmgr MetaData manager
      * @return Whether the elements are stored in a single column
      */
-    public static boolean arrayIsStoredInSingleColumn(AbstractMemberMetaData fmd, MetaDataManager mmgr)
+    public static boolean arrayIsStoredInSingleColumn(AbstractMemberMetaData mmd, MetaDataManager mmgr)
     {
-        boolean singleColumn = fmd.isSerialized();
-        if (!singleColumn && fmd.getArray() != null && fmd.getJoinMetaData() == null)
+        boolean singleColumn = mmd.isSerialized();
+        if (!singleColumn && mmd.getArray() != null && mmd.getJoinMetaData() == null)
         {
-            if (fmd.getArray().isEmbeddedElement())
+            if (mmd.getArray().isEmbeddedElement())
             {
                 // Elements are embedded but no join table so we store in a single column
                 singleColumn = true;
             }
 
-            Class elementClass = fmd.getType().getComponentType();
+            Class elementClass = mmd.getType().getComponentType();
             ApiAdapter api = mmgr.getApiAdapter();
             if (!elementClass.isInterface() && !api.isPersistable(elementClass))
             {
@@ -423,26 +422,26 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a map field has the keys/values serialised. This is really for use
-     * within an RDBMS context.
-     * @param fmd MetaData for the field
+     * Convenience method to return if a map member has the keys/values serialised. 
+     * This is really for use within an RDBMS context.
+     * @param mmd MetaData for the member
      * @return Whether the keys and values are serialised (either explicitly or implicitly)
      */
-    public static boolean mapHasSerialisedKeysAndValues(AbstractMemberMetaData fmd)
+    public static boolean mapHasSerialisedKeysAndValues(AbstractMemberMetaData mmd)
     {
         boolean inverseKeyField = false;
-        if (fmd.getKeyMetaData() != null && fmd.getKeyMetaData().getMappedBy() != null)
+        if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getMappedBy() != null)
         {
             inverseKeyField = true;
         }
         boolean inverseValueField = false;
-        if (fmd.getValueMetaData() != null && fmd.getValueMetaData().getMappedBy() != null)
+        if (mmd.getValueMetaData() != null && mmd.getValueMetaData().getMappedBy() != null)
         {
             inverseValueField = true;
         }
 
-        boolean serialised = fmd.isSerialized();
-        if (fmd.getMap() != null && fmd.getJoinMetaData() == null && (fmd.getMap().isEmbeddedKey() && fmd.getMap().isEmbeddedValue()) && !inverseKeyField && !inverseValueField)
+        boolean serialised = mmd.isSerialized();
+        if (mmd.getMap() != null && mmd.getJoinMetaData() == null && (mmd.getMap().isEmbeddedKey() && mmd.getMap().isEmbeddedValue()) && !inverseKeyField && !inverseValueField)
         {
             // Keys AND values are embedded but no join table so we serialise the whole map
             // Note that we explicitly excluded the 1-N Map with the key stored in the value
@@ -991,35 +990,16 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to detach (recursively) all elements for a collection field. All elements that are
-     * persistable will be detached.
-     * @param ownerSM StateManager for the owning object with the collection
-     * @param elements The elements in the collection
-     * @param state FetchPlan state
-     */
-    public static void detachForCollection(DNStateManager ownerSM, Object[] elements, FetchPlanState state)
-    {
-        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
-        for (int i = 0; i < elements.length; i++)
-        {
-            if (api.isPersistable(elements[i]))
-            {
-                ownerSM.getExecutionContext().detachObject(state, elements[i]);
-            }
-        }
-    }
-
-    /**
-     * Convenience method to detach copies (recursively) of all elements for a collection field. All elements
-     * that are persistable will be detached.
-     * @param ownerSM StateManager for the owning object with the collection
+     * Convenience method to detach copies (recursively) of all elements for a collection field. 
+     * All elements that are persistable will be detached.
+     * @param ec ExecutionContext
      * @param elements The elements in the collection
      * @param state FetchPlan state
      * @param detached Collection to add the detached copies to
      */
-    public static void detachCopyForCollection(DNStateManager ownerSM, Object[] elements, FetchPlanState state, Collection detached)
+    public static void detachCopyForCollection(ExecutionContext ec, Object[] elements, FetchPlanState state, Collection detached)
     {
-        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ec.getApiAdapter();
         for (int i = 0; i < elements.length; i++)
         {
             if (elements[i] == null)
@@ -1031,7 +1011,7 @@ public class SCOUtils
                 Object object = elements[i];
                 if (api.isPersistable(object))
                 {
-                    detached.add(ownerSM.getExecutionContext().detachObjectCopy(state, object));
+                    detached.add(ec.detachObjectCopy(state, object));
                 }
                 else
                 {
@@ -1067,42 +1047,16 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to detach (recursively) all elements for a map field. All elements that are
-     * persistable will be detached.
-     * @param ownerSM StateManager for the owning object with the map
-     * @param entries The entries in the map
-     * @param state FetchPlan state
-     */
-    public static void detachForMap(DNStateManager ownerSM, Set entries, FetchPlanState state)
-    {
-        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
-        for (Iterator it = entries.iterator(); it.hasNext();)
-        {
-            Map.Entry entry = (Map.Entry) it.next();
-            Object val = entry.getValue();
-            Object key = entry.getKey();
-            if (api.isPersistable(key))
-            {
-                ownerSM.getExecutionContext().detachObject(state, key);
-            }
-            if (api.isPersistable(val))
-            {
-                ownerSM.getExecutionContext().detachObject(state, val);
-            }
-        }
-    }
-
-    /**
-     * Convenience method to detach copies (recursively) of all elements for a map field. All elements that
-     * are persistable will be detached.
-     * @param ownerSM StateManager for the owning object with the map
+     * Convenience method to detach copies (recursively) of all elements for a map field. 
+     * All elements that are persistable will be detached.
+     * @param ec ExecutionContext
      * @param entries The entries in the map
      * @param state FetchPlan state
      * @param detached Map to add the detached copies to
      */
-    public static void detachCopyForMap(DNStateManager ownerSM, Set entries, FetchPlanState state, Map detached)
+    public static void detachCopyForMap(ExecutionContext ec, Set entries, FetchPlanState state, Map detached)
     {
-        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ec.getApiAdapter();
         for (Iterator it = entries.iterator(); it.hasNext();)
         {
             Map.Entry entry = (Map.Entry) it.next();
@@ -1110,11 +1064,11 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(val))
             {
-                val = ownerSM.getExecutionContext().detachObjectCopy(state, val);
+                val = ec.detachObjectCopy(state, val);
             }
             if (api.isPersistable(key))
             {
-                key = ownerSM.getExecutionContext().detachObjectCopy(state, key);
+                key = ec.detachObjectCopy(state, key);
             }
             detached.put(key, val);
         }
@@ -1143,7 +1097,7 @@ public class SCOUtils
                 if (attached == null)
                 {
                     // Not yet attached so attach
-                    ownerSM.getExecutionContext().attachObject(ownerSM, key, keysWithoutIdentity);
+                    ec.attachObject(ownerSM, key, keysWithoutIdentity);
                 }
             }
             if (api.isPersistable(val))
@@ -1152,7 +1106,7 @@ public class SCOUtils
                 if (attached == null)
                 {
                     // Not yet attached so attach
-                    ownerSM.getExecutionContext().attachObject(ownerSM, val, valuesWithoutIdentity);
+                    ec.attachObject(ownerSM, val, valuesWithoutIdentity);
                 }
             }
         }
@@ -1312,12 +1266,12 @@ public class SCOUtils
 
     /**
      * Convenience accessor for whether to detach SCO objects as wrapped.
-     * @param ownerSM StateManager
+     * @param ec ExecutionContext
      * @return Whether to detach SCOs in wrapped form
      */
-    public static boolean detachAsWrapped(DNStateManager ownerSM)
+    public static boolean detachAsWrapped(ExecutionContext ec)
     {
-        return ownerSM.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
+        return ec.getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
     }
 
     /**

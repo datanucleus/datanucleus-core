@@ -203,7 +203,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     public java.util.Queue detachCopy(FetchPlanState state)
     {
         java.util.Queue detached = new java.util.PriorityQueue();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

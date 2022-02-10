@@ -218,7 +218,7 @@ public class TreeMap<K, V> extends java.util.TreeMap<K, V> implements SCOMap<jav
     public java.util.TreeMap detachCopy(FetchPlanState state)
     {
         java.util.TreeMap detached = new java.util.TreeMap();
-        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM.getExecutionContext(), entrySet(), state, detached);
         return detached;
     }
 

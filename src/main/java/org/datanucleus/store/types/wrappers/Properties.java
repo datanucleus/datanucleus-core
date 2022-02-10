@@ -197,7 +197,7 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
     public java.util.Properties detachCopy(FetchPlanState state)
     {
         java.util.Properties detached = new java.util.Properties();
-        SCOUtils.detachCopyForMap(ownerSM, entrySet(), state, detached);
+        SCOUtils.detachCopyForMap(ownerSM.getExecutionContext(), entrySet(), state, detached);
         return detached;
     }
 

@@ -192,7 +192,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
     public java.util.List detachCopy(FetchPlanState state)
     {
         java.util.List detached = new java.util.ArrayList();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 

@@ -194,7 +194,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
     public java.util.Stack detachCopy(FetchPlanState state)
     {
         java.util.Stack detached = new java.util.Stack();
-        SCOUtils.detachCopyForCollection(ownerSM, toArray(), state, detached);
+        SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 
