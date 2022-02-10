@@ -428,7 +428,7 @@ public final class EnhanceUtils
 
     public static int getAsmVersionForJRE()
     {
-        // TODO Use V1_8 if the user is using JRE 1.8
-        return Opcodes.V1_7;
+        // TODO Keep this up to date with ASM version
+        return Opcodes.V1_8;
     }
 }

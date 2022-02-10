@@ -153,8 +153,7 @@ public class ManagementManager
             {
                 if (jmxType != null)
                 {
-                    // TODO Remove "default"
-                    if (jmxType.equals("platform") || jmxType.equals("default"))
+                    if (jmxType.equals("platform"))
                     {
                         mgmtServer = new PlatformManagementServer();
                     }
