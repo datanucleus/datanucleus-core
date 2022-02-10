@@ -5833,7 +5833,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(DNStateManager embSM)
     {
-        // TODO Drop this method
         if (smEmbeddedInfoByEmbedded == null)
         {
             return null;

@@ -23,10 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.datanucleus.ExecutionContext;
 
 /**
- * TransactionManager is facade for creating (Open/XA) transactions.
+ * TransactionManager provides a facade for creating (Open/XA) transactions.
  * A cache of transactions is held with each transaction for a user object.
  * If using with a multithreaded PM/EM then you must lock access external to TransactionManager since this is for a PMF/EMF.
- * TODO Consider merging this into org.datanucleus.TransactionImpl.
+ * TODO Consider merging this into org.datanucleus.transaction.TransactionImpl.
  */
 public class ResourcedTransactionManager
 {

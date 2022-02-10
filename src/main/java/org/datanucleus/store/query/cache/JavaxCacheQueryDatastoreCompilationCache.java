@@ -28,6 +28,7 @@ import javax.cache.configuration.MutableConfiguration;
 import javax.cache.spi.CachingProvider;
 
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.util.NucleusLogger;
 
@@ -44,7 +45,7 @@ public class JavaxCacheQueryDatastoreCompilationCache implements QueryDatastoreC
     public JavaxCacheQueryDatastoreCompilationCache(NucleusContext nucleusCtx)
     {
         org.datanucleus.Configuration conf = nucleusCtx.getConfiguration();
-        String cacheName = conf.getStringProperty("datanucleus.cache.queryCompilationDatastore.cacheName");
+        String cacheName = conf.getStringProperty(PropertyNames.PROPERTY_CACHE_QUERYCOMPILEDATASTORE_NAME);
         if (cacheName == null)
         {
             cacheName = "datanucleus-query-compilation-datastore";
@@ -113,7 +114,6 @@ public class JavaxCacheQueryDatastoreCompilationCache implements QueryDatastoreC
     @Override
     public int size()
     {
-        // TODO Implement this
         throw new UnsupportedOperationException("size() method not supported by this plugin");
     }
 

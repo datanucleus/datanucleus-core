@@ -70,17 +70,16 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
         this.indexed = omd.indexed;
         this.columnName = omd.columnName;
 
-        // TODO Change these to copy rather than reference
         if (omd.indexMetaData != null)
         {
-            this.indexMetaData = omd.indexMetaData;
+            this.indexMetaData = new IndexMetaData(omd.indexMetaData);
             this.indexMetaData.parent = this;
         }
         if (omd.columns != null)
         {
             for (ColumnMetaData colmd : omd.columns)
             {
-                addColumn(colmd);
+                addColumn(new ColumnMetaData(colmd));
             }
         }
         this.mappedBy = omd.mappedBy;

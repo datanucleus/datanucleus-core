@@ -201,7 +201,6 @@ public class EmbeddedMetaData extends MetaData
         // Check that all "members" are of the correct type for the embedded object
         for (AbstractMemberMetaData mmd : members)
         {
-            // TODO Should allow PropertyMetaData here I think
             if (embCmd instanceof InterfaceMetaData && mmd instanceof FieldMetaData)
             {
                 // Cannot have a field within a persistent interface

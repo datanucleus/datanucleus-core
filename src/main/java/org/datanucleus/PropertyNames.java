@@ -154,7 +154,9 @@ public class PropertyNames
     public static final String PROPERTY_CACHE_L2_UPDATE_MODE = "datanucleus.cache.level2.updateMode";
     public static final String PROPERTY_CACHE_L2_CONFIG_FILE = "datanucleus.cache.level2.configurationFile";
     public static final String PROPERTY_CACHE_QUERYCOMPILE_TYPE = "datanucleus.cache.queryCompilation.type";
+    public static final String PROPERTY_CACHE_QUERYCOMPILE_NAME = "datanucleus.cache.queryCompilation.cacheName";
     public static final String PROPERTY_CACHE_QUERYCOMPILEDATASTORE_TYPE = "datanucleus.cache.queryCompilationDatastore.type";
+    public static final String PROPERTY_CACHE_QUERYCOMPILEDATASTORE_NAME = "datanucleus.cache.queryCompilationDatastore.cacheName";
     public static final String PROPERTY_CACHE_QUERYRESULTS_TYPE = "datanucleus.cache.queryResults.type";
     public static final String PROPERTY_CACHE_QUERYRESULTS_NAME = "datanucleus.cache.queryResults.cacheName";
     public static final String PROPERTY_CACHE_QUERYRESULTS_MAXSIZE = "datanucleus.cache.queryResults.maxSize";

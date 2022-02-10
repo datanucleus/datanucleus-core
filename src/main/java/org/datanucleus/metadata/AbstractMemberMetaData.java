@@ -143,7 +143,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** load-fetch-group value. */
     protected String loadFetchGroup;
 
-    /** recursion-depth value. TODO This is only for FetchGroupMemberMetaData.*/
+    /** recursion-depth value. */
     protected Integer recursionDepth = null;
 
     /** Field name. */
