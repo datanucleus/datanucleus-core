@@ -77,34 +77,34 @@ public class MetaData implements Serializable
     public static final String EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME = "softdelete-column-name";
 
     /** Class : when the class will have a create-user column for auditing. */
-    public static final String EXTENSION_CLASS_CREATEUSER = "createuser";
+    public static final String EXTENSION_CLASS_CREATEUSER = "create-user";
 
     /** Class : when the class will have a create-user column for auditing, specifies the column name to use. */
-    public static final String EXTENSION_CLASS_CREATEUSER_COLUMN_NAME = "createuser-column-name";
+    public static final String EXTENSION_CLASS_CREATEUSER_COLUMN_NAME = "create-user-column-name";
 
     /** Class : when the class will have a create-user column for auditing, defines the length of column to use. */
-    public static final String EXTENSION_CLASS_CREATEUSER_COLUMN_LENGTH = "createuser-column-length";
+    public static final String EXTENSION_CLASS_CREATEUSER_COLUMN_LENGTH = "create-user-column-length";
 
     /** Class : when the class will have a update-user column for auditing. */
-    public static final String EXTENSION_CLASS_UPDATEUSER = "updateuser";
+    public static final String EXTENSION_CLASS_UPDATEUSER = "update-user";
 
     /** Class : when the class will have a update-user column for auditing, specifies the column name to use. */
-    public static final String EXTENSION_CLASS_UPDATEUSER_COLUMN_NAME = "updateuser-column-name";
+    public static final String EXTENSION_CLASS_UPDATEUSER_COLUMN_NAME = "update-user-column-name";
 
     /** Class : when the class will have a update-user column for auditing, defines the length of column to use. */
-    public static final String EXTENSION_CLASS_UPDATEUSER_COLUMN_LENGTH = "updateuser-column-length";
+    public static final String EXTENSION_CLASS_UPDATEUSER_COLUMN_LENGTH = "update-user-column-length";
 
     /** Class : when the class will have a create-timestamp column for auditing. */
-    public static final String EXTENSION_CLASS_CREATETIMESTAMP = "createtimestamp";
+    public static final String EXTENSION_CLASS_CREATETIMESTAMP = "create-timestamp";
 
     /** Class : when the class will have a create-timestamp column for auditing, specifies the column name to use. */
-    public static final String EXTENSION_CLASS_CREATETIMESTAMP_COLUMN_NAME = "createtimestamp-column-name";
+    public static final String EXTENSION_CLASS_CREATETIMESTAMP_COLUMN_NAME = "create-timestamp-column-name";
 
     /** Class : when the class will have a update-timestamp column for auditing. */
-    public static final String EXTENSION_CLASS_UPDATETIMESTAMP = "updatetimestamp";
+    public static final String EXTENSION_CLASS_UPDATETIMESTAMP = "update-timestamp";
 
     /** Class : when the class will have a update-timestamp column for auditing, specifies the column name to use. */
-    public static final String EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME = "updatetimestamp-column-name";
+    public static final String EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME = "update-timestamp-column-name";
 
     /** Class : define the name of a member that will store the version of this class. */
     public static final String EXTENSION_CLASS_VERSION_FIELD_NAME = "field-name"; // TODO Change to member-name
