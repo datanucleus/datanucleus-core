@@ -5883,7 +5883,10 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void saveFields()
     {
-        savedPC = myPC.dnNewInstance(this);
+        if (savedPC == null)
+        {
+            savedPC = myPC.dnNewInstance(this);
+        }
         savedPC.dnCopyFields(myPC, cmd.getAllMemberPositions());
         savedPersistenceFlags = persistenceFlags;
         savedLoadedFields = loadedFields.clone();
