@@ -118,6 +118,10 @@ import org.datanucleus.util.StringUtils;
  * and about 500 bytes per StateManager when taking PC-individual child-object (like the OID) referred by the StateManager into account. 
  * With small Java objects this can mean a substantial memory overhead and for applications using such small objects can be critical. 
  * For this reason the StateManager should always be minimal in memory consumption.
+ * 
+ * <H3>Commit/Rollback</H3>
+ * When the managed object is changed it is saved as <I>savedPC</I> and its state as <I>savedPersistenceFlags</I> and <I>savedLoadedFields</I>.
+ * These fields allow it to be rolled-back to an earlier state. Refer to the <I>saveFields</I> and <I>restoreFields</I> methods.
  */
 public class StateManagerImpl implements DNStateManager<Persistable>
 {
@@ -213,14 +217,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /** The type of the managed object (0 = PC, 1 = embedded PC, 2 = embedded element, 3 = embedded key, 4 = embedded value. */
     protected short objectType = 0;
 
-    /** Flags of the persistable instance when the instance is enlisted in the transaction. */
-    protected byte savedPersistenceFlags;
-
-    /** Loaded fields of the persistable instance when the instance is enlisted in the transaction. */
-    protected boolean[] savedLoadedFields = null;
-
-    /** Copy (shallow) of the Persistable instance when the instance is enlisted in the transaction. */
-    protected Persistable savedPC = null;
+    /** Saved state, for use during any rollback for reinstating the object. */
+    protected SavedState savedState = null;
 
     private static final EnhancementHelper HELPER;
     static
@@ -265,14 +263,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         loadedFields = new boolean[fieldCount];
         dirty = false;
         myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
-        savedPersistenceFlags = 0;
-        savedLoadedFields = null;
         objectType = 0;
         activity = ActivityState.NONE;
         myVersion = null;
         transactionalVersion = null;
         persistenceFlags = 0;
-        savedPC = null;
 
         ec.setAttachDetachReferencedObject(this, null);
     }
@@ -319,7 +314,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             flags &= ~FLAG_DISCONNECTING;
         }
 
-        clearSavedFields();
+        savedState = null;
         preDeleteLoadedFields = null;
         objectType = 0;
         myPC = null;
@@ -1375,8 +1370,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     protected int[] loadFieldsFromLevel2Cache(int[] fieldNumbers)
     {
         // Only continue if there are fields, and not being deleted/flushed etc
-        if (fieldNumbers == null || fieldNumbers.length == 0 || myEC.isFlushing() || myLC.isDeleted() || isDeleting() ||
-            getExecutionContext().getTransaction().isCommitting())
+        if (fieldNumbers == null || fieldNumbers.length == 0 || myEC.isFlushing() || myLC.isDeleted() || isDeleting() || myEC.getTransaction().isCommitting())
         {
             return fieldNumbers;
         }
@@ -2120,7 +2114,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
             throw myEC.getApiAdapter().getUserExceptionForException(Localiser.msg("026003"), null);
         }
-        else if (pc == savedPC)
+        else if (pc == (savedState != null ? savedState.getPC() : null))
         {
             return null;
         }
@@ -2362,17 +2356,17 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         finally
         {
-            int[] nonpkFields = cmd.getNonPKMemberPositions();
+            int[] nonPKMemberPosns = cmd.getNonPKMemberPositions();
 
             // Unset owner of any SCO wrapper so if the user holds on to a wrapper it doesn't affect the datastore
-            int[] nonPkScoFields = ClassUtils.getFlagsSetTo(cmd.getSCOMutableMemberFlags(), ClassUtils.getFlagsSetTo(loadedFields, cmd.getNonPKMemberPositions(), true), true);
+            int[] nonPkScoFields = ClassUtils.getFlagsSetTo(cmd.getSCOMutableMemberFlags(), ClassUtils.getFlagsSetTo(loadedFields, nonPKMemberPosns, true), true);
             if (nonPkScoFields != null)
             {
                 provideFields(nonPkScoFields, new UnsetOwnerFieldManager());
             }
 
-            clearFieldsByNumbers(nonpkFields);
-            clearDirtyFlags(nonpkFields);
+            clearFieldsByNumbers(nonPKMemberPosns);
+            clearDirtyFlags(nonPKMemberPosns);
 
             if (myEC.getStoreManager() instanceof ObjectReferencingStoreManager)
             {
@@ -3372,11 +3366,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 // Notify any owners that embed this object that it has just changed
                 for (EmbeddedOwnerRelation owner : embeddedOwners)
                 {
-                    StateManagerImpl ownerOP = (StateManagerImpl) owner.getOwnerSM();
+                    StateManagerImpl ownerSM = (StateManagerImpl)owner.getOwnerSM();
 
-                    if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                    if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
                     {
-                        ownerOP.makeDirty(owner.getOwnerFieldNum());
+                        ownerSM.makeDirty(owner.getOwnerFieldNum());
                     }
                 }
             }
@@ -4571,19 +4565,13 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             if (myLC == null)
             {
                 // Initialise the StateManager in T_CLEAN state
-                final DNStateManager thisOP = this;
+                final DNStateManager thisSM = this;
                 myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.T_CLEAN);
 
                 try
                 {
-                    if (myLC.isPersistent())
-                    {
-                        myEC.addStateManagerToCache(this);
-                    }
-
-                    // Everything OK so far. Now we can set SM reference in PC 
-                    // It can be done only after myLC is set to deligate validation to the LC and objectId verified for uniqueness
-                    replaceStateManager(myPC, thisOP);
+                    // Set SM reference in PC - can be done only after myLC is set to delegate validation to the LC and objectId verified for uniqueness
+                    replaceStateManager(myPC, thisSM);
                 }
                 catch (SecurityException e)
                 {
@@ -4779,8 +4767,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                         if (api.isPersistable(value))
                         {
                             // PC field beyond end of graph
-                            DNStateManager valueOP = myEC.findStateManager(value);
-                            if (!api.isDetached(value) && !(valueOP != null && valueOP.isDetaching()))
+                            DNStateManager valueSM = myEC.findStateManager(value);
+                            if (!api.isDetached(value) && !(valueSM != null && valueSM.isDetaching()))
                             {
                                 // Field value is not detached or being detached so unload it
                                 String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i).getName();
@@ -5881,42 +5869,53 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /**
      * Method to save all fields of the object, for use in any rollback.
      */
+    @Override
     public void saveFields()
     {
-        if (savedPC == null)
+        if (savedState == null)
         {
-            savedPC = myPC.dnNewInstance(this);
+            // Create SavedState, and copy PC fields
+            savedState = new SavedState(myPC.dnNewInstance(this), loadedFields.clone(), persistenceFlags);
+            savedState.getPC().dnCopyFields(myPC, cmd.getAllMemberPositions());
         }
-        savedPC.dnCopyFields(myPC, cmd.getAllMemberPositions());
-        savedPersistenceFlags = persistenceFlags;
-        savedLoadedFields = loadedFields.clone();
-    }
-
-    /**
-     * Method to clear all saved fields on the object.
-     */
-    public void clearSavedFields()
-    {
-        savedPC = null;
-        savedPersistenceFlags = 0;
-        savedLoadedFields = null;
+        else
+        {
+            // Update SavedState with current PC fields, flags etc
+            savedState.getPC().dnCopyFields(myPC, cmd.getAllMemberPositions());
+            savedState.setPersistenceFlags(persistenceFlags);
+            savedState.setLoadedFields(loadedFields.clone());
+        }
     }
 
     /**
      * Method to restore all fields of the object.
      */
+    @Override
     public void restoreFields()
     {
-        if (savedPC != null)
+        if (savedState != null)
         {
-            loadedFields = savedLoadedFields;
-            persistenceFlags = savedPersistenceFlags;
+            // Restore PC fields, flags etc from SavedState
+            loadedFields = savedState.getLoadedFields();
+
+            persistenceFlags = savedState.getPersistenceFlags();
             myPC.dnReplaceFlags();
-            myPC.dnCopyFields(savedPC, cmd.getAllMemberPositions());
+
+            myPC.dnCopyFields(savedState.getPC(), cmd.getAllMemberPositions());
+
+            savedState = null;
 
             clearDirtyFlags();
-            clearSavedFields();
         }
+    }
+
+    /**
+     * Method to clear all saved fields on the object.
+     */
+    @Override
+    public void clearSavedFields()
+    {
+        savedState = null;
     }
 
     // ------------------------------ Helper Methods ---------------------------
@@ -6024,23 +6023,26 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         log.debug("    myPC=" + convertPCToString(myPC, cmd));
 
-        switch (savedPersistenceFlags)
+        if (savedState != null)
         {
-            case Persistable.LOAD_REQUIRED:
-                log.debug("    savedFlags=LOAD_REQUIRED");
-                break;
-            case Persistable.READ_OK:
-                log.debug("    savedFlags=READ_OK");
-                break;
-            case Persistable.READ_WRITE_OK:
-                log.debug("    savedFlags=READ_WRITE_OK");
-                break;
-            default:
-                log.debug("    savedFlags=???");
-                break;
+            switch (savedState.getPersistenceFlags())
+            {
+                case Persistable.LOAD_REQUIRED:
+                    log.debug("    savedState.persistableFlags=LOAD_REQUIRED");
+                    break;
+                case Persistable.READ_OK:
+                    log.debug("    savedState.persistableFlags=READ_OK");
+                    break;
+                case Persistable.READ_WRITE_OK:
+                    log.debug("    savedState.persistableFlags=READ_WRITE_OK");
+                    break;
+                default:
+                    log.debug("    savedState.persistableFlags=???");
+                    break;
+            }
+            log.debug("    savedState.loadedFields=" + StringUtils.booleanArrayToString(savedState.getLoadedFields()));
+            log.debug("    savedState.PC= " + convertPCToString(savedState.getPC(), cmd));
         }
-        log.debug("    savedLoadedFields=" + StringUtils.booleanArrayToString(savedLoadedFields));
-        log.debug("    savedImage = " + convertPCToString(savedPC, cmd));
     }
 
     /**

@@ -494,11 +494,6 @@ public interface DNStateManager<T> extends StateManager
     void refreshLoadedFields();
 
     /**
-     * Method to clear all saved fields on the object.
-     */
-    void clearSavedFields();
-    
-    /**
      * Refreshes from the database all fields in fetch plan.
      * Called by life-cycle transitions.
      */
@@ -508,22 +503,27 @@ public interface DNStateManager<T> extends StateManager
      * Method to clear all fields that are not part of the primary key of the object.
      */
     void clearNonPrimaryKeyFields();
-    
+
     /**
-     * Method to restore all fields of the object.
+     * Method to restore all fields of the object from the saved state, in the case of rollback.
      */
     void restoreFields();
 
     /**
-     * Method to save all fields of the object.
+     * Method to save all fields of the object to a saved state, in case of later rollback.
      */
     void saveFields();
-    
+
+    /**
+     * Method to clear all saved fields on the object from the saved state, e.g at commit.
+     */
+    void clearSavedFields();
+
     /**
      * Method to clear all fields of the object.
      */
     void clearFields();
-    
+
     /**
      * Registers the pc class in the cache
      */
