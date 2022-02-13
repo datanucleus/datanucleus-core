@@ -120,7 +120,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
                     DNStateManager objOP = ec.findStateManager(pc);
                     if (objOP == null)
                     {
-                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }
@@ -184,7 +184,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
                     DNStateManager objOP = ec.findStateManager(pc);
                     if (objOP == null)
                     {
-                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }

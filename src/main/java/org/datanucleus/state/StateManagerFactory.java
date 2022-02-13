@@ -20,6 +20,7 @@ package org.datanucleus.state;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.store.FieldValues;
 
 /**
@@ -107,11 +108,12 @@ public interface StateManagerFactory
      * @param pc The persistable to manage (see copyPc also)
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      * @param ownerSM Owner StateManager
-     * @param ownerFieldNumber Field number in owner object where this is stored
+     * @param ownerMemberNumber Member number in owner object where this is stored
+     * @param ownerMemberCmpt Component within the member where this is stored
      * @param <T> Type of the persistable class
      * @return StateManager
      */
-    <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerFieldNumber);
+    <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt);
 
     /**
      * Constructs a StateManager for an object of the specified type, creating the PC object to hold the values
@@ -120,10 +122,11 @@ public interface StateManagerFactory
      * @param ec ExecutionContext
      * @param cmd Meta-data for the class that this is an instance of.
      * @param ownerSM Owner StateManager
-     * @param ownerFieldNumber Field number in owner object where this is stored
+     * @param ownerMemberNumber Member number in owner object where this is stored
+     * @param ownerMemberCmpt Component within the member where this is stored
      * @return StateManager
      */
-    DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerFieldNumber);
+    DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt);
 
     /**
      * Constructs a StateManager to manage a transient instance that is  becoming newly persistent.

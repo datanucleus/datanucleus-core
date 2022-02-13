@@ -177,7 +177,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
                     DNStateManager objOP = ec.findStateManager(pc);
                     if (objOP == null)
                     {
-                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }
@@ -295,7 +295,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
                     DNStateManager objOP = ec.findStateManager(pc);
                     if (objOP == null)
                     {
-                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }

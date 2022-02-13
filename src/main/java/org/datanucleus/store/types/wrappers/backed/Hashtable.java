@@ -32,6 +32,7 @@ import org.datanucleus.flush.MapPutOperation;
 import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOUtils;
@@ -94,7 +95,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         DNStateManager keyOP = ec.findStateManager(key);
                         if (keyOP == null)
                         {
-                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -102,7 +104,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         DNStateManager valOP = ec.findStateManager(value);
                         if (valOP == null)
                         {
-                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                         }
                     }
                 }
@@ -181,7 +184,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         DNStateManager keyOP = ec.findStateManager(key);
                         if (keyOP == null)
                         {
-                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -189,7 +193,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         DNStateManager valOP = ec.findStateManager(value);
                         if (valOP == null)
                         {
-                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                         }
                     }
                 }

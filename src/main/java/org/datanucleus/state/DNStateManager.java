@@ -332,6 +332,7 @@ public interface DNStateManager<T> extends StateManager
     /**
      * Method to set this StateManager as managing an embedded/serialised object.
      * @param type The type of object being managed
+     * @deprecated Drop this and use memberCmpt
      */
     void setPcObjectType(short type);
 

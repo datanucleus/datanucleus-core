@@ -34,6 +34,7 @@ import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
@@ -195,7 +196,7 @@ public interface ExecutionContext extends ExecutionContextReference
     Set<String> getSupportedProperties();
 
     /**
-     * TODO should we keep this here? this is api/language dependent
+     * Convenience accessor for the type manager for this persistence context (from NucleusContext).
      * @return The type manager
      */
     default TypeManager getTypeManager()
@@ -236,9 +237,10 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param value The embedded object
      * @param owner The owner StateManager (if known).
      * @param mmd Metadata for the field of the owner
+     * @param ownerMemberCmpt Component in the owner member where this object is stored (null implies default)
      * @return StateManager for the embedded object
      */
-    DNStateManager findStateManagerForEmbedded(Object value, DNStateManager owner, AbstractMemberMetaData mmd);
+    DNStateManager findStateManagerForEmbedded(Object value, DNStateManager owner, AbstractMemberMetaData mmd, MemberComponent ownerMemberCmpt);
 
     DNStateManager findStateManagerOfOwnerForAttachingObject(Object pc);
 
@@ -921,14 +923,14 @@ public interface ExecutionContext extends ExecutionContextReference
     void setAttachDetachReferencedObject(DNStateManager sm, Object obj);
 
     /**
-     * Method to register an embedded relation for the specified memberf of the owner StateManager
-     * where the embedded StateManager is stored.
+     * Method to register an embedded relation for the specified member of the owner StateManager where the embedded StateManager is stored.
      * @param ownerSM Owner StateManager
-     * @param ownerFieldNum Member number that is embedded
+     * @param ownerMemberNum Member number that is embedded
+     * @param ownerMemberCmpt Component of member where this is embedded (null means default)
      * @param embSM StateManager of the embedded object
      * @return The EmbeddedOwnerRelation
      */
-    EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM);
+    EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerMemberNum, MemberComponent ownerMemberCmpt, DNStateManager embSM);
 
     /**
      * Method to deregister the specified embedded relation (e.g when the embedded object is disconnected).
@@ -968,18 +970,22 @@ public interface ExecutionContext extends ExecutionContextReference
     public static class EmbeddedOwnerRelation
     {
         protected DNStateManager ownerSM;
-        protected int ownerFieldNum;
+        protected int ownerMemberNum;
+        protected MemberComponent ownerMemberCmpt;
+
         protected DNStateManager embSM;
 
-        public EmbeddedOwnerRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM)
+        public EmbeddedOwnerRelation(DNStateManager sm, int memberNum, MemberComponent memberCmpt, DNStateManager embSM)
         {
-            this.ownerSM = ownerSM;
-            this.ownerFieldNum = ownerFieldNum;
+            this.ownerSM = sm;
+            this.ownerMemberNum = memberNum;
+            this.ownerMemberCmpt = memberCmpt;
             this.embSM = embSM;
         }
         public DNStateManager getOwnerSM() {return ownerSM;}
+        public int getOwnerMemberNum() {return ownerMemberNum;}
+        public MemberComponent getOwnerMemberComponent() {return ownerMemberCmpt;}
         public DNStateManager getEmbeddedSM() {return embSM;}
-        public int getOwnerFieldNum() {return ownerFieldNum;}
     }
 
     void setStateManagerAssociatedValue(DNStateManager sm, Object key, Object value);

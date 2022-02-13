@@ -124,7 +124,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }
@@ -188,7 +188,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }

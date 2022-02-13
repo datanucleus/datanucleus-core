@@ -218,6 +218,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     protected FieldManager currFM = null;
 
     /** The type of the managed object (0 = PC, 1 = embedded PC, 2 = embedded element, 3 = embedded key, 4 = embedded value. */ // TODO Merge into embedded state
+    @Deprecated
     protected short objectType = 0;
 
     /** Saved state, for use during any rollback for reinstating the object. */
@@ -1718,8 +1719,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     /**
      * Method to set this StateManager as managing an embedded/serialised object.
-     * TODO Drop this
      * @param objType The type of object being managed
+     * @deprecated Use memberCmpt
      */
     public void setPcObjectType(short objType)
     {
@@ -3375,7 +3376,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
                     if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
                     {
-                        ownerSM.makeDirty(owner.getOwnerFieldNum());
+                        ownerSM.makeDirty(owner.getOwnerMemberNum());
                     }
                 }
             }
@@ -4167,11 +4168,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             {
                 StateManagerImpl ownerOP = (StateManagerImpl) ownerRel.getOwnerSM();
 
-                AbstractMemberMetaData ownerMmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(ownerRel.getOwnerFieldNum());
+                AbstractMemberMetaData ownerMmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(ownerRel.getOwnerMemberNum());
                 if (ownerMmd.getCollection() != null)
                 {
                     // PC Object embedded in collection
-                    Object ownerField = ownerOP.provideField(ownerRel.getOwnerFieldNum());
+                    Object ownerField = ownerOP.provideField(ownerRel.getOwnerMemberNum());
                     if (ownerField instanceof SCOCollection)
                     {
                         ((SCOCollection)ownerField).updateEmbeddedElement(myPC, fieldNumber, value, makeDirty);
@@ -4181,14 +4182,14 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                         // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
                         if (makeDirty)
                         {
-                            ownerOP.makeDirty(ownerRel.getOwnerFieldNum());
+                            ownerOP.makeDirty(ownerRel.getOwnerMemberNum());
                         }
                     }
                 }
                 else if (ownerMmd.getMap() != null)
                 {
                     // PC Object embedded in map
-                    Object ownerField = ownerOP.provideField(ownerRel.getOwnerFieldNum());
+                    Object ownerField = ownerOP.provideField(ownerRel.getOwnerMemberNum());
                     if (ownerField instanceof SCOMap)
                     {
                         if (objectType == DNStateManager.EMBEDDED_MAP_KEY_PC)
@@ -4205,7 +4206,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                         // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
                         if (makeDirty)
                         {
-                            ownerOP.makeDirty(ownerRel.getOwnerFieldNum());
+                            ownerOP.makeDirty(ownerRel.getOwnerMemberNum());
                         }
                     }
                 }
@@ -4217,11 +4218,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                         // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
                         if (makeDirty)
                         {
-                            ownerOP.replaceFieldMakeDirty(ownerRel.getOwnerFieldNum(), pc);
+                            ownerOP.replaceFieldMakeDirty(ownerRel.getOwnerMemberNum(), pc);
                         }
                         else
                         {
-                            ownerOP.replaceField(ownerRel.getOwnerFieldNum(), pc);
+                            ownerOP.replaceField(ownerRel.getOwnerMemberNum(), pc);
                         }
                     }
                 }

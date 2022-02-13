@@ -117,7 +117,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }
@@ -181,7 +181,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }

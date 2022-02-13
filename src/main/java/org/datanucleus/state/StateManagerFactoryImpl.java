@@ -27,6 +27,7 @@ import org.datanucleus.cache.CachedPC;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -119,27 +120,27 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     }
 
     @Override
-    public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerFieldNumber)
+    public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         DNStateManager sm = getStateManager(ec, cmd);
         sm.initialiseForEmbedded(pc, copyPc);
         if (ownerSM != null)
         {
-            ec.registerEmbeddedRelation(ownerSM, ownerFieldNumber, sm);
+            ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, ownerMemberCmpt, sm);
         }
         return sm;
     }
 
     @Override
-    public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerFieldNumber)
+    public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt)
     {
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         DNStateManager sm = newForHollow(ec, pcClass, null);
         sm.initialiseForEmbedded(sm.getObject(), false);
         if (ownerSM != null)
         {
-            ec.registerEmbeddedRelation(ownerSM, ownerFieldNumber, sm);
+            ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, ownerMemberCmpt, sm);
         }
         return sm;
     }

@@ -419,7 +419,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
     private Object convertCachedPCToPersistable(CachedPC cachedPC, int fieldNumber)
     {
         AbstractClassMetaData valueCmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
-        DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber);
+        DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber, null);
 
         // TODO Perhaps only load fetch plan fields?
         int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), valueCmd.getAllMemberPositions(), true);

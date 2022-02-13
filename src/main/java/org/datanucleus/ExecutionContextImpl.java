@@ -77,6 +77,7 @@ import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.TransactionType;
 import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.metadata.VersionMetaData;
@@ -1351,20 +1352,37 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return sm;
     }
 
-    public DNStateManager findStateManagerForEmbedded(Object value, DNStateManager ownerSM, AbstractMemberMetaData mmd)
+    public DNStateManager findStateManagerForEmbedded(Object value, DNStateManager ownerSM, AbstractMemberMetaData mmd, MemberComponent ownerMemberCmpt)
     {
+        // This caters for the calling code using a MMD from an <embedded> definition, going back to the class itself
+        AbstractMemberMetaData ownerMmd = ownerSM.getClassMetaData().getMetaDataForMember(mmd.getName());
+
+        if (ownerMemberCmpt == null)
+        {
+            // Set default for the MemberComponent when not provided
+            if (mmd.hasCollection())
+            {
+                ownerMemberCmpt = MemberComponent.COLLECTION_ELEMENT;
+            }
+            else if (mmd.hasArray())
+            {
+                ownerMemberCmpt = MemberComponent.ARRAY_ELEMENT;
+            }
+        }
+
+        // TODO If we limit each object to one embedded owner then need to check for different owner here and create copy if necessary
+
         DNStateManager embeddedSM = findStateManager(value);
         if (embeddedSM == null)
         {
             // Assign a StateManager to manage our embedded object
-            embeddedSM = nucCtx.getStateManagerFactory().newForEmbedded(this, value, false, ownerSM,
-                ownerSM.getClassMetaData().getMetaDataForMember(mmd.getName()).getAbsoluteFieldNumber());
+            embeddedSM = nucCtx.getStateManagerFactory().newForEmbedded(this, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), ownerMemberCmpt);
         }
         DNStateManager[] embOwnerSMs = getOwnersForEmbeddedStateManager(embeddedSM);
         if (embOwnerSMs == null || embOwnerSMs.length == 0)
         {
-            int absoluteFieldNumber = ownerSM.getClassMetaData().getMetaDataForMember(mmd.getName()).getAbsoluteFieldNumber();
-            registerEmbeddedRelation(ownerSM, absoluteFieldNumber, embeddedSM);
+            // Register the relation
+            registerEmbeddedRelation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), ownerMemberCmpt, embeddedSM);
             embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_PC);
         }
         return embeddedSM;
@@ -2083,7 +2101,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                              objectType == DNStateManager.EMBEDDED_PC) && ownerSM != null)
                         {
                             // SCO object
-                            op = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum);
+                            op = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum, null);
                             op.setPcObjectType((short) objectType);
                             op.makePersistent();
                             id = op.getInternalObjectId();
@@ -2610,7 +2628,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // SCO PC (embedded/serialised)
             boolean detached = getApiAdapter().isDetached(pc);
-            DNStateManager<T> targetSM = nucCtx.getStateManagerFactory().newForEmbedded(this, pc, true, null, -1);
+            DNStateManager<T> targetSM = nucCtx.getStateManagerFactory().newForEmbedded(this, pc, true, null, -1, null);
             pcTarget = targetSM.getObject();
             if (detached)
             {
@@ -5714,12 +5732,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return getFetchGroupManager().getFetchGroupsWithName(name);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#registerEmbeddedRelation(org.datanucleus.state.DNStateManager, int, org.datanucleus.state.DNStateManager)
-     */
-    public EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM)
+    @Override
+    public EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerMemberNum, MemberComponent ownerMemberCmpt, DNStateManager embSM)
     {
-        EmbeddedOwnerRelation relation = new EmbeddedOwnerRelation(ownerSM, ownerFieldNum, embSM);
+        EmbeddedOwnerRelation relation = new EmbeddedOwnerRelation(ownerSM, ownerMemberNum, ownerMemberCmpt, embSM);
 
         if (smEmbeddedInfoByEmbedded == null)
         {
@@ -5748,9 +5764,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return relation;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#deregisterEmbeddedRelation(org.datanucleus.ExecutionContext.EmbeddedOwnerRelation)
-     */
+    @Override
     public void deregisterEmbeddedRelation(EmbeddedOwnerRelation rel)
     {
         if (smEmbeddedInfoByEmbedded != null)
@@ -5781,9 +5795,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#removeEmbeddedOwnerRelation(org.datanucleus.state.DNStateManager, int, org.datanucleus.state.DNStateManager)
-     */
+    @Override
     public void removeEmbeddedOwnerRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM)
     {
         if (smEmbeddedInfoByOwner != null)
@@ -5792,7 +5804,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             EmbeddedOwnerRelation rel = null;
             for (EmbeddedOwnerRelation ownerRel : ownerRels)
             {
-                if (ownerRel.getEmbeddedSM() == embSM && ownerRel.getOwnerFieldNum() == ownerFieldNum)
+                if (ownerRel.getEmbeddedSM() == embSM && ownerRel.getOwnerMemberNum() == ownerFieldNum)
                 {
                     rel = ownerRel;
                     break;
@@ -5805,12 +5817,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Accessor for the owning StateManagers for the managed object when stored embedded.
-     * Should really only have a single owner but users could, in principle, assign it to multiple.
-     * @param embSM StateManager that is embedded that we are looking for the owners for
-     * @return StateManagers owning this embedded object.
-     */
+    @Override
     public DNStateManager[] getOwnersForEmbeddedStateManager(DNStateManager embSM)
     {
         if (smEmbeddedInfoByEmbedded == null || !smEmbeddedInfoByEmbedded.containsKey(embSM))
@@ -5828,9 +5835,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return owners;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getOwnerInformationForEmbedded(org.datanucleus.state.DNStateManager)
-     */
+    @Override
     public List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(DNStateManager embSM)
     {
         if (smEmbeddedInfoByEmbedded == null)
@@ -5840,9 +5845,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return smEmbeddedInfoByEmbedded.get(embSM);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getEmbeddedInformationForOwner(org.datanucleus.state.DNStateManager)
-     */
+    @Override
     public List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(DNStateManager ownerSM)
     {
         if (smEmbeddedInfoByOwner == null)
@@ -5852,9 +5855,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return smEmbeddedInfoByOwner.get(ownerSM);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#setStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object, java.lang.Object)
-     */
+    @Override
     public void setStateManagerAssociatedValue(DNStateManager sm, Object key, Object value)
     {
         Map valueMap = null;
@@ -5876,9 +5877,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         valueMap.put(key, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object)
-     */
+    @Override
     public Object getStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
         if (stateManagerAssociatedValuesMap == null)
@@ -5889,9 +5888,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return valueMap == null ? null : valueMap.get(key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#removeStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object)
-     */
+    @Override
     public void removeStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
         if (stateManagerAssociatedValuesMap != null)
@@ -5904,9 +5901,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#containsStateManagerAssociatedValue(org.datanucleus.state.DNStateManager, java.lang.Object)
-     */
+    @Override
     public boolean containsStateManagerAssociatedValue(DNStateManager sm, Object key)
     {
         if (stateManagerAssociatedValuesMap != null && stateManagerAssociatedValuesMap.containsKey(sm))

@@ -121,7 +121,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }
@@ -185,7 +185,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
                     DNStateManager elemOP = ec.findStateManager(pc);
                     if (elemOP == null)
                     {
-                        elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                        elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
             }

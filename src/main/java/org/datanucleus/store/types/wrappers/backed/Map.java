@@ -36,6 +36,7 @@ import org.datanucleus.flush.MapPutOperation;
 import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOUtils;
@@ -114,7 +115,8 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
                         DNStateManager objSM = ec.findStateManager(key);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -122,7 +124,8 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
                         DNStateManager objSM = ec.findStateManager(value);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                         }
                     }
                 }
@@ -201,7 +204,8 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
                         DNStateManager objSM = ec.findStateManager(key);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -209,7 +213,8 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
                         DNStateManager objSM = ec.findStateManager(value);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                         }
                     }
                 }
