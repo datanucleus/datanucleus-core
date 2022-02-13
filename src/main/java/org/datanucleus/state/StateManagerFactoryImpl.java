@@ -63,18 +63,13 @@ public class StateManagerFactoryImpl implements StateManagerFactory
 //            smClass);
     }
 
+    @Override
     public void close()
     {
 //        smPool.close();
     }
 
-    /**
-     * Constructs a StateManager to manage a hollow instance having the given object ID.
-     * This constructor is used for creating new instances of existing persistent objects.
-     * @param ec the ExecutionContext
-     * @param pcClass the class of the new instance to be created.
-     * @param id the identity of the object.
-     */
+    @Override
     public <T> DNStateManager<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id)
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
@@ -84,15 +79,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager to manage a recently populated hollow instance having the
-     * given object ID and the given field values. This constructor is used for
-     * creating new instances of persistent objects obtained e.g. via a Query or backed by a view.
-     * @param ec ExecutionContext
-     * @param pcClass the class of the new instance to be created.
-     * @param id the identity of the object.
-     * @param fv the initial field values of the object.
-     */
+    @Override
     public <T> DNStateManager<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id, FieldValues fv)
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
@@ -102,13 +89,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager to manage a hollow instance having the given object ID.
-     * The instance is already supplied.
-     * @param ec ExecutionContext
-     * @param id the identity of the object.
-     * @param pc The object that is hollow that we are going to manage
-     */
+    @Override
     public <T> DNStateManager<T> newForHollowPreConstructed(ExecutionContext ec, Object id, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
@@ -117,14 +98,8 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager to manage a hollow (or P-clean) instance having the given FieldValues.
-     * This constructor is used for creating new instances of existing persistent objects using application identity.
-     * @param ec ExecutionContext
-     * @param pcClass the class of the new instance to be created.
-     * @param fv the initial field values of the object.
-     * @deprecated Use newForHollow instead
-     */
+    @Deprecated
+    @Override
     public <T> DNStateManager<T> newForHollowPopulatedAppId(ExecutionContext ec, Class<T> pcClass, final FieldValues fv)
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
@@ -134,12 +109,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager to manage the specified persistent instance having the given object ID.
-     * @param ec ExecutionContext
-     * @param id the identity of the object.
-     * @param pc The object that is persistent that we are going to manage
-     */
+    @Override
     public <T> DNStateManager<T> newForPersistentClean(ExecutionContext ec, Object id, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
@@ -148,16 +118,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager to manage a persistable instance that will
-     * be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
-     * @param ec ExecutionContext
-     * @param pc The persistable to manage (see copyPc also)
-     * @param copyPc Whether the SM should manage a copy of the passed PC or that one
-     * @param ownerSM Owner StateManager
-     * @param ownerFieldNumber Field number in owner object where this is stored
-     */
+    @Override
     public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerFieldNumber)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
@@ -170,15 +131,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager for an object of the specified type, creating the PC object to hold the values
-     * where this object will be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
-     * @param ec ExecutionContext
-     * @param cmd Meta-data for the class that this is an instance of.
-     * @param ownerSM Owner StateManager
-     * @param ownerFieldNumber Field number in owner object where this is stored
-     */
+    @Override
     public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerFieldNumber)
     {
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
@@ -191,15 +144,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager to manage a transient instance that is becoming newly persistent.
-     * A new object ID for the instance is obtained from the store manager and the object is inserted
-     * in the data store. This constructor is used for assigning StateManagers to existing
-     * instances that are transitioning to a persistent state.
-     * @param ec ExecutionContext
-     * @param pc the instance being make persistent.
-     * @param preInsertChanges Any changes to make before inserting
-     */
+    @Override
     public <T> DNStateManager<T> newForPersistentNew(ExecutionContext ec, T pc, FieldValues preInsertChanges)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
@@ -208,14 +153,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructs a StateManager to manage a transactional-transient instance.
-     * A new object ID for the instance is obtained from the store manager and the object is inserted in 
-     * the data store. This constructor is used for assigning a StateManager to a transient instance
-     * that is transitioning to a transient clean state.
-     * @param ec ExecutionContext
-     * @param pc the instance being make persistent.
-     */
+    @Override
     public <T> DNStateManager<T> newForTransactionalTransient(ExecutionContext ec, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
@@ -224,13 +162,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructor for creating a StateManager to manage a persistable object in detached state.
-     * @param ec ExecutionContext
-     * @param pc the detached object
-     * @param id the identity of the object.
-     * @param version the detached version
-     */
+    @Override
     public <T> DNStateManager<T> newForDetached(ExecutionContext ec, T pc, Object id, Object version)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
@@ -239,13 +171,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructor for creating a StateManager to manage a persistable object that is not persistent yet
-     * is about to be deleted. Consequently the initial lifecycle state will be P_NEW, but will soon
-     * move to P_NEW_DELETED.
-     * @param ec Execution Context
-     * @param pc the object being deleted from persistence
-     */
+    @Override
     public <T> DNStateManager<T> newForPNewToBeDeleted(ExecutionContext ec, T pc)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
@@ -254,14 +180,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Constructor to create a StateManager for an object taken from the L2 cache with the specified id.
-     * Creates an object that the cached object represents, assigns a StateManager to it, and copies across 
-     * the fields that were cached, and its version (if available).
-     * @param ec ExecutionContext
-     * @param id Id to assign to the persistable object
-     * @param cachedPC CachedPC object from the L2 cache
-     */
+    @Override
     public <T> DNStateManager<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC cachedPC)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
@@ -270,10 +189,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         return sm;
     }
 
-    /**
-     * Hook to allow a StateManager to mark itself as disconnected so that it is returned to the pool.
-     * @param sm StateManager to re-pool
-     */
+    @Override
     public void disconnectStateManager(DNStateManager sm)
     {
         // TODO Enable this when the pool is working in multithreaded mode [NUCCORE-1007]

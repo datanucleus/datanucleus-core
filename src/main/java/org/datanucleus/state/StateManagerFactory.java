@@ -96,6 +96,7 @@ public interface StateManagerFactory
      * @return StateManager
      * @deprecated Use newForHollowPopulated instead
      */
+    @Deprecated
     <T> DNStateManager<T> newForHollowPopulatedAppId(ExecutionContext ec, Class<T> pcClass, final FieldValues fv);
 
     /**

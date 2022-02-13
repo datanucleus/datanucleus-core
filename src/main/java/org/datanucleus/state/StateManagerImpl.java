@@ -115,9 +115,12 @@ import org.datanucleus.util.StringUtils;
  * StateManagers are very performance-critical, because for each Persistable object made persistent,
  * there will be one StateManager instance, adding up to the total memory footprint of that object.
  * In heap profiling analysis (cerca 2008), StateManagerImpl showed to consume bytes 169 per StateManager by itself
- * and about 500 bytes per StateManager when taking PC-individual child-object (like the OID) referred by the StateManager into account. 
+ * and about 500 bytes per StateManager when taking PC-individual child-object (like the id) referred by the StateManager into account. 
  * With small Java objects this can mean a substantial memory overhead and for applications using such small objects can be critical. 
  * For this reason the StateManager should always be minimal in memory consumption.
+ * Any fields that are only present for some cases should, in general, either be offloaded to the ExecutionContext, or to a separate object if multiple fields.
+ * The fields <I>loadedFields</I> and <I>dirtyFields</I> could, arguably, be made BitSet but it isn't clear of the benefit in the typical use-case
+ * of smaller array sizes (number of fields in a class), as per https://www.baeldung.com/java-boolean-array-bitset-performance
  * 
  * <H3>Commit/Rollback</H3>
  * When the managed object is changed it is saved as <I>savedPC</I> and its state as <I>savedPersistenceFlags</I> and <I>savedLoadedFields</I>.
@@ -214,7 +217,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /** Current FieldManager. */
     protected FieldManager currFM = null;
 
-    /** The type of the managed object (0 = PC, 1 = embedded PC, 2 = embedded element, 3 = embedded key, 4 = embedded value. */
+    /** The type of the managed object (0 = PC, 1 = embedded PC, 2 = embedded element, 3 = embedded key, 4 = embedded value. */ // TODO Merge into embedded state
     protected short objectType = 0;
 
     /** Saved state, for use during any rollback for reinstating the object. */
@@ -1709,11 +1712,13 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public boolean isEmbedded()
     {
+        // TODO Use embeddedState
         return objectType > 0;
     }
 
     /**
      * Method to set this StateManager as managing an embedded/serialised object.
+     * TODO Drop this
      * @param objType The type of object being managed
      */
     public void setPcObjectType(short objType)
@@ -4041,7 +4046,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             if (!loadedFields[fieldNumber])
             {
                 // Field not loaded, so load it
-                if (objectType != DNStateManager.PC)
+                if (isEmbedded())
                 {
                     // TODO When we have nested embedded objects that can have relations to non-embedded then this needs to change
                     // Embedded object so we assume that all was loaded before (when it was read)
