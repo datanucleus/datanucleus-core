@@ -66,6 +66,7 @@ Contributors:
         <entityresolver url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
         <entityresolver url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
         <entityresolver identity="https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
+        <entityresolver identity="https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
         <entityresolver identity="http://www.datanucleus.org/xsd/jpa/persistence_3_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
     </extension>
 </plugin>
