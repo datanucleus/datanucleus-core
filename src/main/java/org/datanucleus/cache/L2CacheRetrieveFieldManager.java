@@ -28,6 +28,7 @@ import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -202,7 +203,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 {
                     if (keyIsEmbedded || keyIsSerialised || mmd.isSerialized())
                     {
-                        mapKey = convertCachedPCToPersistable((CachedPC)entry.getKey(), mmd.getAbsoluteFieldNumber());
+                        mapKey = convertCachedPCToPersistable((CachedPC)entry.getKey(), mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                     }
                     else
                     {
@@ -222,7 +223,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                     {
                         if (valueIsEmbedded || valueIsSerialised || mmd.isSerialized())
                         {
-                            mapValue = convertCachedPCToPersistable((CachedPC)entry.getValue(), mmd.getAbsoluteFieldNumber());
+                            mapValue = convertCachedPCToPersistable((CachedPC)entry.getValue(), mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                         }
                         else
                         {
@@ -300,7 +301,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                         if (elementCachedPC != null)
                         {
                             // Convert the CachedPC back into a managed object loading all cached fields
-                            element = convertCachedPCToPersistable(elementCachedPC, mmd.getAbsoluteFieldNumber());
+                            element = convertCachedPCToPersistable(elementCachedPC, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
                         }
 
                         fieldContainerAdapter.add(element);
@@ -347,7 +348,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 if (value instanceof CachedPC)
                 {
                     // Convert the CachedPC back into a managed object loading all cached fields
-                    return convertCachedPCToPersistable((CachedPC)value, mmd.getAbsoluteFieldNumber());
+                    return convertCachedPCToPersistable((CachedPC)value, mmd.getAbsoluteFieldNumber(), null);
                 }
             }
         }
@@ -414,12 +415,13 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
      * Method to convert a nested (i.e embedded) CachedPC back to the persistable object it represents.
      * @param cachedPC The CachedPC
      * @param fieldNumber Field number in the owning object where this is stored
+     * @param memberCmpt Component that the member is stored in when embedded/serialised
      * @return The (persistable) object
      */
-    private Object convertCachedPCToPersistable(CachedPC cachedPC, int fieldNumber)
+    private Object convertCachedPCToPersistable(CachedPC cachedPC, int fieldNumber, MemberComponent memberCmpt)
     {
         AbstractClassMetaData valueCmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
-        DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber, null);
+        DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber, memberCmpt);
 
         // TODO Perhaps only load fetch plan fields?
         int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), valueCmd.getAllMemberPositions(), true);

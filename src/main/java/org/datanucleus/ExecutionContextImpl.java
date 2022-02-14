@@ -1341,8 +1341,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         DNStateManager sm = findStateManager(pc);
         if (sm == null && persist)
         {
-            int objectType = DNStateManager.PC;
-            Object object2 = persistObjectInternal(pc, null, null, -1, objectType);
+            Object object2 = persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
             sm = findStateManager(object2);
         }
         else if (sm == null)
@@ -1352,6 +1351,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return sm;
     }
 
+    @Override
     public DNStateManager findStateManagerForEmbedded(Object value, DNStateManager ownerSM, AbstractMemberMetaData mmd, MemberComponent ownerMemberCmpt)
     {
         // This caters for the calling code using a MMD from an <embedded> definition, going back to the class itself
@@ -1993,7 +1993,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param preInsertChanges Any changes to make before inserting
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.DNStateManager, e.g DNStateManager.PC)
+     * @param objectType Type of object (see org.datanucleus.DNStateManager, e.g DNStateManager.PC) TODO Use memberCmpt instead
      * @return The persisted object
      * @throws NucleusUserException if the object is managed by a different manager
      */
@@ -2101,7 +2101,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                              objectType == DNStateManager.EMBEDDED_PC) && ownerSM != null)
                         {
                             // SCO object
-                            op = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum, null);
+                            op = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum, null); // TODO Set component
                             op.setPcObjectType((short) objectType);
                             op.makePersistent();
                             id = op.getInternalObjectId();
@@ -2192,7 +2192,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param pc The object
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.DNStateManager, e.g DNStateManager.PC)
+     * @param objectType Type of object (see org.datanucleus.state.DNStateManager, e.g DNStateManager.PC) TODO Use memberCmpt instead
      * @return The persisted object
      */
     public <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, int objectType)
