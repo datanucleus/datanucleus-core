@@ -23,12 +23,12 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.StringUtils;
 
@@ -80,10 +80,9 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
     }
 
     @Override
-    public int getObjectType(AbstractMemberMetaData mmd)
+    public PersistableObjectType getObjectType(AbstractMemberMetaData mmd)
     {
-        // TODO This should be ARRAY_ELEMENT_PC but we haven't got that yet
-        return mmd.getArray().isEmbeddedElement() || mmd.getArray().isSerializedElement() ? DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC : DNStateManager.PC;
+        return mmd.getArray().isEmbeddedElement() || mmd.getArray().isSerializedElement() ? PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC : PersistableObjectType.PC;
     }
 
     @Override

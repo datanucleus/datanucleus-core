@@ -18,9 +18,9 @@ Contributors:
 package org.datanucleus.state;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.store.FieldValues;
 
 /**
@@ -113,7 +113,7 @@ public interface StateManagerFactory
      * @param <T> Type of the persistable class
      * @return StateManager
      */
-    <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt);
+    <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType ownerMemberCmpt);
 
     /**
      * Constructs a StateManager for an object of the specified type, creating the PC object to hold the values
@@ -126,7 +126,7 @@ public interface StateManagerFactory
      * @param ownerMemberCmpt Component within the member where this is stored
      * @return StateManager
      */
-    DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt);
+    DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType ownerMemberCmpt);
 
     /**
      * Constructs a StateManager to manage a transient instance that is  becoming newly persistent.

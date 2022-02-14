@@ -20,6 +20,7 @@ package org.datanucleus.store.fieldmanager;
 import java.util.Map.Entry;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
@@ -61,17 +62,17 @@ public class PersistFieldManager extends AbstractFieldManager
      * Utility method to process the passed persistable object.
      * @param pc The PC object
      * @param ownerFieldNum Field number of owner where this is embedded
-     * @param objectType Type of object (see org.datanucleus.state.DNStateManager)
+     * @param objectType Type of object
      * @return The processed persistable object
      */
-    protected Object processPersistable(Object pc, int ownerFieldNum, int objectType)
+    protected Object processPersistable(Object pc, int ownerFieldNum, PersistableObjectType objectType)
     {
         // TODO Consider adding more of the functionality in SCOUtils.validateObjectForWriting
         ApiAdapter adapter = sm.getExecutionContext().getApiAdapter();
         if (!adapter.isPersistent(pc) || (adapter.isPersistent(pc) && adapter.isDeleted(pc)))
         {
             // Object is TRANSIENT/DETACHED and being persisted, or P_NEW_DELETED and being re-persisted
-            if (objectType != DNStateManager.PC)
+            if (objectType != PersistableObjectType.PC)
             {
                 return sm.getExecutionContext().persistObjectInternal(pc, sm, ownerFieldNum, objectType);
             }
@@ -118,11 +119,11 @@ public class PersistFieldManager extends AbstractFieldManager
                         // Process PC fields
                         if (mmd.isEmbedded() || mmd.isSerialized())
                         {
-                            processPersistable(value, fieldNumber, DNStateManager.EMBEDDED_PC);
+                            processPersistable(value, fieldNumber, PersistableObjectType.EMBEDDED_PC);
                         }
                         else
                         {
-                            processPersistable(value, -1, DNStateManager.PC);
+                            processPersistable(value, -1, PersistableObjectType.PC);
                         }
                     }
                 }
@@ -160,14 +161,16 @@ public class PersistFieldManager extends AbstractFieldManager
             if (api.isPersistable(mapKey))
             {
                 // Persist (or attach) the key
-                int mapKeyObjectType = mmd.getMap().isEmbeddedKey() || mmd.getMap().isSerializedKey() ? DNStateManager.EMBEDDED_MAP_KEY_PC : DNStateManager.PC;
+                PersistableObjectType mapKeyObjectType = mmd.getMap().isEmbeddedKey() || mmd.getMap().isSerializedKey() ? 
+                        PersistableObjectType.EMBEDDED_MAP_KEY_PC : PersistableObjectType.PC;
                 newMapKey = processPersistable(mapKey, mmd.getAbsoluteFieldNumber(), mapKeyObjectType);
             }
 
             if (api.isPersistable(mapValue))
             {
                 // Persist (or attach) the value
-                int mapValueObjectType = mmd.getMap().isEmbeddedValue() || mmd.getMap().isSerializedValue() ? DNStateManager.EMBEDDED_MAP_VALUE_PC : DNStateManager.PC;
+                PersistableObjectType mapValueObjectType = mmd.getMap().isEmbeddedValue() || mmd.getMap().isSerializedValue() ? 
+                        PersistableObjectType.EMBEDDED_MAP_VALUE_PC : PersistableObjectType.PC;
                 newMapValue = processPersistable(mapValue, mmd.getAbsoluteFieldNumber(), mapValueObjectType);
             }
 
@@ -217,8 +220,8 @@ public class PersistFieldManager extends AbstractFieldManager
         ElementContainerAdapter containerAdapter = elementContainerHandler.getAdapter(container);
 
         ApiAdapter api = sm.getExecutionContext().getApiAdapter();
-        int objectType = elementContainerHandler.getObjectType(mmd);
-        if (objectType == DNStateManager.PC)
+        PersistableObjectType objectType = elementContainerHandler.getObjectType(mmd);
+        if (objectType == PersistableObjectType.PC)
         {
             int elementPosition = 0;
             for (Object element : containerAdapter)

@@ -46,6 +46,7 @@ public interface DNStateManager<T> extends StateManager
     /** Key prefix under which we store member (identity) value when just retrieving a FK. Member number is then appended to this prefix. */
     public static final String MEMBER_VALUE_STORED_PREFIX = "MEMBER_VALUE.STORED.";
 
+    // TODO Drop these and use PersistableObjectType enum
     /** PC **/
     public static short PC = 0;
     /** Embedded (or serialised) PC **/
@@ -332,7 +333,7 @@ public interface DNStateManager<T> extends StateManager
     /**
      * Method to set this StateManager as managing an embedded/serialised object.
      * @param type The type of object being managed
-     * @deprecated Drop this and use memberCmpt
+     * @deprecated Drop this and use from embedded relation info
      */
     void setPcObjectType(short type);
 

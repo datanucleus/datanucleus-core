@@ -15,17 +15,24 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.metadata;
+package org.datanucleus;
 
 /**
- * Definition of a component of a member.
- * Allows definition of part of a member where a related object is persisted.
- * This is of particular use when dealing with a map and a persistent object is in the key or the value.
+ * Definition of the type of a persistable object.
+ * This can be a plan persistable object (PC) or a persistable object embedded/serialised in a collection/array element or in a map key/value.
  */
-public enum MemberComponent
+public enum PersistableObjectType
 {
-    COLLECTION_ELEMENT, // Only place in a collection
-    ARRAY_ELEMENT, // Only place in an array
-    MAP_KEY,
-    MAP_VALUE
+    /** Persisted in own right with an identity */
+    PC,
+    /** Persistable type persisted into owner */
+    EMBEDDED_PC,
+    /** Persistable collection element persisted into owner */
+    EMBEDDED_COLLECTION_ELEMENT_PC,
+    /** Persistable array element persisted into owner */
+    EMBEDDED_ARRAY_ELEMENT_PC,
+    /** Persistable map key persisted into owner */
+    EMBEDDED_MAP_KEY_PC,
+    /** Persistable map value persisted into owner */
+    EMBEDDED_MAP_VALUE_PC
 }

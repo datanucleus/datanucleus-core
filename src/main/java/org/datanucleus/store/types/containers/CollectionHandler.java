@@ -25,13 +25,13 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.OrderMetaData;
-import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -89,9 +89,10 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
     }
 
     @Override
-    public int getObjectType(AbstractMemberMetaData mmd) 
+    public PersistableObjectType getObjectType(AbstractMemberMetaData mmd) 
     {
-        return mmd.getCollection().isEmbeddedElement() || mmd.getCollection().isSerializedElement() ? DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC : DNStateManager.PC;
+        return mmd.getCollection().isEmbeddedElement() || mmd.getCollection().isSerializedElement() ? 
+                PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC : PersistableObjectType.PC;
     }
 
     @Override

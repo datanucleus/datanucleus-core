@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.flush.MapClearOperation;
 import org.datanucleus.flush.MapPutOperation;
 import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOUtils;
@@ -96,7 +96,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         if (objSM == null)
                         {
                             objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
-                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_KEY_PC);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -105,7 +105,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         if (objSM == null)
                         {
                             objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
-                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
                         }
                     }
                 }
@@ -185,7 +185,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         if (objSM == null)
                         {
                             objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
-                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_KEY_PC);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -194,7 +194,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         if (objSM == null)
                         {
                             objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
-                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
+                                ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
                         }
                     }
                 }

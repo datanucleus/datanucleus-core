@@ -34,7 +34,6 @@ import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
@@ -237,10 +236,10 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param value The embedded object
      * @param owner The owner StateManager (if known).
      * @param mmd Metadata for the field of the owner
-     * @param ownerMemberCmpt Component in the owner member where this object is stored (null implies default)
+     * @param objectType Type of persistable object being stored (null implies take default for the member if one possible)
      * @return StateManager for the embedded object
      */
-    DNStateManager findStateManagerForEmbedded(Object value, DNStateManager owner, AbstractMemberMetaData mmd, MemberComponent ownerMemberCmpt);
+    DNStateManager findStateManagerForEmbedded(Object value, DNStateManager owner, AbstractMemberMetaData mmd, PersistableObjectType objectType);
 
     DNStateManager findStateManagerOfOwnerForAttachingObject(Object pc);
 
@@ -303,32 +302,32 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param preInsertChanges Changes to be made before inserting
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.store.DNStateManager, e.g DNStateManager.PC)
+     * @param objectType Type of object
      * @param <T> Type of the persistable object
      * @return The persisted object
      */
-    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, int objectType);
+    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType);
 
     /**
      * Method to persist the passed object (internally).
      * @param pc The object
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.state.DNStateManager, e.g DNStateManager.PC)
+     * @param objectType Type of object
      * @param <T> Type of the persistable object
      * @return The persisted object
      */
-    <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, int objectType);
+    <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType);
 
     /**
      * Method to persist the passed object (internally).
      * @param pc The object
      * @param preInsertChanges Changes to be made before inserting
-     * @param objectType Type of object (see org.datanucleus.state.DNStateManager, e.g DNStateManager.PC)
+     * @param objectType Type of object
      * @param <T> Type of the persistable object
      * @return The persisted object
      */
-    default <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, int objectType)
+    default <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, PersistableObjectType objectType)
     {
         return persistObjectInternal(pc, preInsertChanges, null, -1, objectType);
     }
@@ -926,11 +925,11 @@ public interface ExecutionContext extends ExecutionContextReference
      * Method to register an embedded relation for the specified member of the owner StateManager where the embedded StateManager is stored.
      * @param ownerSM Owner StateManager
      * @param ownerMemberNum Member number that is embedded
-     * @param ownerMemberCmpt Component of member where this is embedded (null means default)
+     * @param objectType Type of object being persisted
      * @param embSM StateManager of the embedded object
      * @return The EmbeddedOwnerRelation
      */
-    EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerMemberNum, MemberComponent ownerMemberCmpt, DNStateManager embSM);
+    EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerMemberNum, PersistableObjectType objectType, DNStateManager embSM);
 
     /**
      * Method to deregister the specified embedded relation (e.g when the embedded object is disconnected).
@@ -971,21 +970,21 @@ public interface ExecutionContext extends ExecutionContextReference
     {
         protected DNStateManager ownerSM;
         protected int ownerMemberNum;
-        protected MemberComponent ownerMemberCmpt;
+        protected PersistableObjectType objectType;
 
-        protected DNStateManager embSM;
+        protected DNStateManager embeddedSM;
 
-        public EmbeddedOwnerRelation(DNStateManager sm, int memberNum, MemberComponent memberCmpt, DNStateManager embSM)
+        public EmbeddedOwnerRelation(DNStateManager sm, int memberNum, PersistableObjectType objectType, DNStateManager embSM)
         {
             this.ownerSM = sm;
             this.ownerMemberNum = memberNum;
-            this.ownerMemberCmpt = memberCmpt;
-            this.embSM = embSM;
+            this.objectType = objectType;
+            this.embeddedSM = embSM;
         }
         public DNStateManager getOwnerSM() {return ownerSM;}
         public int getOwnerMemberNum() {return ownerMemberNum;}
-        public MemberComponent getOwnerMemberComponent() {return ownerMemberCmpt;}
-        public DNStateManager getEmbeddedSM() {return embSM;}
+        public PersistableObjectType getObjectType() {return objectType;}
+        public DNStateManager getEmbeddedSM() {return embeddedSM;}
     }
 
     void setStateManagerAssociatedValue(DNStateManager sm, Object key, Object value);

@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.cache.CachedPC.CachedId;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -203,7 +203,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 {
                     if (keyIsEmbedded || keyIsSerialised || mmd.isSerialized())
                     {
-                        mapKey = convertCachedPCToPersistable((CachedPC)entry.getKey(), mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
+                        mapKey = convertCachedPCToPersistable((CachedPC)entry.getKey(), mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_KEY_PC);
                     }
                     else
                     {
@@ -223,7 +223,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                     {
                         if (valueIsEmbedded || valueIsSerialised || mmd.isSerialized())
                         {
-                            mapValue = convertCachedPCToPersistable((CachedPC)entry.getValue(), mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
+                            mapValue = convertCachedPCToPersistable((CachedPC)entry.getValue(), mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
                         }
                         else
                         {
@@ -301,7 +301,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                         if (elementCachedPC != null)
                         {
                             // Convert the CachedPC back into a managed object loading all cached fields
-                            element = convertCachedPCToPersistable(elementCachedPC, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
+                            element = convertCachedPCToPersistable(elementCachedPC, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                         }
 
                         fieldContainerAdapter.add(element);
@@ -414,14 +414,14 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
     /**
      * Method to convert a nested (i.e embedded) CachedPC back to the persistable object it represents.
      * @param cachedPC The CachedPC
-     * @param fieldNumber Field number in the owning object where this is stored
-     * @param memberCmpt Component that the member is stored in when embedded/serialised
+     * @param memberNumber Member number in the owning object where this is stored
+     * @param objectType Type of object that is embedded/serialised
      * @return The (persistable) object
      */
-    private Object convertCachedPCToPersistable(CachedPC cachedPC, int fieldNumber, MemberComponent memberCmpt)
+    private Object convertCachedPCToPersistable(CachedPC cachedPC, int memberNumber, PersistableObjectType objectType)
     {
         AbstractClassMetaData valueCmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
-        DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, fieldNumber, memberCmpt);
+        DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, memberNumber, objectType);
 
         // TODO Perhaps only load fetch plan fields?
         int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), valueCmd.getAllMemberPositions(), true);

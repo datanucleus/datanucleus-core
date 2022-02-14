@@ -77,7 +77,6 @@ import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.TransactionType;
 import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.metadata.VersionMetaData;
@@ -1341,7 +1340,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         DNStateManager sm = findStateManager(pc);
         if (sm == null && persist)
         {
-            Object object2 = persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
+            Object object2 = persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
             sm = findStateManager(object2);
         }
         else if (sm == null)
@@ -1352,21 +1351,21 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public DNStateManager findStateManagerForEmbedded(Object value, DNStateManager ownerSM, AbstractMemberMetaData mmd, MemberComponent ownerMemberCmpt)
+    public DNStateManager findStateManagerForEmbedded(Object value, DNStateManager ownerSM, AbstractMemberMetaData mmd, PersistableObjectType objectType)
     {
         // This caters for the calling code using a MMD from an <embedded> definition, going back to the class itself
         AbstractMemberMetaData ownerMmd = ownerSM.getClassMetaData().getMetaDataForMember(mmd.getName());
 
-        if (ownerMemberCmpt == null)
+        if (objectType == null)
         {
-            // Set default for the MemberComponent when not provided
+            // Set default when not provided
             if (mmd.hasCollection())
             {
-                ownerMemberCmpt = MemberComponent.COLLECTION_ELEMENT;
+                objectType = PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC;
             }
             else if (mmd.hasArray())
             {
-                ownerMemberCmpt = MemberComponent.ARRAY_ELEMENT;
+                objectType = PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC;
             }
         }
 
@@ -1376,13 +1375,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (embeddedSM == null)
         {
             // Assign a StateManager to manage our embedded object
-            embeddedSM = nucCtx.getStateManagerFactory().newForEmbedded(this, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), ownerMemberCmpt);
+            embeddedSM = nucCtx.getStateManagerFactory().newForEmbedded(this, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), objectType);
         }
         DNStateManager[] embOwnerSMs = getOwnersForEmbeddedStateManager(embeddedSM);
         if (embOwnerSMs == null || embOwnerSMs.length == 0)
         {
             // Register the relation
-            registerEmbeddedRelation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), ownerMemberCmpt, embeddedSM);
+            registerEmbeddedRelation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), objectType, embeddedSM);
             embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_PC);
         }
         return embeddedSM;
@@ -1953,7 +1952,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         boolean detached = getApiAdapter().isDetached(obj);
 
         // Persist the object
-        Object persistedPc = persistObjectInternal(obj, null, null, -1, DNStateManager.PC);
+        Object persistedPc = persistObjectInternal(obj, null, null, -1, PersistableObjectType.PC);
 
         // If using reachability at commit and appropriate save it for reachability checks when we commit
         DNStateManager sm = findStateManager(persistedPc);
@@ -1993,11 +1992,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param preInsertChanges Any changes to make before inserting
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.DNStateManager, e.g DNStateManager.PC) TODO Use memberCmpt instead
+     * @param objectType Type of object
      * @return The persisted object
      * @throws NucleusUserException if the object is managed by a different manager
      */
-    public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, int objectType)
+    @Override
+    public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType)
     {
         if (obj == null)
         {
@@ -2095,14 +2095,29 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     DNStateManager<T> op = findStateManager(obj);
                     if (op == null)
                     {
-                        if ((objectType == DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC || 
-                             objectType == DNStateManager.EMBEDDED_MAP_KEY_PC ||
-                             objectType == DNStateManager.EMBEDDED_MAP_VALUE_PC ||
-                             objectType == DNStateManager.EMBEDDED_PC) && ownerSM != null)
+                        if ((objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || 
+                             objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC ||
+                             objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC ||
+                             objectType == PersistableObjectType.EMBEDDED_PC) && ownerSM != null)
                         {
                             // SCO object
                             op = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum, null); // TODO Set component
-                            op.setPcObjectType((short) objectType);
+                            if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
+                            {
+                                op.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
+                            }
+                            else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
+                            {
+                                op.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
+                            }
+                            else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
+                            {
+                                op.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
+                            }
+                            else if (objectType == PersistableObjectType.EMBEDDED_PC)
+                            {
+                                op.setPcObjectType(DNStateManager.EMBEDDED_PC);
+                            }
                             op.makePersistent();
                             id = op.getInternalObjectId();
                         }
@@ -2192,10 +2207,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param pc The object
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object (see org.datanucleus.state.DNStateManager, e.g DNStateManager.PC) TODO Use memberCmpt instead
+     * @param objectType Type of object
      * @return The persisted object
      */
-    public <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, int objectType)
+    @Override
+    public <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType)
     {
         if (ownerSM != null)
         {
@@ -2210,6 +2226,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param objs The objects
      * @throws NucleusUserException Thrown if an error occurs during the deletion process. Any exception could have several nested exceptions for each failed object deletion
      */
+    @Override
     public void deleteObjects(Object... objs)
     {
         if (objs == null)
@@ -2557,7 +2574,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else if (id == null && !sco)
         {
             // Transient object so needs persisting
-            persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
+            persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
             return;
         }
 
@@ -2614,7 +2631,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else if (id == null && !sco)
         {
             // Object was not persisted before so persist it
-            return persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
+            return persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
         }
         else if (api.isPersistent(pc))
         {
@@ -2704,7 +2721,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Transient object passed so persist it before thinking about detaching
             if (tx.isActive())
             {
-                persistObjectInternal(obj, null, null, -1, DNStateManager.PC);
+                persistObjectInternal(obj, null, null, -1, PersistableObjectType.PC);
             }
         }
 
@@ -2753,7 +2770,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Transient object passed so persist it before thinking about detaching
                 if (tx.isActive())
                 {
-                    persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
+                    persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
                 }
             }
 
@@ -2797,7 +2814,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Transient object passed so persist it before thinking about detaching
                 if (tx.isActive())
                 {
-                    thePC = persistObjectInternal(pc, null, null, -1, DNStateManager.PC);
+                    thePC = persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
                 }
                 else
                 {
@@ -5733,9 +5750,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerMemberNum, MemberComponent ownerMemberCmpt, DNStateManager embSM)
+    public EmbeddedOwnerRelation registerEmbeddedRelation(DNStateManager ownerSM, int ownerMemberNum, PersistableObjectType objectType, DNStateManager embSM)
     {
-        EmbeddedOwnerRelation relation = new EmbeddedOwnerRelation(ownerSM, ownerMemberNum, ownerMemberCmpt, embSM);
+        EmbeddedOwnerRelation relation = new EmbeddedOwnerRelation(ownerSM, ownerMemberNum, objectType, embSM);
 
         if (smEmbeddedInfoByEmbedded == null)
         {

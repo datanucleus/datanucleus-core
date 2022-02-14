@@ -45,6 +45,7 @@ import org.datanucleus.ExecutionContext.EmbeddedOwnerRelation;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.FetchPlanState;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC;
@@ -524,7 +525,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                             if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
                             {
                                 // Make sure the PC field is persistent - can cause the insert of our object being managed by this SM via flush() when bidir relation
-                                Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, DNStateManager.PC);
+                                Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, PersistableObjectType.PC);
                                 replaceField(myPC, fieldNumber, persistedFieldPC, false);
                             }
                         }
@@ -1694,17 +1695,15 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void unloadField(String fieldName)
     {
-        if (objectType == DNStateManager.PC)
-        {
-            // Mark as not loaded
-            AbstractMemberMetaData mmd = getClassMetaData().getMetaDataForMember(fieldName);
-            loadedFields[mmd.getAbsoluteFieldNumber()] = false;
-        }
-        else
+        if (isEmbedded())
         {
             // TODO When we have nested embedded objects that can have relations to non-embedded then this needs to change
             throw new NucleusUserException("Cannot unload field/property of embedded object");
         }
+
+        // Mark as not loaded
+        AbstractMemberMetaData mmd = getClassMetaData().getMetaDataForMember(fieldName);
+        loadedFields[mmd.getAbsoluteFieldNumber()] = false;
     }
 
     /**
@@ -1720,7 +1719,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /**
      * Method to set this StateManager as managing an embedded/serialised object.
      * @param objType The type of object being managed
-     * @deprecated Use memberCmpt
+     * @deprecated Use from embedded relation info
      */
     public void setPcObjectType(short objType)
     {

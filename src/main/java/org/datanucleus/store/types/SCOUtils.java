@@ -38,6 +38,7 @@ import java.util.TreeSet;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlanState;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
@@ -1171,7 +1172,7 @@ public class SCOUtils
                 if (!exists)
                 {
                     // Persist the object
-                    ec.persistObjectInternal(object, fieldValues, DNStateManager.PC);
+                    ec.persistObjectInternal(object, fieldValues, PersistableObjectType.PC);
                     persisted = true;
                 }
             }

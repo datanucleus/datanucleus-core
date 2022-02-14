@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.containers;
 
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
@@ -29,7 +30,7 @@ public abstract class ElementContainerHandler<C, A extends ElementContainerAdapt
 {
 	public abstract C newContainer(AbstractMemberMetaData mmd, Object... objects);
 
-	public abstract int getObjectType(AbstractMemberMetaData mmd);
+	public abstract PersistableObjectType getObjectType(AbstractMemberMetaData mmd);
 
     public String getElementTypeName(ContainerMetaData cmd)
     {

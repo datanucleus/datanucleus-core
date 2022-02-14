@@ -20,6 +20,7 @@ package org.datanucleus.state;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.Configuration;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
@@ -27,7 +28,6 @@ import org.datanucleus.cache.CachedPC;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -120,7 +120,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     }
 
     @Override
-    public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt)
+    public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType ownerMemberCmpt)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         DNStateManager sm = getStateManager(ec, cmd);
@@ -133,7 +133,7 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     }
 
     @Override
-    public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, MemberComponent ownerMemberCmpt)
+    public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType ownerMemberCmpt)
     {
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         DNStateManager sm = newForHollow(ec, pcClass, null);
