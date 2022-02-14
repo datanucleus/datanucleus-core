@@ -348,7 +348,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 if (value instanceof CachedPC)
                 {
                     // Convert the CachedPC back into a managed object loading all cached fields
-                    return convertCachedPCToPersistable((CachedPC)value, mmd.getAbsoluteFieldNumber(), null);
+                    return convertCachedPCToPersistable((CachedPC)value, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_PC);
                 }
             }
         }

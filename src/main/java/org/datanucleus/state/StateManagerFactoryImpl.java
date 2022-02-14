@@ -31,6 +31,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -120,28 +121,77 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     }
 
     @Override
-    public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType ownerMemberCmpt)
+    public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType objectType)
     {
+        if (objectType == null)
+        {
+            // TODO Remove this
+            NucleusLogger.GENERAL.error("SMF.newForEmbedded(PC) has null objectType", new Exception());
+        }
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         DNStateManager sm = getStateManager(ec, cmd);
         sm.initialiseForEmbedded(pc, copyPc);
         if (ownerSM != null)
         {
-            ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, ownerMemberCmpt, sm);
+            ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, objectType, sm);
         }
+
+        // TODO Drop this when the above code works fully
+        if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
+        }
+        else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
+        }
+        else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
+        }
+        else if (objectType == PersistableObjectType.EMBEDDED_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_PC);
+        }
+
         return sm;
     }
 
     @Override
-    public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType ownerMemberCmpt)
+    public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType objectType)
     {
+        if (objectType == null)
+        {
+            // TODO Remove this
+            NucleusLogger.GENERAL.error("SMF.newForEmbedded(CMD) has null objectType", new Exception());
+        }
+        // TODO Collection : If the member metadata has "fieldTypes" specified then we should use that data here rather than just the "cmd" of the element.
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         DNStateManager sm = newForHollow(ec, pcClass, null);
         sm.initialiseForEmbedded(sm.getObject(), false);
         if (ownerSM != null)
         {
-            ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, ownerMemberCmpt, sm);
+            ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, objectType, sm);
         }
+
+        // TODO Drop this when the above code works fully
+        if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
+        }
+        else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
+        }
+        else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
+        }
+        else if (objectType == PersistableObjectType.EMBEDDED_PC)
+        {
+            sm.setPcObjectType(DNStateManager.EMBEDDED_PC);
+        }
+
         return sm;
     }
 

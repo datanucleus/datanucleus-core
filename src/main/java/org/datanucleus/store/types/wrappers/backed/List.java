@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.flush.ListAddAtOperation;
 import org.datanucleus.flush.CollectionAddOperation;
@@ -121,7 +122,8 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), 
+                            PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                     }
                 }
             }
@@ -185,7 +187,8 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
                     DNStateManager elemOP = ec.findStateManager(pc);
                     if (elemOP == null)
                     {
-                        elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
+                        elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
+                            PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                     }
                 }
             }

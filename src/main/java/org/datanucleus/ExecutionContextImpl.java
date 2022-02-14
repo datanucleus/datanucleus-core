@@ -1382,7 +1382,24 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // Register the relation
             registerEmbeddedRelation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), objectType, embeddedSM);
-            embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_PC);
+
+            // TODO Drop this when the above code works fully
+            if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
+            {
+                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
+            }
+            else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
+            {
+                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
+            }
+            else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
+            {
+                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
+            }
+            else if (objectType == PersistableObjectType.EMBEDDED_PC)
+            {
+                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_PC);
+            }
         }
         return embeddedSM;
     }
@@ -2092,8 +2109,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                 if (!merged)
                 {
-                    DNStateManager<T> op = findStateManager(obj);
-                    if (op == null)
+                    DNStateManager<T> sm = findStateManager(obj);
+                    if (sm == null)
                     {
                         if ((objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || 
                              objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC ||
@@ -2101,51 +2118,36 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                              objectType == PersistableObjectType.EMBEDDED_PC) && ownerSM != null)
                         {
                             // SCO object
-                            op = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum, null); // TODO Set component
-                            if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
-                            {
-                                op.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
-                            }
-                            else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
-                            {
-                                op.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
-                            }
-                            else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
-                            {
-                                op.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
-                            }
-                            else if (objectType == PersistableObjectType.EMBEDDED_PC)
-                            {
-                                op.setPcObjectType(DNStateManager.EMBEDDED_PC);
-                            }
-                            op.makePersistent();
-                            id = op.getInternalObjectId();
+                            sm = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum, objectType);
+
+                            sm.makePersistent();
+                            id = sm.getInternalObjectId();
                         }
                         else
                         {
                             // FCO object
-                            op = nucCtx.getStateManagerFactory().newForPersistentNew(this, obj, preInsertChanges);
-                            op.makePersistent();
-                            id = op.getInternalObjectId();
+                            sm = nucCtx.getStateManagerFactory().newForPersistentNew(this, obj, preInsertChanges);
+                            sm.makePersistent();
+                            id = sm.getInternalObjectId();
                         }
                     }
                     else
                     {
-                        if (op.getReferencedPC() == null)
+                        if (sm.getReferencedPC() == null)
                         {
                             // Persist it
-                            op.makePersistent();
-                            id = op.getInternalObjectId();
+                            sm.makePersistent();
+                            id = sm.getInternalObjectId();
                         }
                         else
                         {
                             // Being attached, so use the attached object
-                            persistedPc = op.getReferencedPC();
+                            persistedPc = sm.getReferencedPC();
                         }
                     }
-                    if (op != null)
+                    if (sm != null)
                     {
-                        cacheable = nucCtx.isClassCacheable(op.getClassMetaData());
+                        cacheable = nucCtx.isClassCacheable(sm.getClassMetaData());
                     }
                 }
             }
@@ -2645,7 +2647,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // SCO PC (embedded/serialised)
             boolean detached = getApiAdapter().isDetached(pc);
-            DNStateManager<T> targetSM = nucCtx.getStateManagerFactory().newForEmbedded(this, pc, true, null, -1, null);
+            DNStateManager<T> targetSM = nucCtx.getStateManagerFactory().newForEmbedded(this, pc, true, null, -1, PersistableObjectType.EMBEDDED_PC);
             pcTarget = targetSM.getObject();
             if (detached)
             {

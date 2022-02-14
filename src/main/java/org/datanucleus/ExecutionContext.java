@@ -236,7 +236,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param value The embedded object
      * @param owner The owner StateManager (if known).
      * @param mmd Metadata for the field of the owner
-     * @param objectType Type of persistable object being stored (null implies take default for the member if one possible)
+     * @param objectType Type of persistable object being stored
      * @return StateManager for the embedded object
      */
     DNStateManager findStateManagerForEmbedded(Object value, DNStateManager owner, AbstractMemberMetaData mmd, PersistableObjectType objectType);

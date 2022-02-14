@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionClearOperation;
@@ -124,7 +125,8 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
+                            PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                     }
                 }
             }
@@ -188,7 +190,8 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), null);
+                        objSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
+                            PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                     }
                 }
             }
