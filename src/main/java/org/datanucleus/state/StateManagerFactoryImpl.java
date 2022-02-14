@@ -31,7 +31,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -123,11 +122,6 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     @Override
     public <T> DNStateManager<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType objectType)
     {
-        if (objectType == null)
-        {
-            // TODO Remove this
-            NucleusLogger.GENERAL.error("SMF.newForEmbedded(PC) has null objectType", new Exception());
-        }
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         DNStateManager sm = getStateManager(ec, cmd);
         sm.initialiseForEmbedded(pc, copyPc);
@@ -160,12 +154,14 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     @Override
     public DNStateManager newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, DNStateManager ownerSM, int ownerMemberNumber, PersistableObjectType objectType)
     {
-        if (objectType == null)
-        {
-            // TODO Remove this
-            NucleusLogger.GENERAL.error("SMF.newForEmbedded(CMD) has null objectType", new Exception());
-        }
         // TODO Collection : If the member metadata has "fieldTypes" specified then we should use that data here rather than just the "cmd" of the element.
+//      Class embeddedType = clr.classForName(embCmd.getFullClassName());
+//      if (mmd.getFieldTypes() != null && mmd.getFieldTypes().length > 0)
+//      {
+//          // Embedded type has field-type defined so use that as our embedded type
+//          embeddedType = ec.getClassLoaderResolver().classForName(mmd.getFieldTypes()[0]);
+//      }
+
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         DNStateManager sm = newForHollow(ec, pcClass, null);
         sm.initialiseForEmbedded(sm.getObject(), false);

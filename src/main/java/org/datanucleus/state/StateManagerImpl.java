@@ -131,6 +131,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 {
     protected static final SingleTypeFieldManager HOLLOWFIELDMANAGER = new SingleTypeFieldManager();
 
+    /** Whether we are managing an embedded object. */
+    protected static final int FLAG_EMBEDDED = 2<<18;
     /** Whether we are currently validating the object in the datastore. */
     protected static final int FLAG_VALIDATING = 2<<17;
     /** Whether to restore values at StateManager. If true, overwrites the restore values at tx level. */
@@ -438,6 +440,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         myID = null; // It is embedded at this point so dont need an ID since we're not persisting it
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
         persistenceFlags = Persistable.LOAD_REQUIRED;
+        flags |= FLAG_EMBEDDED;
 
         myPC = pc;
         replaceStateManager(myPC, this); // Set SM for embedded PC to be this
@@ -1712,8 +1715,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public boolean isEmbedded()
     {
-        // TODO Use embeddedState
-        return objectType > 0;
+        return (flags&FLAG_EMBEDDED) != 0;
     }
 
     /**

@@ -1356,50 +1356,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // This caters for the calling code using a MMD from an <embedded> definition, going back to the class itself
         AbstractMemberMetaData ownerMmd = ownerSM.getClassMetaData().getMetaDataForMember(mmd.getName());
 
-        if (objectType == null)
-        {
-            // Set default when not provided
-            if (mmd.hasCollection())
-            {
-                objectType = PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC;
-            }
-            else if (mmd.hasArray())
-            {
-                objectType = PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC;
-            }
-        }
-
         // TODO If we limit each object to one embedded owner then need to check for different owner here and create copy if necessary
 
         DNStateManager embeddedSM = findStateManager(value);
         if (embeddedSM == null)
         {
-            // Assign a StateManager to manage our embedded object
+            // Assign a StateManager to manage our embedded object (and register it)
             embeddedSM = nucCtx.getStateManagerFactory().newForEmbedded(this, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), objectType);
-        }
-        DNStateManager[] embOwnerSMs = getOwnersForEmbeddedStateManager(embeddedSM);
-        if (embOwnerSMs == null || embOwnerSMs.length == 0)
-        {
-            // Register the relation
-            registerEmbeddedRelation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), objectType, embeddedSM);
-
-            // TODO Drop this when the above code works fully
-            if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
-            {
-                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
-            }
-            else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
-            {
-                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
-            }
-            else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
-            {
-                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
-            }
-            else if (objectType == PersistableObjectType.EMBEDDED_PC)
-            {
-                embeddedSM.setPcObjectType(DNStateManager.EMBEDDED_PC);
-            }
         }
         return embeddedSM;
     }
@@ -5756,6 +5719,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         EmbeddedOwnerRelation relation = new EmbeddedOwnerRelation(ownerSM, ownerMemberNum, objectType, embSM);
 
+        // Keyed by embedded
         if (smEmbeddedInfoByEmbedded == null)
         {
             smEmbeddedInfoByEmbedded = new HashMap<DNStateManager, List<EmbeddedOwnerRelation>>();
@@ -5768,6 +5732,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         relations.add(relation);
         smEmbeddedInfoByEmbedded.put(embSM, relations);
 
+        // Keyed by owner
         if (smEmbeddedInfoByOwner == null)
         {
             smEmbeddedInfoByOwner = new HashMap<DNStateManager, List<EmbeddedOwnerRelation>>();
