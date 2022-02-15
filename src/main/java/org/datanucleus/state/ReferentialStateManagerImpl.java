@@ -71,14 +71,13 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
     }
 
     /**
-     * Change the activity state to a particular state.
-     * @param activityState the new state
+     * Override the superclass that simply sets the INSERTING_CALLBACKS flag, and call insertion notify list.
      */
     @Override
-    public void changeActivityState(ActivityState activityState)
+    public void setInsertingCallbacks()
     {
-        activity = activityState;
-        if (activityState == ActivityState.INSERTING_CALLBACKS && insertionNotifyList != null)
+        super.setInsertingCallbacks();
+        if (insertionNotifyList != null)
         {
             // Full insertion has just completed so notify all interested parties
             synchronized (insertionNotifyList)

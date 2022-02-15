@@ -219,9 +219,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /** indicators for which fields are currently loaded in the persistable instance. */
     protected boolean[] loadedFields;
 
-    /** state for transitions of activities. */
-    protected ActivityState activity;
-
     /** Current FieldManager. */
     protected FieldManager currFM = null;
 
@@ -271,7 +268,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         loadedFields = new boolean[fieldCount];
         dirty = false;
         myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
-        activity = ActivityState.NONE;
         myVersion = null;
         transactionalVersion = null;
         persistenceFlags = 0;
@@ -833,7 +829,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     public boolean isInserting()
     {
-        return activity == ActivityState.INSERTING;
+        return (flags&FLAG_INSERTING) != 0;
     }
 
     public boolean isDeleting()
@@ -3139,7 +3135,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
         // If we're writing a field in the process of inserting it must be due to dnPreStore().
         // We haven't actually done the INSERT yet so we don't want to mark anything as dirty, which would make us want to do an UPDATE later.
-        if (activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS)
+        if ((flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0)
         {
             if (!wasDirty) // (only do it for first dirty event).
             {
@@ -3164,8 +3160,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
 
         // TODO replaceField typically does a markDirty above, so need to catch those cases and avoid multiple calls to it
-        if (/*!myLC.isDirty && */activity == ActivityState.NONE && !isFlushing() && 
-            !(myLC.isTransactional() && !myLC.isPersistent()))
+        if ((flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && !isFlushing() && !(myLC.isTransactional() && !myLC.isPersistent()))
         {
             // Not during flush, and not transactional-transient, and not inserting - so mark as dirty
             myEC.markDirty(this, true);
@@ -3601,9 +3596,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             if (!isFlushing())
             {
                 // Flush any datastore changes so that myID is set by the time we return
-                if (!isFlushedNew() &&
-                    activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS &&
-                    myLC.stateType() == LifeCycleState.P_NEW)
+                if (!isFlushedNew() && (flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && myLC.stateType() == LifeCycleState.P_NEW)
                 {
                     if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, -1))
                     {
@@ -3619,9 +3612,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             if (!isFlushing())
             {
                 // Flush any datastore changes so that we have all necessary fields populated only if the datastore generates the field numbers
-                if (!isFlushedNew() &&
-                    activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS &&
-                    myLC.stateType() == LifeCycleState.P_NEW)
+                if (!isFlushedNew() && (flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && myLC.stateType() == LifeCycleState.P_NEW)
                 {
                     int[] pkMemberNumbers = cmd.getPKMemberPositions();
                     for (int i = 0; i < pkMemberNumbers.length; i++)
@@ -4429,10 +4420,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     {
         if (myLC.isDeleted() && !myEC.getNucleusContext().getApiAdapter().allowPersistOfDeletedObject())
         {
-            // API doesnt allow repersist of deleted objects
+            // API doesn't allow re-persist of deleted objects
             return;
         }
-        if (activity != ActivityState.NONE)
+
+        if ((flags&FLAG_INSERTING) != 0 || (flags&FLAG_INSERTING_CALLBACKS) != 0)
         {
             // Already making persistent
             return;
@@ -4513,7 +4505,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     private void internalMakePersistent()
     {
-        activity = ActivityState.INSERTING;
+        flags |= FLAG_INSERTING;
         boolean[] tmpDirtyFields = dirtyFields.clone();
         try
         {
@@ -4541,7 +4533,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         finally
         {
-            activity = ActivityState.NONE;
+            flags &= ~FLAG_INSERTING;
+            flags &= ~FLAG_INSERTING_CALLBACKS;
         }
     }
 
@@ -5549,7 +5542,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
         // If we're writing a field in the process of inserting it must be due to dnPreStore().
         // We haven't actually done the INSERT yet so we don't want to mark anything as dirty, which would make us want to do an UPDATE later. 
-        if (activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS)
+        if ((flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0)
         {
             if (!wasDirty) // (only do it for first dirty event).
             {
@@ -5579,7 +5572,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             getCallbackHandler().postDirty(myPC);
         }
 
-        if (activity == ActivityState.NONE && !isFlushing() && !(myLC.isTransactional() && !myLC.isPersistent()))
+        if ((flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && !isFlushing() && !(myLC.isTransactional() && !myLC.isPersistent()))
         {
             if (isDetaching() && getReferencedPC() == null)
             {
@@ -5735,6 +5728,20 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         return (flags&FLAG_STORING_PC) != 0;
     }
 
+    @Override
+    public void setInserting()
+    {
+        flags |= FLAG_INSERTING;
+        flags &= ~FLAG_INSERTING_CALLBACKS;
+    }
+
+    @Override
+    public void setInsertingCallbacks()
+    {
+        flags &= ~FLAG_INSERTING;
+        flags |= FLAG_INSERTING_CALLBACKS;
+    }
+
     /**
      * Flushes any outstanding changes to the object to the datastore. 
      * This will process :-
@@ -5756,7 +5763,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 // the InsertRequest for the object itself. Just return since we are flushing right now
                 return;
             }
-            if (activity == ActivityState.INSERTING || activity == ActivityState.INSERTING_CALLBACKS)
+            if ((flags&FLAG_INSERTING) != 0 || (flags&FLAG_INSERTING_CALLBACKS) != 0)
             {
                 return;
             }
@@ -6059,11 +6066,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             return e.toString();
         }
-    }
-
-    public void changeActivityState(ActivityState state)
-    {
-        // Does nothing in this implementation; refer to ReferentialJDOStateManager
     }
 
     public void updateFieldAfterInsert(Object pc, int fieldNumber)

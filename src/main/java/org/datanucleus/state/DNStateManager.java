@@ -330,6 +330,10 @@ public interface DNStateManager<T> extends StateManager
      */
     void unsetStoringPC();
 
+    void setInserting();
+
+    void setInsertingCallbacks();
+
     /**
      * Accessor for whether all changes have been written to the datastore.
      * @return Whether the datastore has all changes
@@ -369,12 +373,6 @@ public interface DNStateManager<T> extends StateManager
      * @return true if this instance is waiting to be flushed
      */
     boolean isWaitingToBeFlushedToDatastore();
-
-    /**
-     * Update the activity state.
-     * @param state the activity state
-     */
-    void changeActivityState(ActivityState state);
 
     /**
      * Tests whether this object is being inserted.
