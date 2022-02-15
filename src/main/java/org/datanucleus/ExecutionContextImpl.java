@@ -213,7 +213,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private Map<DNStateManager, List<EmbeddedOwnerRelation>> smEmbeddedInfoByOwner = null;
 
     /** Map of embedded StateManager relations, keyed by embedded StateManager. */
-    private Map<DNStateManager, List<EmbeddedOwnerRelation>> smEmbeddedInfoByEmbedded = null;
+    private Map<DNStateManager, EmbeddedOwnerRelation> smEmbeddedInfoByEmbedded = null;
 
     /**
      * Map of associated values per StateManager. This can contain anything really and is down to the StoreManager to define. 
@@ -1271,16 +1271,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (smEmbeddedInfoByEmbedded != null)
         {
             // Remove any owner-embedded relations for this
-            List<EmbeddedOwnerRelation> embRels = smEmbeddedInfoByEmbedded.get(sm);
-            if (embRels != null)
+            EmbeddedOwnerRelation embRel = smEmbeddedInfoByEmbedded.get(sm);
+            if (embRel != null)
             {
                 if (smEmbeddedInfoByOwner != null)
                 {
-                    for (EmbeddedOwnerRelation rel : embRels)
-                    {
-                        // Remove from owner lookup too
-                        smEmbeddedInfoByOwner.remove(rel.getOwnerSM());
-                    }
+                    // Remove from owner lookup too
+                    smEmbeddedInfoByOwner.remove(embRel.getOwnerSM());
                 }
                 smEmbeddedInfoByEmbedded.remove(sm);
             }
@@ -5722,28 +5719,27 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // Keyed by embedded
         if (smEmbeddedInfoByEmbedded == null)
         {
-            smEmbeddedInfoByEmbedded = new HashMap<DNStateManager, List<EmbeddedOwnerRelation>>();
+            smEmbeddedInfoByEmbedded = new HashMap<DNStateManager, EmbeddedOwnerRelation>();
         }
-        List<EmbeddedOwnerRelation> relations = smEmbeddedInfoByEmbedded.get(embSM);
-        if (relations == null)
+        if (smEmbeddedInfoByEmbedded.containsKey(embSM))
         {
-            relations = new ArrayList<>();
+            // TODO Fix this situation
+            NucleusLogger.PERSISTENCE.warn("Attempt to register relation between embedded object " + embSM + " with owner " + ownerSM + " but already has an owner");
         }
-        relations.add(relation);
-        smEmbeddedInfoByEmbedded.put(embSM, relations);
+        smEmbeddedInfoByEmbedded.put(embSM, relation);
 
         // Keyed by owner
         if (smEmbeddedInfoByOwner == null)
         {
             smEmbeddedInfoByOwner = new HashMap<DNStateManager, List<EmbeddedOwnerRelation>>();
         }
-        relations = smEmbeddedInfoByOwner.get(ownerSM);
-        if (relations == null)
+        List<EmbeddedOwnerRelation> ownerRelations = smEmbeddedInfoByOwner.get(ownerSM);
+        if (ownerRelations == null)
         {
-            relations = new ArrayList<>();
+            ownerRelations = new ArrayList<>();
         }
-        relations.add(relation);
-        smEmbeddedInfoByOwner.put(ownerSM, relations);
+        ownerRelations.add(relation);
+        smEmbeddedInfoByOwner.put(ownerSM, ownerRelations);
 
         return relation;
     }
@@ -5753,22 +5749,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (smEmbeddedInfoByEmbedded != null)
         {
-            List<EmbeddedOwnerRelation> ownerRels = smEmbeddedInfoByEmbedded.get(rel.getEmbeddedSM());
-            ownerRels.remove(rel);
-            if (ownerRels.isEmpty())
+            smEmbeddedInfoByEmbedded.remove(rel.getEmbeddedSM());
+            if (smEmbeddedInfoByEmbedded.isEmpty())
             {
-                smEmbeddedInfoByEmbedded.remove(rel.getEmbeddedSM());
-                if (smEmbeddedInfoByEmbedded.isEmpty())
-                {
-                    smEmbeddedInfoByEmbedded = null;
-                }
+                smEmbeddedInfoByEmbedded = null;
             }
         }
         if (smEmbeddedInfoByOwner != null)
         {
-            List<EmbeddedOwnerRelation> embRels = smEmbeddedInfoByOwner.get(rel.getOwnerSM());
-            embRels.remove(rel);
-            if (embRels.isEmpty())
+            List<EmbeddedOwnerRelation> ownerRels = smEmbeddedInfoByOwner.get(rel.getOwnerSM());
+            ownerRels.remove(rel);
+            if (ownerRels.isEmpty())
             {
                 smEmbeddedInfoByOwner.remove(rel.getOwnerSM());
                 if (smEmbeddedInfoByOwner.isEmpty())
@@ -5802,27 +5793,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public DNStateManager[] getOwnersForEmbeddedStateManager(DNStateManager embSM)
+    public DNStateManager getOwnerForEmbeddedStateManager(DNStateManager embSM)
     {
-        if (smEmbeddedInfoByEmbedded == null || !smEmbeddedInfoByEmbedded.containsKey(embSM))
+        if (embSM == null || !embSM.isEmbedded() || smEmbeddedInfoByEmbedded == null || !smEmbeddedInfoByEmbedded.containsKey(embSM))
         {
             return null;
         }
-
-        List<EmbeddedOwnerRelation> ownerRels = smEmbeddedInfoByEmbedded.get(embSM);
-        DNStateManager[] owners = new DNStateManager[ownerRels.size()];
-        int i = 0;
-        for (EmbeddedOwnerRelation rel : ownerRels)
-        {
-            owners[i++] = rel.getOwnerSM();
-        }
-        return owners;
+        return smEmbeddedInfoByEmbedded.get(embSM).getOwnerSM();
     }
 
     @Override
-    public List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(DNStateManager embSM)
+    public EmbeddedOwnerRelation getOwnerInformationForEmbedded(DNStateManager embSM)
     {
-        if (smEmbeddedInfoByEmbedded == null)
+        if (embSM == null || !embSM.isEmbedded() || smEmbeddedInfoByEmbedded == null)
         {
             return null;
         }

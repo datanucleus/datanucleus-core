@@ -939,32 +939,32 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Accessor for the relations for the specified embedded StateManager where it is embedded.
-     * @param ownerOP StateManager that owns the embedded
+     * @param ownerSM StateManager that owns the embedded
      * @return The List of embedded relations involving this StateManager as owner
      */
-    List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(DNStateManager ownerOP);
+    List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(DNStateManager ownerSM);
 
     /**
-     * Accessor for the relations for the specified embedded StateManager where it is embedded.
-     * @param embOP StateManager that is embedded
-     * @return The List of embedded relations involving this StateManager as embedded
+     * Accessor for the owner relation for the specified embedded StateManager where it is embedded.
+     * @param embSM StateManager that is embedded
+     * @return The embedded relation info involving this (embedded) StateManager
      */
-    List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(DNStateManager embOP);
+    EmbeddedOwnerRelation getOwnerInformationForEmbedded(DNStateManager embSM);
 
     /**
-     * Accessor for the owner objects for the provided embedded StateManager.
-     * @param embOP StateManager that is embedded
-     * @return The owner object(s) that have this object embedded.
+     * Accessor for the owner StateManager for the provided embedded StateManager.
+     * @param embSM StateManager that is embedded
+     * @return The owner StateManager that have this object embedded.
      */
-    DNStateManager[] getOwnersForEmbeddedStateManager(DNStateManager embOP);
+    DNStateManager getOwnerForEmbeddedStateManager(DNStateManager embSM);
 
     /**
      * Convenience method to remove the EmbeddedOwnerRelation between the specified StateManagers.
      * @param ownerSM Owner StateManager
      * @param ownerFieldNum Field in owner
-     * @param embOP Embedded StateManager
+     * @param embSM Embedded StateManager
      */
-    void removeEmbeddedOwnerRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embOP);
+    void removeEmbeddedOwnerRelation(DNStateManager ownerSM, int ownerFieldNum, DNStateManager embSM);
 
     public static class EmbeddedOwnerRelation
     {

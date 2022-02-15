@@ -36,7 +36,6 @@ package org.datanucleus.state;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.BitSet;
-import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.DetachState;
@@ -220,10 +219,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     /** Current FieldManager. */
     protected FieldManager currFM = null;
 
-    /** The type of the managed object (0 = PC, 1 = embedded PC, 2 = embedded element, 3 = embedded key, 4 = embedded value. */ // TODO Merge into embedded state
-    @Deprecated
-    protected short objectType = 0;
-
     /** Saved state, for use during any rollback for reinstating the object. */
     protected SavedState savedState = null;
 
@@ -270,7 +265,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         loadedFields = new boolean[fieldCount];
         dirty = false;
         myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
-        objectType = 0;
         activity = ActivityState.NONE;
         myVersion = null;
         transactionalVersion = null;
@@ -323,7 +317,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
         savedState = null;
         preDeleteLoadedFields = null;
-        objectType = 0;
         myPC = null;
         myID = null;
         myInternalID = null;
@@ -436,7 +429,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void initialiseForEmbedded(Persistable pc, boolean copyPc)
     {
-        objectType = DNStateManager.EMBEDDED_PC; // Default to an embedded PC object
         myID = null; // It is embedded at this point so dont need an ID since we're not persisting it
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
         persistenceFlags = Persistable.LOAD_REQUIRED;
@@ -1716,16 +1708,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     public boolean isEmbedded()
     {
         return (flags&FLAG_EMBEDDED) != 0;
-    }
-
-    /**
-     * Method to set this StateManager as managing an embedded/serialised object.
-     * @param objType The type of object being managed
-     * @deprecated Use from embedded relation info
-     */
-    public void setPcObjectType(short objType)
-    {
-        this.objectType = objType;
     }
 
     // -------------------------- providedXXXField Methods ----------------------------
@@ -3367,18 +3349,15 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             boolean wasDirty = preWriteField(fieldNumber);
             postWriteField(wasDirty);
 
-            List<EmbeddedOwnerRelation> embeddedOwners = myEC.getOwnerInformationForEmbedded(this);
-            if (embeddedOwners != null)
+            EmbeddedOwnerRelation embeddedRel = myEC.getOwnerInformationForEmbedded(this);
+            if (embeddedRel != null)
             {
-                // Notify any owners that embed this object that it has just changed
-                for (EmbeddedOwnerRelation owner : embeddedOwners)
-                {
-                    StateManagerImpl ownerSM = (StateManagerImpl)owner.getOwnerSM();
+                // Notify owner that this embedded object has just changed
+                StateManagerImpl ownerSM = (StateManagerImpl)embeddedRel.getOwnerSM();
 
-                    if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
-                    {
-                        ownerSM.makeDirty(owner.getOwnerMemberNum());
-                    }
+                if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                {
+                    ownerSM.makeDirty(embeddedRel.getOwnerMemberNum());
                 }
             }
         }
@@ -3605,8 +3584,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     protected Object getExternalObjectId(Object obj)
     {
-        List<EmbeddedOwnerRelation> embeddedOwners = myEC.getOwnerInformationForEmbedded(this);
-        if (embeddedOwners != null)
+        if (isEmbedded())
         {
             // Embedded object has no id
             return myID;
@@ -4160,15 +4138,14 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     protected void replaceField(Persistable pc, int fieldNumber, Object value, boolean makeDirty)
     {
-        List<EmbeddedOwnerRelation> embeddedOwners = myEC.getOwnerInformationForEmbedded(this);
-        if (embeddedOwners != null)
+        if (isEmbedded())
         {
-            // Notify any owners that embed this object that it has just changed
-            // We do this before we actually change the object so we can compare with the old value
-            for (EmbeddedOwnerRelation ownerRel : embeddedOwners)
+            EmbeddedOwnerRelation ownerRel = myEC.getOwnerInformationForEmbedded(this);
+            if (ownerRel != null)
             {
+                // Notify the owner of this embedded object that it has just changed
+                // We do this before we actually change the object so we can compare with the old value
                 StateManagerImpl ownerSM = (StateManagerImpl) ownerRel.getOwnerSM();
-
                 AbstractMemberMetaData ownerMmd = ownerSM.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(ownerRel.getOwnerMemberNum());
                 if (ownerMmd.getCollection() != null)
                 {
@@ -4193,11 +4170,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     Object ownerField = ownerSM.provideField(ownerRel.getOwnerMemberNum());
                     if (ownerField instanceof SCOMap)
                     {
-                        if (objectType == DNStateManager.EMBEDDED_MAP_KEY_PC)
+                        if (ownerRel.getObjectType() == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
                         {
                             ((SCOMap)ownerField).updateEmbeddedKey(myPC, fieldNumber, value, makeDirty);
                         }
-                        if (objectType == DNStateManager.EMBEDDED_MAP_VALUE_PC)
+                        if (ownerRel.getObjectType() == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
                         {
                             ((SCOMap)ownerField).updateEmbeddedValue(myPC, fieldNumber, value, makeDirty);
                         }
@@ -4232,7 +4209,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
         // Update the field in our PC object
         // TODO Why don't we mark as dirty if non-tx ? Maybe need P_NONTRANS_DIRTY
-        if (embeddedOwners == null && makeDirty && !myLC.isDeleted() && myEC.getTransaction().isActive())
+        if (!isEmbedded() && makeDirty && !myLC.isDeleted() && myEC.getTransaction().isActive())
         {
             // Mark dirty (if not being deleted)
             boolean wasDirty = preWriteField(fieldNumber);

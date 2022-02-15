@@ -130,24 +130,6 @@ public class StateManagerFactoryImpl implements StateManagerFactory
             ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, objectType, sm);
         }
 
-        // TODO Drop this when the above code works fully
-        if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
-        }
-        else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
-        }
-        else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
-        }
-        else if (objectType == PersistableObjectType.EMBEDDED_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_PC);
-        }
-
         return sm;
     }
 
@@ -168,24 +150,6 @@ public class StateManagerFactoryImpl implements StateManagerFactory
         if (ownerSM != null)
         {
             ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, objectType, sm);
-        }
-
-        // TODO Drop this when the above code works fully
-        if (objectType == PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC || objectType == PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
-        }
-        else if (objectType == PersistableObjectType.EMBEDDED_MAP_KEY_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_KEY_PC);
-        }
-        else if (objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_MAP_VALUE_PC);
-        }
-        else if (objectType == PersistableObjectType.EMBEDDED_PC)
-        {
-            sm.setPcObjectType(DNStateManager.EMBEDDED_PC);
         }
 
         return sm;

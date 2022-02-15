@@ -74,6 +74,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
      * Change the activity state to a particular state.
      * @param activityState the new state
      */
+    @Override
     public void changeActivityState(ActivityState activityState)
     {
         activity = activityState;
@@ -99,6 +100,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
      * @param pc The Persistable object
      * @param fieldNumber Number of the field.
      */
+    @Override
     public void updateFieldAfterInsert(Object pc, int fieldNumber)
     {
         ReferentialStateManagerImpl otherSM = (ReferentialStateManagerImpl) myEC.findStateManager(pc);

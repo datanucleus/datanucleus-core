@@ -34,8 +34,10 @@ import org.datanucleus.transaction.Transaction;
 /**
  * StateManager for DataNucleus systems for a managed object, extending the basic enhancement contract for a StateManager.
  * Each StateManager manages a single Persistable object.
+ * The Persistable object can be embedded/serialised into another managed Persistable object, in which case it will return <I>true</I>
+ * from the <B>isEmbedded()</B> method, and will also have ownership information obtainable via
+ * <B>ExecutionContext.getOwnerInformationForEmbedded(sm)</B> and <B>ExecutionContext.getOwnerForEmbeddedStateManager(sm)</B>.
  * 
- * TODO Drop the generics and use Persistable. This will require updates to ExecutionContext to match
  * @param <T> Type of the object being managed
  */
 public interface DNStateManager<T> extends StateManager
@@ -46,27 +48,15 @@ public interface DNStateManager<T> extends StateManager
     /** Key prefix under which we store member (identity) value when just retrieving a FK. Member number is then appended to this prefix. */
     public static final String MEMBER_VALUE_STORED_PREFIX = "MEMBER_VALUE.STORED.";
 
-    // TODO Drop these and use PersistableObjectType enum
-    /** PC **/
-    public static short PC = 0;
-    /** Embedded (or serialised) PC **/
-    public static short EMBEDDED_PC = 1;
-    /** Embedded (or serialised) Collection Element PC **/
-    public static short EMBEDDED_COLLECTION_ELEMENT_PC = 2;
-    /** Embedded (or serialised) Map Key PC **/
-    public static short EMBEDDED_MAP_KEY_PC = 3;
-    /** Embedded (or serialised) Map Value PC **/
-    public static short EMBEDDED_MAP_VALUE_PC = 4;
-
     /**
-     * Method to (re)connect this provider to the specified ExecutionContext and object type.
+     * Method to (re)connect this StateManager to the specified ExecutionContext and object type.
      * @param ec ExecutionContext to connect to
-     * @param cmd Metadata for this class
+     * @param cmd Metadata for the persistable class
      */
     void connect(ExecutionContext ec, AbstractClassMetaData cmd);
 
     /**
-     * Disconnect this provider from the ExecutionContext and PC object.
+     * Disconnect this StateManager from the ExecutionContext and persistable object.
      */
     void disconnect();
 
@@ -158,7 +148,7 @@ public interface DNStateManager<T> extends StateManager
     void initialiseForCachedPC(CachedPC cachedPC, Object id);
 
     /**
-     * Accessor for the ClassMetaData for this object.
+     * Accessor for the ClassMetaData for this persistable object.
      * @return The ClassMetaData.
      */
     AbstractClassMetaData getClassMetaData();
@@ -194,7 +184,7 @@ public interface DNStateManager<T> extends StateManager
     Object getExternalObjectId();
 
     /**
-     * Accessor for the LifeCycleState
+     * Accessor for the LifeCycleState of this persistable object.
      * @return the LifeCycleState
      */
     LifeCycleState getLifecycleState();
@@ -329,13 +319,6 @@ public interface DNStateManager<T> extends StateManager
      * @param value The value of the field (embedded)
      */
     void updateOwnerFieldInEmbeddedField(int fieldNumber, Object value);
-
-    /**
-     * Method to set this StateManager as managing an embedded/serialised object.
-     * @param type The type of object being managed
-     * @deprecated Drop this and use from embedded relation info
-     */
-    void setPcObjectType(short type);
 
     /**
      * Method to set the storing PC flag.
@@ -738,14 +721,13 @@ public interface DNStateManager<T> extends StateManager
     // Transaction handling methods
 
     /**
-     * Convenience interceptor to allow operations to be performed before the begin is performed
+     * Convenience interceptor to allow operations to be performed before the begin is performed.
      * @param tx The transaction
      */
     void preBegin(Transaction tx);
 
     /**
-     * Convenience interceptor to allow operations to be performed after the commit is performed
-     * but before returning control to the application.
+     * Convenience interceptor to allow operations to be performed after the commit is performed but before returning control to the application.
      * @param tx The transaction
      */
     void postCommit(Transaction tx);
