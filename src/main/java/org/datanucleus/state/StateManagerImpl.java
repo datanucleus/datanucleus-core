@@ -130,6 +130,12 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 {
     protected static final SingleTypeFieldManager HOLLOWFIELDMANAGER = new SingleTypeFieldManager();
 
+    /** Whether we are in the process of INSERTING the object to persistence. */
+    protected static final int FLAG_INSERTING = 2<<21;
+    /** Whether we are in the process of INSERTING the object from persistence, running callbacks. */
+    protected static final int FLAG_INSERTING_CALLBACKS = 2<<20;
+    /** Whether we are in the process of DELETING the object from persistence. */
+    protected static final int FLAG_DELETING = 2<<19;
     /** Whether we are managing an embedded object. */
     protected static final int FLAG_EMBEDDED = 2<<18;
     /** Whether we are currently validating the object in the datastore. */
@@ -832,7 +838,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     public boolean isDeleting()
     {
-        return activity == ActivityState.DELETING;
+        return (flags&FLAG_DELETING) != 0;
     }
 
     public void markForInheritanceValidation()
@@ -1170,7 +1176,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             throw new NucleusUserException(Localiser.msg("026008"));
         }
 
-        activity = ActivityState.DELETING;
+        flags |= FLAG_DELETING;
         try
         {
             if (dirty)
@@ -1191,7 +1197,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         finally
         {
-            activity = ActivityState.NONE;
+            flags &= ~FLAG_DELETING;
         }
     }
 
@@ -3343,7 +3349,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void makeDirty(int fieldNumber)
     {
-        if (activity != ActivityState.DELETING)
+        if ((flags&FLAG_DELETING) == 0)
         {
             // Mark dirty unless in the process of being deleted
             boolean wasDirty = preWriteField(fieldNumber);
@@ -3724,7 +3730,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             return;
         }
 
-        if (preDeleteLoadedFields != null && ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING))
+        if (preDeleteLoadedFields != null && ((myLC.isDeleted() && myEC.isFlushing()) || (flags&FLAG_DELETING) != 0))
         {
             // During deletion process so we know what is really loaded so only load if necessary
             fieldNumbers = ClassUtils.getFlagsSetTo(preDeleteLoadedFields, fieldNumbers, false);
@@ -3777,7 +3783,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             return;
         }
 
-        if (preDeleteLoadedFields != null && ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING))
+        if (preDeleteLoadedFields != null && ((myLC.isDeleted() && myEC.isFlushing()) || (flags&FLAG_DELETING) != 0))
         {
             // During deletion process so we know what is really loaded so only load if necessary
             fieldNumbers = ClassUtils.getFlagsSetTo(preDeleteLoadedFields, fieldNumbers, false);
@@ -4012,7 +4018,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
             boolean checkRead = true;
             boolean beingDeleted = false;
-            if ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING)
+
+            if ((myLC.isDeleted() && myEC.isFlushing()) || (flags&FLAG_DELETING) != 0)
             {
                 // Bypass "read-field" check when deleting, or when marked for deletion and flushing
                 checkRead = false;

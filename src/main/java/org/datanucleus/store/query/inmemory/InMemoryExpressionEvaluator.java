@@ -1269,20 +1269,20 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 if (ec.getApiAdapter().isPersistent(value))
                 {
                     // Make sure this field is loaded
-                    DNStateManager valueOP = ec.findStateManager(value);
-                    if (valueOP != null)
+                    DNStateManager valueSM = ec.findStateManager(value);
+                    if (valueSM != null)
                     {
-                        AbstractMemberMetaData mmd = valueOP.getClassMetaData().getMetaDataForMember(fieldName);
+                        AbstractMemberMetaData mmd = valueSM.getClassMetaData().getMetaDataForMember(fieldName);
                         if (mmd == null)
                         {
-                            NucleusLogger.QUERY.error("Cannot find " + fieldName + " member of " + valueOP.getClassMetaData().getFullClassName());
+                            NucleusLogger.QUERY.error("Cannot find " + fieldName + " member of " + valueSM.getClassMetaData().getFullClassName());
                             return new InMemoryFailure();
                         }
                         if (mmd.getAbsoluteFieldNumber() >= 0)
                         {
                             // Field is managed so make sure it is loaded, and get its value
-                            valueOP.isLoaded(mmd.getAbsoluteFieldNumber());
-                            value = valueOP.provideField(mmd.getAbsoluteFieldNumber());
+                            valueSM.isLoaded(mmd.getAbsoluteFieldNumber());
+                            value = valueSM.provideField(mmd.getAbsoluteFieldNumber());
                             getValueByReflection = false;
                         }
                     }

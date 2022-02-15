@@ -20,8 +20,6 @@ package org.datanucleus.state;
 
 /**
  * Definition of the activity states of a StateManager.
- * Each activity is mutually exclusive so, for example, a StateManager cannot be inserting
- * and then start deleting (without finishing the insert process first).
  */
 public class ActivityState
 {
@@ -33,9 +31,6 @@ public class ActivityState
 
     /** Running callbacks after the insert of the object. **/
     public static final ActivityState INSERTING_CALLBACKS = new ActivityState(2);
-
-    /** Deleting the object. **/
-    public static final ActivityState DELETING = new ActivityState(3);
 
     /** The type id */
     private final int typeId;
@@ -82,8 +77,6 @@ public class ActivityState
                 return "inserting";
             case 2 :
                 return "inserting-callback";
-            case 3 :
-                return "deleting";
         }
         return "";
     }
@@ -119,10 +112,6 @@ public class ActivityState
         else if (ActivityState.INSERTING_CALLBACKS.toString().equals(value))
         {
             return ActivityState.INSERTING_CALLBACKS;
-        }
-        else if (ActivityState.DELETING.toString().equals(value))
-        {
-            return ActivityState.DELETING;
         }
         return ActivityState.NONE;
     }

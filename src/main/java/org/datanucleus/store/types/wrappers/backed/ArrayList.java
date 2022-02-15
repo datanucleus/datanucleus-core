@@ -118,10 +118,10 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    DNStateManager objOP = ec.findStateManager(pc);
-                    if (objOP == null)
+                    DNStateManager sm = ec.findStateManager(pc);
+                    if (sm == null)
                     {
-                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
+                        sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
                             PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                     }
                 }
@@ -183,10 +183,10 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    DNStateManager objOP = ec.findStateManager(pc);
-                    if (objOP == null)
+                    DNStateManager sm = ec.findStateManager(pc);
+                    if (sm == null)
                     {
-                        objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
+                        sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
                             PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                     }
                 }

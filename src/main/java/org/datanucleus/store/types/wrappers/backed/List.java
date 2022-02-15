@@ -184,10 +184,10 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    DNStateManager elemOP = ec.findStateManager(pc);
-                    if (elemOP == null)
+                    DNStateManager sm = ec.findStateManager(pc);
+                    if (sm == null)
                     {
-                        elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
+                        sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, pc, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(),
                             PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                     }
                 }

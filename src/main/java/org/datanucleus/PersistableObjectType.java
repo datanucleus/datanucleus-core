@@ -19,7 +19,7 @@ package org.datanucleus;
 
 /**
  * Definition of the type of a persistable object.
- * This can be a plan persistable object (PC) or a persistable object embedded/serialised in a collection/array element or in a map key/value.
+ * This can be a plain persistable object (PC) or a persistable object embedded/serialised, possibily in a collection/array element or in a map key/value.
  */
 public enum PersistableObjectType
 {

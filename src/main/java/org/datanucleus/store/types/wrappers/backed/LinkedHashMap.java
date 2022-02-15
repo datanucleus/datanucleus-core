@@ -94,19 +94,19 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
                     {
-                        DNStateManager keyOP = ec.findStateManager(key);
-                        if (keyOP == null)
+                        DNStateManager keySM = ec.findStateManager(key);
+                        if (keySM == null)
                         {
-                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                            keySM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
                                 ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_KEY_PC);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
                     {
-                        DNStateManager valOP = ec.findStateManager(value);
-                        if (valOP == null)
+                        DNStateManager valSM = ec.findStateManager(value);
+                        if (valSM == null)
                         {
-                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
+                            valSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
                                 ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
                         }
                     }
@@ -183,19 +183,19 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
                     {
-                        DNStateManager keyOP = ec.findStateManager(key);
-                        if (keyOP == null)
+                        DNStateManager keySM = ec.findStateManager(key);
+                        if (keySM == null)
                         {
-                            keyOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                            keySM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
                                 ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_KEY_PC);
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
                     {
-                        DNStateManager valOP = ec.findStateManager(value);
-                        if (valOP == null)
+                        DNStateManager valSM = ec.findStateManager(value);
+                        if (valSM == null)
                         {
-                            valOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
+                            valSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false,
                                 ownerSM, ownerMmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
                         }
                     }
