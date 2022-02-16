@@ -17,9 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancement;
 
-import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.util.Localiser;
-
 /**
  * This interface is the point of contact between managed instances of <code>Persistable</code> classes and DataNucleus.
  * It contains the methods used by <code>Persistable</code> instances to delegate behavior to DataNucleus.
@@ -164,126 +161,6 @@ public interface StateManager
      * @param pc the calling <code>Persistable</code> instance
      */
     void preSerialize(Persistable pc);
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default boolean getBooleanField(Persistable pc, int field, boolean currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default char getCharField(Persistable pc, int field, char currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default byte getByteField(Persistable pc, int field, byte currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default short getShortField(Persistable pc, int field, short currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default int getIntField(Persistable pc, int field, int currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default long getLongField(Persistable pc, int field, long currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default float getFloatField(Persistable pc, int field, float currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default double getDoubleField(Persistable pc, int field, double currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default String getStringField(Persistable pc, int field, String currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-
-    /**
-     * Return the value for the field.
-     * @param pc the calling <code>Persistable</code> instance
-     * @param field the field number
-     * @param currentValue the current value of the field
-     * @return the new value for the field
-     */
-    default Object getObjectField(Persistable pc, int field, Object currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
 
     /**
      * Mark the field as modified by the user.

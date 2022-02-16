@@ -1863,11 +1863,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a byte field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public byte replacingByteField(Persistable obj, int fieldNumber)
+    public byte replacingByteField(Persistable ignored, int fieldNumber)
     {
         byte value = currFM.fetchByteField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -1876,11 +1876,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a char field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public char replacingCharField(Persistable obj, int fieldNumber)
+    public char replacingCharField(Persistable ignored, int fieldNumber)
     {
         char value = currFM.fetchCharField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -3232,6 +3232,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         if (pc != myPC)
         {
+            NucleusLogger.GENERAL.warn("StateManager.disconnectClone : Please let developers know how you got this - myPC=" + StringUtils.toJVMIDString(myPC) + " other=" + StringUtils.toJVMIDString(pc), new Exception());
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("026001", StringUtils.toJVMIDString(pc), this));
