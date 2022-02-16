@@ -27,8 +27,10 @@ import org.datanucleus.enhancement.ExecutionContextReference;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusOptimisticException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushMode;
 import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
@@ -281,30 +283,35 @@ public interface ExecutionContext extends ExecutionContextReference
     void retrieveObjects(boolean useFetchPlan, Object... pcs);
 
     /**
-     * Method to persist the passed object.
+     * Method to make an object persistent.
+     * NOT to be called by internal DataNucleus methods. Only callable by external APIs (JDO/JPA).
      * @param pc The object
      * @param merging Whether this object (and dependents) is being merged
      * @param <T> Type of the persistable object
      * @return The persisted object
+     * @throws NucleusUserException if the object is managed by a different manager
      */
     <T> T persistObject(T pc, boolean merging);
 
     /**
-     * Method to persist the passed object(s).
-     * @param pcs The objects to persist
+     * Method to persist an array of objects to the datastore.
+     * @param objs The objects to persist
      * @return The persisted objects
+     * @throws NucleusUserException Thrown if an error occurs during the persist process.
+     *     Any exception could have several nested exceptions for each failed object persist
      */
     Object[] persistObjects(Object... pcs);
 
     /**
-     * Method to persist the passed object (internally).
-     * @param pc The object
-     * @param preInsertChanges Changes to be made before inserting
+     * Method to make an object persistent which should be called from internal calls only.
+     * All PM/EM calls should go via persistObject(Object obj).
+     * @param obj The object
+     * @param preInsertChanges Any changes to make before inserting
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
      * @param objectType Type of object
-     * @param <T> Type of the persistable object
      * @return The persisted object
+     * @throws NucleusUserException if the object is managed by a different manager
      */
     <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType);
 
@@ -333,21 +340,24 @@ public interface ExecutionContext extends ExecutionContextReference
     }
 
     /**
-     * Method to make transient the passed object.
-     * @param pc The object
-     * @param state Object containing the state of the fetchplan processing
+     * Method to migrate an object to transient state.
+     * @param obj The object
+     * @param state Object containing the state of the fetch plan process (if any)
+     * @throws NucleusException When an error occurs in making the object transient
      */
     void makeObjectTransient(Object pc, FetchPlanState state);
 
     /**
-     * Method to make the passed object transactional.
-     * @param pc The object
+     * Method to make an object transactional.
+     * @param obj The object
+     * @throws NucleusException Thrown when an error occurs
      */
     void makeObjectTransactional(Object pc);
 
     /**
      * Method to make the passed object nontransactional.
      * @param pc The object
+     * @throws NucleusException Thrown when an error occurs
      */
     void makeObjectNontransactional(Object pc);
 
@@ -361,6 +371,8 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Accessor for the currently managed objects for the current transaction.
      * If the transaction is not active this returns null.
+     * @param states States that we want the enlisted objects for
+     * @param classes Classes that we want the enlisted objects for
      * @return Collection of managed objects enlisted in the current transaction
      */
     Set getManagedObjects();
@@ -392,6 +404,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to delete an object from the datastore.
+     * NOT to be called by internal methods. Only callable by external APIs (JDO/JPA).
      * @param obj The object
      */
     void deleteObject(Object obj);
@@ -399,19 +412,24 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to delete an array of objects from the datastore.
      * @param objs The objects to delete
+     * @throws NucleusUserException Thrown if an error occurs during the deletion process. Any exception could have several nested exceptions for each failed object deletion
      */
     void deleteObjects(Object... objs);
 
     /**
-     * Method to delete the passed object (internally).
-     * @param pc The object
+     * Method to delete an object from persistence which should be called from internal calls only.
+     * All PM/EM calls should go via deleteObject(Object obj).
+     * @param obj Object to delete
      */
     void deleteObjectInternal(Object pc);
 
     /**
-     * Method to detach the passed object.
-     * @param state State for the detachment process.
-     * @param pc The object to detach
+     * Method to detach a persistent object without making a copy. 
+     * Note that also all the objects which are refered to from this object are detached.
+     * If the object is of class that is not detachable a ClassNotDetachableException will be thrown. 
+     * If the object is not persistent a NucleusUserException is thrown.
+     * @param state State for the detachment process
+     * @param obj The object
      */
     void detachObject(FetchPlanState state, Object pc);
 
@@ -423,53 +441,61 @@ public interface ExecutionContext extends ExecutionContextReference
     void detachObjects(FetchPlanState state, Object... pcs);
 
     /**
-     * Method to detach a copy of the passed object using the provided state.
+     * Detach a copy of the passed persistent object using the provided detach state.
+     * If the object is of class that is not detachable it will be detached as transient.
+     * If it is not yet persistent it will be first persisted.
      * @param state State for the detachment process
      * @param pc The object
      * @param <T> Type of the persistable object
-     * @return The detached copy of the object
+     * @return The detached object
      */
     <T> T detachObjectCopy(FetchPlanState state, T pc);
 
     /**
-     * Method to detach all managed objects.
+     * Method to detach all objects in the context.
+     * Detaches all objects enlisted as well as all objects in the L1 cache.
+     * Of particular use with JPA when doing a clear of the persistence context.
      */
     void detachAll();
 
     /**
-     * Method to attach the passed object (and related objects).
-     * Throws an exception if another (persistent) object with the same id exists in the L1 cache already.
-     * @param sm StateManager of the owning object that has this in a field causing its attach
-     * @param pc The (detached) object
-     * @param sco Whether the object has no identity (embedded or serialised)
+     * Method to attach a persistent detached object.
+     * If a different object with the same identity as this object exists in the L1 cache then an exception will be thrown.
+     * @param ownerSM StateManager of the owner object that has this in a field that causes this attach
+     * @param pc The persistable object
+     * @param sco Whether the PC object is stored without an identity (embedded/serialised)
      */
     void attachObject(DNStateManager sm, Object pc, boolean sco);
 
     /**
-     * Method to attach a copy of the passed object (and related objects).
-     * @param sm StateManager of the owning object that has this in a field causing its attach
+     * Method to attach a persistent detached object returning an attached copy of the object.
+     * If the object is of class that is not detachable, a ClassNotDetachableException will be thrown.
+     * @param ownerSM StateManager of the owner object that has this in a field that causes this attach
      * @param pc The object
      * @param sco Whether it has no identity (second-class object)
      * @param <T> Type of the persistable object
-     * @return The attached copy of the input object
+     * @return The attached object
      */
     <T> T attachObjectCopy(DNStateManager sm, T pc, boolean sco);
 
     /**
      * Convenience method to return the attached object for the specified id if one exists.
+     * Returns null if there is no currently enlisted/cached object with the specified id.
      * @param id The id
      * @return The attached object
      */
     Object getAttachedObjectForId(Object id);
 
     /**
-     * Method to refresh the passed object.
+     * Method to do a refresh of an object, updating it from its datastore representation. 
+     * Also updates the object in the L1/L2 caches.
      * @param pc The object
      */
     void refreshObject(Object pc);
 
     /**
-     * Method to refresh all L1 cache objects
+     * Method to do a refresh of all objects.
+     * @throws NucleusUserException thrown if instances could not be refreshed.
      */
     void refreshAllObjects();
 
@@ -480,17 +506,17 @@ public interface ExecutionContext extends ExecutionContextReference
     void enlistInTransaction(DNStateManager sm);
 
     /**
+     * Method to evict the specified StateManager from the current transaction.
+     * @param sm StateManager
+     */
+    void evictFromTransaction(DNStateManager sm);
+
+    /**
      * Method to return if an object is enlisted in the current transaction.
      * @param id Identity for the object
      * @return Whether it is enlisted in the current transaction
      */
     boolean isEnlistedInTransaction(Object id);
-
-    /**
-     * Method to evict the specified StateManager from the current transaction.
-     * @param sm StateManager
-     */
-    void evictFromTransaction(DNStateManager sm);
 
     /**
      * Mark the specified StateManager as dirty
@@ -525,7 +551,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * With datastore id or single-field id the "key" is the key of the id, and with composite ids the "key" is the toString() of the id.
      * @param cls Class of the persistable
      * @param key Value of the key field for SingleFieldIdentity, or the string value of the key otherwise
-     * @return The object meeting this requirement
+     * @return The object for this id.
      * @param <T> Type of the persistable
      */
     <T> T findObject(Class<T> cls, Object key);
@@ -564,10 +590,10 @@ public interface ExecutionContext extends ExecutionContextReference
     Persistable findObject(Object id, boolean validate);
 
     /**
-     * Accessor for persistable objects with the specified identities.
-     * @param ids Ids of the object(s).
+     * Accessor for objects with the specified identities.
+     * @param ids Identities of the object(s).
      * @param validate Whether to validate the object state
-     * @return The persistable objects with these ids (same order)
+     * @return The Objects with these ids (same order)
      * @throws NucleusObjectNotFoundException if an object doesn't exist in the datastore
      */
     Persistable[] findObjectsById(Object[] ids, boolean validate);
@@ -586,13 +612,15 @@ public interface ExecutionContext extends ExecutionContextReference
     Persistable findObject(Object id, boolean validate, boolean checkInheritance, String objectClassName);
 
     /**
-     * Accessor for an object given the object id. Typically used after a query to apply the retrieved values to an object.
+     * Accessor for an object given the object id and a set of field values to apply to it.
+     * This is intended for use where we have done a query and have the id from the results, and we want to
+     * create the object, preferably using the cache, and then apply any field values to it.
      * @param id Id of the object.
-     * @param fv FieldValues to apply to the object (optional)
-     * @param pcClass the type which the object is. This type will be used to instantiate the object
-     * @param ignoreCache true if the cache is ignored
-     * @param checkInheritance Whether to check the inheritance of this object
-     * @return the Object
+     * @param fv Field values for the object (to copy in)
+     * @param cls the type which the object is (optional). Used to instantiate the object
+     * @param ignoreCache true if it must ignore the cache
+     * @param checkInheritance Whether to check the inheritance on the id of the object
+     * @return The Object
      */
     Persistable findObject(Object id, FieldValues fv, Class pcClass, boolean ignoreCache, boolean checkInheritance);
 
@@ -720,8 +748,10 @@ public interface ExecutionContext extends ExecutionContextReference
     FlushMode getFlushMode();
 
     /**
-     * Whether the datastore operations are delayed until commit.
+     * Whether the datastore operations are delayed until commit/flush.
      * In optimistic transactions this is automatically enabled.
+     * In datastore transactions there is a persistence property to enable it.
+     * If we are committing/flushing then will return false since the delay is no longer required.
      * @return true if datastore operations are delayed until commit
      */
     boolean isDelayDatastoreOperationsEnabled();

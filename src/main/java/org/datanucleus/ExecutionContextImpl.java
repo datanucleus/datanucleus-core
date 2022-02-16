@@ -603,6 +603,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (ecListeners != null)
         {
             ecListeners.remove(listener);
+            if (ecListeners.isEmpty())
+            {
+                ecListeners = null;
+            }
         }
     }
 
@@ -749,9 +753,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public void transactionReleaseSavepoint(String name) {}
     public void transactionRollbackToSavepoint(String name) {}
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.ExecutionContext#getStatistics()
-     */
+    @Override
     public ManagerStatistics getStatistics()
     {
         return statistics;
@@ -812,31 +814,32 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getLevel1Cache()
-     */
     @Override
     public Level1Cache getLevel1Cache()
     {
         return cache;
     }
 
+    @Override
     public ClassLoaderResolver getClassLoaderResolver()
     {
         return clr;
     }
 
+    @Override
     public LockManager getLockManager()
     {
         return lockMgr;
     }
 
+    @Override
     public FetchPlan getFetchPlan()
     {
         assertIsOpen();
         return fetchPlan;
     }
 
+    @Override
     public PersistenceNucleusContext getNucleusContext()
     {
         return nucCtx;
@@ -851,9 +854,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return owner;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.ExecutionContext#setProperties(java.util.Map)
-     */
+    @Override
     public void setProperties(Map props)
     {
         if (props == null)
@@ -871,6 +872,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    @Override
     public void setProperty(String name, Object value)
     {
         /*if (tx.isActive())
@@ -992,6 +994,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    @Override
     public Map<String, Object> getProperties()
     {
         Map<String, Object> props = new HashMap<String, Object>();
@@ -1004,6 +1007,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return props;
     }
 
+    @Override
     public Boolean getBooleanProperty(String name)
     {
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
@@ -1014,6 +1018,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return null;
     }
 
+    @Override
     public Integer getIntProperty(String name)
     {
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
@@ -1024,6 +1029,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return null;
     }
 
+    @Override
     public String getStringProperty(String name)
     {
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
@@ -1034,6 +1040,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return null;
     }
 
+    @Override
     public Object getProperty(String name)
     {
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
@@ -1044,35 +1051,25 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return null;
     }
 
+    @Override
     public Set<String> getSupportedProperties()
     {
         return nucCtx.getConfiguration().getManagedOverrideablePropertyNames();
     }
 
-    /**
-     * Accessor for whether the usage is multi-threaded.
-     * @return False
-     */
+    @Override
     public boolean getMultithreaded()
     {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#getFlushMode()
-     */
     @Override
     public FlushMode getFlushMode()
     {
         return flushMode;
     }
 
-    /**
-     * Whether the datastore operations are delayed until commit/flush. 
-     * In optimistic transactions this is automatically enabled. In datastore transactions there is a persistence property to enable it.
-     * If we are committing/flushing then will return false since the delay is no longer required.
-     * @return true if datastore operations are delayed until commit/flush
-     */
+    @Override
     public boolean isDelayDatastoreOperationsEnabled()
     {
         if (!tx.isActive())
@@ -1117,11 +1114,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return nucCtx.getCurrentUser(this);
     }
 
-    /**
-     * Tests whether this persistable object is in the process of being inserted.
-     * @param pc the object to verify the status
-     * @return true if this instance is inserting.
-     */
+    @Override
     public boolean isInserting(Object pc)
     {
         DNStateManager sm = findStateManager(pc);
@@ -1132,20 +1125,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return sm.isInserting();
     }
 
-    /**
-     * Accessor for the current transaction.
-     * @return The transaction
-     */
+    @Override
     public Transaction getTransaction()
     {
         assertIsOpen();
         return tx;
     }
 
-    /**
-     * Method to enlist the specified StateManager in the current transaction.
-     * @param sm StateManager
-     */
+    @Override
     public void enlistInTransaction(DNStateManager sm)
     {
         assertActiveTransaction();
@@ -1181,10 +1168,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         enlistedSMCache.put(sm.getInternalObjectId(), sm);
     }
 
-    /**
-     * Method to evict the specified StateManager from the current transaction.
-     * @param sm StateManager
-     */
+    @Override
     public void evictFromTransaction(DNStateManager sm)
     {
         if (enlistedSMCache.remove(sm.getInternalObjectId()) != null)
@@ -1214,30 +1198,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return false;
         }
         return pbrAtCommitHandler.isObjectEnlisted(id);
-    }
-
-    /**
-     * Convenience method to return the attached object for the specified id if one exists.
-     * Returns null if there is no currently enlisted/cached object with the specified id.
-     * @param id The id
-     * @return The attached object
-     */
-    public Object getAttachedObjectForId(Object id)
-    {
-        DNStateManager sm = enlistedSMCache.get(id);
-        if (sm != null)
-        {
-            return sm.getObject();
-        }
-        if (cache != null)
-        {
-            sm = cache.get(id);
-            if (sm != null)
-            {
-                return sm.getObject();
-            }
-        }
-        return null;
     }
 
     /**
@@ -1327,9 +1287,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Find StateManager for the specified object, persisting it if required.
+     * Find StateManager for the specified object, persisting it if required and assigning a StateManager if doing so
      * @param pc The persistable object
-     * @param persist persists the object if not yet persisted. 
+     * @param persist persists the object if not yet persisted
      * @return StateManager
      */
     public DNStateManager findStateManager(Object pc, boolean persist)
@@ -1337,12 +1297,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         DNStateManager sm = findStateManager(pc);
         if (sm == null && persist)
         {
-            Object object2 = persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
-            sm = findStateManager(object2);
-        }
-        else if (sm == null)
-        {
-            return null;
+            return findStateManager(persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC));
         }
         return sm;
     }
@@ -1615,11 +1570,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to do a refresh of an object, updating it from its datastore representation. 
-     * Also updates the object in the L1/L2 caches.
-     * @param obj The Object
-     */
+    @Override
     public void refreshObject(Object obj)
     {
         if (obj == null)
@@ -1653,10 +1604,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to do a refresh of all objects.
-     * @throws NucleusUserException thrown if instances could not be refreshed.
-     */
+    @Override
     public void refreshAllObjects()
     {
         Set<DNStateManager> toRefresh = new HashSet<>();
@@ -1691,11 +1639,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to retrieve fields for objects.
-     * @param useFetchPlan Whether to use the current fetch plan
-     * @param pcs The objects to retrieve the fields for
-     */
+    @Override
     public void retrieveObjects(boolean useFetchPlan, Object... pcs)
     {
         if (pcs == null || pcs.length == 0)
@@ -1745,14 +1689,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to make an object persistent.
-     * NOT to be called by internal DataNucleus methods. Only callable by external APIs (JDO/JPA).
-     * @param obj The object
-     * @param merging Whether this object (and dependents) is being merged
-     * @return The persisted object
-     * @throws NucleusUserException if the object is managed by a different manager
-     */
+    @Override
     public Object persistObject(Object obj, boolean merging)
     {
         if (obj == null)
@@ -1831,13 +1768,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to persist an array of objects to the datastore.
-     * @param objs The objects to persist
-     * @return The persisted objects
-     * @throws NucleusUserException Thrown if an error occurs during the persist process.
-     *     Any exception could have several nested exceptions for each failed object persist
-     */
+    @Override
     public Object[] persistObjects(Object... objs)
     {
         if (objs == null)
@@ -1962,17 +1893,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return persistedPc;
     }
 
-    /**
-     * Method to make an object persistent which should be called from internal calls only.
-     * All PM/EM calls should go via persistObject(Object obj).
-     * @param obj The object
-     * @param preInsertChanges Any changes to make before inserting
-     * @param ownerSM StateManager of the owner when embedded
-     * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object
-     * @return The persisted object
-     * @throws NucleusUserException if the object is managed by a different manager
-     */
     @Override
     public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType)
     {
@@ -2164,14 +2084,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to persist the passed object (internally).
-     * @param pc The object
-     * @param ownerSM StateManager of the owner when embedded
-     * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object
-     * @return The persisted object
-     */
     @Override
     public <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType)
     {
@@ -2183,11 +2095,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return persistObjectInternal(pc, null, null, ownerFieldNum, objectType);
     }
 
-    /**
-     * Method to delete an array of objects from the datastore.
-     * @param objs The objects
-     * @throws NucleusUserException Thrown if an error occurs during the deletion process. Any exception could have several nested exceptions for each failed object deletion
-     */
     @Override
     public void deleteObjects(Object... objs)
     {
@@ -2252,11 +2159,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to delete an object from the datastore.
-     * NOT to be called by internal methods. Only callable by external APIs (JDO/JPA).
-     * @param obj The object
-     */
+    @Override
     public void deleteObject(Object obj)
     {
         if (obj == null)
@@ -2335,11 +2238,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to delete an object from persistence which should be called from internal calls only.
-     * All PM/EM calls should go via deleteObject(Object obj).
-     * @param obj Object to delete
-     */
+    @Override
     public void deleteObjectInternal(Object obj)
     {
         if (obj == null)
@@ -2407,12 +2306,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to migrate an object to transient state.
-     * @param obj The object
-     * @param state Object containing the state of the fetch plan process (if any)
-     * @throws NucleusException When an error occurs in making the object transient
-     */
+    @Override
     public void makeObjectTransient(Object obj, FetchPlanState state)
     {
         if (obj == null)
@@ -2443,11 +2337,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to make an object transactional.
-     * @param obj The object
-     * @throws NucleusException Thrown when an error occurs
-     */
+    @Override
     public void makeObjectTransactional(Object obj)
     {
         if (obj == null)
@@ -2478,10 +2368,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to make an object nontransactional.
-     * @param obj The object
-     */
+    @Override
     public void makeObjectNontransactional(Object obj)
     {
         if (obj == null)
@@ -2507,14 +2394,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to attach a persistent detached object.
-     * If a different object with the same identity as this object exists in the L1 cache then an exception
-     * will be thrown.
-     * @param ownerSM StateManager of the owner object that has this in a field that causes this attach
-     * @param pc The persistable object
-     * @param sco Whether the PC object is stored without an identity (embedded/serialised)
-     */
+    @Override
     public void attachObject(DNStateManager ownerSM, Object pc, boolean sco)
     {
         assertClassPersistable(pc.getClass());
@@ -2563,14 +2443,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to attach a persistent detached object returning an attached copy of the object.
-     * If the object is of class that is not detachable, a ClassNotDetachableException will be thrown.
-     * @param ownerSM StateManager of the owner object that has this in a field that causes this attach
-     * @param pc The object
-     * @param sco Whether it has no identity (second-class object)
-     * @return The attached object
-     */
+    @Override
     public <T> T attachObjectCopy(DNStateManager ownerSM, T pc, boolean sco)
     {
         assertClassPersistable(pc.getClass());
@@ -2657,14 +2530,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return pcTarget;
     }
 
-    /**
-     * Method to detach a persistent object without making a copy. Note that 
-     * also all the objects which are refered to from this object are detached.
-     * If the object is of class that is not detachable a ClassNotDetachableException
-     * will be thrown. If the object is not persistent a NucleusUserException is thrown.
-     * @param state State for the detachment process
-     * @param obj The object
-     */
+    @Override
+    public Object getAttachedObjectForId(Object id)
+    {
+        DNStateManager sm = enlistedSMCache.get(id);
+        if (sm == null && cache != null)
+        {
+            sm = cache.get(id);
+        }
+
+        return (sm != null) ? sm.getObject() : null;
+    }
+
+    @Override
     public void detachObject(FetchPlanState state, Object obj)
     {
         if (getApiAdapter().isDetached(obj))
@@ -2702,9 +2580,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#detachObjects(org.datanucleus.FetchPlanState, java.lang.Object[])
-     */
     @Override
     public void detachObjects(FetchPlanState state, Object... pcs)
     {
@@ -2757,14 +2632,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     }
 
-    /**
-     * Detach a copy of the passed persistent object using the provided detach state.
-     * If the object is of class that is not detachable it will be detached as transient.
-     * If it is not yet persistent it will be first persisted.
-     * @param state State for the detachment process
-     * @param pc The object
-     * @return The detached object
-     */
+    @Override
     public <T> T detachObjectCopy(FetchPlanState state, T pc)
     {
         T thePC = pc;
@@ -2807,11 +2675,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /**
-     * Method to detach all objects in the context.
-     * Detaches all objects enlisted as well as all objects in the L1 cache.
-     * Of particular use with JPA when doing a clear of the persistence context.
-     */
+    @Override
     public void detachAll()
     {
         Collection<DNStateManager> smsToDetach = new HashSet<>(this.enlistedSMCache.values());
@@ -2827,6 +2691,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    @Override
     public Object getAttachDetachReferencedObject(DNStateManager sm)
     {
         if (smAttachDetachObjectReferenceMap == null)
@@ -2836,6 +2701,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return smAttachDetachObjectReferenceMap.get(sm);
     }
 
+    @Override
     public void setAttachDetachReferencedObject(DNStateManager sm, Object obj)
     {
         if (obj != null)
@@ -2994,13 +2860,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return objs;
     }
 
-    /**
-     * Accessor for the currently managed objects for the current transaction.
-     * If the transaction is not active this returns null.
-     * @param states States that we want the enlisted objects for
-     * @param classes Classes that we want the enlisted objects for
-     * @return Collection of managed objects enlisted in the current transaction
-     */
+    @Override
     public Set getManagedObjects(String[] states, Class[] classes)
     {
         if (!tx.isActive())
@@ -3035,14 +2895,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return objs;
     }
 
-    /**
-     * Accessor for an object of the specified type with the provided id "key".
-     * With datastore id or single-field id the "key" is the key of the id, and with composite ids the "key" is the toString() of the id.
-     * @param cls Class of the persistable
-     * @param key Value of the key field for SingleFieldIdentity, or the string value of the key otherwise
-     * @return The object for this id.
-     * @param <T> Type of the persistable
-     */
+    @Override
     public <T> T findObject(Class<T> cls, Object key)
     {
         if (cls == null || key == null)
@@ -3082,9 +2935,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return (T) findObject(id, true, true, null);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#findObjects(java.lang.Class, java.util.List)
-     */
     @Override
     public <T> List<T> findObjects(Class<T> cls, List keys)
     {
@@ -3131,9 +2981,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return objs;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#findObjectByUnique(java.lang.Class, java.lang.String[], java.lang.Object[])
-     */
     @Override
     public <T> T findObjectByUnique(Class<T> cls, String[] memberNames, Object[] memberValues)
     {
@@ -3187,17 +3034,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return findObject(id, validate, validate, null);
     }
 
-    /**
-     * Accessor for an object given the object id and a set of field values to apply to it.
-     * This is intended for use where we have done a query and have the id from the results, and we want to
-     * create the object, preferably using the cache, and then apply any field values to it.
-     * @param id Id of the object.
-     * @param fv Field values for the object (to copy in)
-     * @param cls the type which the object is (optional). Used to instantiate the object
-     * @param ignoreCache true if it must ignore the cache
-     * @param checkInheritance Whether to check the inheritance on the id of the object
-     * @return The Object
-     */
+    @Override
     public Persistable findObject(Object id, FieldValues fv, Class cls, boolean ignoreCache, boolean checkInheritance)
     {
         assertIsOpen();
@@ -3280,13 +3117,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return pc;
     }
 
-    /**
-     * Accessor for objects with the specified identities.
-     * @param identities Ids of the object(s).
-     * @param validate Whether to validate the object state
-     * @return The Objects with these ids (same order)
-     * @throws NucleusObjectNotFoundException if an object doesn't exist in the datastore
-     */
+    @Override
     public Persistable[] findObjectsById(Object[] identities, boolean validate)
     {
         if (identities == null)
@@ -3505,7 +3336,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Accessor for an object given the object id. If validate is false, we return the object
      * if found in the cache, or otherwise a Hollow object with that id. If validate is true
      * we check with the datastore and return an object with the FetchPlan fields loaded.
-     * TODO Would be nice, when using checkInheritance, to be able to specify the "id" is an instance of class X or subclass. See IdentityUtils where we have the min class
+     * TODO Would be nice, when using checkInheritance, to be able to specify the "id" is an instance of class X or subclass. See IdentityUtils where we have the root class
      * @param id Id of the object.
      * @param validate Whether to validate the object state
      * @param checkInheritance Whether look to the database to determine which class this object is.
