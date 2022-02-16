@@ -68,9 +68,6 @@ public abstract class NucleusLogger
     /** Log for Datastore native operations */
     public static final NucleusLogger DATASTORE_NATIVE;
 
-    /** Log for Lifecycle issues */
-    public static final NucleusLogger LIFECYCLE;
-
     /** Log for General issues */
     public static final NucleusLogger GENERAL;
 
@@ -116,7 +113,6 @@ public abstract class NucleusLogger
         DATASTORE_RETRIEVE = getLoggerInstance("DataNucleus.Datastore.Retrieve");
         DATASTORE_SCHEMA = getLoggerInstance("DataNucleus.Datastore.Schema");
         DATASTORE_NATIVE = getLoggerInstance("DataNucleus.Datastore.Native");
-        LIFECYCLE = getLoggerInstance("DataNucleus.Lifecycle");
 
         GENERAL = getLoggerInstance("DataNucleus.General");
         VALUEGENERATION = getLoggerInstance("DataNucleus.ValueGeneration");

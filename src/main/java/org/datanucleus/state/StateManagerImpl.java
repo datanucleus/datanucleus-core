@@ -832,6 +832,20 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         return (flags&FLAG_INSERTING) != 0;
     }
 
+    @Override
+    public void setInserting()
+    {
+        flags |= FLAG_INSERTING;
+        flags &= ~FLAG_INSERTING_CALLBACKS;
+    }
+
+    @Override
+    public void setInsertingCallbacks()
+    {
+        flags &= ~FLAG_INSERTING;
+        flags |= FLAG_INSERTING_CALLBACKS;
+    }
+
     public boolean isDeleting()
     {
         return (flags&FLAG_DELETING) != 0;
@@ -5408,10 +5422,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 {
                     // Keep "loadedFields" settings til after delete is complete to save reloading
                     preDeleteLoadedFields = new boolean[loadedFields.length];
-                    for (int i=0;i<preDeleteLoadedFields.length;i++)
-                    {
-                        preDeleteLoadedFields[i] = loadedFields[i];
-                    }
+                    System.arraycopy(loadedFields, 0, preDeleteLoadedFields, 0, loadedFields.length);
 
                     myLC = myLC.transitionDeletePersistent(this);
                 }
@@ -5435,10 +5446,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 {
                     // Keep "loadedFields" settings til after delete is complete to save reloading
                     preDeleteLoadedFields = new boolean[loadedFields.length];
-                    for (int i=0;i<preDeleteLoadedFields.length;i++)
-                    {
-                        preDeleteLoadedFields[i] = loadedFields[i];
-                    }
+                    System.arraycopy(loadedFields, 0, preDeleteLoadedFields, 0, loadedFields.length);
 
                     myLC = myLC.transitionDeletePersistent(this);
                 }
@@ -5726,20 +5734,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     protected boolean isStoringPC()
     {
         return (flags&FLAG_STORING_PC) != 0;
-    }
-
-    @Override
-    public void setInserting()
-    {
-        flags |= FLAG_INSERTING;
-        flags &= ~FLAG_INSERTING_CALLBACKS;
-    }
-
-    @Override
-    public void setInsertingCallbacks()
-    {
-        flags &= ~FLAG_INSERTING;
-        flags |= FLAG_INSERTING_CALLBACKS;
     }
 
     /**

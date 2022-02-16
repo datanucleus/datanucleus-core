@@ -91,9 +91,9 @@ public abstract class LifeCycleState
     {
         LifeCycleState newState = sm.getExecutionContext().getNucleusContext().getApiAdapter().getLifeCycleState(newStateType);
 
-        if (NucleusLogger.LIFECYCLE.isDebugEnabled())
+        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.LIFECYCLE.debug(Localiser.msg("027016", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), this, newState));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("027016", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), this, newState));
         }
 
         if (isTransactional)
