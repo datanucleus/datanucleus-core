@@ -603,10 +603,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (ecListeners != null)
         {
             ecListeners.remove(listener);
-            if (ecListeners.isEmpty())
-            {
-                ecListeners = null;
-            }
+//            if (ecListeners.isEmpty())
+//            {
+//                ecListeners = null;
+//            }
         }
     }
 
