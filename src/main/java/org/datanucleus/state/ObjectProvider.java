@@ -20,6 +20,7 @@ package org.datanucleus.state;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.Transaction;
 import org.datanucleus.cache.CachedPC;
@@ -45,6 +46,9 @@ public interface ObjectProvider<T> extends StateManager
      * This value is set if a field is updated using a setter.
      */
     public static final String ORIGINAL_FIELD_VALUE_KEY_PREFIX = "FIELD_VALUE.ORIGINAL.";
+
+    /** Key prefix under which we store member (identity) value when just retrieving a FK. Member number is then appended to this prefix. */
+    public static final String MEMBER_VALUE_STORED_PREFIX = "MEMBER_VALUE.STORED.";
 
     /** PC **/
     public static short PC = 0;
@@ -174,6 +178,12 @@ public interface ObjectProvider<T> extends StateManager
     ExecutionContext getExecutionContext();
 
     StoreManager getStoreManager();
+
+    /**
+     * Accessor for the FetchPlan for this class.
+     * @return The FetchPlanForClass to be used on all fetches
+     */
+    FetchPlanForClass getFetchPlanForClass();
 
     /**
      * The object being persisted, or a virtual object containing properties to be persisted

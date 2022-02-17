@@ -120,21 +120,16 @@ public class FetchPlanForClass
      */
     public int getMaxRecursionDepthForMember(int memberNum)
     {
-        // prepare array of FetchGroupMetaData from current fetch plan
-        Set<String> currentGroupNames = new HashSet(plan.getGroups());
-
-        // find FetchGroupMetaDatas that contain the field in question
-        Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(currentGroupNames), memberNum);
-
         // find recursion depth for field in its class <field> definition
-        int recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
-        if (recursionDepth == AbstractMemberMetaData.UNDEFINED_RECURSION_DEPTH)
+        Integer recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
+        if (recursionDepth == null)
         {
-            recursionDepth = AbstractMemberMetaData.DEFAULT_RECURSION_DEPTH;
+            recursionDepth = 1;
         }
 
-        // find if it has been overridden in a <fetch-group> definition
+        // find FetchGroupMetaDatas that contain the member in question, and see if it has been overridden
         String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getName();
+        Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (Iterator<FetchGroupMetaData> iter = fetchGroupsContainingField.iterator(); iter.hasNext();)
         {
             FetchGroupMetaData fgmd = iter.next();
@@ -145,10 +140,8 @@ public class FetchPlanForClass
                 {
                     if (fgmmd.getName().equals(fieldName))
                     {
-                        if (fgmmd.getRecursionDepth() != AbstractMemberMetaData.UNDEFINED_RECURSION_DEPTH)
-                        {
-                            recursionDepth = fgmmd.getRecursionDepth();
-                        }
+                        // TODO Add concept of "max" as per this method's name
+                        recursionDepth = fgmmd.getRecursionDepth();
                     }
                 }
             }

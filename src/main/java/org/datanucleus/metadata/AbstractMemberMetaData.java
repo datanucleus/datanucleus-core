@@ -143,14 +143,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** load-fetch-group value. */
     protected String loadFetchGroup;
 
-    /** Default recursion-depth according to proposed final draft spec, [12.7.2]. */
-    public static final int DEFAULT_RECURSION_DEPTH = 1;
-
-    /** Indicates the recursion-depth is not defined.  Use default value. */
-    public static final int UNDEFINED_RECURSION_DEPTH = 0;
-
-    /** recursion-depth value. */
-    protected int recursionDepth = UNDEFINED_RECURSION_DEPTH;
+    /** recursion-depth value. TODO This is only for FetchGroupMemberMetaData, and for DFG.*/
+    protected Integer recursionDepth = null;
 
     /** Field name. */
     protected final String name;
@@ -1374,7 +1368,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         addExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_DISABLED, "true");
     }
 
-    public int getRecursionDepth()
+    public Integer getRecursionDepth()
     {
         return recursionDepth;
     }
