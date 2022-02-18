@@ -49,7 +49,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -413,10 +412,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
 
         // Check java types with wrappers
-        Iterator iter = javaTypes.values().iterator();
-        while (iter.hasNext())
+        for (JavaType type : javaTypes.values())
         {
-            JavaType type = (JavaType)iter.next();
             if (type.wrapperType != null && type.wrapperType.getName().equals(className))
             {
                 return true;
@@ -426,7 +423,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 return true;
             }
         }
-
         return false;
     }
 
@@ -554,21 +550,14 @@ public class TypeManagerImpl implements TypeManager, Serializable
         // Find the SCO wrapper type most suitable
         StoreManager storeMgr = ownerSM.getExecutionContext().getStoreManager();
         boolean backedWrapper = storeMgr.useBackedSCOWrapperForMember(mmd, ownerSM.getExecutionContext());
-        Class<? extends SCO> wrapperType = null;
         if (mmd.isSerialized())
         {
             // If we have all elements serialised into a column then cannot have backing stores
             backedWrapper = false;
         }
 
-        if (backedWrapper)
-        {
-            wrapperType = getBackedWrapperTypeForType(mmd.getType(), instantiatedType, typeName);
-        }
-        else
-        {
-            wrapperType = getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName);
-        }
+        Class<? extends SCO> wrapperType = backedWrapper ?
+            getBackedWrapperTypeForType(mmd.getType(), instantiatedType, typeName) : getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName);
         if (wrapperType == null)
         {
             throw new NucleusUserException(Localiser.msg("023011", mmd.getTypeName(), typeName, mmd.getFullFieldName()));
@@ -655,10 +644,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public Class getTypeForSecondClassWrapper(String className)
     {
-        Iterator iter = javaTypes.values().iterator();
-        while (iter.hasNext())
+        for (JavaType type : javaTypes.values())
         {
-            JavaType type = (JavaType)iter.next();
             if (type.wrapperType != null && type.wrapperType.getName().equals(className))
             {
                 return type.cls;
@@ -822,11 +809,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
 
         Map<Class, TypeConverter> convertersForMember = typeConverterMap.get(memberType);
-        if (convertersForMember == null)
-        {
-            return null;
-        }
-        return convertersForMember.get(datastoreType);
+        return (convertersForMember == null) ? null : convertersForMember.get(datastoreType);
     }
 
     /* (non-Javadoc)
@@ -841,11 +824,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
 
         Map<Class, TypeConverter> convertersForMember = typeConverterMap.get(memberType);
-        if (convertersForMember == null)
-        {
-            return null;
-        }
-        return convertersForMember.values();
+        return (convertersForMember == null) ? null : convertersForMember.values();
     }
 
     /**
@@ -891,7 +870,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
 
         // Not supported so try to find one that is supported that this class derives from
-        Collection<JavaType> supportedTypes = new HashSet(javaTypes.values());
+        Collection<JavaType> supportedTypes = Collections.unmodifiableCollection(javaTypes.values());
         for (JavaType type : supportedTypes)
         {
             if (type.cls == cls && type.genericType == null)
@@ -964,17 +943,15 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
 
         // Not supported so try to find one that is supported that this class derives from
-        Collection supportedTypes = new HashSet(javaTypes.values());
-        Iterator iter = supportedTypes.iterator();
-        while (iter.hasNext())
+        Collection<JavaType> supportedTypes = Collections.unmodifiableCollection(javaTypes.values());
+        for (JavaType javaType : supportedTypes)
         {
-            type = (JavaType)iter.next();
-            if (type.cls.isAssignableFrom(cls))
+            if (javaType.cls.isAssignableFrom(cls))
             {
-                if (type.genericType != null && type.genericType.isAssignableFrom(genericType))
+                if (javaType.genericType != null && javaType.genericType.isAssignableFrom(genericType))
                 {
-                    javaTypes.put(typeName, type); // Register this subtype for reference
-                    return type;
+                    javaTypes.put(typeName, javaType); // Register this subtype for reference
+                    return javaType;
                 }
             }
         }
@@ -1275,21 +1252,21 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     private Class loadClass(PluginManager mgr, ConfigurationElement elem, String className, String messageKey)
     {
-        Class result = null;
-        if (className != null)
+        if (className == null)
         {
-            try
-            {
-                result = mgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), className);
-            }
-            catch (NucleusException ne)
-            {
-                // Impossible to load the class implementation from this plugin
-                NucleusLogger.PERSISTENCE.error(Localiser.msg(messageKey, className));
-                throw new NucleusException(Localiser.msg(messageKey, className));
-            }
+            return null;
         }
-        return result;
+
+        try
+        {
+            return mgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), className);
+        }
+        catch (NucleusException ne)
+        {
+            // Impossible to load the class implementation from this plugin
+            NucleusLogger.PERSISTENCE.error(Localiser.msg(messageKey, className));
+            throw new NucleusException(Localiser.msg(messageKey, className));
+        }
     }
 
     /**

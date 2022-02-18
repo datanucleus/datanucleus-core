@@ -135,10 +135,9 @@ public class FetchPlan implements Serializable
      */
     private void markDirty()
     {
-        Iterator<FetchPlanForClass> it = fetchPlansByClassName.values().iterator();
-        while (it.hasNext())
+        for (FetchPlanForClass fpCls : fetchPlansByClassName.values())
         {
-            it.next().markDirty();
+            fpCls.markDirty();
         }
     }
 
@@ -245,13 +244,11 @@ public class FetchPlan implements Serializable
 
         if (grpNames != null)
         {
-            Set<String> g = new HashSet<String>(grpNames);
-            groups.addAll(g);
+            groups.addAll(grpNames);
 
-            Iterator<String> iter = grpNames.iterator();
-            while (iter.hasNext())
+            for (String grpName : grpNames)
             {
-                addDynamicGroup(iter.next());
+                addDynamicGroup(grpName);
             }
         }
 
@@ -312,10 +309,9 @@ public class FetchPlan implements Serializable
     {
         if (dynamicGroups != null)
         {
-            Iterator<FetchGroup> iter = dynamicGroups.iterator();
-            while (iter.hasNext())
+            for (FetchGroup grp : dynamicGroups)
             {
-                iter.next().deregisterListener(this);
+                grp.deregisterListener(this);
             }
             dynamicGroups.clear();
         }
@@ -338,10 +334,8 @@ public class FetchPlan implements Serializable
             {
                 dynamicGroups = new HashSet<>();
             }
-            Iterator<FetchGroup> grpIter = ecGrpsWithName.iterator();
-            while (grpIter.hasNext())
+            for (FetchGroup grp : ecGrpsWithName)
             {
-                FetchGroup grp = grpIter.next();
                 dynamicGroups.add(grp);
                 grp.registerListener(this); // Register us with this group
                 changed = true;
@@ -358,10 +352,8 @@ public class FetchPlan implements Serializable
                 {
                     dynamicGroups = new HashSet<>();
                 }
-                Iterator<FetchGroup> grpIter = grpsWithName.iterator();
-                while (grpIter.hasNext())
+                for (FetchGroup grp : grpsWithName)
                 {
-                    FetchGroup grp = grpIter.next();
                     dynamicGroups.add(grp);
                     grp.registerListener(this); // Register us with this group
                     changed = true;
@@ -573,9 +565,8 @@ public class FetchPlan implements Serializable
             fp.dynamicGroups = new HashSet<>(dynamicGroups);
         }
 
-        for (Iterator<Map.Entry<String, FetchPlanForClass>> it = this.fetchPlansByClassName.entrySet().iterator(); it.hasNext();)
+        for (Map.Entry<String, FetchPlanForClass> entry : this.fetchPlansByClassName.entrySet())
         {
-            Map.Entry<String, FetchPlanForClass> entry = it.next();
             String className = entry.getKey();
             FetchPlanForClass fpcls = entry.getValue();
             fp.fetchPlansByClassName.put(className, fpcls.getCopy(fp));
