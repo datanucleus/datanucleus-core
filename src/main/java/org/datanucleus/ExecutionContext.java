@@ -147,7 +147,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * Method to set properties on the execution context.
      * @param props The properties
      */
-    void setProperties(Map props);
+    void setProperties(Map<String, Object> props);
 
     /**
      * Method to set a property on the execution context

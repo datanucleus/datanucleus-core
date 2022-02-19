@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -164,7 +163,12 @@ public class DataNucleusEnhancer
         if (props != null)
         {
             // Superimpose any user-provided properties
-            nucleusContext.getConfiguration().setPersistenceProperties(props);
+            Map<String, Object> enhanceProps = new HashMap<>();
+            for (String key : props.stringPropertyNames()) 
+            {
+                props.put(key, props.getProperty(key));
+            }
+            nucleusContext.getConfiguration().setPersistenceProperties(enhanceProps);
         }
         this.metadataMgr = nucleusContext.getMetaDataManager();
         this.clr = nucleusContext.getClassLoaderResolver(null);
@@ -334,7 +338,7 @@ public class DataNucleusEnhancer
             return this;
         }
 
-        Collection names = new HashSet();
+        Collection<String> names = new HashSet<>();
         for (int i=0;i<classNames.length;i++)
         {
             if (classNames[i].endsWith(".class"))
@@ -503,11 +507,9 @@ public class DataNucleusEnhancer
         // Enhance the classes implied by the FileMetaData
         long inputTime = System.currentTimeMillis();
         Set<String> classNames = new HashSet<String>();
-        Iterator<FileMetaData> filemdIter = fileMetaData.iterator();
         boolean success = true;
-        while (filemdIter.hasNext())
+        for (FileMetaData filemd : fileMetaData)
         {
-            FileMetaData filemd = filemdIter.next();
             for (int packagenum = 0; packagenum < filemd.getNoOfPackages(); packagenum++)
             {
                 PackageMetaData pmd = filemd.getPackage(packagenum);
@@ -580,11 +582,9 @@ public class DataNucleusEnhancer
 
         // Validate the classes implied by the FileMetaData
         long inputTime = System.currentTimeMillis();
-        Set<String> classNames = new HashSet<String>();
-        Iterator<FileMetaData> filemdIter = fileMetaData.iterator();
-        while (filemdIter.hasNext())
+        Set<String> classNames = new HashSet<>();
+        for (FileMetaData filemd : fileMetaData)
         {
-            FileMetaData filemd = filemdIter.next();
             for (int packagenum = 0; packagenum < filemd.getNoOfPackages(); packagenum++)
             {
                 PackageMetaData pmd = filemd.getPackage(packagenum);
@@ -636,11 +636,9 @@ public class DataNucleusEnhancer
      */
     protected Collection<FileMetaData> getFileMetaDataForInput()
     {
-        Iterator<EnhanceComponent> iter = componentsToEnhance.iterator();
         Collection<FileMetaData> fileMetaData = new ArrayList<FileMetaData>();
-        while (iter.hasNext())
+        for (EnhanceComponent comp : componentsToEnhance)
         {
-            EnhanceComponent comp = iter.next();
             FileMetaData[] filemds = null;
             switch (comp.getType())
             {
@@ -743,7 +741,7 @@ public class DataNucleusEnhancer
                     {
                         // Multiple jar files
                         String[] jarFilenames = (String[])comp.getValue();
-                        Collection<FileMetaData> filemdsColl = new HashSet<FileMetaData>();
+                        Collection<FileMetaData> filemdsColl = new HashSet<>();
                         for (int i=0;i<jarFilenames.length;i++)
                         {
                             FileMetaData[] fmds = metadataMgr.loadJar(jarFilenames[i], userClassLoader);
@@ -880,7 +878,7 @@ public class DataNucleusEnhancer
             classEnhancer = new ClassEnhancerImpl(cmd, clr, metadataMgr, namer);
         }
 
-        Collection<String> options = new HashSet<String>();
+        Collection<String> options = new HashSet<>();
         if (generatePK)
         {
             options.add(ClassEnhancer.OPTION_GENERATE_PK);

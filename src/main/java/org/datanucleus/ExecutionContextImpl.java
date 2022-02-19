@@ -34,7 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.datanucleus.api.ApiAdapter;
@@ -293,10 +292,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         Configuration conf = nucCtx.getConfiguration();
 
         // copy default configuration from factory for overrideable properties
-        Iterator<Map.Entry<String, Object>> propIter = conf.getManagerOverrideableProperties().entrySet().iterator();
-        while (propIter.hasNext())
+        for (Map.Entry<String, Object> entry : conf.getManagerOverrideableProperties().entrySet())
         {
-            Map.Entry<String, Object> entry = propIter.next();
             properties.setProperty(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
         }
         properties.getFrequentProperties().setDefaults(conf.getFrequentProperties());
@@ -855,20 +852,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public void setProperties(Map props)
+    public void setProperties(Map<String, Object> props)
     {
         if (props == null)
         {
             return;
         }
-        Iterator<Entry<Object, Object>> entryIter = props.entrySet().iterator();
-        while (entryIter.hasNext())
+
+        for (Map.Entry<String, Object> entry : props.entrySet())
         {
-            Map.Entry entry = entryIter.next();
-            if (entry.getKey() instanceof String)
-            {
-                setProperty((String)entry.getKey(), entry.getValue());
-            }
+            setProperty(entry.getKey(), entry.getValue());
         }
     }
 
@@ -958,7 +951,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         return;
                     }
                     cache.clear();
-                    cache = null;   
+                    cache = null;
                 }
             }
             else
@@ -998,10 +991,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public Map<String, Object> getProperties()
     {
         Map<String, Object> props = new HashMap<String, Object>();
-        Iterator<Map.Entry<String, Object>> propertiesIter = properties.getProperties().entrySet().iterator();
-        while (propertiesIter.hasNext())
+        for (Map.Entry<String, Object> entry : properties.getProperties().entrySet())
         {
-            Map.Entry<String, Object> entry = propertiesIter.next();
             props.put(nucCtx.getConfiguration().getCaseSensitiveNameForPropertyName(entry.getKey()), entry.getValue());
         }
         return props;
@@ -4423,11 +4414,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         List<Exception> failures = null;
         try
         {
-            Collection<DNStateManager> sms = enlistedSMCache.values();
-            Iterator<DNStateManager> smsIter = sms.iterator();
-            while (smsIter.hasNext())
+            for (DNStateManager sm : enlistedSMCache.values())
             {
-                DNStateManager sm = smsIter.next();
                 try
                 {
                     sm.preRollback(getTransaction());

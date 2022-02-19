@@ -394,7 +394,7 @@ public interface ApiAdapter extends Serializable
      * Method to return a set of default properties for the factory (PMF, EMF, etc)
      * @return The default properties (if any) for this API
      */
-    Map getDefaultFactoryProperties();
+    Map<String, Object> getDefaultFactoryProperties();
 
     /**
      * Whether we should add in metadata when using persistent properties and a property is not specified.

@@ -741,10 +741,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
 
         // Extract the classes that have metadata loaded (e.g persistence-unit)
-        Set<String> schemaClassNames = null;
-        MetaDataManager metaDataMgr = getMetaDataManager();
-        FileMetaData[] filemds = metaDataMgr.getFileMetaData();
-        schemaClassNames = new TreeSet<String>();
+        Set<String> schemaClassNames = new TreeSet<String>();
+        FileMetaData[] filemds = getMetaDataManager().getFileMetaData();
         if (filemds == null)
         {
             throw new NucleusUserException("No classes to process in generateSchema");

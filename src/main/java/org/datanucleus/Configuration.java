@@ -145,10 +145,8 @@ public class Configuration extends PropertyStore implements Serializable
     {
         Map<String, Object> props = new HashMap<String, Object>();
 
-        Iterator<Map.Entry<String, Object>> propEntryIter = properties.entrySet().iterator();
-        while (propEntryIter.hasNext())
+        for (Map.Entry<String, Object> propEntry : properties.entrySet())
         {
-            Map.Entry<String, Object> propEntry = propEntryIter.next();
             String name = propEntry.getKey();
             if (isPropertyForDatastore(name))
             {
@@ -203,10 +201,8 @@ public class Configuration extends PropertyStore implements Serializable
             return props;
         }
         props = new LinkedHashMap<String, Object>();
-        Iterator<Map.Entry<String, PropertyMapping>> propIter = propertyMappings.entrySet().iterator();
-        while (propIter.hasNext())
+        for (Map.Entry<String, PropertyMapping> entry : propertyMappings.entrySet())
         {
-            Map.Entry<String, PropertyMapping> entry = propIter.next();
             PropertyMapping mapping = entry.getValue();
             if (mapping.managerOverride)
             {
@@ -281,22 +277,20 @@ public class Configuration extends PropertyStore implements Serializable
      * This should only be called after the other setDefaultProperties method is called, which sets up the mappings
      * @param props Properties to use in the default set
      */
-    public void setDefaultProperties(Map props)
+    public void setDefaultProperties(Map<String, Object> props)
     {
         if (props != null && !props.isEmpty())
         {
-            Iterator<Map.Entry> entryIter = props.entrySet().iterator();
-            while (entryIter.hasNext())
+            for (Map.Entry<String, Object> entry : props.entrySet())
             {
-                Map.Entry entry = entryIter.next();
-                PropertyMapping mapping = propertyMappings.get(((String)entry.getKey()).toLowerCase(Locale.ENGLISH));
+                PropertyMapping mapping = propertyMappings.get(entry.getKey().toLowerCase(Locale.ENGLISH));
                 Object propValue = entry.getValue();
                 if (mapping != null && mapping.validatorName != null && propValue instanceof String)
                 {
                     propValue = getValueForPropertyWithValidator((String)propValue, mapping.validatorName);
                 }
-                defaultProperties.put(((String)entry.getKey()).toLowerCase(Locale.ENGLISH), propValue);
-                defaultFrequentProperties.setProperty((String)entry.getKey(), propValue);
+                defaultProperties.put(entry.getKey().toLowerCase(Locale.ENGLISH), propValue);
+                defaultFrequentProperties.setProperty(entry.getKey(), propValue);
             }
         }
     }
@@ -321,12 +315,10 @@ public class Configuration extends PropertyStore implements Serializable
         String storedName = internalName != null ? internalName.toLowerCase(Locale.ENGLISH) : name.toLowerCase(Locale.ENGLISH);
         if (!defaultProperties.containsKey(storedName))
         {
-            // Add the default property+value
+            // Check if provided via a System property, otherwise use passed default
             Object propValue = System.getProperty(name);
-            // TODO Feed system value through validator if provided
             if (propValue == null)
             {
-                // No system value so use code default
                 propValue = value;
             }
 
@@ -336,7 +328,7 @@ public class Configuration extends PropertyStore implements Serializable
                 {
                     propValue = getValueForPropertyWithValidator(value, validatorName);
                 }
-                this.defaultProperties.put(storedName, propValue);
+                defaultProperties.put(storedName, propValue);
                 defaultFrequentProperties.setProperty(storedName, propValue);
             }
         }
@@ -399,10 +391,16 @@ public class Configuration extends PropertyStore implements Serializable
             return;
         }
 
-        Properties props = null;
+        Map<String, Object> props = null;
         try
         {
-            props = PersistenceUtils.setPropertiesUsingFile(filename);
+            Properties propsFromFile = PersistenceUtils.setPropertiesUsingFile(filename);
+            props = new HashMap<>();
+            for (String key : propsFromFile.stringPropertyNames()) 
+            {
+                props.put(key, propsFromFile.getProperty(key));
+            }
+
             setPropertyInternal(PropertyNames.PROPERTY_PROPERTIES_FILE, filename);
         }
         catch (NucleusUserException nue)
@@ -429,7 +427,7 @@ public class Configuration extends PropertyStore implements Serializable
     /**
      * Accessor for the persistence properties.
      * This returns just the user-supplied properties, not the defaulted properties
-     * @see #getPersistenceProperties()
+     * @see #setPersistenceProperties()
      * @return The persistence properties
      */
     public Map<String, Object> getPersistenceProperties()
@@ -440,10 +438,8 @@ public class Configuration extends PropertyStore implements Serializable
     public Set<String> getPropertyNamesWithPrefix(String prefix)
     {
         Set<String> propNames = null;
-        Iterator<String> nameIter = properties.keySet().iterator();
-        while (nameIter.hasNext())
+        for (String name : properties.keySet())
         {
-            String name = nameIter.next();
             if (name.startsWith(prefix.toLowerCase(Locale.ENGLISH)))
             {
                 if (propNames == null)
@@ -459,22 +455,14 @@ public class Configuration extends PropertyStore implements Serializable
     /**
      * Set the properties for this configuration.
      * Note : this has this name so it has a getter/setter pair for use by things like Spring.
-     * @see #getPersistencePropertiesDefaults()
+     * @see #getPersistenceProperties()
      * @param props The persistence properties
      */
-    public void setPersistenceProperties(Map props)
+    public void setPersistenceProperties(Map<String, Object> props)
     {
-        Set entries = props.entrySet();
-        Iterator<Map.Entry> entryIter = entries.iterator();
-        while (entryIter.hasNext())
+        for (Map.Entry<String, Object> entry : props.entrySet())
         {
-            Map.Entry entry = entryIter.next();
-            Object keyObj = entry.getKey();
-            if (keyObj instanceof String)
-            {
-                String key = (String)keyObj;
-                setProperty(key, entry.getValue());
-            }
+            setProperty(entry.getKey(), entry.getValue());
         }
     }
 
@@ -503,16 +491,8 @@ public class Configuration extends PropertyStore implements Serializable
                     }
                 }
 
-                if (mapping.internalName != null)
-                {
-                    setPropertyInternal(mapping.internalName, value);
-                }
-                else
-                {
-                    setPropertyInternal(mapping.name, value);
-                }
+                setPropertyInternal((mapping.internalName != null) ? mapping.internalName : mapping.name, value);
 
-                // Special behaviour properties
                 if (propertyName.equals(PropertyNames.PROPERTY_PROPERTIES_FILE))
                 {
                     // Load all properties from the specified file
@@ -538,10 +518,10 @@ public class Configuration extends PropertyStore implements Serializable
         if (mapping != null)
         {
             validatorName = mapping.validatorName;
-        }
-        if (validatorName != null)
-        {
-            validatePropertyValue(name, value, validatorName);
+            if (validatorName != null)
+            {
+                validatePropertyValue(name, value, validatorName);
+            }
         }
     }
 
@@ -585,8 +565,7 @@ public class Configuration extends PropertyStore implements Serializable
 
         if (validator != null)
         {
-            boolean validated = validator.validate(name, value);
-            if (!validated)
+            if (!validator.validate(name, value))
             {
                 throw new IllegalArgumentException(Localiser.msg("008012", name, value));
             }
