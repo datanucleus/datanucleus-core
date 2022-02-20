@@ -42,6 +42,7 @@ import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.flush.ListSetOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOListIterator;
@@ -263,14 +264,33 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator<E> iter=backingStore.iterator(ownerSM);
+
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            RelationType relType = ownerMmd.getRelationType(ec.getClassLoaderResolver());
+            int relatedMemberNum = -1;
+            if (RelationType.isBidirectional(relType) && relType == RelationType.ONE_TO_MANY_BI)
+            {
+                AbstractMemberMetaData[] relMmds = ownerMmd.getRelatedMemberMetaData(ec.getClassLoaderResolver());
+                relatedMemberNum = (relMmds != null && relMmds.length > 0) ? relMmds[0].getAbsoluteFieldNumber() : -1;
+            }
+
+            Iterator<E> iter = backingStore.iterator(ownerSM);
             while (iter.hasNext())
             {
-                delegate.add(iter.next());
+                E element = iter.next();
+                if (relatedMemberNum >= 0)
+                {
+                    DNStateManager elemSM = ec.findStateManager(element);
+                    if (!elemSM.isFieldLoaded(relatedMemberNum))
+                    {
+                        // Store the "id" value in case the container owner member is ever accessed
+                        elemSM.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + relatedMemberNum, ownerSM.getExternalObjectId());
+                    }
+                }
+                delegate.add(element);
             }
 
             isCacheLoaded = true;
@@ -330,11 +350,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return ((java.util.ArrayList)delegate).clone();
     }
 
-    /**
-     * Accessor for whether an element is contained in the List.
-     * @param element The element
-     * @return Whether the element is contained here
-     **/
+    @Override
     public boolean contains(Object element)
     {
         if (useCache && isCacheLoaded)
@@ -350,11 +366,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.contains(element);
     }
 
-    /**
-     * Accessor for whether a collection of elements are contained here.
-     * @param c The collection of elements.
-     * @return Whether they are contained.
-     **/
+    @Override
     public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
@@ -376,11 +388,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
+    @Override
     public boolean equals(Object o)
     {
         if (useCache)
@@ -421,11 +429,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         }
     }
 
-    /**
-     * Method to retrieve an element no.
-     * @param index The item to retrieve
-     * @return The element at that position.
-     */
+    @Override
     public E get(int index)
     {
         if (useCache)
@@ -440,6 +444,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.get(index);
     }
 
+    @Override
     public int hashCode()
     {
         if (useCache)
@@ -449,11 +454,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.hashCode();
     }
 
-    /**
-     * Method to retrieve the position of an element.
-     * @param element The element.
-     * @return The position.
-     **/
+    @Override
     public int indexOf(Object element)
     {
         if (useCache)
@@ -468,20 +469,13 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.indexOf(element);
     }
 
-    /**
-     * Accessor for whether the List is empty.
-     * @return Whether it is empty.
-     **/
+    @Override
     public boolean isEmpty()
     {
         return size() == 0;
     }
 
-    /**
-     * Method to retrieve the last position of the element.
-     * @param element The element
-     * @return The last position of this element in the List.
-     **/
+    @Override
     public int lastIndexOf(Object element)
     {
         if (useCache)
@@ -496,10 +490,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.lastIndexOf(element);
     }
 
-    /**
-     * Accessor for an iterator for the List
-     * @return The iterator
-     **/
+    @Override
     public Iterator<E> iterator()
     {
         // Populate the cache if necessary
@@ -511,10 +502,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, -1);
     }
 
-    /**
-     * Method to retrieve a List iterator for the list.
-     * @return The iterator
-     **/
+    @Override
     public ListIterator<E> listIterator()
     {
         // Populate the cache if necessary
@@ -526,11 +514,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, -1);
     }
 
-    /**
-     * Method to retrieve a List iterator for the list from the index.
-     * @param index The start point 
-     * @return The iterator
-     **/
+    @Override
     public ListIterator<E> listIterator(int index)
     {
         // Populate the cache if necessary
@@ -542,10 +526,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, index);
     }
 
-    /**
-     * Accessor for the size of the List
-     * @return The size
-     **/
+    @Override
     public int size()
     {
         if (useCache && isCacheLoaded)
@@ -561,12 +542,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.size();
     }
 
-    /**
-     * Accessor for the subList of elements between from and to of the List
-     * @param from Start index (inclusive)
-     * @param to End index (exclusive) 
-     * @return The subList
-     **/
+    @Override
     public java.util.List<E> subList(int from,int to)
     {
         if (useCache)
@@ -581,10 +557,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.subList(from,to);
     }
 
-    /**
-     * Method to return the List as an array.
-     * @return The array
-     **/
+    @Override
     public Object[] toArray()
     {
         if (useCache)
@@ -598,11 +571,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the List as an array.
-     * @param a The array to copy to
-     * @return The array
-     **/
+    @Override
     public Object[] toArray(Object a[])
     {
         if (useCache)
@@ -616,13 +585,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.toArray(a);
     }
 
-    // ----------------------------- Mutators methods --------------------------
- 
-    /**
-     * Method to add an element to the List
-     * @param element The element to add
-     * @return Whether it was added successfully.
-     **/
+    @Override
     public boolean add(E element)
     {
         // Reject inappropriate elements
@@ -669,11 +632,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to add an element to the List at a position.
-     * @param element The element to add
-     * @param index The position
-     **/
+    @Override
     public void add(int index, E element)
     {
         // Reject inappropriate elements
@@ -718,11 +677,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         }
     }
 
-    /**
-     * Method to add a Collection to the ArrayList.
-     * @param elements The collection
-     * @return Whether it was added ok.
-     */
+    @Override
     public boolean addAll(Collection elements)
     {
         if (useCache)
@@ -766,12 +721,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to add a collection of elements.
-     * @param elements The collection of elements to add.
-     * @param index The position to add them
-     * @return Whether they were added successfully.
-     **/
+    @Override
     public boolean addAll(int index, Collection elements)
     {
         if (useCache)
@@ -816,9 +766,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to clear the List
-     **/
+    @Override
     public void clear()
     {
         makeDirty();
@@ -842,21 +790,13 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         }
     }
 
-    /**
-     * Method to remove an element from the List
-     * @param element The Element to remove
-     * @return Whether it was removed successfully.
-     **/
+    @Override
     public boolean remove(Object element)
     {
         return remove(element, true);
     }
 
-    /**
-     * Method to remove an element from the collection, and observe the flag for whether to allow cascade delete.
-     * @param element The element
-     * @param allowCascadeDelete Whether to allow cascade delete
-     */
+    @Override
     public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
@@ -902,11 +842,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to remove an element from the ArrayList.
-     * @param index The element position.
-     * @return The object that was removed
-     */
+    @Override
     public E remove(int index)
     {
         makeDirty();
@@ -949,11 +885,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return backingStore != null ? backingObject : delegateObject;
     }
 
-    /**
-     * Method to remove a collection of elements from the List.
-     * @param elements Collection of elements to remove
-     * @return Whether it was successful.
-     */
+    @Override
     public boolean removeAll(Collection elements)
     {
         if (elements == null)
@@ -1031,11 +963,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegateSuccess;
     }
 
-    /**
-     * Method to retain a Collection of elements (and remove all others).
-     * @param c The collection to retain
-     * @return Whether they were retained successfully.
-     **/
+    @Override
     public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
@@ -1064,15 +992,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return modified;
     }
 
-    /**
-     * Wrapper addition that allows turning off of the dependent-field checks
-     * when doing the position setting. This means that we can prevent the deletion of
-     * the object that was previously in that position. This particular feature is used
-     * when attaching a list field and where some elements have changed positions.
-     * @param index The position
-     * @param element The new element
-     * @return The element previously at that position
-     */
+    @Override
     public E set(int index, E element, boolean allowDependentField)
     {
         // Reject inappropriate elements
@@ -1109,29 +1029,13 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegateReturn;
     }
 
-    /**
-     * Method to set the element at a position in the ArrayList.
-     * @param index The position
-     * @param element The new element
-     * @return The element previously at that position
-     */
+    @Override
     public E set(int index, E element)
     {
         return set(index, element, !sorting);
     }
 
-    /**
-     * The writeReplace method is called when ObjectOutputStream is preparing
-     * to write the object to the stream. The ObjectOutputStream checks whether
-     * the class defines the writeReplace method. If the method is defined, the
-     * writeReplace method is called to allow the object to designate its 
-     * replacement in the stream. The object returned should be either of the
-     * same type as the object passed in or an object that when read and
-     * resolved will result in an object of a type that is compatible with all
-     * references to the object.
-     * @return the replaced object
-     * @throws ObjectStreamException if an error occurs
-     */
+    @Override
     protected Object writeReplace() throws ObjectStreamException
     {
         if (useCache)

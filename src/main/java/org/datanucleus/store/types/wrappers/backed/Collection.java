@@ -39,6 +39,7 @@ import org.datanucleus.flush.CollectionClearOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.BackedSCOStoreManager;
@@ -373,14 +374,33 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
+
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            RelationType relType = ownerMmd.getRelationType(ec.getClassLoaderResolver());
+            int relatedMemberNum = -1;
+            if (RelationType.isBidirectional(relType) && relType == RelationType.ONE_TO_MANY_BI)
+            {
+                AbstractMemberMetaData[] relMmds = ownerMmd.getRelatedMemberMetaData(ec.getClassLoaderResolver());
+                relatedMemberNum = (relMmds != null && relMmds.length > 0) ? relMmds[0].getAbsoluteFieldNumber() : -1;
+            }
+
             Iterator<E> iter = backingStore.iterator(ownerSM);
             while (iter.hasNext())
             {
-                delegate.add(iter.next());
+                E element = iter.next();
+                if (relatedMemberNum >= 0)
+                {
+                    DNStateManager elemSM = ec.findStateManager(element);
+                    if (!elemSM.isFieldLoaded(relatedMemberNum))
+                    {
+                        // Store the "id" value in case the container owner member is ever accessed
+                        elemSM.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + relatedMemberNum, ownerSM.getExternalObjectId());
+                    }
+                }
+                delegate.add(element);
             }
 
             isCacheLoaded = true;
@@ -444,11 +464,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return ((java.util.HashSet)delegate).clone();
     }
 
-    /**
-     * Accessor for whether an element is contained in the Collection.
-     * @param element The element
-     * @return Whether the element is contained here
-     **/
+    @Override
     public boolean contains(Object element)
     {
         if (useCache && isCacheLoaded)
@@ -464,11 +480,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return delegate.contains(element);
     }
 
-    /**
-     * Accessor for whether a collection of elements are contained here.
-     * @param c The collection of elements.
-     * @return Whether they are contained.
-     **/
+    @Override
     public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
@@ -490,11 +502,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
+    @Override
     public boolean equals(Object o)
     {
         if (useCache)
@@ -525,10 +533,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         }
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
+    @Override
     public int hashCode()
     {
         if (useCache)
@@ -538,19 +543,13 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return delegate.hashCode();
     }
 
-    /**
-     * Accessor for whether the Collection is empty.
-     * @return Whether it is empty.
-     **/
+    @Override
     public boolean isEmpty()
     {
         return size() == 0;
     }
 
-    /**
-     * Accessor for an iterator for the Collection.
-     * @return The iterator
-     **/
+    @Override
     public Iterator<E> iterator()
     {
         // Populate the cache if necessary
@@ -561,10 +560,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return new SCOCollectionIterator(this, ownerSM, delegate, backingStore, useCache);
     }
 
-    /**
-     * Accessor for the size of the Collection.
-     * @return The size
-     **/
+    @Override
     public int size()
     {
         if (useCache && isCacheLoaded)
@@ -580,10 +576,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return delegate.size();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @return The array
-     **/
+    @Override
     public Object[] toArray()
     {
         if (useCache)
@@ -597,11 +590,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @param a The array to write the results to
-     * @return The array
-     **/
+    @Override
     public Object[] toArray(Object a[])
     {
         if (useCache)
@@ -615,10 +604,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return delegate.toArray(a);
     }
 
-    /**
-     * Method to return the Collection as a String.
-     * @return The string form
-     **/
+    @Override
     public String toString()
     {
         StringBuilder s = new StringBuilder("[");
@@ -638,13 +624,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return s.toString();
     }
 
-    // ----------------------------- Mutator methods ---------------------------
-
-    /**
-     * Method to add an element to the Collection.
-     * @param element The element to add
-     * @return Whether it was added successfully.
-     **/
+    @Override
     public boolean add(E element)
     {
         // Reject inappropriate elements
@@ -701,11 +681,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to add a collection of elements.
-     * @param elements The collection of elements to add.
-     * @return Whether they were added successfully.
-     **/
+    @Override
     public boolean addAll(java.util.Collection elements)
     {
         if (useCache)
@@ -758,9 +734,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to clear the Collection.
-     **/
+    @Override
     public void clear()
     {
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
@@ -794,21 +768,13 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         }
     }
 
-    /**
-     * Method to remove an element from the Collection.
-     * @param element The Element to remove
-     * @return Whether it was removed successfully.
-     **/
+    @Override
     public boolean remove(Object element)
     {
         return remove(element, true);
     }
 
-    /**
-     * Method to remove an element from the collection, and observe the flag for whether to allow cascade delete.
-     * @param element The element
-     * @param allowCascadeDelete Whether to allow cascade delete
-     */
+    @Override
     public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
@@ -859,11 +825,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to remove a Collection of elements.
-     * @param elements The collection to remove
-     * @return Whether they were removed successfully.
-     **/
+    @Override
     public boolean removeAll(java.util.Collection elements)
     {
         if (elements == null)
@@ -951,11 +913,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return delegateSuccess;
     }
 
-    /**
-     * Method to retain a Collection of elements (and remove all others).
-     * @param c The collection to retain
-     * @return Whether they were retained successfully.
-     **/
+    @Override
     public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
@@ -984,18 +942,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         return modified;
     }
 
-    /**
-     * The writeReplace method is called when ObjectOutputStream is preparing
-     * to write the object to the stream. The ObjectOutputStream checks whether
-     * the class defines the writeReplace method. If the method is defined, the
-     * writeReplace method is called to allow the object to designate its
-     * replacement in the stream. The object returned should be either of the
-     * same type as the object passed in or an object that when read and
-     * resolved will result in an object of a type that is compatible with all
-     * references to the object.
-     * @return the replaced object
-     * @throws ObjectStreamException if an error occurs
-     */
+    @Override
     protected Object writeReplace() throws ObjectStreamException
     {
         if (useCache)

@@ -35,6 +35,7 @@ import org.datanucleus.flush.CollectionClearOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.BackedSCOStoreManager;
@@ -268,14 +269,33 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator<E> iter=backingStore.iterator(ownerSM);
+
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            RelationType relType = ownerMmd.getRelationType(ec.getClassLoaderResolver());
+            int relatedMemberNum = -1;
+            if (RelationType.isBidirectional(relType) && relType == RelationType.ONE_TO_MANY_BI)
+            {
+                AbstractMemberMetaData[] relMmds = ownerMmd.getRelatedMemberMetaData(ec.getClassLoaderResolver());
+                relatedMemberNum = (relMmds != null && relMmds.length > 0) ? relMmds[0].getAbsoluteFieldNumber() : -1;
+            }
+
+            Iterator<E> iter = backingStore.iterator(ownerSM);
             while (iter.hasNext())
             {
-                delegate.add(iter.next());
+                E element = iter.next();
+                if (relatedMemberNum >= 0)
+                {
+                    DNStateManager elemSM = ec.findStateManager(element);
+                    if (!elemSM.isFieldLoaded(relatedMemberNum))
+                    {
+                        // Store the "id" value in case the container owner member is ever accessed
+                        elemSM.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + relatedMemberNum, ownerSM.getExternalObjectId());
+                    }
+                }
+                delegate.add(element);
             }
 
             isCacheLoaded = true;
@@ -333,11 +353,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return super.clone();
     }
 
-    /**
-     * Accessor for whether an element is contained in this Set.
-     * @param element The element
-     * @return Whether it is contained.
-     **/
+    @Override
     public boolean contains(Object element)
     {
         if (useCache && isCacheLoaded)
@@ -353,11 +369,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return delegate.contains(element);
     }
 
-    /**
-     * Accessor for whether a collection is contained in this Set.
-     * @param c The collection
-     * @return Whether it is contained.
-     */
+    @Override
     public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
@@ -379,6 +391,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return delegate.containsAll(c);
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (useCache)
@@ -409,6 +422,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         }
     }
 
+    @Override
     public int hashCode()
     {
         if (useCache)
@@ -418,19 +432,13 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return delegate.hashCode();
     }
 
-    /**
-     * Accessor for whether the LinkedHashSet is empty.
-     * @return Whether it is empty.
-     **/
+    @Override
     public boolean isEmpty()
     {
         return size() == 0;
     }
 
-    /**
-     * Accessor for an iterator for the Set.
-     * @return The iterator
-     */
+    @Override
     public Iterator<E> iterator()
     {
         // Populate the cache if necessary
@@ -441,10 +449,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return new SCOCollectionIterator(this, ownerSM, delegate, backingStore, useCache);
     }
 
-    /**
-     * Accessor for the size of the LinkedHashSet.
-     * @return The size.
-     **/
+    @Override
     public int size()
     {
         if (useCache && isCacheLoaded)
@@ -460,10 +465,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return delegate.size();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     **/
+    @Override
     public Object[] toArray()
     {
         if (useCache)
@@ -473,11 +475,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
-     * @return The array
-     **/
+    @Override
     public Object[] toArray(Object a[])
     {
         if (useCache)
@@ -486,14 +484,8 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         }
         return delegate.toArray(a);
     }
- 
-    // ------------------------------ Mutator methods --------------------------
 
-    /**
-     * Method to add an element to the LinkedHashSet.
-     * @param element The new element
-     * @return Whether it was added ok.
-     **/
+    @Override
     public boolean add(E element)
     {
         // Reject inappropriate elements
@@ -550,11 +542,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to add a collection to the LinkedHashSet.
-     * @param elements The collection
-     * @return Whether it was added ok.
-     **/
+    @Override
     public boolean addAll(Collection elements)
     {
         if (useCache)
@@ -607,9 +595,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to clear the LinkedHashSet
-     **/
+    @Override
     public void clear()
     {
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
@@ -643,21 +629,13 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         }
     }
 
-    /**
-     * Method to remove an element from the LinkedHashSet.
-     * @param element The element
-     * @return Whether it was removed ok.
-     */
+    @Override
     public boolean remove(Object element)
     {
         return remove(element, true);
     }
 
-    /**
-     * Method to remove an element from the collection, and observe the flag for whether to allow cascade delete.
-     * @param element The element
-     * @param allowCascadeDelete Whether to allow cascade delete
-     */
+    @Override
     public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
@@ -708,11 +686,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to remove all elements from the collection from the LinkedHashSet.
-     * @param elements The collection of elements to remove 
-     * @return Whether it was removed ok.
-     **/
+    @Override
     public boolean removeAll(java.util.Collection elements)
     {
         if (elements == null)
@@ -800,11 +774,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return delegateSuccess;
     }
 
-    /**
-     * Method to retain a Collection of elements (and remove all others).
-     * @param c The collection to retain
-     * @return Whether they were retained successfully.
-     */
+    @Override
     public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
@@ -833,18 +803,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return modified;
     }
 
-    /**
-     * The writeReplace method is called when ObjectOutputStream is preparing
-     * to write the object to the stream. The ObjectOutputStream checks
-     * whether the class defines the writeReplace method. If the method is
-     * defined, the writeReplace method is called to allow the object to
-     * designate its replacement in the stream. The object returned should be
-     * either of the same type as the object passed in or an object that when
-     * read and resolved will result in an object of a type that is compatible
-     * with all references to the object.
-     * @return the replaced object
-     * @throws ObjectStreamException if an error occurs
-     */
+    @Override
     protected Object writeReplace() throws ObjectStreamException
     {
         if (useCache)

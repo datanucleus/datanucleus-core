@@ -40,6 +40,7 @@ import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.flush.ListSetOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.types.SCOListIterator;
@@ -261,14 +262,33 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerSM.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator<E> iter=backingStore.iterator(ownerSM);
+
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            RelationType relType = ownerMmd.getRelationType(ec.getClassLoaderResolver());
+            int relatedMemberNum = -1;
+            if (RelationType.isBidirectional(relType) && relType == RelationType.ONE_TO_MANY_BI)
+            {
+                AbstractMemberMetaData[] relMmds = ownerMmd.getRelatedMemberMetaData(ec.getClassLoaderResolver());
+                relatedMemberNum = (relMmds != null && relMmds.length > 0) ? relMmds[0].getAbsoluteFieldNumber() : -1;
+            }
+
+            Iterator<E> iter = backingStore.iterator(ownerSM);
             while (iter.hasNext())
             {
-                delegate.add(iter.next());
+                E element = iter.next();
+                if (relatedMemberNum >= 0)
+                {
+                    DNStateManager elemSM = ec.findStateManager(element);
+                    if (!elemSM.isFieldLoaded(relatedMemberNum))
+                    {
+                        // Store the "id" value in case the container owner member is ever accessed
+                        elemSM.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + relatedMemberNum, ownerSM.getExternalObjectId());
+                    }
+                }
+                delegate.add(element);
             }
 
             isCacheLoaded = true;
@@ -310,8 +330,6 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
     }
 
-    // ------------------ Implementation of Vector methods ---------------------
- 
     /**
      * Clone operator to return a copy of this object.
      * <P>Mutable second-class Objects are required to provide a public clone method in order to allow for copying persistable objects.
@@ -328,11 +346,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.clone();
     }
 
-    /**
-     * Method to return if the list contains this element.
-     * @param element The element
-     * @return Whether it is contained
-     **/
+    @Override
     public boolean contains(Object element)
     {
         if (useCache && isCacheLoaded)
@@ -348,11 +362,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.contains(element);
     }
 
-    /**
-     * Accessor for whether a collection of elements are contained here.
-     * @param c The collection of elements.
-     * @return Whether they are contained.
-     **/
+    @Override
     public synchronized boolean containsAll(java.util.Collection c)
     {
         if (useCache)
@@ -361,7 +371,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
         else if (backingStore != null)
         {
-            java.util.HashSet h=new java.util.HashSet(c);
+            java.util.HashSet h = new java.util.HashSet(c);
             Iterator iter=iterator();
             while (iter.hasNext())
             {
@@ -374,16 +384,13 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.containsAll(c);
     }
 
-    /**
-     * Method to retrieve an element no.
-     * @param index The item to retrieve
-     * @return The element at that position.
-     */
+    @Override
     public synchronized E elementAt(int index)
     {
         return get(index);
     }
 
+    @Override
     public synchronized boolean equals(Object o)
     {
         if (useCache)
@@ -417,10 +424,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return true;
     }
 
-    /**
-     * Method to return the elements of the List as an Enumeration.
-     * @return The elements
-     */
+    @Override
     public Enumeration elements()
     {
         if (useCache)
@@ -442,10 +446,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         };
     }
 
-    /**
-     * Method to return the first element in the Vector.
-     * @return The first element
-     */
+    @Override
     public synchronized E firstElement()
     {
         return get(0);
@@ -461,11 +462,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
     }
 
-    /**
-     * Method to retrieve an element no.
-     * @param index The item to retrieve
-     * @return The element at that position.
-     **/
+    @Override
     public synchronized E get(int index)
     {
         if (useCache)
@@ -480,10 +477,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.get(index);
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
+    @Override
     public synchronized int hashCode()
     {
         if (useCache)
@@ -493,11 +487,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.hashCode();
     }
 
-    /**
-     * Method to the position of an element.
-     * @param element The element.
-     * @return The position.
-     **/
+    @Override
     public int indexOf(Object element)
     {
         if (useCache)
@@ -512,12 +502,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.indexOf(element);
     }
 
-    /**
-     * Method to the position of an element.
-     * @param element The element.
-     * @param startIndex The start position
-     * @return The position.
-     **/
+    @Override
     public synchronized int indexOf(Object element, int startIndex)
     {
         if (useCache)
@@ -533,19 +518,13 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.indexOf(element, startIndex);
     }
 
-    /**
-     * Accessor for whether the Vector is empty.
-     * @return Whether it is empty.
-     **/
+    @Override
     public synchronized boolean isEmpty()
     {
         return size() == 0;
     }
 
-    /**
-     * Method to retrieve an iterator for the list.
-     * @return The iterator
-     **/
+    @Override
     public synchronized Iterator<E> iterator()
     {
         // Populate the cache if necessary
@@ -557,20 +536,13 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, -1);
     }
 
-    /**
-     * Method to return the last element in the Vector.
-     * @return The last element
-     */
+    @Override
     public synchronized E lastElement()
     {
         return get(size() - 1);
     }
 
-    /**
-     * Method to retrieve the last position of the element.
-     * @param element The element
-     * @return The last position of this element in the List.
-     **/
+    @Override
     public synchronized int lastIndexOf(Object element)
     {
         if (useCache)
@@ -585,12 +557,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.lastIndexOf(element);
     }
 
-    /**
-     * Method to retrieve the last position of the element.
-     * @param element The element
-     * @param startIndex The start position
-     * @return The last position of this element in the List.
-     **/
+    @Override
     public synchronized int lastIndexOf(Object element, int startIndex)
     {
         if (useCache)
@@ -606,10 +573,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.lastIndexOf(element, startIndex);
     }
 
-    /**
-     * Method to retrieve a List iterator for the list.
-     * @return The iterator
-     **/
+    @Override
     public synchronized ListIterator<E> listIterator()
     {
         // Populate the cache if necessary
@@ -621,11 +585,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, -1);
     }
 
-    /**
-     * Method to retrieve a List iterator for the list from the index.
-     * @param index The start point 
-     * @return The iterator
-     **/
+    @Override
     public synchronized ListIterator<E> listIterator(int index)
     {
         // Populate the cache if necessary
@@ -637,10 +597,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return new SCOListIterator(this, ownerSM, delegate, backingStore, useCache, index);
     }
 
-    /**
-     * Accessor for the size of the Vector.
-     * @return The size.
-     **/
+    @Override
     public synchronized int size()
     {
         if (useCache && isCacheLoaded)
@@ -656,12 +613,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.size();
     }
 
-    /**
-     * Accessor for the subList of elements between from and to of the List
-     * @param from Start index (inclusive)
-     * @param to End index (exclusive) 
-     * @return The subList
-     **/
+    @Override
     public synchronized java.util.List<E> subList(int from,int to)
     {
         if (useCache)
@@ -676,10 +628,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.subList(from,to);
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     **/
+    @Override
     public synchronized Object[] toArray()
     {
         if (useCache)
@@ -693,11 +642,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
-     * @return The array
-     **/
+    @Override
     public synchronized Object[] toArray(Object a[])
     {
         if (useCache)
@@ -711,13 +656,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegate.toArray(a);
     }
 
-    // --------------------------- Mutator methods -----------------------------
- 
-    /**
-     * Method to add an element to a position in the Vector.
-     * @param index The position
-     * @param element The new element
-     **/
+    @Override
     public void add(int index, E element)
     {
         // Reject inappropriate elements
@@ -762,11 +701,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
     }
 
-    /**
-     * Method to add an element to the Vector.
-     * @param element The new element
-     * @return Whether it was added ok.
-     **/
+    @Override
     public synchronized boolean add(E element)
     {
         // Reject inappropriate elements
@@ -813,11 +748,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to add a Collection to the Vector.
-     * @param elements The collection
-     * @return Whether it was added ok.
-     **/
+    @Override
     public synchronized boolean addAll(Collection elements)
     {
         if (useCache)
@@ -861,12 +792,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to add a Collection to a position in the Vector.
-     * @param index Position to insert the collection.
-     * @param elements The collection
-     * @return Whether it was added ok.
-     **/
+    @Override
     public synchronized boolean addAll(int index, Collection elements)
     {
         if (useCache)
@@ -911,19 +837,14 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to add an element to the Vector.
-     * @param element The new element
-     **/
+    @Override
     public synchronized void addElement(E element)
     {
         // This is a historical wrapper to the Collection method
         add(element);
     }
 
-    /**
-     * Method to clear the Vector.
-     **/
+    @Override
     public synchronized void clear()
     {
         makeDirty();
@@ -947,21 +868,13 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
     }
 
-    /**
-     * Method to remove an element from the Vector.
-     * @param element The element
-     * @return Whether the element was removed
-     **/
+    @Override
     public synchronized boolean remove(Object element)
     {
         return remove(element, true);
     }
 
-    /**
-     * Method to remove an element from the collection, and observe the flag for whether to allow cascade delete.
-     * @param element The element
-     * @param allowCascadeDelete Whether to allow cascade delete
-     */
+    @Override
     public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
@@ -1008,11 +921,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
-    /**
-     * Method to remove an element from the Vector.
-     * @param index The element position.
-     * @return The object that was removed
-     **/
+    @Override
     public synchronized E remove(int index)
     {
         makeDirty();
@@ -1054,11 +963,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return backingStore != null ? backingObject : delegateObject;
     }
 
-    /**
-     * Method to remove a Collection of elements from the Vector.
-     * @param elements The collection
-     * @return Whether it was removed ok.
-     */
+    @Override
     public synchronized boolean removeAll(Collection elements)
     {
         if (elements == null)
@@ -1136,40 +1041,27 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegateSuccess;
     }
 
-    /**
-     * Method to remove an element from the Vector.
-     * @param element The element
-     * @return Whether the element was removed
-     **/
+    @Override
     public synchronized boolean removeElement(Object element)
     {
         // This is a historical wrapper to the Collection method
         return remove(element);
     }
 
-    /**
-     * Method to remove an element from the Vector.
-     * @param index The element position.
-     **/
+    @Override
     public synchronized void removeElementAt(int index)
     {
         // This is a historical wrapper to the Collection method
         remove(index);
     }
 
-    /**
-     * Method to remove all elements from the Vector.
-     **/
+    @Override
     public synchronized void removeAllElements()
     {
         clear();
     }
 
-    /**
-     * Method to retain a Collection of elements (and remove all others).
-     * @param c The collection to retain
-     * @return Whether they were retained successfully.
-     **/
+    @Override
     public synchronized boolean retainAll(java.util.Collection c)
     {
         makeDirty();
@@ -1198,15 +1090,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return modified;
     }
 
-    /**
-     * Addition that allows turning off of the dependent-field checks
-     * when doing the position setting. This means that we can prevent the deletion of
-     * the object that was previously in that position. This particular feature is used
-     * when attaching a list field and where some elements have changed positions.
-     * @param index The position
-     * @param element The new element
-     * @return The element previously at that position
-     */
+    @Override
     public E set(int index, E element, boolean allowDependentField)
     {
         // Reject inappropriate elements
@@ -1242,41 +1126,20 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         return delegateReturn;
     }
 
-    /**
-     * Method to set the element at a position in the Vector.
-     * @param index The position
-     * @param element The new element
-     * @return The element previously at that position
-     **/
+    @Override
     public synchronized E set(int index, E element)
     {
         return set(index, element, !sorting);
     }
 
-    /**
-     * Method to set the element at a position in the Vector.
-     * @param element The new element
-     * @param index The position
-     **/
+    @Override
     public synchronized void setElementAt(E element, int index)
     {
         // This is a historical wrapper to the Collection method
         set(index,element);
     }
 
-    /**
-     * The writeReplace method is called when ObjectOutputStream is preparing
-     * to write the object to the stream. The ObjectOutputStream checks whether
-     * the class defines the writeReplace method. If the method is defined, the
-     * writeReplace method is called to allow the object to designate its
-     * replacement in the stream. The object returned should be either of the
-     * same type as the object passed in or an object that when read and
-     * resolved will result in an object of a type that is compatible with 
-     * all references to the object.
-     *
-     * @return the replaced object
-     * @throws ObjectStreamException if an error occurs
-     */
+    @Override
     protected Object writeReplace() throws ObjectStreamException
     {
         if (useCache)
