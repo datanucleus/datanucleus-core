@@ -134,10 +134,8 @@ public class CachedPC implements Serializable, Comparable<CachedPC>
         {
             // TODO Some (mutable) field values may need copying
             copy.fieldValues = new HashMap<Integer, Object>(fieldValues.size());
-            Iterator<Map.Entry<Integer, Object>> entryIter = fieldValues.entrySet().iterator();
-            while (entryIter.hasNext())
+            for (Map.Entry<Integer, Object> entry : fieldValues.entrySet())
             {
-                Map.Entry<Integer, Object> entry = entryIter.next();
                 Integer key = entry.getKey();
                 Object val = entry.getValue();
                 if (val != null && val instanceof CachedPC)

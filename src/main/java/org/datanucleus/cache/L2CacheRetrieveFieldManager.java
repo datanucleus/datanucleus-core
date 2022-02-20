@@ -69,13 +69,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         {
             return null;
         }
-        int[] flds = new int[fieldsNotLoaded.size()];
-        int i=0;
-        for (Integer fldNum : fieldsNotLoaded)
-        {
-            flds[i++] = fldNum;
-        }
-        return flds;
+        return fieldsNotLoaded.stream().mapToInt(i->i).toArray();
     }
 
     /* (non-Javadoc)
@@ -388,27 +382,22 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         return ec.findObject(pcId, null, pcCls, false, false);
     }
     
-    /*
-     * Copy container without using the container handler and metadata type info. Calling newContainer from
-     * container handler for interfaces will return the default chosen implementation, but this causes the JDO
-     * TCK (TestCollectionCollections) to fail because it expects Collection fields to return the same or at
-     * most a List.
+    /**
+     * Copy container without using the container handler and metadata type info. 
+     * Calling newContainer from container handler for interfaces will return the default chosen implementation, but this causes the JDO TCK
+     * (TestCollectionCollections) to fail because it expects Collection fields to return the same or at most a List.
      */
     static <T> T newContainer(Object container, AbstractMemberMetaData mmd, ContainerHandler containerHandler)
     {
-        Object newContainer;
-        
         try
         {
-            newContainer = container.getClass().getDeclaredConstructor().newInstance();
+            return (T)container.getClass().getDeclaredConstructor().newInstance();
         }
         catch (Exception e)
         {
             // Fallback for containers that don't have a default constructor
-            newContainer = containerHandler.newContainer(mmd);
+            return (T)containerHandler.newContainer(mmd);
         }
-        
-        return (T) newContainer;
     }
 
     /**

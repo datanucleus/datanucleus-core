@@ -4095,6 +4095,10 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             Object member = myEC.findObject(memberValue, false);
             // TODO What if the related object is not found, or deleted? (i.e deleted the other end but not set the FK!)
             replaceField(myPC, fieldNumber, member);
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug("Setting member " + fieldNumber + " of " + this + " from STORED-VALUE-CACHE");
+            }
             removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
         }
         return hasStored;
