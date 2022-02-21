@@ -773,19 +773,6 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         }
 
         int size = useCache ? delegate.size() : -1;
-        Collection contained = null;
-        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerSM))
-        {
-            // Check which are contained before updating the delegate
-            contained = new java.util.HashSet();
-            for (Object elem : elements)
-            {
-                if (contains(elem))
-                {
-                    contained.add(elem);
-                }
-            }
-        }
         boolean delegateSuccess = delegate.removeAll(elements);
 
         if (backingStore != null && ownerSM != null)
@@ -793,7 +780,16 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             boolean backingSuccess = true;
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                if (contained != null && !contained.isEmpty())
+                // Check which are contained before updating the delegate
+                Collection contained = new java.util.HashSet();
+                for (Object elem : elements)
+                {
+                    if (contains(elem))
+                    {
+                        contained.add(elem);
+                    }
+                }
+                if (!contained.isEmpty())
                 {
                     backingSuccess = false;
                     for (Object element : contained)
