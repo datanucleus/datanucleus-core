@@ -698,6 +698,11 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
 
         int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
+        if (useCache && !contained)
+        {
+            // Element not present in the delegate so nothing to do
+            return false;
+        }
         boolean delegateSuccess = delegate.remove(element);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {

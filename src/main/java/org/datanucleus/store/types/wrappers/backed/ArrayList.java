@@ -810,10 +810,13 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
         int indexOfElement = -1;
-        if (useCache && contained)
+        if (useCache)
         {
-            indexOfElement = delegate.indexOf(element);
-            if (indexOfElement < 0)
+            if (contained)
+            {
+                indexOfElement = delegate.indexOf(element);
+            }
+            else
             {
                 // Element not present in the delegate so nothing to do
                 return false;
@@ -834,7 +837,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
             }
             else
             {
-                if (useCache)
+                if (indexOfElement >= 0)
                 {
                     // We know the index of the first instance so use that
                     Object removedElement = backingStore.remove(ownerSM, indexOfElement, size);
@@ -877,6 +880,10 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         }
 
         int size = useCache ? delegate.size() : -1;
+        if (useCache && (index < 0 || index>= size))
+        {
+            throw new IndexOutOfBoundsException(index);
+        }
         E delegateObject = useCache ? delegate.remove(index) : null;
 
         E backingObject = null;

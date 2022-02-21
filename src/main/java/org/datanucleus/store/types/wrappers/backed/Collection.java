@@ -786,6 +786,11 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
 
         int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
+        if (useCache && !contained)
+        {
+            // Element not present in the delegate so nothing to do
+            return false;
+        }
         boolean delegateSuccess = delegate.remove(element);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {

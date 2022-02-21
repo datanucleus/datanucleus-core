@@ -808,6 +808,19 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
 
         int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
+        int indexOfElement = -1;
+        if (useCache)
+        {
+            if (contained)
+            {
+                indexOfElement = delegate.indexOf(element);
+            }
+            else
+            {
+                // Element not present in the delegate so nothing to do
+                return false;
+            }
+        }
         boolean delegateSuccess = delegate.remove(element);
         boolean backingSuccess = true;
         if (backingStore != null)
@@ -822,14 +835,26 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
             }
             else
             {
-                try
+                if (indexOfElement >= 0)
                 {
-                    backingSuccess = backingStore.remove(ownerSM, element, size, allowCascadeDelete);
+                    // We know the index of the first instance so use that
+                    Object removedElement = backingStore.remove(ownerSM, indexOfElement, size);
+                    if (removedElement != null)
+                    {
+                        backingSuccess = true;
+                    }
                 }
-                catch (NucleusDataStoreException dse)
+                else
                 {
-                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "remove", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    try
+                    {
+                        backingSuccess = backingStore.remove(ownerSM, element, size, allowCascadeDelete);
+                    }
+                    catch (NucleusDataStoreException dse)
+                    {
+                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "remove", ownerMmd.getName(), dse));
+                        backingSuccess = false;
+                    }
                 }
             }
         }
@@ -853,6 +878,10 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         }
 
         int size = useCache ? delegate.size() : -1;
+        if (useCache && (index < 0 || index>= size))
+        {
+            throw new IndexOutOfBoundsException(index);
+        }
         E delegateObject = useCache ? delegate.remove(index) : null;
 
         E backingObject = null;
