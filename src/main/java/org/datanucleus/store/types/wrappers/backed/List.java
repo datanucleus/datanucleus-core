@@ -49,6 +49,7 @@ import org.datanucleus.store.types.SCOListIterator;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.scostore.ListStore;
 import org.datanucleus.store.types.scostore.Store;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -933,6 +934,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
             loadFromStore();
         }
 
+        int[] elementIndexes = useCache ? ClassUtils.getIndexesOfCollectionInList(delegate, elements) : null;
         int size = useCache ? delegate.size() : -1;
         boolean delegateSuccess = delegate.removeAll(elements);
 
@@ -964,7 +966,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
             {
                 try
                 {
-                    backingSuccess = backingStore.removeAll(ownerSM, elements, size);
+                    backingSuccess = backingStore.removeAll(ownerSM, elements, size, elementIndexes);
                 }
                 catch (NucleusDataStoreException dse)
                 {

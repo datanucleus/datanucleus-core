@@ -41,6 +41,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -2136,5 +2137,31 @@ public class ClassUtils
         }
         int mask = 1 << bitIndex;
         return (bits & ~mask) | (flag ? mask : 0);
+    }
+
+    /**
+     * Convenience method to return the list index positions in "delegate" where the passed "elements" are located.
+     * The index positions are in <B>reverse numeric order</B> (i.e highest first).
+     * @param delegate The delegate list
+     * @param elements The elements to check for
+     * @return The index positions (highest first)
+     */
+    public static int[] getIndexesOfCollectionInList(List delegate, Collection elements)
+    {
+        Collection<Integer> indexes = new java.util.ArrayList<>();
+        int elemNum = 0;
+        for (Object delegateElem : delegate)
+        {
+            for (Object elem : elements)
+            {
+                if (elem.equals(delegateElem))
+                {
+                    indexes.add(elemNum);
+                    break;
+                }
+            }
+            elemNum++;
+        }
+        return indexes.stream().sorted(Comparator.reverseOrder()).mapToInt(i->i).toArray();
     }
 }

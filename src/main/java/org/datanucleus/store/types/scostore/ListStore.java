@@ -35,22 +35,22 @@ public interface ListStore<E> extends CollectionStore<E>
 {
     /**
      * Method to add an element to the List.
-     * @param sm StateManager for the owner of the List. 
+     * @param ownerSM StateManager for the owner of the List. 
      * @param element Element to add
      * @param index Position to add the element. 
      * @param size Current size of list (if known). -1 if not known
      */
-    void add(DNStateManager sm, E element, int index, int size);
+    void add(DNStateManager ownerSM, E element, int index, int size);
 
     /**
      * Method to add a collection of elements to the List.
-     * @param sm StateManager for the owner of the List.
+     * @param ownerSM StateManager for the owner of the List.
      * @param c Collection of elements to add
      * @param index Position to add the elements.
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether the elements were added ok
      */
-	boolean addAll(DNStateManager sm, Collection<E> c, int index, int size);
+	boolean addAll(DNStateManager ownerSM, Collection<E> c, int index, int size);
 
     /**
      * Method to remove an element from the List.
@@ -62,52 +62,62 @@ public interface ListStore<E> extends CollectionStore<E>
 	E remove(DNStateManager sm, int index, int size);
 
     /**
+     * Method to remove a collection of elements from the collection.
+     * @param ownerSM StateManager for the owner of the collection. 
+     * @param elements Element to remove
+     * @param size Current size of collection if known. -1 if not known
+     * @param elementIndices Indices where these elements are found (null if not known, or for an ordered list).
+     * @return Whether the elements were removed ok
+     */
+    boolean removeAll(DNStateManager ownerSM, Collection elements, int size, int[] elementIndices);
+
+    /**
      * Method to retrieve an element from a position in the List.
-     * @param sm StateManager for the owner of the List.
+     * @param ownerSM StateManager for the owner of the List.
      * @param index Position of the element.
      * @return The element at that position.
      */
-	E get(DNStateManager sm, int index);
+	E get(DNStateManager ownerSM, int index);
 
     /**
      * Method to update an element at a position in the List.
-     * @param sm StateManager for the owner of the List.
+     * @param ownerSM StateManager for the owner of the List.
      * @param index Position of the element.
      * @param element The element value
      * @param allowDependentField Whether to enable dependent field during this operation
      * @return The previous element at that position.
      */
-	Object set(DNStateManager sm, int index, Object element, boolean allowDependentField);
+	Object set(DNStateManager ownerSM, int index, Object element, boolean allowDependentField);
 
     /**
      * Accessor for a sublist of elements between from and to indices.
-     * @param sm StateManager for the owner of the List.
+     * @param ownerSM StateManager for the owner of the List.
      * @param from Start position (inclusive)
      * @param to End position (exclusive)
      * @return List of elements in this range.
      */
-	java.util.List subList(DNStateManager sm, int from, int to);
+	java.util.List subList(DNStateManager ownerSM, int from, int to);
 
     /**
      * Method to return the position of an element in the List.
-     * @param sm StateManager for the owner of the List.
+     * @param ownerSM StateManager for the owner of the List.
      * @param element The element value
      * @return The position of the element.
      */
-	int indexOf(DNStateManager sm, Object element);
+	int indexOf(DNStateManager ownerSM, Object element);
 
     /**
      * Method to return the last position of an element in the List.
-     * @param sm StateManager for the owner of the List.
+     * @param ownerSM StateManager for the owner of the List.
      * @param element The element value
      * @return The last position of the element.
      **/
-	int lastIndexOf(DNStateManager sm, Object element);
+	int lastIndexOf(DNStateManager ownerSM, Object element);
 
     /**
      * Accessor for a list iterator for the List.
-     * @param sm StateManager for the owner of the List. 
+     * @param ownerSM StateManager for the owner of the List. 
      * @return List iterator for the List.
      */
-	ListIterator<E> listIterator(DNStateManager sm);
+	ListIterator<E> listIterator(DNStateManager ownerSM);
 }
