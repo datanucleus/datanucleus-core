@@ -278,6 +278,13 @@ public interface DNStateManager<T> extends StateManager
     Object getAssociatedValue(Object key);
 
     /**
+     * Accessor for whether the specified associated value key is present.
+     * @param key The key
+     * @return Whether it is present
+     */
+    boolean containsAssociatedValue(Object key);
+
+    /**
      * Method to remove the associated value with the specified key (if it exists).
      * @param key The key
      */
@@ -427,6 +434,13 @@ public interface DNStateManager<T> extends StateManager
      * @param fieldNumber Absolute field number
      */
     void loadField(int fieldNumber);
+
+    /**
+     * Convenience method to load the specified field from the stored associated value cache if available.
+     * @param fieldNumber Absolute field number
+     * @return whether it was loaded from stored cache values
+     */
+    boolean loadStoredField(int fieldNumber);
 
     /**
      * Method to load all unloaded fields in the FetchPlan.

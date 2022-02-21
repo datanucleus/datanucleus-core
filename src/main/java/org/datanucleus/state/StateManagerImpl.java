@@ -2012,6 +2012,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         myEC.removeStateManagerAssociatedValue(this, key);
     }
 
+    @Override
     public boolean containsAssociatedValue(Object key)
     {
         return myEC.containsStateManagerAssociatedValue(this, key);
@@ -3726,6 +3727,26 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         loadSpecifiedFields(new int[]{fieldNumber});
     }
 
+    @Override
+    public boolean loadStoredField(int fieldNumber)
+    {
+        boolean hasStored = containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+        if (hasStored)
+        {
+            // Instantiate object using the stored "id" value, and remove associated value
+            Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+            Object member = myEC.findObject(memberValue, false);
+            // TODO What if the related object is not found, or deleted? (i.e deleted the other end but not set the FK!)
+            replaceField(myPC, fieldNumber, member);
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug("Setting member " + fieldNumber + " of " + this + " from STORED-VALUE-CACHE");
+            }
+            removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+        }
+        return hasStored;
+    }
+
     public void loadUnloadedRelationFields()
     {
         int[] fieldsConsidered = cmd.getRelationMemberPositions(myEC.getClassLoaderResolver());
@@ -4053,7 +4074,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 }
                 else if (!beingDeleted && myFP.hasMember(fieldNumber))
                 {
-                    if (!checkForAndRetrieveStoredValue(fieldNumber))
+                    if (!loadStoredField(fieldNumber))
                     {
                         // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
                         loadUnloadedFieldsInFetchPlan();
@@ -4061,7 +4082,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 }
                 else
                 {
-                    if (!checkForAndRetrieveStoredValue(fieldNumber))
+                    if (!loadStoredField(fieldNumber))
                     {
                         // Just load this field
                         loadSpecifiedFields(new int[] {fieldNumber});
@@ -4078,30 +4099,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             // Convert into an exception suitable for the current API since this is called from a user update of a field
             throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
         }
-    }
-
-    /**
-     * Convenience method to check whether the specified field number has a (FK) identity value stored for later loading, and set the field value accordingly.
-     * @param fieldNumber The absolute field number
-     * @return Whether the field (FK) value was stored
-     */
-    protected boolean checkForAndRetrieveStoredValue(int fieldNumber)
-    {
-        boolean hasStored = containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-        if (hasStored)
-        {
-            // Instantiate object using the stored "id" value, and remove associated value
-            Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-            Object member = myEC.findObject(memberValue, false);
-            // TODO What if the related object is not found, or deleted? (i.e deleted the other end but not set the FK!)
-            replaceField(myPC, fieldNumber, member);
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                NucleusLogger.PERSISTENCE.debug("Setting member " + fieldNumber + " of " + this + " from STORED-VALUE-CACHE");
-            }
-            removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-        }
-        return hasStored;
     }
 
     /**
