@@ -544,18 +544,19 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     }
 
     /**
-     * Method to remove an element from the List
+     * Method to remove (the first occurrence of) an element from the collection
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
+     */
     public boolean remove(Object element)
     {
         return remove(element, true);
     }
 
     /**
-     * Method to remove an element from the List
+     * Method to remove (the first occurrence of) an element from the collection
      * @param element The Element to remove
+     * @param allowCascadeDelete Whether to cascade delete
      * @return Whether it was removed successfully.
      */
     public boolean remove(Object element, boolean allowCascadeDelete)

@@ -543,20 +543,21 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
     }
 
     /**
-     * Method to remove an element from the List
+     * Method to remove (the first occurrence of) an element from the collection
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
+     */
     public boolean remove(Object element)
     {
         return remove(element, true);
     }
 
     /**
-     * Method to remove an element from the List
+     * Method to remove (the first occurrence of) an element from the collection
      * @param element The Element to remove
+     * @param allowCascadeDelete Whether to cascade delete
      * @return Whether it was removed successfully.
-     **/
+     */
     public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);

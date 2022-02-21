@@ -400,7 +400,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
     }
 
     /**
-     * Method to remove an element from the set
+     * Method to remove (the first occurrence of) an element from the collection
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      */
@@ -410,8 +410,9 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
     }
 
     /**
-     * Method to remove an element from the set
+     * Method to remove (the first occurrence of) an element from the collection
      * @param element The Element to remove
+     * @param allowCascadeDelete Whether to cascade delete
      * @return Whether it was removed successfully.
      */
     public boolean remove(Object element, boolean allowCascadeDelete)
