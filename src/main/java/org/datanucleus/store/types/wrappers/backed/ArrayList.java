@@ -287,7 +287,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
                     if (!elemSM.isFieldLoaded(relatedMemberNum))
                     {
                         // Store the "id" value in case the container owner member is ever accessed
-                        elemSM.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + relatedMemberNum, ownerSM.getExternalObjectId());
+                        elemSM.storeFieldValue(relatedMemberNum, ownerSM.getExternalObjectId());
                     }
                 }
                 delegate.add(element);

@@ -1670,6 +1670,15 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         return loadedFields[fieldNumber];
     }
 
+    @Override
+    public void storeFieldValue(int fieldNumber, Object value)
+    {
+        if (!loadedFields[fieldNumber])
+        {
+            setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + fieldNumber, value);
+        }
+    }
+
     protected void clearFieldsByNumbers(int[] fieldNumbers)
     {
         replaceFields(fieldNumbers, HOLLOWFIELDMANAGER);
@@ -3210,6 +3219,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             {
                 currFM = prevFM;
             }
+
+            if (containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber))
+            {
+                removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+            }
         }
         finally
         {
@@ -3730,19 +3744,27 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     @Override
     public boolean loadStoredField(int fieldNumber)
     {
-        boolean hasStored = containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+        String assocValueKey = MEMBER_VALUE_STORED_PREFIX + fieldNumber;
+        boolean hasStored = containsAssociatedValue(assocValueKey);
         if (hasStored)
         {
             // Instantiate object using the stored "id" value, and remove associated value
-            Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+            Object memberValue = getAssociatedValue(assocValueKey);
             Object member = myEC.findObject(memberValue, false);
-            // TODO What if the related object is not found, or deleted? (i.e deleted the other end but not set the FK!)
-            replaceField(myPC, fieldNumber, member);
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            DNStateManager memberSM = (member != null) ? myEC.findStateManager(member) : null;
+            if (memberSM != null && !memberSM.isDeleted()) // Only apply the stored value if found and not (being) deleted
             {
-                NucleusLogger.PERSISTENCE.debug("Setting member " + fieldNumber + " of " + this + " from STORED-VALUE-CACHE");
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                if (mmd.getType().isAssignableFrom(member.getClass()))
+                {
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.PERSISTENCE.debug("Setting member \"" + mmd.getName() + "\" of " + this + " from STORED-VALUE-CACHE");
+                    }
+                    replaceField(myPC, fieldNumber, member);
+                }
             }
-            removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
+            removeAssociatedValue(assocValueKey);
         }
         return hasStored;
     }

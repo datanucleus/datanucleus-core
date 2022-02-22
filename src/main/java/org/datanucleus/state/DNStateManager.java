@@ -443,6 +443,14 @@ public interface DNStateManager<T> extends StateManager
     boolean loadStoredField(int fieldNumber);
 
     /**
+     * Method to store the value for the specified field. 
+     * This is for use with fields that are of type Persistable, and we stored the "id" of the related object in case they need loading later rather than instantiating now.
+     * @param fieldNumber Absolute field number
+     * @param value The value to store (FK "id")
+     */
+    void storeFieldValue(int fieldNumber, Object value);
+
+    /**
      * Method to load all unloaded fields in the FetchPlan.
      * Recurses through the FetchPlan objects and loads fields of sub-objects where needed.
      * @param state The FetchPlan state
