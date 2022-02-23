@@ -20,7 +20,6 @@ package org.datanucleus;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -110,10 +109,7 @@ public class FetchPlanForClass
         if (this.memberNumbers != null)
         {
             fpCopy.memberNumbers = new int[this.memberNumbers.length];
-            for (int i = 0; i < fpCopy.memberNumbers.length; i++)
-            {
-                fpCopy.memberNumbers[i] = this.memberNumbers[i];
-            }
+            System.arraycopy(this.memberNumbers, 0, fpCopy.memberNumbers, 0, this.memberNumbers.length);
         }
         fpCopy.dirty = this.dirty;
         return fpCopy;
@@ -137,12 +133,16 @@ public class FetchPlanForClass
             return recursionDepth;
         }
 
+        // Fallback to recursion depth for this member using its class' metadata definition
         AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
-
-        // Find fallback recursion depth for this member using its class' metadata definition
-        recursionDepth = mmd.getRecursionDepth();
-        if (recursionDepth == null)
+        if (mmd.getRecursionDepth() != null)
         {
+            // Don't currently support 0 with the DFG
+            recursionDepth = (mmd.getRecursionDepth() != 0) ? mmd.getRecursionDepth() : 1;
+        }
+        else
+        {
+            // Fallback to 1, the JDO(/JPA) default
             recursionDepth = 1;
         }
 
@@ -263,18 +263,14 @@ public class FetchPlanForClass
         if (plan.dynamicGroups != null)
         {
             // dynamic fetch groups
-            Iterator<FetchGroup> iter = plan.dynamicGroups.iterator();
-            while (iter.hasNext())
+            for (FetchGroup grp : plan.dynamicGroups)
             {
-                FetchGroup grp = iter.next();
                 if (grp.getType().getName().equals(cmd.getFullClassName()))
                 {
                     // Dynamic fetch group applies
                     Set<String> members = grp.getMembers();
-                    Iterator<String> membersIter = members.iterator();
-                    while (membersIter.hasNext())
+                    for (String memberName : members)
                     {
-                        String memberName = membersIter.next();
                         int fieldPos = cmd.getAbsolutePositionOfMember(memberName);
                         if (fieldPos >= 0)
                         {
@@ -384,7 +380,8 @@ public class FetchPlanForClass
      */
     private void setAsDefault(BitSet memberNums)
     {
-        for (int i = 0; i < cmd.getDFGMemberPositions().length; i++)
+        int numDFGMembers = cmd.getDFGMemberPositions().length;
+        for (int i = 0; i < numDFGMembers; i++)
         {
             memberNums.set(cmd.getDFGMemberPositions()[i]);
         }
@@ -396,7 +393,8 @@ public class FetchPlanForClass
      */
     private void setAsAll(BitSet memberNums)
     {
-        for (int i = 0; i < cmd.getNoOfManagedMembers(); i++)
+        int numManagedMembers = cmd.getNoOfManagedMembers();
+        for (int i = 0; i < numManagedMembers; i++)
         {
             if (cmd.getMetaDataForManagedMemberAtRelativePosition(i).getPersistenceModifier() != FieldPersistenceModifier.NONE)
             {
@@ -411,12 +409,13 @@ public class FetchPlanForClass
      */
     private void setAsNone(BitSet memberNums)
     {
-        for (int i = 0; i < cmd.getNoOfManagedMembers(); i++)
+        int numManagedMembers = cmd.getNoOfManagedMembers();
+        for (int i = 0; i < numManagedMembers; i++)
         {
-            AbstractMemberMetaData fmd = cmd.getManagedMembers()[i];
-            if (fmd.isPrimaryKey())
+            AbstractMemberMetaData mmd = cmd.getManagedMembers()[i];
+            if (mmd.isPrimaryKey())
             {
-                memberNums.set(fmd.getAbsoluteFieldNumber());
+                memberNums.set(mmd.getAbsoluteFieldNumber());
             }
         }
     }
@@ -478,9 +477,8 @@ public class FetchPlanForClass
                                 fetchGroupsByMemberNumber.put(fieldNumberInteger, fetchGroups);
                             }
 
-                            for (Iterator it = fetchGroups.iterator(); it.hasNext();)
+                            for (FetchGroupMetaData fgmd : fetchGroups)
                             {
-                                FetchGroupMetaData fgmd = (FetchGroupMetaData) it.next();
                                 if (fgmd.getPostLoad().booleanValue())
                                 {
                                     result = Boolean.TRUE;
@@ -495,9 +493,8 @@ public class FetchPlanForClass
                                 // Dynamic Fetch groups
                                 String fieldName = mmd.getName();
                                 Class cls = plan.clr.classForName(cmd.getFullClassName());
-                                for (Iterator<FetchGroup> it = plan.dynamicGroups.iterator(); it.hasNext();)
+                                for (FetchGroup group : plan.dynamicGroups)
                                 {
-                                    FetchGroup group = it.next();
                                     Set groupMembers = group.getMembers();
                                     if (group.getType().isAssignableFrom(cls) && groupMembers.contains(fieldName) && group.getPostLoad())
                                     {

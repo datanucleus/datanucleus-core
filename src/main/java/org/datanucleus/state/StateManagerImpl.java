@@ -5699,13 +5699,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else
         {
-            /*
-             * A transactional object whose DFG fields are loaded does not need to contact us
-             * in order to read those fields, so we can safely set READ_OK.
-             * A non-transactional object needs to notify us on all field reads
-             * so that we can decide whether or not any transition should occur,
-             * so we leave the flags at LOAD_REQUIRED.
-             */
+            // A tx object whose DFG fields are loaded doesn't need to contact us in order to read those fields, so we can safely set READ_OK.
+            // A non-tx object needs to notify us on all field reads so that we can decide whether or not any transition should occur, so we leave the flags at LOAD_REQUIRED.
             if (persistenceFlags == Persistable.LOAD_REQUIRED && myLC.isTransactional())
             {
                 persistenceFlags = Persistable.READ_OK;
