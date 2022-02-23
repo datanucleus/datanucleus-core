@@ -1676,6 +1676,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         if (!loadedFields[fieldNumber])
         {
             setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + fieldNumber, value);
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                NucleusLogger.PERSISTENCE.debug("Storing FK value for member \"" + mmd.getName() + "\" of " + this + " to STORED-VALUE-CACHE");
+            }
         }
     }
 
