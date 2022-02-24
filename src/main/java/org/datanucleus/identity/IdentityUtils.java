@@ -361,11 +361,11 @@ public class IdentityUtils
             {
                 pkFieldValues[i] = resultsFM.fetchObjectField(pkFieldNums[i]);
             }
-        }
-        if (pkFieldValues[0] == null)
-        {
-            // Null identity, so represents null
-            return null;
+            if (pkFieldValues[i] == null)
+            {
+                // Null identity field, so represents null. Assumes we can't have a composite PK with one field being null
+                return null;
+            }
         }
 
         Class idClass = ec.getClassLoaderResolver().classForName(cmd.getObjectidClass());
