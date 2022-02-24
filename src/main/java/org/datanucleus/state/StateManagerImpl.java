@@ -1361,7 +1361,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 {
                     return;
                 }
-                */
+                 */
                 int[] cacheFieldsToLoad = fieldNumbers;
                 CachedPC copyCachedPC = cachedPC.getCopy();
                 if (NucleusLogger.CACHE.isDebugEnabled())
@@ -1373,6 +1373,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
                 // Replace the current L2 cached object with this one
                 myEC.getNucleusContext().getLevel2Cache().put(getInternalObjectId(), copyCachedPC);
+            }
+            else
+            {
+                // Add to L2 cache since not present
+                myEC.putObjectIntoLevel2Cache(this, false);
             }
         }
     }
@@ -1678,8 +1683,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + fieldNumber, value);
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                NucleusLogger.PERSISTENCE.debug("Storing FK value for member \"" + mmd.getName() + "\" of " + this + " to STORED-VALUE-CACHE");
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026037", cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName(), this));
             }
         }
     }
@@ -3764,12 +3768,13 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 {
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug("Setting member \"" + mmd.getName() + "\" of " + this + " from STORED-VALUE-CACHE");
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026038", mmd.getName(), this));
                     }
                     replaceField(myPC, fieldNumber, member);
                 }
             }
             removeAssociatedValue(assocValueKey);
+            updateLevel2CacheForFields(new int[] {fieldNumber});
         }
         return hasStored;
     }

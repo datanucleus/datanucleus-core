@@ -4600,12 +4600,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return null;
     }
 
-    /**
-     * Method to add/update the managed object into the L2 cache as long as it isn't modified in the current transaction.
-     * @param sm StateManager for the object
-     * @param updateIfPresent Whether to update it in the L2 cache if already present
-     */
-    protected void putObjectIntoLevel2Cache(DNStateManager sm, boolean updateIfPresent)
+    @Override
+    public void putObjectIntoLevel2Cache(DNStateManager sm, boolean updateIfPresent)
     {
         if (sm.getInternalObjectId() == null || !nucCtx.isClassCacheable(sm.getClassMetaData()))
         {

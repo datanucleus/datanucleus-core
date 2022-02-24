@@ -640,6 +640,13 @@ public interface ExecutionContext extends ExecutionContextReference
     void putObjectIntoLevel1Cache(DNStateManager sm);
 
     /**
+     * Method to add/update the managed object into the L2 cache as long as it isn't modified in the current transaction.
+     * @param sm StateManager for the object
+     * @param updateIfPresent Whether to update it in the L2 cache if already present
+     */
+    void putObjectIntoLevel2Cache(DNStateManager sm, boolean updateIfPresent);
+
+    /**
      * Convenience method to access an object in the cache.
      * Firstly looks in the L1 cache for this ExecutionContext, and if not found looks in the L2 cache.
      * @param id Id of the object
