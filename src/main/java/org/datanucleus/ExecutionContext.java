@@ -295,7 +295,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to persist an array of objects to the datastore.
-     * @param objs The objects to persist
+     * @param pcs The objects to persist
      * @return The persisted objects
      * @throws NucleusUserException Thrown if an error occurs during the persist process.
      *     Any exception could have several nested exceptions for each failed object persist
@@ -305,12 +305,13 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to make an object persistent which should be called from internal calls only.
      * All PM/EM calls should go via persistObject(Object obj).
-     * @param obj The object
+     * @param pc The object
      * @param preInsertChanges Any changes to make before inserting
      * @param ownerSM StateManager of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
      * @param objectType Type of object
      * @return The persisted object
+     * @param <T> Type of the persistable object
      * @throws NucleusUserException if the object is managed by a different manager
      */
     <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType);
@@ -341,7 +342,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to migrate an object to transient state.
-     * @param obj The object
+     * @param pc The object
      * @param state Object containing the state of the fetch plan process (if any)
      * @throws NucleusException When an error occurs in making the object transient
      */
@@ -349,7 +350,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to make an object transactional.
-     * @param obj The object
+     * @param pc The object
      * @throws NucleusException Thrown when an error occurs
      */
     void makeObjectTransactional(Object pc);
@@ -371,8 +372,6 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Accessor for the currently managed objects for the current transaction.
      * If the transaction is not active this returns null.
-     * @param states States that we want the enlisted objects for
-     * @param classes Classes that we want the enlisted objects for
      * @return Collection of managed objects enlisted in the current transaction
      */
     Set getManagedObjects();
@@ -419,7 +418,7 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to delete an object from persistence which should be called from internal calls only.
      * All PM/EM calls should go via deleteObject(Object obj).
-     * @param obj Object to delete
+     * @param pc Object to delete
      */
     void deleteObjectInternal(Object pc);
 
@@ -429,7 +428,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * If the object is of class that is not detachable a ClassNotDetachableException will be thrown. 
      * If the object is not persistent a NucleusUserException is thrown.
      * @param state State for the detachment process
-     * @param obj The object
+     * @param pc The object
      */
     void detachObject(FetchPlanState state, Object pc);
 
@@ -465,7 +464,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param pc The persistable object
      * @param sco Whether the PC object is stored without an identity (embedded/serialised)
      */
-    void attachObject(DNStateManager sm, Object pc, boolean sco);
+    void attachObject(DNStateManager ownerSM, Object pc, boolean sco);
 
     /**
      * Method to attach a persistent detached object returning an attached copy of the object.
@@ -476,7 +475,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param <T> Type of the persistable object
      * @return The attached object
      */
-    <T> T attachObjectCopy(DNStateManager sm, T pc, boolean sco);
+    <T> T attachObjectCopy(DNStateManager ownerSM, T pc, boolean sco);
 
     /**
      * Convenience method to return the attached object for the specified id if one exists.
@@ -617,7 +616,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * create the object, preferably using the cache, and then apply any field values to it.
      * @param id Id of the object.
      * @param fv Field values for the object (to copy in)
-     * @param cls the type which the object is (optional). Used to instantiate the object
+     * @param pcClass the type which the object is (optional). Used to instantiate the object
      * @param ignoreCache true if it must ignore the cache
      * @param checkInheritance Whether to check the inheritance on the id of the object
      * @return The Object

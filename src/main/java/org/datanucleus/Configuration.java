@@ -427,7 +427,6 @@ public class Configuration extends PropertyStore implements Serializable
     /**
      * Accessor for the persistence properties.
      * This returns just the user-supplied properties, not the defaulted properties
-     * @see #setPersistenceProperties()
      * @return The persistence properties
      */
     public Map<String, Object> getPersistenceProperties()
