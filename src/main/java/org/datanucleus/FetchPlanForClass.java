@@ -120,15 +120,21 @@ public class FetchPlanForClass
      */
     public int getMaxRecursionDepthForMember(int memberNum)
     {
-        // find recursion depth for field in its class <field> definition
-        Integer recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
-        if (recursionDepth == null)
+        // Fallback to recursion depth for this member using its class' metadata definition
+        Integer recursionDepth = null;
+        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
+        if (mmd.getRecursionDepth() != null)
         {
+            // Don't currently support 0 with the DFG
+            recursionDepth = (mmd.getRecursionDepth() != 0) ? mmd.getRecursionDepth() : 1;
+        }
+        else
+        {
+            // Fallback to 1, the JDO(/JPA) default
             recursionDepth = 1;
         }
 
         // find FetchGroupMetaDatas that contain the member in question, and see if it has been overridden
-        String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getName();
         Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (Iterator<FetchGroupMetaData> iter = fetchGroupsContainingField.iterator(); iter.hasNext();)
         {
@@ -138,7 +144,7 @@ public class FetchPlanForClass
             {
                 for (FetchGroupMemberMetaData fgmmd : fgmmds)
                 {
-                    if (fgmmd.getName().equals(fieldName))
+                    if (fgmmd.getName().equals(mmd.getName()))
                     {
                         // TODO Add concept of "max" as per this method's name
                         recursionDepth = fgmmd.getRecursionDepth();
