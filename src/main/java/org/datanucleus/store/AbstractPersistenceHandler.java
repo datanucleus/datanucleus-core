@@ -88,11 +88,12 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
      */
     public void assertReadOnlyForUpdateOfObject(DNStateManager sm)
     {
-        if (sm.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
+        ExecutionContext ec = sm.getExecutionContext();
+        if (ec.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
         {
-            if (sm.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
+            if (ec.getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
             {
-                throw new DatastoreReadOnlyException(Localiser.msg("032004", sm.getObjectAsPrintable()), sm.getExecutionContext().getClassLoaderResolver());
+                throw new DatastoreReadOnlyException(Localiser.msg("032004", sm.getObjectAsPrintable()), ec.getClassLoaderResolver());
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -111,9 +112,9 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                 boolean readonly = Boolean.valueOf(value).booleanValue();
                 if (readonly)
                 {
-                    if (sm.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
+                    if (ec.getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
                     {
-                        throw new DatastoreReadOnlyException(Localiser.msg("032006", sm.getObjectAsPrintable()), sm.getExecutionContext().getClassLoaderResolver());
+                        throw new DatastoreReadOnlyException(Localiser.msg("032006", sm.getObjectAsPrintable()), ec.getClassLoaderResolver());
                     }
 
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
