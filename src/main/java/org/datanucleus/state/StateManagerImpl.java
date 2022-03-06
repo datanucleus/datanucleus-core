@@ -282,7 +282,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026011", IdentityUtils.getPersistableIdentityForId(myID), this));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026011", IdentityUtils.getPersistableIdentityForId(getInternalObjectId()), this));
         }
 
         // Transitioning to TRANSIENT state, so if any postLoad action is pending we do it before. 
@@ -800,7 +800,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     public String toString()
     {
-        return "StateManager[pc=" + StringUtils.toJVMIDString(myPC) + ", lifecycle=" + myLC + "]";
+        return "StateManager[pc=" + StringUtils.toJVMIDString(myPC) + ", lifecycle=" + myLC + (isEmbedded() ? ", EMBEDDED" : "") + "]";
     }
 
     /**
@@ -3438,7 +3438,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         else if (myInternalID == null)
         {
             // Assign a temporary internal "id" based on the object itself until our real identity is assigned
-            myInternalID = new IdentityReference(this);
+            myInternalID = new IdentityReference(myPC);
             return myInternalID;
         }
         else

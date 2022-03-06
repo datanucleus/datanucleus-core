@@ -19,6 +19,8 @@ package org.datanucleus.identity;
 
 import java.io.Serializable;
 
+import org.datanucleus.util.StringUtils;
+
 /**
  * Simple identity being a reference to the object itself.
  */
@@ -46,5 +48,10 @@ public class IdentityReference implements Serializable
             return client == ((IdentityReference)o).client;
         }
         return false;
+    }
+
+    public String toString()
+    {
+        return StringUtils.toJVMIDString(client);
     }
 }

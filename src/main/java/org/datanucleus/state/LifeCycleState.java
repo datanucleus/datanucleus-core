@@ -93,6 +93,7 @@ public abstract class LifeCycleState
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
+            // TODO Cater for embedded cases (id not set, and doesn't show the class)
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("027016", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), this, newState));
         }
 
