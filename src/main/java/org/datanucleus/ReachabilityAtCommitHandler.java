@@ -175,7 +175,7 @@ public class ReachabilityAtCommitHandler
                     {
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug("Performing reachability algorithm on object with id \""+ids[i]+"\"");
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007001", IdentityUtils.getPersistableIdentityForId(ids[i])));
                         }
                         try
                         {
