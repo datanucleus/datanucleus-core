@@ -102,8 +102,8 @@ public interface StateManagerFactory
 
     /**
      * Constructs a StateManager to manage a persistable instance that will
-     * be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
+     * be EMBEDDED/SERIALISED into another persistable object. 
+     * The instance will not be assigned an identity in the process since it is a SCO.
      * @param ec ExecutionContext
      * @param pc The persistable to manage (see copyPc also)
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
@@ -117,8 +117,8 @@ public interface StateManagerFactory
 
     /**
      * Constructs a StateManager for an object of the specified type, creating the PC object to hold the values
-     * where this object will be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
+     * where this object will be EMBEDDED/SERIALISED into another persistable object. 
+     * The instance will not be assigned an identity in the process since it is a SCO.
      * @param ec ExecutionContext
      * @param cmd Meta-data for the class that this is an instance of.
      * @param ownerSM Owner StateManager

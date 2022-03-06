@@ -100,12 +100,20 @@ public interface DNStateManager<T> extends StateManager
     void initialiseForPersistentClean(Object id, T pc);
 
     /**
-     * Initialises a state manager to manage a persistable instance that will be EMBEDDED/SERIALISED into another persistable object. 
+     * Initialises a state manager to manage the passed persistable instance that will be EMBEDDED/SERIALISED into another persistable object.
      * The instance will not be assigned an identity in the process since it is a SCO.
      * @param pc The persistable to manage (see copyPc also)
      * @param copyPc Whether StateManager should manage a copy of the passed PC or that one
      */
     void initialiseForEmbedded(T pc, boolean copyPc);
+
+    /**
+     * Initialises a state manager to manage a persistable instance that will be EMBEDDED/SERIALISED into another persistable object.
+     * This will create the (embedded) persistable instance.
+     * The instance will not be assigned an identity in the process since it is a SCO.
+     * @param pcClass Class of the embedded object
+     */
+    void initialiseForEmbedded(Class pcClass);
 
     /**
      * Initialises a state manager to manage a transient instance that is becoming newly persistent.

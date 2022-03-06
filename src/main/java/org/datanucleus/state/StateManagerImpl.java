@@ -396,10 +396,9 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     /**
      * Initialises a state manager to manage the passed persistent instance having the given object ID.
-     * Used where we have retrieved a PC object from a datastore directly (not field-by-field), for example on
-     * an object datastore. This initialiser will not add StateManagers to all related PCs. This must be done by
-     * any calling process. This simply adds the StateManager to the specified object and records the id, setting
-     * all fields of the object as loaded.
+     * Used where we have retrieved a PC object from a datastore directly (not field-by-field), for example on an object datastore. 
+     * This initialiser will not add StateManagers to all related PCs. This must be done by any calling process. 
+     * This simply adds the StateManager to the specified object and records the id, setting all fields of the object as loaded.
      * @param id the identity of the object.
      * @param pc The object to be managed
      */
@@ -424,14 +423,14 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     }
 
     /**
-     * Initialises a state manager to manage a Persistable instance that will be EMBEDDED/SERIALISED into another Persistable object. 
+     * Initialises a state manager to manage a provided Persistable instance that will be EMBEDDED/SERIALISED into another Persistable object. 
      * The instance will not be assigned an identity in the process since it is a SCO.
      * @param pc The Persistable to manage (see copyPc also)
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      */
     public void initialiseForEmbedded(Persistable pc, boolean copyPc)
     {
-        myID = null; // It is embedded at this point so dont need an ID since we're not persisting it
+        myID = null; // Embedded, so don;t need an ID since we're not persisting it
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
         persistenceFlags = Persistable.LOAD_REQUIRED;
         flags |= FLAG_EMBEDDED;
@@ -454,6 +453,30 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
 
         // Mark all fields as loaded since we are using the passed Persistable
+        for (int i=0;i<loadedFields.length;i++)
+        {
+            loadedFields[i] = true;
+        }
+    }
+
+    /**
+     * Initialises a state manager to manage an embedded instance of the specified type.
+     * This constructor is used for creating new instances of existing (embedded) persistent objects, and consequently shouldn't be used 
+     * when the StoreManager controls the creation of such objects (such as in an ODBMS).
+     * TODO Consider passing in a FieldValues and set the fields
+     * @param pcClass Class of the (embedded) object that this will manage the state for
+     */
+    public void initialiseForEmbedded(Class pcClass)
+    {
+        myID = null; // Embedded, so don't need an ID since we're not persisting it
+        myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN); // TODO Should be HOLLOW?
+        persistenceFlags = Persistable.LOAD_REQUIRED;
+        flags |= FLAG_EMBEDDED;
+
+        // Create new (embedded) PC
+        myPC = HELPER.newInstance(pcClass, this);
+
+        // Mark all fields as loaded for now, to be populated later
         for (int i=0;i<loadedFields.length;i++)
         {
             loadedFields[i] = true;

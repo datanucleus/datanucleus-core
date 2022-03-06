@@ -145,8 +145,9 @@ public class StateManagerFactoryImpl implements StateManagerFactory
 //      }
 
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
-        DNStateManager sm = newForHollow(ec, pcClass, null);
-        sm.initialiseForEmbedded(sm.getObject(), false);
+        Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
+        DNStateManager sm = getStateManager(ec, cmd);
+        sm.initialiseForEmbedded(cls);
         if (ownerSM != null)
         {
             ec.registerEmbeddedRelation(ownerSM, ownerMemberNumber, objectType, sm);
