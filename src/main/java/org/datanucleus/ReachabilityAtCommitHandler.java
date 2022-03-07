@@ -189,7 +189,6 @@ public class ReachabilityAtCommitHandler
                                 // Add this object id since not yet reached
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.GENERAL.info(">> Reachability adding " + sm + " RACHandler");
                                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(ids[i]), sm.getLifecycleState()));
                                 }
                                 currentReachableIds.add(ids[i]);
