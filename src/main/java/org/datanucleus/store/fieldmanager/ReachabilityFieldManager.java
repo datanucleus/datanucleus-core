@@ -74,12 +74,15 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                     objSM.loadUnloadedRelationFields();
                 }
 
-                // Add this object id since not yet reached
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                if (!objSM.isEmbedded())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(objID), objSM.getLifecycleState()));
+                    // Add this object id since not yet reached and not embedded into owner
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(objID), objSM.getLifecycleState()));
+                    }
+                    reachables.add(objID);
                 }
-                reachables.add(objID);
 
                 // Recurse through relation fields of this object
                 ReachabilityFieldManager pcFM = new ReachabilityFieldManager(objSM, reachables);
@@ -129,14 +132,12 @@ public class ReachabilityFieldManager extends AbstractFieldManager
         AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (value != null)
         {
-            boolean persistCascade = mmd.isCascadePersist();
-            
-            if (persistCascade)
+            if (mmd.isCascadePersist())
             {
                 RelationType relType = mmd.getRelationType(sm.getExecutionContext().getClassLoaderResolver());
-                if ( relType != RelationType.NONE ){
-                    
-                    if ( mmd.hasContainer() )
+                if (relType != RelationType.NONE)
+                {
+                    if (mmd.hasContainer())
                     {
                         processContainer(fieldNumber, value, mmd);
                     }
@@ -147,7 +148,6 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                         {
                             NucleusLogger.PERSISTENCE.debug(Localiser.msg("007004", mmd.getFullFieldName()));
                         }
-                        
                         processPersistable(value, mmd);
                     }
                 }
