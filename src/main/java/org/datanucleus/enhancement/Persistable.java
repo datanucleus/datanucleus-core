@@ -175,6 +175,7 @@ public interface Persistable
      * Instances that have been modified, deleted, or newly made persistent in the current transaction return true.
      * <P>
      * Transient instances return false.
+     * Embedded instances return false.
      * @return true if this instance has been modified in the current transaction.
      */
     boolean dnIsDirty();

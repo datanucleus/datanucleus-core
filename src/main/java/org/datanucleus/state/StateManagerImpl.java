@@ -1079,6 +1079,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     protected void transitionWriteField()
     {
+        if (isEmbedded())
+        {
+            // Means that embedded objects don't change to DIRTY state, the owner handles state
+            return;
+        }
         try
         {
             if (myEC.getMultithreaded())
@@ -3279,7 +3284,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         if (pc != myPC)
         {
-            NucleusLogger.GENERAL.warn("StateManager.disconnectClone : Please let developers know how you got this - myPC=" + StringUtils.toJVMIDString(myPC) + " other=" + StringUtils.toJVMIDString(pc), new Exception());
+            NucleusLogger.PERSISTENCE.warn("StateManager.disconnectClone : Please let developers know how you got this - myPC=" + StringUtils.toJVMIDString(myPC) + " other=" + StringUtils.toJVMIDString(pc), new Exception());
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("026001", StringUtils.toJVMIDString(pc), this));
@@ -3412,15 +3417,18 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             boolean wasDirty = preWriteField(fieldNumber);
             postWriteField(wasDirty);
 
-            EmbeddedOwnerRelation embeddedRel = myEC.getOwnerInformationForEmbedded(this);
-            if (embeddedRel != null)
+            if (isEmbedded())
             {
-                // Notify owner that this embedded object has just changed
-                StateManagerImpl ownerSM = (StateManagerImpl)embeddedRel.getOwnerSM();
-
-                if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                EmbeddedOwnerRelation embeddedRel = myEC.getOwnerInformationForEmbedded(this);
+                if (embeddedRel != null)
                 {
-                    ownerSM.makeDirty(embeddedRel.getOwnerMemberNum());
+                    // Notify owner that this embedded object has just changed
+                    StateManagerImpl ownerSM = (StateManagerImpl)embeddedRel.getOwnerSM();
+
+                    if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                    {
+                        ownerSM.makeDirty(embeddedRel.getOwnerMemberNum());
+                    }
                 }
             }
         }
@@ -4209,6 +4217,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     {
         if (isEmbedded())
         {
+            // Inform the owner of this change in the embedded object if necessary
             EmbeddedOwnerRelation ownerRel = myEC.getOwnerInformationForEmbedded(this);
             if (ownerRel != null)
             {
@@ -4218,24 +4227,16 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 AbstractMemberMetaData ownerMmd = ownerSM.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(ownerRel.getOwnerMemberNum());
                 if (ownerMmd.getCollection() != null)
                 {
-                    // PC Object embedded in collection
+                    // PC Object embedded in collection element
                     Object ownerField = ownerSM.provideField(ownerRel.getOwnerMemberNum());
                     if (ownerField instanceof SCOCollection)
                     {
                         ((SCOCollection)ownerField).updateEmbeddedElement(myPC, fieldNumber, value, makeDirty);
                     }
-                    if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
-                    {
-                        // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
-                        if (makeDirty)
-                        {
-                            ownerSM.makeDirty(ownerRel.getOwnerMemberNum());
-                        }
-                    }
                 }
                 else if (ownerMmd.getMap() != null)
                 {
-                    // PC Object embedded in map
+                    // PC Object embedded in map key / value
                     Object ownerField = ownerSM.provideField(ownerRel.getOwnerMemberNum());
                     if (ownerField instanceof SCOMap)
                     {
@@ -4248,46 +4249,39 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                             ((SCOMap)ownerField).updateEmbeddedValue(myPC, fieldNumber, value, makeDirty);
                         }
                     }
-                    if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
-                    {
-                        // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
-                        if (makeDirty)
-                        {
-                            ownerSM.makeDirty(ownerRel.getOwnerMemberNum());
-                        }
-                    }
                 }
                 else
                 {
                     // PC Object embedded in PC object
-                    if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                }
+
+                if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                {
+                    // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
+                    if (makeDirty)
                     {
-                        // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
-                        if (makeDirty)
-                        {
-                            ownerSM.replaceFieldMakeDirty(ownerRel.getOwnerMemberNum(), pc);
-                        }
-                        else
-                        {
-                            ownerSM.replaceField(ownerRel.getOwnerMemberNum(), pc);
-                        }
+                        ownerSM.makeDirty(ownerRel.getOwnerMemberNum());
                     }
                 }
             }
-        }
 
-        // Update the field in our PC object
-        // TODO Why don't we mark as dirty if non-tx ? Maybe need P_NONTRANS_DIRTY
-        if (!isEmbedded() && makeDirty && !myLC.isDeleted() && myEC.getTransaction().isActive())
-        {
-            // Mark dirty (if not being deleted)
-            boolean wasDirty = preWriteField(fieldNumber);
+            // Replace the field value in this embedded object
             replaceField(pc, fieldNumber, value);
-            postWriteField(wasDirty);
         }
         else
         {
-            replaceField(pc, fieldNumber, value);
+            // Non-embedded TODO Why don't we mark as dirty if non-tx ? Maybe need P_NONTRANS_DIRTY
+            if (makeDirty && !myLC.isDeleted() && myEC.getTransaction().isActive())
+            {
+                // Mark dirty (if not being deleted)
+                boolean wasDirty = preWriteField(fieldNumber);
+                replaceField(pc, fieldNumber, value);
+                postWriteField(wasDirty);
+            }
+            else
+            {
+                replaceField(pc, fieldNumber, value);
+            }
         }
     }
 

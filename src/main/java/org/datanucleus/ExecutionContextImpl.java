@@ -1855,7 +1855,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // If using reachability at commit and appropriate save it for reachability checks when we commit
         DNStateManager sm = findStateManager(persistedPc);
-        if (sm != null)
+        if (sm != null && !sm.isEmbedded())
         {
             // TODO If attaching (detached=true), we maybe ought not add StateManager to dirtySMs/indirectDirtySMs
             if (indirectDirtySMs.contains(sm))
@@ -2195,7 +2195,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             Object attachedObj = findObject(getApiAdapter().getIdForObject(obj), true, false, obj.getClass().getName());
             sm = findStateManager(attachedObj);
         }
-        if (sm != null)
+        if (sm != null && !sm.isEmbedded())
         {
             // Add the object to the relevant list of dirty StateManagers
             if (indirectDirtySMs.contains(sm))
@@ -3782,6 +3782,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void markDirty(DNStateManager sm, boolean directUpdate)
     {
+        if (sm.isEmbedded())
+        {
+            // We don't monitor embedded StateManagers for flushing, they are handled via their owner
+            return;
+        }
         if (tx.isCommitting() && !tx.isActive())
         {
             //post commit cannot change objects (sanity check - avoid changing avoids on detach)
