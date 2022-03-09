@@ -36,6 +36,7 @@ package org.datanucleus.state;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.BitSet;
+import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.DetachState;
@@ -302,6 +303,20 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             provideFields(fieldNumbers, new UnsetOwnerFieldManager());
         }
 
+        // Disconnect any embedded related StateManagers, since we own them
+        List<EmbeddedOwnerRelation> subSMRelations = myEC.getEmbeddedInformationForOwner(this);
+        if (subSMRelations != null && !subSMRelations.isEmpty())
+        {
+            for (EmbeddedOwnerRelation embRel : subSMRelations)
+            {
+                DNStateManager embSM = embRel.getEmbeddedSM();
+                if (embSM.isConnected())
+                {
+                    embSM.disconnect();
+                }
+            }
+        }
+
         myEC.removeStateManagerFromCache(this);
 
         persistenceFlags = Persistable.READ_WRITE_OK;
@@ -336,6 +351,12 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         loadedFields = null;
 
         // TODO Remove the object from any pooling (when we enable it) via nucCtx.getStateManagerFactory().disconnectStateManager(this);
+    }
+
+    @Override
+    public boolean isConnected()
+    {
+        return myPC != null;
     }
 
     /**

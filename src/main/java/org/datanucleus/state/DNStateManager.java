@@ -60,6 +60,8 @@ public interface DNStateManager<T> extends StateManager
      */
     void disconnect();
 
+    boolean isConnected();
+
     /**
      * Initialises a state manager to manage a hollow instance having the given object ID and the given (optional) field values.
      * This constructor is used for creating new instances of existing persistent objects, and consequently shouldn't be used when 

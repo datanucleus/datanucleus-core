@@ -1307,6 +1307,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Assign a StateManager to manage our embedded object (and register it)
             embeddedSM = nucCtx.getStateManagerFactory().newForEmbedded(this, value, false, ownerSM, ownerMmd.getAbsoluteFieldNumber(), objectType);
         }
+        else
+        {
+            if (!embeddedSM.isEmbedded())
+            {
+                // TODO This object is already registered as not embedded!
+                NucleusLogger.PERSISTENCE.warn("Object " + StringUtils.toJVMIDString(value) + " is already registered with " + embeddedSM +
+                    " as NOT EMBEDDED but needs to be embedded into " + ownerSM + ". Please correct this. An object can be either embedded or not but not both");
+            }
+        }
         return embeddedSM;
     }
 
@@ -4528,6 +4537,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void putObjectIntoLevel1Cache(DNStateManager sm)
     {
+        if (sm.isEmbedded())
+        {
+            NucleusLogger.PERSISTENCE.warn("Attempt to L1 cache an embedded object! How did this occur? Trying to use an object as embedded yet also independently persistable? : " + sm, new Exception());
+            return;
+        }
         if (cache != null)
         {
             Object id = sm.getInternalObjectId();
