@@ -47,7 +47,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class OperationQueue
 {
-    protected List<Operation> queuedOperations = new ArrayList<Operation>();
+    protected List<Operation> queuedOperations = new ArrayList<>();
 
     /**
      * Method to add the specified operation to the operation queue.
@@ -60,8 +60,8 @@ public class OperationQueue
         {
             if (sm.isWaitingToBeFlushedToDatastore())
             {
-                NucleusLogger.GENERAL.info(">> OperationQueue : not adding operation since owner not yet flushed - " + oper);
                 // Don't enlist since not yet flushed
+                NucleusLogger.PERSISTENCE.info(">> OperationQueue : not adding operation since owner not yet flushed - " + oper);
                 return;
             }
         }
@@ -73,10 +73,10 @@ public class OperationQueue
      */
     public void log()
     {
-        NucleusLogger.GENERAL.debug(">> OperationQueue :" + (queuedOperations.isEmpty() ? " Empty" : ("" + queuedOperations.size() + " operations")));
+        NucleusLogger.PERSISTENCE.debug(">> OperationQueue :" + (queuedOperations.isEmpty() ? " Empty" : ("" + queuedOperations.size() + " operations")));
         for (Operation oper : queuedOperations)
         {
-            NucleusLogger.GENERAL.debug(">> " + oper);
+            NucleusLogger.PERSISTENCE.debug(">> " + oper);
         }
     }
 
@@ -267,7 +267,7 @@ public class OperationQueue
                             {
                                 objectsToCascadeDelete = new ArrayList();
                             }
-                            NucleusLogger.GENERAL.info(">> Flush collection element needs cascade delete " + collRemoveOper.getValue());
+                            NucleusLogger.PERSISTENCE.info(">> Flush collection element needs cascade delete " + collRemoveOper.getValue());
                             objectsToCascadeDelete.add(collRemoveOper.getValue());
                         }
                     }

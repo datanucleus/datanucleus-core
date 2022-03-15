@@ -42,19 +42,19 @@ public class FlushNonReferential implements FlushProcess
     /* (non-Javadoc)
      * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<DNStateManager> primaryOPs, Collection<DNStateManager> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<DNStateManager> primarySMs, Collection<DNStateManager> secondarySMs, OperationQueue opQueue)
     {
         // Make copy of StateManagers so we don't have ConcurrentModification issues
-        Set<DNStateManager> smsToFlush = new HashSet<DNStateManager>();
-        if (primaryOPs != null)
+        Set<DNStateManager> smsToFlush = new HashSet<>();
+        if (primarySMs != null)
         {
-            smsToFlush.addAll(primaryOPs);
-            primaryOPs.clear();
+            smsToFlush.addAll(primarySMs);
+            primarySMs.clear();
         }
-        if (secondaryOPs != null)
+        if (secondarySMs != null)
         {
-            smsToFlush.addAll(secondaryOPs);
-            secondaryOPs.clear();
+            smsToFlush.addAll(secondarySMs);
+            secondarySMs.clear();
         }
 
         // Process all delete, insert and update of objects
@@ -89,11 +89,11 @@ public class FlushNonReferential implements FlushProcess
         Set<Class> classesToFlush = null;
         if (ec.getNucleusContext().getStoreManager().getQueryManager().getQueryResultsCache() != null)
         {
-            classesToFlush = new HashSet();
+            classesToFlush = new HashSet<>();
         }
 
-        Set<DNStateManager> smsToDelete = new HashSet<DNStateManager>();
-        Set<DNStateManager> smsToInsert = new HashSet<DNStateManager>();
+        Set<DNStateManager> smsToDelete = new HashSet<>();
+        Set<DNStateManager> smsToInsert = new HashSet<>();
         Iterator<DNStateManager> smIter = smsToFlush.iterator();
         while (smIter.hasNext())
         {
@@ -222,10 +222,8 @@ public class FlushNonReferential implements FlushProcess
         if (classesToFlush != null)
         {
             // Flush any query results from cache for these types
-            Iterator<Class> queryClsIter = classesToFlush.iterator();
-            while (queryClsIter.hasNext())
+            for (Class cls : classesToFlush)
             {
-                Class cls = queryClsIter.next();
                 ec.getNucleusContext().getStoreManager().getQueryManager().evictQueryResultsForType(cls);
             }
         }
