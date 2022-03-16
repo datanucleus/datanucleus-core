@@ -1290,6 +1290,27 @@ public class JPQLParser extends AbstractParser
                 stack.push(node);
                 return;
             }
+            else if (lexer.parseStringIgnoreCase("LOCAL_DATE()")) // Some people put "()" in JPQL
+            {
+                // Convert to a method call of LOCAL_DATE
+                Node node = new Node(NodeType.INVOKE, "LOCAL_DATE");
+                stack.push(node);
+                return;
+            }
+            else if (lexer.parseStringIgnoreCase("LOCAL_TIME()")) // Some people put "()" in JPQL
+            {
+                // Convert to a method call
+                Node node = new Node(NodeType.INVOKE, "LOCAL_TIME");
+                stack.push(node);
+                return;
+            }
+            else if (lexer.parseStringIgnoreCase("LOCAL_DATETIME()")) // Some people put "()" in JPQL
+            {
+                // Convert to a method call
+                Node node = new Node(NodeType.INVOKE, "LOCAL_DATETIME");
+                stack.push(node);
+                return;
+            }
         }
 
         if (lexer.parseStringIgnoreCase("CURRENT_DATE"))
@@ -1310,6 +1331,48 @@ public class JPQLParser extends AbstractParser
         {
             // Convert to a method call
             Node node = new Node(NodeType.INVOKE, "CURRENT_TIME");
+            stack.push(node);
+            return;
+        }
+        else if (lexer.parseStringIgnoreCase("LOCAL_DATETIME"))
+        {
+            // Convert to a method call
+            Node node = new Node(NodeType.INVOKE, "LOCAL_DATETIME");
+            stack.push(node);
+            return;
+        }
+        else if (lexer.parseStringIgnoreCase("LOCAL_DATE"))
+        {
+            // Convert to a method call
+            Node node = new Node(NodeType.INVOKE, "LOCAL_DATE");
+            stack.push(node);
+            return;
+        }
+        else if (lexer.parseStringIgnoreCase("LOCAL_TIME"))
+        {
+            // Convert to a method call
+            Node node = new Node(NodeType.INVOKE, "LOCAL_TIME");
+            stack.push(node);
+            return;
+        }
+        else if (lexer.parseStringIgnoreCase("LOCAL DATETIME"))
+        {
+            // Convert to a method call
+            Node node = new Node(NodeType.INVOKE, "LOCAL_DATETIME");
+            stack.push(node);
+            return;
+        }
+        else if (lexer.parseStringIgnoreCase("LOCAL DATE"))
+        {
+            // Convert to a method call
+            Node node = new Node(NodeType.INVOKE, "LOCAL_DATE");
+            stack.push(node);
+            return;
+        }
+        else if (lexer.parseStringIgnoreCase("LOCAL TIME"))
+        {
+            // Convert to a method call
+            Node node = new Node(NodeType.INVOKE, "LOCAL_TIME");
             stack.push(node);
             return;
         }

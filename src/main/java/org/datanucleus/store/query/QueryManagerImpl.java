@@ -497,6 +497,9 @@ public class QueryManagerImpl implements QueryManager
             if ("CURRENT_DATE".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CurrentDateFunction();
             if ("CURRENT_TIME".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CurrentTimeFunction();
             if ("CURRENT_TIMESTAMP".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CurrentTimestampFunction();
+            if ("LOCAL_DATE".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LocalDateFunction();
+            if ("LOCAL_TIME".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LocalTimeFunction();
+            if ("LOCAL_DATETIME".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LocalDateTimeFunction();
             if ("ABS".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.AbsFunction();
             if ("SQRT".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SqrtFunction();
             if ("MOD".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ModFunction();

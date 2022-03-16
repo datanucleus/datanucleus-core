@@ -294,6 +294,18 @@ public class JPQLQueryHelper
             {
                 return "CURRENT_TIMESTAMP";
             }
+            else if (method.equalsIgnoreCase("LOCAL_DATE"))
+            {
+                return "LOCAL_DATE";
+            }
+            else if (method.equalsIgnoreCase("LOCAL_TIME"))
+            {
+                return "LOCAL_TIME";
+            }
+            else if (method.equalsIgnoreCase("LOCAL_DATETIME"))
+            {
+                return "LOCAL_DATETIME";
+            }
             else if (method.equalsIgnoreCase("length"))
             {
                 StringBuilder str = new StringBuilder("LENGTH(");
