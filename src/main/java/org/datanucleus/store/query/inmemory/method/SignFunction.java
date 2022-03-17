@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2012 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2022 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -18,19 +18,27 @@ Contributors:
 package org.datanucleus.store.query.inmemory.method;
 
 /**
- * Evaluator for the function EXP(numExpr).
+ * Evaluator for the function SIGN(numExpr).
  */
-public class ExpFunction extends MathFunction
+public class SignFunction extends MathFunction
 {
     @Override
     protected String getFunctionName()
     {
-        return "exp";
+        return "sign";
     }
 
     @Override
     protected double evaluateMathFunction(double num)
     {
-        return Math.exp(num);
+        if (num > 0)
+        {
+            return 1;
+        }
+        if (num < 0)
+        {
+            return -1;
+        }
+        return 0;
     }
 }

@@ -510,10 +510,13 @@ public class QueryManagerImpl implements QueryManager
             if ("ACOS".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcCosineFunction();
             if ("ASIN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcSineFunction();
             if ("ATAN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangentFunction();
+            if ("ROUND".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.RoundFunction();
+            if ("POWER".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.PowerFunction();
             if ("CEIL".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CeilFunction();
             if ("CEILING".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CeilFunction();
             if ("FLOOR".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.FloorFunction();
             if ("LOG".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LogFunction();
+            if ("LN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LogFunction();
             if ("EXP".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ExpFunction();
             if ("NULLIF".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.NullIfFunction();
             if ("SIZE".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SizeFunction();

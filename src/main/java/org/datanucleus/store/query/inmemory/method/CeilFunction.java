@@ -22,18 +22,12 @@ package org.datanucleus.store.query.inmemory.method;
  */
 public class CeilFunction extends MathFunction
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.query.evaluator.memory.MathFunctionEvaluator#getFunctionName()
-     */
     @Override
     protected String getFunctionName()
     {
         return "ceil";
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.query.evaluator.memory.MathFunctionEvaluator#evaluateMathFunction(double)
-     */
     @Override
     protected double evaluateMathFunction(double num)
     {
