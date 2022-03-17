@@ -511,6 +511,7 @@ public class QueryManagerImpl implements QueryManager
             if ("ASIN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcSineFunction();
             if ("ATAN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangentFunction();
             if ("CEIL".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CeilFunction();
+            if ("CEILING".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CeilFunction();
             if ("FLOOR".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.FloorFunction();
             if ("LOG".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LogFunction();
             if ("EXP".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ExpFunction();
