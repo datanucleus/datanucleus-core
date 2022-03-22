@@ -55,18 +55,19 @@ Contributors:
     <!-- XML METADATA ENTITY RESOLVERS -->
     <extension point="org.datanucleus.metadata_entityresolver">
         <!-- Persistence XML -->
-        <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver identity="http://www.datanucleus.org/xsd/jpa/persistence_2_2.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-        <entityresolver url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
-        <entityresolver identity="https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
-        <entityresolver identity="https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
-        <entityresolver identity="http://www.datanucleus.org/xsd/jpa/persistence_3_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_0.xsd"/>
+        <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+
+        <entityresolver identity="http://www.datanucleus.org/xsd/jpa/persistence_2_2.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://www.datanucleus.org/xsd/jpa/persistence_3_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
+        <entityresolver identity="http://www.datanucleus.org/xsd/jpa/persistence_3_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_3_1.xsd"/>
     </extension>
 </plugin>
