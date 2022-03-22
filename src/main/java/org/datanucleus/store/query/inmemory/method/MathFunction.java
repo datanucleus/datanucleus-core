@@ -20,6 +20,7 @@ package org.datanucleus.store.query.inmemory.method;
 import java.math.BigDecimal;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.query.QueryUtils;
 import org.datanucleus.store.query.expression.DyadicExpression;
 import org.datanucleus.store.query.expression.InvokeExpression;
@@ -40,7 +41,82 @@ public abstract class MathFunction implements InvocationEvaluator
     public Object evaluate(InvokeExpression expr, Object invokedValue, InMemoryExpressionEvaluator eval)
     {
         String method = expr.getOperation();
-        Object param = expr.getArguments().get(0);
+
+        Object paramValue = getParamValueForParam(expr.getArguments().get(0), eval, method);
+
+        Object result = null;
+        if (expr.getArguments().size() == 1)
+        {
+            // Math function taking in 1 argument
+            if (paramValue instanceof Double)
+            {
+                result = Double.valueOf(evaluateMathFunction(((Double)paramValue).doubleValue()));
+            }
+            else if (paramValue instanceof Float)
+            {
+                result = Float.valueOf((float)evaluateMathFunction(((Float)paramValue).floatValue()));
+            }
+            else if (paramValue instanceof BigDecimal)
+            {
+                result = new BigDecimal(evaluateMathFunction(((BigDecimal)paramValue).doubleValue()));
+            }
+            else if (paramValue instanceof Integer)
+            {
+                result = Double.valueOf(evaluateMathFunction(((Integer)paramValue).doubleValue()));
+            }
+            else if (paramValue instanceof Long)
+            {
+                result = Double.valueOf(evaluateMathFunction(((Long)paramValue).doubleValue()));
+            }
+            else
+            {
+                throw new NucleusException("Not possible to use " + getFunctionName() + " on value of type " + paramValue.getClass().getName());
+            }
+        }
+        else if (expr.getArguments().size() == 2)
+        {
+            // Math function taking in 2 arguments
+            Object paramValue2 = (expr.getArguments().size() == 2) ? getParamValueForParam(expr.getArguments().get(1), eval, method) : null;
+
+            if (paramValue instanceof Double)
+            {
+                result = Double.valueOf(evaluateMathFunction(((Double)paramValue).doubleValue(), ((Double)paramValue2).doubleValue()));
+            }
+            else if (paramValue instanceof Float)
+            {
+                result = Float.valueOf((float)evaluateMathFunction(((Float)paramValue).floatValue(), ((Float)paramValue2).floatValue()));
+            }
+            else if (paramValue instanceof BigDecimal)
+            {
+                result = new BigDecimal(evaluateMathFunction(((BigDecimal)paramValue).doubleValue(), ((BigDecimal)paramValue2).doubleValue()));
+            }
+            else if (paramValue instanceof Integer)
+            {
+                result = Double.valueOf(evaluateMathFunction(((Integer)paramValue).doubleValue(), ((Integer)paramValue2).doubleValue()));
+            }
+            else if (paramValue instanceof Long)
+            {
+                result = Double.valueOf(evaluateMathFunction(((Long)paramValue).doubleValue(), ((Long)paramValue2).doubleValue()));
+            }
+            else
+            {
+                throw new NucleusException("Not possible to use " + getFunctionName() + " on value of type " + paramValue.getClass().getName());
+            }
+        }
+        return result;
+    }
+
+    protected abstract String getFunctionName();
+
+    protected abstract double evaluateMathFunction(double num);
+    
+    protected double evaluateMathFunction(double num1, double num2)
+    {
+        throw new NucleusUserException("evaluate method with multiple arguments not implemented");
+    }
+
+    protected Object getParamValueForParam(Object param, InMemoryExpressionEvaluator eval, String method)
+    {
         Object paramValue = null;
         if (param instanceof PrimaryExpression)
         {
@@ -68,38 +144,9 @@ public abstract class MathFunction implements InvocationEvaluator
         }
         else
         {
-            throw new NucleusException(method + "(num) where num is instanceof " + param.getClass().getName() + " not supported");
+            throw new NucleusException(method + " parameter which is instanceof " + param.getClass().getName() + " not supported");
         }
 
-        Object result = null;
-        if (paramValue instanceof Double)
-        {
-            result = Double.valueOf(evaluateMathFunction(((Double)paramValue).doubleValue()));
-        }
-        else if (paramValue instanceof Float)
-        {
-            result = Float.valueOf((float)evaluateMathFunction(((Float)paramValue).floatValue()));
-        }
-        else if (paramValue instanceof BigDecimal)
-        {
-            result = new BigDecimal(evaluateMathFunction(((BigDecimal)paramValue).doubleValue()));
-        }
-        else if (paramValue instanceof Integer)
-        {
-            result = Double.valueOf(evaluateMathFunction(((Integer)paramValue).doubleValue()));
-        }
-        else if (paramValue instanceof Long)
-        {
-            result = Double.valueOf(evaluateMathFunction(((Long)paramValue).doubleValue()));
-        }
-        else
-        {
-            throw new NucleusException("Not possible to use " + getFunctionName() + " on value of type " + paramValue.getClass().getName());
-        }
-        return result;
+        return paramValue;
     }
-
-    protected abstract String getFunctionName();
-
-    protected abstract double evaluateMathFunction(double num);
 }

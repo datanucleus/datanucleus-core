@@ -484,6 +484,7 @@ public class QueryManagerImpl implements QueryManager
             if ("Math.acos".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcCosineFunction();
             if ("Math.asin".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcSineFunction();
             if ("Math.atan".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangentFunction();
+            if ("Math.atan2".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangent2Function();
             if ("Math.cos".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CosineFunction();
             if ("Math.sin".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SineFunction();
             if ("Math.tan".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.TangentFunction();
@@ -510,6 +511,7 @@ public class QueryManagerImpl implements QueryManager
             if ("ACOS".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcCosineFunction();
             if ("ASIN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcSineFunction();
             if ("ATAN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangentFunction();
+            if ("ATAN2".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangent2Function();
             if ("ROUND".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.RoundFunction();
             if ("POWER".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.PowerFunction();
             if ("CEIL".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CeilFunction();
