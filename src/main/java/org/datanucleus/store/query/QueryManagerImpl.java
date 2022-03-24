@@ -489,6 +489,9 @@ public class QueryManagerImpl implements QueryManager
             if ("Math.cot".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CotangentFunction();
             if ("Math.sin".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SineFunction();
             if ("Math.tan".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.TangentFunction();
+            if ("Math.cosh".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CoshFunction();
+            if ("Math.sinh".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SinhFunction();
+            if ("Math.tanh".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.TanhFunction();
             if ("Math.log".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LogFunction();
             if ("Math.exp".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ExpFunction();
             if ("Math.floor".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.FloorFunction();
@@ -510,6 +513,9 @@ public class QueryManagerImpl implements QueryManager
             if ("COT".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CotangentFunction();
             if ("SIN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SineFunction();
             if ("TAN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.TangentFunction();
+            if ("COSH".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CoshFunction();
+            if ("SINH".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SinhFunction();
+            if ("TANH".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.TanhFunction();
             if ("ACOS".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcCosineFunction();
             if ("ASIN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcSineFunction();
             if ("ATAN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangentFunction();
