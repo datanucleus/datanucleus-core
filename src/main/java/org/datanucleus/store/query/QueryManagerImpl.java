@@ -486,6 +486,7 @@ public class QueryManagerImpl implements QueryManager
             if ("Math.atan".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangentFunction();
             if ("Math.atan2".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcTangent2Function();
             if ("Math.cos".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CosineFunction();
+            if ("Math.cot".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CotangentFunction();
             if ("Math.sin".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SineFunction();
             if ("Math.tan".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.TangentFunction();
             if ("Math.log".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.LogFunction();
@@ -506,6 +507,7 @@ public class QueryManagerImpl implements QueryManager
             if ("MOD".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ModFunction();
             if ("COALESCE".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CoalesceFunction();
             if ("COS".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CosineFunction();
+            if ("COT".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.CotangentFunction();
             if ("SIN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.SineFunction();
             if ("TAN".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.TangentFunction();
             if ("ACOS".equals(methodName)) eval = new org.datanucleus.store.query.inmemory.method.ArcCosineFunction();
