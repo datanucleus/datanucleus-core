@@ -124,6 +124,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         }
     }
 
+    @Override
     public void applyDefaultProperties(Configuration conf)
     {
         conf.addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRY_CLASSNAME, null, null, null, false, false);
@@ -154,11 +155,13 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_JAVAX_VALIDATION_SHORTCUTS, null, false, false, false);
     }
 
+    @Override
     public synchronized void initialise()
     {
         logConfiguration();
     }
 
+    @Override
     public void close()
     {
         if (typeManager != null)
@@ -167,26 +170,31 @@ public abstract class AbstractNucleusContext implements NucleusContext
         }
     }
 
+    @Override
     public ApiAdapter getApiAdapter()
     {
         return apiAdapter;
     }
 
+    @Override
     public String getApiName()
     {
         return apiAdapter != null ? apiAdapter.getName() : null;
     }
 
+    @Override
     public Configuration getConfiguration()
     {
         return config;
     }
 
+    @Override
     public PluginManager getPluginManager()
     {
         return pluginManager;
     }
 
+    @Override
     public synchronized MetaDataManager getMetaDataManager()
     {
         if (metaDataManager == null)
@@ -215,15 +223,13 @@ public abstract class AbstractNucleusContext implements NucleusContext
         return metaDataManager;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#supportsORMMetaData()
-     */
     @Override
     public boolean supportsORMMetaData()
     {
         return true;
     }
 
+    @Override
     public TypeManager getTypeManager()
     {
         if (typeManager == null)
@@ -233,6 +239,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         return typeManager;
     }
 
+    @Override
     public ClassLoaderResolver getClassLoaderResolver(ClassLoader primaryLoader)
     {
         // Set the key we will refer to this loader by

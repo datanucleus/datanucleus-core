@@ -181,6 +181,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         super(apiName, startupProps, pluginMgr);
     }
 
+    @Override
     public void applyDefaultProperties(Configuration conf)
     {
         super.applyDefaultProperties(conf);
@@ -390,6 +391,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION, null, false, true, false);
     }
 
+    @Override
     public synchronized void initialise()
     {
         final ClassLoaderResolver clr = getClassLoaderResolver(null);
@@ -533,6 +535,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         super.initialise();
     }
 
+    @Override
     public synchronized void close()
     {
         if (cdiHandler != null)
@@ -595,6 +598,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         super.close();
     }
 
+    @Override
     protected void logConfigurationDetails()
     {
         String timeZoneID = config.getStringProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID);
@@ -654,18 +658,12 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 (config.getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS) ? ", Collections/Maps " : ""));
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#isFederated()
-     */
     @Override
     public boolean isFederated()
     {
         return federated;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getAutoStartMechanism()
-     */
     @Override
     public AutoStartMechanism getAutoStartMechanism()
     {
@@ -1079,9 +1077,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getExecutionContextPool()
-     */
     @Override
     public ExecutionContextPool getExecutionContextPool()
     {
@@ -1092,9 +1087,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return ecPool;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getStateManagerFactory()
-     */
     @Override
     public StateManagerFactory getStateManagerFactory()
     {
@@ -1105,15 +1097,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return smFactory;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getExecutionContext(java.lang.Object, java.util.Map)
-     */
     @Override
     public ExecutionContext getExecutionContext(Object owner, Map<String, Object> options)
     {
         return getExecutionContextPool().checkOut(owner, options);
     }
 
+    @Override
     public IdentityManager getIdentityManager()
     {
         if (identityManager == null)
@@ -1123,18 +1113,12 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return identityManager;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#statisticsEnabled()
-     */
     @Override
     public boolean statisticsEnabled()
     {
         return config.getBooleanProperty(PropertyNames.PROPERTY_ENABLE_STATISTICS) || getJMXManager() != null;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getJMXManager()
-     */
     @Override
     public synchronized ManagementManager getJMXManager()
     {
@@ -1146,9 +1130,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return jmxManager;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getStatistics()
-     */
     @Override
     public synchronized FactoryStatistics getStatistics()
     {
@@ -1159,9 +1140,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return statistics;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getImplementationCreator()
-     */
     @Override
     public synchronized ImplementationCreator getImplementationCreator()
     {
@@ -1176,9 +1154,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return implCreator;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getResourcedTransactionManager()
-     */
     @Override
     public synchronized ResourcedTransactionManager getResourcedTransactionManager()
     {
@@ -1189,9 +1164,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return txManager;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getJtaTransactionManager()
-     */
     @Override
     public synchronized javax.transaction.TransactionManager getJtaTransactionManager()
     {
@@ -1207,9 +1179,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return jtaTxManager;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getJtaSyncRegistry()
-     */
     @Override
     public JTASyncRegistry getJtaSyncRegistry()
     {
@@ -1229,9 +1198,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return jtaSyncRegistry;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getStoreManager()
-     */
     @Override
     public StoreManager getStoreManager()
     {
@@ -1242,9 +1208,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return storeMgr;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#supportsORMMetaData()
-     */
     @Override
     public boolean supportsORMMetaData()
     {
@@ -1255,9 +1218,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getValidationHandler(org.datanucleus.ExecutionContext)
-     */
     @Override
     public BeanValidationHandler getBeanValidationHandler(ExecutionContext ec)
     {
@@ -1309,6 +1269,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return null;
     }
 
+    @Override
     public CDIHandler getCDIHandler()
     {
         if (cdiHandlerInit)
@@ -1343,9 +1304,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return cdiHandler;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#hasLevel2Cache()
-     */
     @Override
     public boolean hasLevel2Cache()
     {
@@ -1353,9 +1311,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return !(cache instanceof NullLevel2Cache);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getLevel2Cache()
-     */
     @Override
     public Level2Cache getLevel2Cache()
     {
@@ -1408,45 +1363,30 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return cache;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getExecutionContextListeners()
-     */
     @Override
     public ExecutionContext.LifecycleListener[] getExecutionContextListeners()
     {
         return executionContextListeners.toArray(new ExecutionContext.LifecycleListener[executionContextListeners.size()]);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#addExecutionContextListener(org.datanucleus.ExecutionContext.LifecycleListener)
-     */
     @Override
     public void addExecutionContextListener(ExecutionContext.LifecycleListener listener)
     {
         executionContextListeners.add(listener);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#removeExecutionContextListener(org.datanucleus.ExecutionContext.LifecycleListener)
-     */
     @Override
     public void removeExecutionContextListener(ExecutionContext.LifecycleListener listener)
     {
         executionContextListeners.remove(listener);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#setJcaMode(boolean)
-     */
     @Override
     public synchronized void setJcaMode(boolean jca)
     {
         this.jca = jca;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#isJcaMode()
-     */
     @Override
     public boolean isJcaMode()
     {
@@ -1455,9 +1395,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
     // --------------------------- Fetch Groups ---------------------------------
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getFetchGroupManager()
-     */
     @Override
     public synchronized FetchGroupManager getFetchGroupManager()
     {
@@ -1468,27 +1405,18 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return fetchGrpMgr;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#addInternalFetchGroup(org.datanucleus.FetchGroup)
-     */
     @Override
     public void addInternalFetchGroup(FetchGroup grp)
     {
         getFetchGroupManager().addFetchGroup(grp);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#removeInternalFetchGroup(org.datanucleus.FetchGroup)
-     */
     @Override
     public void removeInternalFetchGroup(FetchGroup grp)
     {
         getFetchGroupManager().removeFetchGroup(grp);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#createInternalFetchGroup(java.lang.Class, java.lang.String)
-     */
     @Override
     public FetchGroup createInternalFetchGroup(Class cls, String name)
     {
@@ -1505,9 +1433,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return getFetchGroupManager().createFetchGroup(cls, name);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getInternalFetchGroup(java.lang.Class, java.lang.String, boolean)
-     */
     @Override
     public FetchGroup getInternalFetchGroup(Class cls, String name, boolean createIfNotPresent)
     {
@@ -1527,18 +1452,12 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return getFetchGroupManager().getFetchGroup(cls, name, createIfNotPresent);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getFetchGroupsWithName(java.lang.String)
-     */
     @Override
     public Set<FetchGroup> getFetchGroupsWithName(String name)
     {
         return getFetchGroupManager().getFetchGroupsWithName(name);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#isClassWithIdentityCacheable(java.lang.Object)
-     */
     @Override
     public boolean isClassWithIdentityCacheable(Object id)
     {
@@ -1576,9 +1495,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return isClassCacheable(cmd);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#isClassCacheable(org.datanucleus.metadata.AbstractClassMetaData)
-     */
     @Override
     public boolean isClassCacheable(AbstractClassMetaData cmd)
     {
@@ -1642,9 +1558,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getMultiTenancyId(org.datanucleus.ExecutionContext)
-     */
     @Override
     public String getTenantId(ExecutionContext ec)
     {
@@ -1693,9 +1606,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return new String[] {tenantId};
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#getCurrentUser(org.datanucleus.ExecutionContext)
-     */
     @Override
     public String getCurrentUser(ExecutionContext ec)
     {

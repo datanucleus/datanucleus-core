@@ -48,6 +48,7 @@ public class EnhancementNucleusContextImpl extends AbstractNucleusContext
         super(apiName, startupProps, pluginMgr);
     }
 
+    @Override
     public void close()
     {
         if (metaDataManager != null)
@@ -68,9 +69,6 @@ public class EnhancementNucleusContextImpl extends AbstractNucleusContext
         super.close();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.AbstractNucleusContext#logConfigurationDetails()
-     */
     @Override
     protected void logConfigurationDetails()
     {
