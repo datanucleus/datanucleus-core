@@ -41,6 +41,7 @@ import org.datanucleus.store.types.containers.ElementContainerHandler;
 import org.datanucleus.store.types.containers.MapContainerAdapter;
 import org.datanucleus.store.types.containers.MapHandler;
 import org.datanucleus.store.types.containers.SequenceAdapter;
+import org.datanucleus.store.types.wrappers.Collection;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -297,6 +298,12 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         if (!mmd.isCacheable())
         {
             // Field is marked as not cacheable so unset its loaded flag and return null
+            cachedPC.setLoadedField(fieldNumber, false);
+            return;
+        }
+        if (value != null && value instanceof Collection)
+        {
+            // Field value is a DN Collection instance, so not instantiated as set / list hence cannot store since we would then not be able to instantiate the specific type on retrieval
             cachedPC.setLoadedField(fieldNumber, false);
             return;
         }
