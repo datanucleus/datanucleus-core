@@ -543,8 +543,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             for (int i=0;i<pkFieldNumbers.length;i++)
             {
                 int fieldNumber = pkFieldNumbers[i];
-                AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                if (myEC.getMetaDataManager().getMetaDataForClass(fmd.getType(), getExecutionContext().getClassLoaderResolver()) != null)
+                AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                if (myEC.getMetaDataManager().getMetaDataForClass(pkMmd.getType(), getExecutionContext().getClassLoaderResolver()) != null)
                 {
                     try
                     {
@@ -561,12 +561,20 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                             Persistable pkFieldPC = (Persistable) ((SingleValueFieldManager) currFM).fetchObjectField(fieldNumber);
                             if (pkFieldPC == null)
                             {
-                                throw new NucleusUserException(Localiser.msg("026016", fmd.getFullFieldName()));
+                                throw new NucleusUserException(Localiser.msg("026016", pkMmd.getFullFieldName()));
                             }
                             if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
                             {
                                 // Make sure the PC field is persistent - can cause the insert of our object being managed by this SM via flush() when bidir relation
-                                Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, PersistableObjectType.PC);
+                                Object persistedFieldPC = null;
+                                if (pkMmd.isEmbedded())
+                                {
+                                    persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, this, fieldNumber, PersistableObjectType.EMBEDDED_PC);
+                                }
+                                else
+                                {
+                                    persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, PersistableObjectType.PC);
+                                }
                                 replaceField(myPC, fieldNumber, persistedFieldPC, false);
                             }
                         }
@@ -3432,7 +3440,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public void makeDirty(int fieldNumber)
     {
-        if ((flags&FLAG_DELETING) == 0)
+        if ((flags & FLAG_DELETING) == 0/* && !isDeleted() */)
         {
             // Mark dirty unless in the process of being deleted
             boolean wasDirty = preWriteField(fieldNumber);
@@ -3546,7 +3554,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     private void setIdentity(boolean afterPreStore)
     {
-        if (cmd.isEmbeddedOnly())
+        if (cmd.isEmbeddedOnly()) // TODO Change this to isEmbedded()
         {
             // Embedded objects don't have an "identity"
             return;
@@ -4522,8 +4530,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         if (dirty && !myLC.isDeleted() && myLC.isTransactional() && myEC.isDelayDatastoreOperationsEnabled())
         {
-            // Already provisionally persistent, but delaying til commit so just re-run reachability
-            // to bring in any new objects that are now reachable
+            // Already provisionally persistent, but delaying til commit so just re-run reachability to bring in any new objects that are now reachable
             if (cmd.hasRelations(myEC.getClassLoaderResolver()))
             {
                 provideFields(cmd.getAllMemberPositions(), new PersistFieldManager(this, false));
@@ -4532,7 +4539,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
 
         getCallbackHandler().prePersist(myPC);
-        // TODO Call prePersist for any embedded field objects
 
         if (isFlushedNew())
         {
@@ -4542,15 +4548,15 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             return;
         }
 
-        if (cmd.isEmbeddedOnly())
+        if (cmd.isEmbeddedOnly()) // TODO Change to isEmbedded()
         {
-            // Cant persist an object of this type since can only be embedded
+            // Object is embedded so return
             return;
         }
 
-        // If this is an embedded/serialised object becoming persistent in its own right, assign an identity.
         if (myID == null)
         {
+            // Assign identity when not yet assigned (is this possible?)
             setIdentity(false);
         }
 
