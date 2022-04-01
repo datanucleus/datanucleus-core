@@ -3554,7 +3554,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     private void setIdentity(boolean afterPreStore)
     {
-        if (cmd.isEmbeddedOnly()) // TODO Change this to isEmbedded()
+        if (isEmbedded())
         {
             // Embedded objects don't have an "identity"
             return;
@@ -4548,7 +4548,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             return;
         }
 
-        if (cmd.isEmbeddedOnly()) // TODO Change to isEmbedded()
+        if (isEmbedded())
         {
             // Object is embedded so return
             return;
