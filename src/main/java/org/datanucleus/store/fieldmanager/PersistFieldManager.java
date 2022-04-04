@@ -74,9 +74,9 @@ public class PersistFieldManager extends AbstractFieldManager
             // Object is TRANSIENT/DETACHED and being persisted, or P_NEW_DELETED and being re-persisted
             if (objectType != PersistableObjectType.PC)
             {
-                return sm.getExecutionContext().persistObjectInternal(pc, sm, ownerFieldNum, objectType);
+                return sm.getExecutionContext().persistObjectInternal(pc, null, objectType, sm, ownerFieldNum);
             }
-            return sm.getExecutionContext().persistObjectInternal(pc, null, -1, objectType);
+            return sm.getExecutionContext().persistObjectInternal(pc, null, objectType);
         }
         return pc;
     }

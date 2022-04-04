@@ -487,7 +487,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      * TODO Consider passing in a FieldValues and set the fields
      * @param pcClass Class of the (embedded) object that this will manage the state for
      */
-    public void initialiseForEmbedded(Class pcClass)
+    public void initialiseForEmbedded(Class<Persistable> pcClass)
     {
         myID = null; // Embedded, so don't need an ID since we're not persisting it
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN); // TODO Should be HOLLOW?
@@ -569,11 +569,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                                 Object persistedFieldPC = null;
                                 if (pkMmd.isEmbedded())
                                 {
-                                    persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, this, fieldNumber, PersistableObjectType.EMBEDDED_PC);
+                                    persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, PersistableObjectType.EMBEDDED_PC, this, fieldNumber);
                                 }
                                 else
                                 {
-                                    persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, PersistableObjectType.PC);
+                                    persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, PersistableObjectType.PC);
                                 }
                                 replaceField(myPC, fieldNumber, persistedFieldPC, false);
                             }

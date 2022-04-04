@@ -115,7 +115,7 @@ public interface DNStateManager<T> extends StateManager
      * The instance will not be assigned an identity in the process since it is a SCO.
      * @param pcClass Class of the embedded object
      */
-    void initialiseForEmbedded(Class pcClass);
+    void initialiseForEmbedded(Class<T> pcClass);
 
     /**
      * Initialises a state manager to manage a transient instance that is becoming newly persistent.

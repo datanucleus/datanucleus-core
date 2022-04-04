@@ -1288,7 +1288,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         DNStateManager sm = findStateManager(pc);
         if (sm == null && persist)
         {
-            return findStateManager(persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC));
+            return findStateManager(persistObjectInternal(pc, null, PersistableObjectType.PC));
         }
         return sm;
     }
@@ -1311,7 +1311,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             if (!embeddedSM.isEmbedded())
             {
-                // TODO This object is already registered as not embedded!
+                // TODO This object is already registered as not embedded so need to create clone of object and manage it as embedded!
                 NucleusLogger.PERSISTENCE.warn("Object " + StringUtils.toJVMIDString(value) + " is already registered with " + embeddedSM +
                     " as NOT EMBEDDED but needs to be embedded into " + ownerSM + ". Please correct this. An object can be either embedded or not but not both");
             }
@@ -1860,7 +1860,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         boolean detached = getApiAdapter().isDetached(obj);
 
         // Persist the object
-        Object persistedPc = persistObjectInternal(obj, null, null, -1, PersistableObjectType.PC);
+        Object persistedPc = persistObjectInternal(obj, null, PersistableObjectType.PC);
 
         // If using reachability at commit and appropriate save it for reachability checks when we commit
         DNStateManager sm = findStateManager(persistedPc);
@@ -1894,7 +1894,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType)
+    public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, PersistableObjectType objectType, DNStateManager ownerSM, int ownerFieldNum)
     {
         if (obj == null)
         {
@@ -1915,6 +1915,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 throw new NucleusUserException(Localiser.msg("010007", obj));
             }
 
+            // This block of code was present up to 6.0.0-m4. No comment present as to why so commented out seemingly to no ill effect
+//            if (ownerSM != null)
+//            {
+//                ownerSM = findStateManager(ownerSM.getObject());
+//            }
+
             boolean cacheable = false;
             T persistedPc = obj; // Persisted object is the passed in pc (unless being attached as a copy)
             if (api.isDetached(obj))
@@ -1930,7 +1936,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     // Attach the object
                     attachObject(ownerSM, obj, api.getIdForObject(obj) == null);
-                    persistedPc = obj;
                 }
             }
             else if (api.isTransactional(obj) && !api.isPersistent(obj))
@@ -1960,6 +1965,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     if (threadInfo.merging)
                     {
+                        // Attach of transient is permitted, so attach it
                         AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(obj.getClass(), clr);
                         if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
@@ -1973,9 +1979,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                                 id = transientId;
                                 merged = true;
                                 persistedPc = existingObj;
+                                cacheable = nucCtx.isClassCacheable(cmd);
                             }
                         }
-                        cacheable = nucCtx.isClassCacheable(cmd);
                     }
                 }
                 catch (NucleusObjectNotFoundException onfe)
@@ -1997,9 +2003,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                              objectType == PersistableObjectType.EMBEDDED_MAP_VALUE_PC ||
                              objectType == PersistableObjectType.EMBEDDED_PC) && ownerSM != null)
                         {
-                            // SCO object
+                            // Embedded/serialised (SCO) object
                             sm = nucCtx.getStateManagerFactory().newForEmbedded(this, obj, false, ownerSM, ownerFieldNum, objectType);
-
                             sm.makePersistent();
                             id = sm.getInternalObjectId();
                         }
@@ -2015,7 +2020,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     {
                         if (sm.getReferencedPC() == null)
                         {
-                            // Persist it
+                            // Not attaching, so persist it
                             sm.makePersistent();
                             id = sm.getInternalObjectId();
                         }
@@ -2082,17 +2087,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             clr.unsetPrimary();
         }
-    }
-
-    @Override
-    public <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType)
-    {
-        if (ownerSM != null)
-        {
-            DNStateManager sm = findStateManager(ownerSM.getObject());
-            return persistObjectInternal(pc, null, sm, ownerFieldNum, objectType);
-        }
-        return persistObjectInternal(pc, null, null, ownerFieldNum, objectType);
     }
 
     @Override
@@ -2416,7 +2410,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else if (id == null && !sco)
         {
             // Transient object so needs persisting
-            persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
+            persistObjectInternal(pc, null, PersistableObjectType.PC);
             return;
         }
 
@@ -2466,7 +2460,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else if (id == null && !sco)
         {
             // Object was not persisted before so persist it
-            return persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
+            return persistObjectInternal(pc, null, PersistableObjectType.PC);
         }
         else if (api.isPersistent(pc))
         {
@@ -2561,7 +2555,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Transient object passed so persist it before thinking about detaching
             if (tx.isActive())
             {
-                persistObjectInternal(obj, null, null, -1, PersistableObjectType.PC);
+                persistObjectInternal(obj, null, PersistableObjectType.PC);
             }
         }
 
@@ -2607,7 +2601,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Transient object passed so persist it before thinking about detaching
                 if (tx.isActive())
                 {
-                    persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
+                    persistObjectInternal(pc, null, PersistableObjectType.PC);
                 }
             }
 
@@ -2644,7 +2638,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Transient object passed so persist it before thinking about detaching
                 if (tx.isActive())
                 {
-                    thePC = persistObjectInternal(pc, null, null, -1, PersistableObjectType.PC);
+                    thePC = persistObjectInternal(pc, null, PersistableObjectType.PC);
                 }
                 else
                 {

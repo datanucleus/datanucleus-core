@@ -284,7 +284,8 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to make an object persistent.
-     * NOT to be called by internal DataNucleus methods. Only callable by external APIs (JDO/JPA).
+     * Should be called by EXTERNAL APIs (JDO/JPA) only.
+     * All INTERNAL (DataNucleus) calls should go via persistObjectInternal(...).
      * @param pc The object
      * @param merging Whether this object (and dependents) is being merged
      * @param <T> Type of the persistable object
@@ -295,6 +296,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to persist an array of objects to the datastore.
+     * Should be called by EXTERNAL APIs (JDO/JPA) only.
      * @param pcs The objects to persist
      * @return The persisted objects
      * @throws NucleusUserException Thrown if an error occurs during the persist process.
@@ -303,42 +305,35 @@ public interface ExecutionContext extends ExecutionContextReference
     Object[] persistObjects(Object... pcs);
 
     /**
-     * Method to make an object persistent which should be called from internal calls only.
-     * All PM/EM calls should go via persistObject(Object obj).
-     * @param pc The object
-     * @param preInsertChanges Any changes to make before inserting
-     * @param ownerSM StateManager of the owner when embedded
-     * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object
-     * @return The persisted object
-     * @param <T> Type of the persistable object
-     * @throws NucleusUserException if the object is managed by a different manager
-     */
-    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType);
-
-    /**
-     * Method to persist the passed object (internally).
-     * @param pc The object
-     * @param ownerSM StateManager of the owner when embedded
-     * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
-     * @param objectType Type of object
-     * @param <T> Type of the persistable object
-     * @return The persisted object
-     */
-    <T> T persistObjectInternal(T pc, DNStateManager ownerSM, int ownerFieldNum, PersistableObjectType objectType);
-
-    /**
-     * Method to persist the passed object (internally).
+     * Method to make an object persistent which should be called from INTERNAL (DataNucleus) calls only.
+     * All EXTERNAL (PM/EM) calls should go via persistObject(Object pc).
+     * To be used when not providing the owner object details that this is part of (embedded).
      * @param pc The object
      * @param preInsertChanges Changes to be made before inserting
      * @param objectType Type of object
-     * @param <T> Type of the persistable object
      * @return The persisted object
+     * @param <T> Type of the persistable object
+     * @throws NucleusUserException if the object is managed by a different context
      */
     default <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, PersistableObjectType objectType)
     {
-        return persistObjectInternal(pc, preInsertChanges, null, -1, objectType);
+        return persistObjectInternal(pc, preInsertChanges, objectType, null, -1);
     }
+
+    /**
+     * Method to make an object persistent which should be called from INTERNAL (DataNucleus) calls only.
+     * All EXTERNAL (PM/EM) calls should go via persistObject(Object pc).
+     * To be used when providing the owner object details that this is part of (embedded).
+     * @param pc The object
+     * @param preInsertChanges Any changes to make before inserting
+     * @param objectType Type of object
+     * @param ownerSM StateManager of the owner when embedded (or attached?) (null if not embedded)
+     * @param ownerFieldNum Field number in the owner where this is embedded (or attached?) (-1 if not embedded)
+     * @return The persisted object
+     * @param <T> Type of the persistable object
+     * @throws NucleusUserException if the object is managed by a different context
+     */
+    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, PersistableObjectType objectType, DNStateManager ownerSM, int ownerFieldNum);
 
     /**
      * Method to migrate an object to transient state.
