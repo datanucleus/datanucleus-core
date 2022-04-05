@@ -49,119 +49,79 @@ public class JDK14Logger extends NucleusLogger
         logger = Logger.getLogger(logName);
     }
 
+    @Override
     public Object getNativeLogger()
     {
         return logger;
     }
 
-    /**
-     * Log a debug message.
-     * @param msg The message
-     */
+    @Override
     public void debug(Object msg)
     {
         log(Level.FINE, msg, null);
     }
 
-    /**
-     * Log a debug message with throwable.
-     * @param msg The message
-     * @param thr A throwable
-     */
+    @Override
     public void debug(Object msg, Throwable thr)
     {
         log(Level.FINE, msg, thr);
     }
 
-    /**
-     * Log an info message.
-     * @param msg The message
-     */
+    @Override
     public void info(Object msg)
     {
         log(Level.INFO, msg, null);
     }
 
-    /**
-     * Log an info message with throwable.
-     * @param msg The message
-     * @param thr A throwable
-     */
+    @Override
     public void info(Object msg, Throwable thr)
     {
         log(Level.INFO, msg, thr);
     }
 
-    /**
-     * Log a warning message.
-     * @param msg The message
-     */
+    @Override
     public void warn(Object msg)
     {
         log(Level.WARNING, msg, null);
     }
 
-    /**
-     * Log a warning message with throwable.
-     * @param msg The message
-     * @param thr A throwable
-     */
+    @Override
     public void warn(Object msg, Throwable thr)
     {
         log(Level.WARNING, msg, thr);
     }
 
-    /**
-     * Log an error message.
-     * @param msg The message
-     */
+    @Override
     public void error(Object msg)
     {
         log(Level.SEVERE, msg, null);
     }
 
-    /**
-     * Log an error message with throwable.
-     * @param msg The message
-     * @param thr A throwable
-     */
+    @Override
     public void error(Object msg, Throwable thr)
     {
         log(Level.SEVERE, msg, thr);
     }
 
-    /**
-     * Log a fatal message.
-     * @param msg The message
-     */
+    @Override
     public void fatal(Object msg)
     {
         log(Level.SEVERE, msg, null);
     }
 
-    /**
-     * Log a fatal message with throwable.
-     * @param msg The message
-     * @param thr A throwable
-     */
+    @Override
     public void fatal(Object msg, Throwable thr)
     {
         log(Level.SEVERE, msg, thr);
     }
 
-    /**
-     * Accessor for whether debug logging is enabled
-     * @return Whether it is enabled
-     */
+    @Override
     public boolean isDebugEnabled()
     {
         return logger.isLoggable(java.util.logging.Level.FINE);
     }
 
-    /**
-     * Accessor for whether info logging is enabled
-     * @return Whether it is enabled
-     */
+    @Override
     public boolean isInfoEnabled()
     {
         return logger.isLoggable(java.util.logging.Level.INFO);
@@ -179,7 +139,9 @@ public class JDK14Logger extends NucleusLogger
         {
             LogRecord result = new LogRecord(level, String.valueOf(msg));
             if (thrown != null)
+            {
                 result.setThrown(thrown);
+            }
             StackTraceElement[] stacktrace = new Throwable().getStackTrace();
             for (int i = 0; i < stacktrace.length; i++)
             {
