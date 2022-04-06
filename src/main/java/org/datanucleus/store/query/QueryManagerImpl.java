@@ -189,7 +189,11 @@ public class QueryManagerImpl implements QueryManager
         {
             cacheType = "soft";
         }
-        if ("soft".equalsIgnoreCase(cacheType))
+        if ("none".equalsIgnoreCase(cacheType))
+        {
+            queryResultsCache = null;
+        }
+        else if ("soft".equalsIgnoreCase(cacheType))
         {
             queryResultsCache = new SoftQueryResultsCache(nucleusContext);
         }
