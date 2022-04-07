@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -1352,7 +1351,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     @Override
     public boolean hasProperty(String name)
     {
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return true;
         }
@@ -1366,7 +1365,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public Object getProperty(String name)
     {
         // Use local property value if present, otherwise relay back to context property value
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return super.getProperty(name);
         }
@@ -1380,7 +1379,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public int getIntProperty(String name)
     {
         // Use local property value if present, otherwise relay back to context property value
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return super.getIntProperty(name);
         }
@@ -1394,7 +1393,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public String getStringProperty(String name)
     {
         // Use local property value if present, otherwise relay back to context property value
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return super.getStringProperty(name);
         }
@@ -1408,7 +1407,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public boolean getBooleanProperty(String name)
     {
         // Use local property value if present, otherwise relay back to context property value
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return super.getBooleanProperty(name);
         }
@@ -1422,7 +1421,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public boolean getBooleanProperty(String name, boolean resultIfNotSet)
     {
         // Use local property value if present, otherwise relay back to context property value
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return super.getBooleanProperty(name, resultIfNotSet);
         }
@@ -1436,7 +1435,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public Boolean getBooleanObjectProperty(String name)
     {
         // Use local property value if present, otherwise relay back to context property value
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return super.getBooleanObjectProperty(name);
         }
