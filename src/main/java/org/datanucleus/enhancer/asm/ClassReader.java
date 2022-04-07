@@ -88,6 +88,9 @@ public class ClassReader {
    */
   static final int EXPAND_ASM_INSNS = 256;
 
+  /** The maximum size of array to allocate. */
+  private static final int MAX_BUFFER_SIZE = 1024 * 1024;
+
   /** The size of the temporary byte array used to read class input streams chunk by chunk. */
   private static final int INPUT_STREAM_DATA_CHUNK_SIZE = 4096;
 
@@ -191,7 +194,7 @@ public class ClassReader {
     this.b = classFileBuffer;
     // Check the class' major_version. This field is after the magic and minor_version fields, which
     // use 4 and 2 bytes respectively.
-    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V17) {
+    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V19) {
       throw new IllegalArgumentException(
           "Unsupported class file major version " + readShort(classFileOffset + 6));
     }
@@ -310,19 +313,38 @@ public class ClassReader {
     if (inputStream == null) {
       throw new IOException("Class not found");
     }
+    int bufferSize = computeBufferSize(inputStream);
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-      byte[] data = new byte[INPUT_STREAM_DATA_CHUNK_SIZE];
+      byte[] data = new byte[bufferSize];
       int bytesRead;
-      while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+      int readCount = 0;
+      while ((bytesRead = inputStream.read(data, 0, bufferSize)) != -1) {
         outputStream.write(data, 0, bytesRead);
+        readCount++;
       }
       outputStream.flush();
+      if (readCount == 1) {
+        return data;
+      }
       return outputStream.toByteArray();
     } finally {
       if (close) {
         inputStream.close();
       }
     }
+  }
+
+  private static int computeBufferSize(final InputStream inputStream) throws IOException {
+    int expectedLength = inputStream.available();
+    /*
+     * Some implementations can return 0 while holding available data (e.g. new
+     * FileInputStream("/proc/a_file")). Also in some pathological cases a very small number might
+     * be returned, and in this case we use a default size.
+     */
+    if (expectedLength < 256) {
+      return INPUT_STREAM_DATA_CHUNK_SIZE;
+    }
+    return Math.min(expectedLength, MAX_BUFFER_SIZE);
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -836,7 +858,7 @@ public class ClassReader {
       currentOffset += 2;
     }
 
-    // Read the  'provides_count' and 'provides' fields.
+    // Read the 'provides_count' and 'provides' fields.
     int providesCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (providesCount-- > 0) {

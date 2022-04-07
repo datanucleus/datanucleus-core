@@ -482,15 +482,15 @@ class Frame {
       // If this local has never been assigned in this basic block, it is still equal to its value
       // in the input frame.
       return LOCAL_KIND | localIndex;
-    }
-
-    int abstractType = outputLocals[localIndex];
-    if (abstractType == 0) {
+    } else {
+      int abstractType = outputLocals[localIndex];
+      if (abstractType == 0) {
         // If this local has never been assigned in this basic block, so it is still equal to its
         // value in the input frame.
         abstractType = outputLocals[localIndex] = LOCAL_KIND | localIndex;
+      }
+      return abstractType;
     }
-    return abstractType;
   }
 
   /**
@@ -566,10 +566,10 @@ class Frame {
   private int pop() {
     if (outputStackTop > 0) {
       return outputStack[--outputStackTop];
+    } else {
+      // If the output frame stack is empty, pop from the input stack.
+      return STACK_KIND | -(--outputStackStart);
     }
-
-    // If the output frame stack is empty, pop from the input stack.
-    return STACK_KIND | -(--outputStackStart);
   }
 
   /**
@@ -655,10 +655,10 @@ class Frame {
         if (abstractType == initializedType) {
           if (abstractType == UNINITIALIZED_THIS) {
             return REFERENCE_KIND | symbolTable.addType(symbolTable.getClassName());
+          } else {
+            return REFERENCE_KIND
+                | symbolTable.addType(symbolTable.getType(abstractType & VALUE_MASK).value);
           }
-
-          return REFERENCE_KIND
-                  | symbolTable.addType(symbolTable.getType(abstractType & VALUE_MASK).value);
         }
       }
     }

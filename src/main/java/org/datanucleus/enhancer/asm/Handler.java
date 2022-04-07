@@ -119,10 +119,9 @@ final class Handler {
   static Handler removeRange(final Handler firstHandler, final Label start, final Label end) {
     if (firstHandler == null) {
       return null;
+    } else {
+      firstHandler.nextHandler = removeRange(firstHandler.nextHandler, start, end);
     }
-
-    firstHandler.nextHandler = removeRange(firstHandler.nextHandler, start, end);
-
     int handlerStart = firstHandler.startPc.bytecodeOffset;
     int handlerEnd = firstHandler.endPc.bytecodeOffset;
     int rangeStart = start.bytecodeOffset;
@@ -135,10 +134,10 @@ final class Handler {
       if (rangeEnd >= handlerEnd) {
         // If [handlerStart,handlerEnd[ is included in [rangeStart,rangeEnd[, remove firstHandler.
         return firstHandler.nextHandler;
+      } else {
+        // [handlerStart,handlerEnd[ - [rangeStart,rangeEnd[ = [rangeEnd,handlerEnd[
+        return new Handler(firstHandler, end, firstHandler.endPc);
       }
-
-      // [handlerStart,handlerEnd[ - [rangeStart,rangeEnd[ = [rangeEnd,handlerEnd[
-      return new Handler(firstHandler, end, firstHandler.endPc);
     } else if (rangeEnd >= handlerEnd) {
       // [handlerStart,handlerEnd[ - [rangeStart,rangeEnd[ = [handlerStart,rangeStart[
       return new Handler(firstHandler, firstHandler.startPc, start);

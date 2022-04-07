@@ -206,9 +206,9 @@ public final class Type {
       } else {
         throw new AssertionError();
       }
+    } else {
+      return getType(getDescriptor(clazz));
     }
-
-    return getType(getDescriptor(clazz));
   }
 
   /**
@@ -440,7 +440,7 @@ public final class Type {
       case '(':
         return new Type(METHOD, descriptorBuffer, descriptorBegin, descriptorEnd);
       default:
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Invalid descriptor: " + descriptorBuffer);
     }
   }
 
@@ -750,10 +750,10 @@ public final class Type {
     currentChar = methodDescriptor.charAt(currentOffset + 1);
     if (currentChar == 'V') {
       return argumentsSize << 2;
+    } else {
+      int returnSize = (currentChar == 'J' || currentChar == 'D') ? 2 : 1;
+      return argumentsSize << 2 | returnSize;
     }
-
-    int returnSize = (currentChar == 'J' || currentChar == 'D') ? 2 : 1;
-    return argumentsSize << 2 | returnSize;
   }
 
   /**
@@ -795,37 +795,37 @@ public final class Type {
         default:
           throw new AssertionError();
       }
-    }
-
-    switch (sort) {
+    } else {
+      switch (sort) {
         case VOID:
-            if (opcode != Opcodes.IRETURN) {
-                throw new UnsupportedOperationException();
-            }
-            return Opcodes.RETURN;
+          if (opcode != Opcodes.IRETURN) {
+            throw new UnsupportedOperationException();
+          }
+          return Opcodes.RETURN;
         case BOOLEAN:
         case BYTE:
         case CHAR:
         case SHORT:
         case INT:
-            return opcode;
+          return opcode;
         case FLOAT:
-            return opcode + (Opcodes.FRETURN - Opcodes.IRETURN);
+          return opcode + (Opcodes.FRETURN - Opcodes.IRETURN);
         case LONG:
-            return opcode + (Opcodes.LRETURN - Opcodes.IRETURN);
+          return opcode + (Opcodes.LRETURN - Opcodes.IRETURN);
         case DOUBLE:
-            return opcode + (Opcodes.DRETURN - Opcodes.IRETURN);
+          return opcode + (Opcodes.DRETURN - Opcodes.IRETURN);
         case ARRAY:
         case OBJECT:
         case INTERNAL:
-            if (opcode != Opcodes.ILOAD && opcode != Opcodes.ISTORE && opcode != Opcodes.IRETURN) {
-                throw new UnsupportedOperationException();
-            }
-            return opcode + (Opcodes.ARETURN - Opcodes.IRETURN);
-        case METHOD:
+          if (opcode != Opcodes.ILOAD && opcode != Opcodes.ISTORE && opcode != Opcodes.IRETURN) {
             throw new UnsupportedOperationException();
+          }
+          return opcode + (Opcodes.ARETURN - Opcodes.IRETURN);
+        case METHOD:
+          throw new UnsupportedOperationException();
         default:
-            throw new AssertionError();
+          throw new AssertionError();
+      }
     }
   }
 

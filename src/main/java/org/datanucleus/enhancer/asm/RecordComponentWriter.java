@@ -112,10 +112,10 @@ final class RecordComponentWriter extends RecordComponentVisitor {
     if (visible) {
       return lastRuntimeVisibleAnnotation =
           AnnotationWriter.create(symbolTable, descriptor, lastRuntimeVisibleAnnotation);
+    } else {
+      return lastRuntimeInvisibleAnnotation =
+          AnnotationWriter.create(symbolTable, descriptor, lastRuntimeInvisibleAnnotation);
     }
-
-    return lastRuntimeInvisibleAnnotation =
-            AnnotationWriter.create(symbolTable, descriptor, lastRuntimeInvisibleAnnotation);
   }
 
   @Override
@@ -125,11 +125,11 @@ final class RecordComponentWriter extends RecordComponentVisitor {
       return lastRuntimeVisibleTypeAnnotation =
           AnnotationWriter.create(
               symbolTable, typeRef, typePath, descriptor, lastRuntimeVisibleTypeAnnotation);
+    } else {
+      return lastRuntimeInvisibleTypeAnnotation =
+          AnnotationWriter.create(
+              symbolTable, typeRef, typePath, descriptor, lastRuntimeInvisibleTypeAnnotation);
     }
-
-    return lastRuntimeInvisibleTypeAnnotation =
-            AnnotationWriter.create(
-                symbolTable, typeRef, typePath, descriptor, lastRuntimeInvisibleTypeAnnotation);
   }
 
   @Override

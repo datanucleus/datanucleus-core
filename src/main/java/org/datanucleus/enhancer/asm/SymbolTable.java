@@ -358,9 +358,9 @@ final class SymbolTable {
     if (bootstrapMethods != null) {
       addConstantUtf8(Constants.BOOTSTRAP_METHODS);
       return 8 + bootstrapMethods.length;
+    } else {
+      return 0;
     }
-
-    return 0;
   }
 
   /**
