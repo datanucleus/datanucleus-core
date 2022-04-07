@@ -57,7 +57,6 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Utilities for handling classes.
@@ -66,7 +65,7 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 public class ClassUtils
 {
     /** caching for constructors - using caching, the perf is at least doubled **/
-    protected static final Map<String, Constructor> constructorsCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+//    protected static final Map<String, Constructor> constructorsCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
     /**
      * Accessor for a new instance of an object.
@@ -83,20 +82,24 @@ public class ClassUtils
     {
         try
         {
-            StringBuilder name = new StringBuilder(""+type.getName());
-            if (parameterTypes != null)
-            {
-                for (int i=0;i<parameterTypes.length; i++)
-                {
-                    name.append("-").append(parameterTypes[i].getName());
-                }
-            }
-            Constructor ctor = constructorsCache.get(name.toString());
-            if (ctor == null)
-            {
-                ctor = type.getConstructor(parameterTypes);
-                constructorsCache.put(name.toString(), ctor);
-            }
+//            StringBuilder name = new StringBuilder(""+type.getName());
+//            if (parameterTypes != null)
+//            {
+//                for (int i=0;i<parameterTypes.length; i++)
+//                {
+//                    name.append("-").append(parameterTypes[i].getName());
+//                }
+//            }
+//            String ctrName = name.toString();
+//            Constructor ctor = constructorsCache.get(ctrName);
+//            if (ctor == null)
+//            {
+//                ctor = type.getConstructor(parameterTypes);
+//                NucleusLogger.GENERAL.error(">> Adding constructor for " + name.toString());
+//                NucleusLogger.GENERAL.error(">>    ctr.toString=" + ctor.toString());
+//                constructorsCache.put(ctrName, ctor);
+//            }
+            Constructor ctor = type.getConstructor(parameterTypes);
             return (T) ctor.newInstance(parameters);
         }
         catch (NoSuchMethodException e)
