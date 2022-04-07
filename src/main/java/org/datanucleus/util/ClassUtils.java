@@ -64,13 +64,9 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class ClassUtils
 {
-    /** caching for constructors - using caching, the perf is at least doubled **/
-//    protected static final Map<String, Constructor> constructorsCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
-
     /**
      * Accessor for a new instance of an object.
      * Uses reflection to generate the instance using the passed constructor parameter arguments.
-     * Caches the constructor used to improve performance for later invocation.
      * @param type Type of object (the class).
      * @param parameterTypes Classes of params for the constructor
      * @param parameters The parameters for the constructor
@@ -82,25 +78,7 @@ public class ClassUtils
     {
         try
         {
-//            StringBuilder name = new StringBuilder(""+type.getName());
-//            if (parameterTypes != null)
-//            {
-//                for (int i=0;i<parameterTypes.length; i++)
-//                {
-//                    name.append("-").append(parameterTypes[i].getName());
-//                }
-//            }
-//            String ctrName = name.toString();
-//            Constructor ctor = constructorsCache.get(ctrName);
-//            if (ctor == null)
-//            {
-//                ctor = type.getConstructor(parameterTypes);
-//                NucleusLogger.GENERAL.error(">> Adding constructor for " + name.toString());
-//                NucleusLogger.GENERAL.error(">>    ctr.toString=" + ctor.toString());
-//                constructorsCache.put(ctrName, ctor);
-//            }
-            Constructor ctor = type.getConstructor(parameterTypes);
-            return (T) ctor.newInstance(parameters);
+            return type.getConstructor(parameterTypes).newInstance(parameters);
         }
         catch (NoSuchMethodException e)
         {
@@ -148,8 +126,7 @@ public class ClassUtils
             Constructor[] constructors = cls.getConstructors();
             if (constructors != null)
             {
-                // Check the types of the constructor and find one that matches allowing for
-                // primitive to wrapper conversion
+                // Check the types of the constructor and find one that matches allowing for primitive to wrapper conversion
                 for (int i=0;i<constructors.length;i++)
                 {
                     Class[] ctrParams = constructors[i].getParameterTypes();
@@ -212,8 +189,7 @@ public class ClassUtils
             Constructor[] constructors = cls.getConstructors();
             if (constructors != null)
             {
-                // Check the types of the constructor and find one that matches allowing for
-                // primitive to wrapper conversion
+                // Check the types of the constructor and find one that matches allowing for primitive to wrapper conversion
                 for (int i=0;i<constructors.length;i++)
                 {
                     Class[] ctrParams = constructors[i].getParameterTypes();
@@ -319,18 +295,18 @@ public class ClassUtils
     /**
      * Method to return the class files below the specified directory.
      * @param dir The directory
-     * @param normal_classes Whether to include normal classes
-     * @param inner_classes Whether to include inner classes
+     * @param includeNormal Whether to include normal classes
+     * @param includeInner Whether to include inner classes
      * @return The class files (Collection of File objects).
      */
-    public static Collection<File> getClassFilesForDirectory(File dir, boolean normal_classes, boolean inner_classes)
+    public static Collection<File> getClassFilesForDirectory(File dir, boolean includeNormal, boolean includeInner)
     {
         if (dir == null)
         {
             return null;
         }
 
-        Collection classes=new HashSet();
+        Collection<File> classes = new HashSet<>();
         File[] files = dir.listFiles();
         if (files != null)
         {
@@ -341,9 +317,8 @@ public class ClassUtils
                     // If this is a class file, add it
                     if (files[i].getName().endsWith(".class"))
                     {
-                        boolean is_inner_class=isInnerClass(files[i].getName());
-                        if ((normal_classes && !is_inner_class) ||
-                            (inner_classes && is_inner_class))
+                        boolean isInnerClass = isInnerClass(files[i].getName());
+                        if ((includeNormal && !isInnerClass) || (includeInner && isInnerClass))
                         {
                             classes.add(files[i]);
                         }
@@ -352,10 +327,10 @@ public class ClassUtils
                 else
                 {
                     // Check for classes in subdirectories
-                    Collection child_classes=getClassFilesForDirectory(files[i],normal_classes,inner_classes);
-                    if (child_classes != null && !child_classes.isEmpty())
+                    Collection childClasses = getClassFilesForDirectory(files[i], includeNormal, includeInner);
+                    if (childClasses != null && !childClasses.isEmpty())
                     {
-                        classes.addAll(child_classes);
+                        classes.addAll(childClasses);
                     }
                 }
             }
@@ -376,7 +351,7 @@ public class ClassUtils
             return null;
         }
 
-        Collection files = new HashSet();
+        Collection<File> files = new HashSet<>();
         File[] dirFiles = dir.listFiles();
         if (dirFiles != null)
         {
@@ -411,8 +386,7 @@ public class ClassUtils
     {
         try
         {
-            JarFile jar = new JarFile(jarFileName);
-            return getClassNamesForJarFile(jar);
+            return getClassNamesForJarFile(new JarFile(jarFileName));
         }
         catch (IOException ioe)
         {
@@ -432,8 +406,7 @@ public class ClassUtils
         File jarFile = new File(jarFileURL.getFile()); // TODO Check for errors
         try
         {
-            JarFile jar = new JarFile(jarFile);
-            return getClassNamesForJarFile(jar);
+            return getClassNamesForJarFile(new JarFile(jarFile));
         }
         catch (IOException ioe)
         {
@@ -469,7 +442,7 @@ public class ClassUtils
     private static String[] getClassNamesForJarFile(JarFile jar)
     {
         Enumeration jarEntries = jar.entries();
-        Set<String> classes = new HashSet();
+        Set<String> classes = new HashSet<>();
         while (jarEntries.hasMoreElements())
         {
             String entry = ((JarEntry)jarEntries.nextElement()).getName();
@@ -492,8 +465,7 @@ public class ClassUtils
     {
         try
         {
-            JarFile jar = new JarFile(jarFileName);
-            return getFileNamesWithSuffixForJarFile(jar, "package.jdo");
+            return getFileNamesWithSuffixForJarFile(new JarFile(jarFileName), "package.jdo");
         }
         catch (IOException ioe)
         {
@@ -512,8 +484,7 @@ public class ClassUtils
         File jarFile = new File(jarFileURL.getFile()); // TODO Check for errors
         try
         {
-            JarFile jar = new JarFile(jarFile);
-            return getFileNamesWithSuffixForJarFile(jar, "package.jdo");
+            return getFileNamesWithSuffixForJarFile(new JarFile(jarFile), "package.jdo");
         }
         catch (IOException ioe)
         {
@@ -551,7 +522,7 @@ public class ClassUtils
     private static String[] getFileNamesWithSuffixForJarFile(JarFile jar, String suffix)
     {
         Enumeration jarEntries = jar.entries();
-        Set<String> files = new HashSet();
+        Set<String> files = new HashSet<>();
         while (jarEntries.hasMoreElements())
         {
             String entry = ((JarEntry)jarEntries.nextElement()).getName();
@@ -617,7 +588,6 @@ public class ClassUtils
 
     /**
      * Method to check for a default constructor on a class.
-     * Particular relevance for JDO is the requirement for a default constructor on all Persistable classes. 
      * Doesn't check superclasses for the default constructor.
      * @param cls The class
      * @return Whether it has a default constructor
