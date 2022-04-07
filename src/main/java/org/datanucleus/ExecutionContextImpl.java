@@ -294,7 +294,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // copy default configuration from factory for overrideable properties
         for (Map.Entry<String, Object> entry : conf.getManagerOverrideableProperties().entrySet())
         {
-            properties.setProperty(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
+            properties.setProperty(entry.getKey(), entry.getValue());
         }
         properties.getFrequentProperties().setDefaults(conf.getFrequentProperties());
 
@@ -990,7 +990,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     @Override
     public Map<String, Object> getProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         for (Map.Entry<String, Object> entry : properties.getProperties().entrySet())
         {
             props.put(nucCtx.getConfiguration().getCaseSensitiveNameForPropertyName(entry.getKey()), entry.getValue());
@@ -1001,7 +1001,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     @Override
     public Boolean getBooleanProperty(String name)
     {
-        if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.hasProperty(name))
         {
             assertIsOpen();
             return properties.getBooleanProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
@@ -1012,7 +1012,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     @Override
     public Integer getIntProperty(String name)
     {
-        if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.hasProperty(name))
         {
             assertIsOpen();
             return properties.getIntProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
@@ -1023,7 +1023,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     @Override
     public String getStringProperty(String name)
     {
-        if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.hasProperty(name))
         {
             assertIsOpen();
             return properties.getStringProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
@@ -1034,10 +1034,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     @Override
     public Object getProperty(String name)
     {
-        if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.hasProperty(name))
         {
             assertIsOpen();
-            return properties.getProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name).toLowerCase(Locale.ENGLISH));
+            return properties.getProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
         }
         return null;
     }

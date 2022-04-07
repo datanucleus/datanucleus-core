@@ -25,6 +25,7 @@ import java.util.Map;
  * Representation of a store of properties.
  * The properties can be for persistence, or for the datastore, or whatever.
  * This class provides convenience type accessors to the properties.
+ * <B>Properties are always stored in lowercase</B>.
  */
 public abstract class PropertyStore
 {
@@ -41,7 +42,7 @@ public abstract class PropertyStore
     protected void setPropertyInternal(String name, Object value)
     {
         this.properties.put(name.toLowerCase(Locale.ENGLISH), value);
-        this.frequentProperties.setProperty(name, value);
+        this.frequentProperties.setProperty(name.toLowerCase(Locale.ENGLISH), value);
     }
 
     /**
@@ -51,9 +52,9 @@ public abstract class PropertyStore
      */
     public Object getProperty(String name)
     {
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
-            return properties.get(name.toLowerCase(Locale.ENGLISH));
+            return properties.get(name);
         }
         return null;
     }
@@ -65,7 +66,7 @@ public abstract class PropertyStore
      */
     public boolean hasProperty(String name)
     {
-        return properties.containsKey(name.toLowerCase(Locale.ENGLISH));
+        return properties.containsKey(name);
     }
 
     /**

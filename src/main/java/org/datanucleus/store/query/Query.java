@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -78,12 +79,12 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_USE_FETCH_PLAN = PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN;
     public static final String EXTENSION_RESULT_SIZE_METHOD = PropertyNames.PROPERTY_QUERY_RESULT_SIZE_METHOD;
     public static final String EXTENSION_LOAD_RESULTS_AT_COMMIT = PropertyNames.PROPERTY_QUERY_LOAD_RESULTS_AT_COMMIT;
-    public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
+    public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultcachetype";
     public static final String EXTENSION_RESULT_CACHE_VALIDATE_OBJECTS = PropertyNames.PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS;
     public static final String EXTENSION_RESULTS_CACHED = PropertyNames.PROPERTY_QUERY_RESULTS_CACHED;
     public static final String EXTENSION_COMPILATION_CACHED = PropertyNames.PROPERTY_QUERY_COMPILATION_CACHED;
     public static final String EXTENSION_EVALUATE_IN_MEMORY = PropertyNames.PROPERTY_QUERY_EVALUATE_IN_MEMORY;
-    public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
+    public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeresultsatmanagerclose";
     public static final String EXTENSION_CHECK_UNUSED_PARAMETERS = PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS;
 
     public static final String EXTENSION_JDOQL_STRICT = PropertyNames.PROPERTY_QUERY_JDOQL_STRICT;
@@ -91,7 +92,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_SQL_SYNTAX_CHECKS = PropertyNames.PROPERTY_QUERY_SQL_SYNTAXCHECKS;
 
     /** Extension for the benefit of JPQL so that we can exclude subclasses (not possible with JPA API). */
-    public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludeSubclasses";
+    public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludesubclasses";
 
     public static final String EXTENSION_QUERY_TYPE = "datanucleus.query.type";
 
@@ -203,7 +204,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     /** Write timeout (milliseconds), if any. */
     private Integer writeTimeoutMillis = null;
 
-    /** Any extensions */
+    /** Any extensions. These are stored with the key in lowercase. */
     protected Map<String, Object> extensions = null;
 
     /** Any subqueries, keyed by the variable name that they represent. */
@@ -568,7 +569,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         {
             extensions = new HashMap<>();
         }
-        extensions.put(key, value);
+        extensions.put(key.toLowerCase(Locale.ENGLISH), value);
         if (key.equals(EXTENSION_EXCLUDE_SUBCLASSES))
         {
             subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
@@ -595,22 +596,34 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setExtensions(Map<String, Object> extensions)
     {
-        this.extensions = extensions != null ? new HashMap<>(extensions) : null;
-        if (extensions != null && extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))
+        if (extensions != null)
         {
-            subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
+            this.extensions = new HashMap<>();
+            for (Map.Entry<String, Object> entry : extensions.entrySet())
+            {
+                this.extensions.put(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
+            }
+
+            if (this.extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))
+            {
+                subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
+            }
+            if (this.extensions.containsKey(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
+            {
+                boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
+                if (closeAtEcClose)
+                {
+                    ec.registerExecutionContextListener(this);
+                }
+                else
+                {
+                    ec.deregisterExecutionContextListener(this);
+                }
+            }
         }
-        if (extensions != null && extensions.containsKey(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
+        else
         {
-            boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
-            if (closeAtEcClose)
-            {
-                ec.registerExecutionContextListener(this);
-            }
-            else
-            {
-                ec.deregisterExecutionContextListener(this);
-            }
+            this.extensions = null;
         }
     }
 

@@ -63,25 +63,25 @@ public class Configuration extends PropertyStore implements Serializable
     private NucleusContext nucCtx;
 
     /** Mapping for the properties of the plugins, PropertyMapping, keyed by the property name. */
-    private Map<String, PropertyMapping> propertyMappings = new HashMap<String, PropertyMapping>();
+    private Map<String, PropertyMapping> propertyMappings = new HashMap<>();
 
-    /** Map of default properties, used as a fallback. */
-    private Map<String, Object> defaultProperties = new HashMap<String, Object>();
+    /** Map of default properties, used as a fallback. Key is lower-case. */
+    private Map<String, Object> defaultProperties = new HashMap<>();
 
     private Map<String, PropertyValidator> propertyValidators = new HashMap();
     
     private volatile Map<String, Object> managerOverrideableProperties;
     
     private FrequentlyAccessedProperties defaultFrequentProperties = new FrequentlyAccessedProperties();
-    
+
     /**
      * Convenience class wrapping the plugin property specification information.
      */
     static class PropertyMapping implements Serializable
     {
         private static final long serialVersionUID = 9004376979051886506L;
-        String name;
-        String internalName;
+        String name; // Case sensitive if we have an internal name
+        String internalName; // Lowercase
         String validatorName;
         boolean datastore;
         boolean managerOverride;
@@ -116,6 +116,7 @@ public class Configuration extends PropertyStore implements Serializable
             {
                 String name = propElements[i].getAttribute("name");
                 String intName = propElements[i].getAttribute("internal-name");
+
                 String value = propElements[i].getAttribute("value");
                 String datastoreString = propElements[i].getAttribute("datastore");
                 String validatorName = propElements[i].getAttribute("validator");
@@ -143,7 +144,7 @@ public class Configuration extends PropertyStore implements Serializable
      */
     public Map<String, Object> getDatastoreProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
 
         for (Map.Entry<String, Object> propEntry : properties.entrySet())
         {
@@ -179,7 +180,7 @@ public class Configuration extends PropertyStore implements Serializable
      */
     private boolean isPropertyForDatastore(String name)
     {
-        PropertyMapping mapping = propertyMappings.get(name.toLowerCase(Locale.ENGLISH));
+        PropertyMapping mapping = propertyMappings.get(name);
         return mapping != null ? mapping.datastore : false;
     }
 
@@ -195,15 +196,14 @@ public class Configuration extends PropertyStore implements Serializable
      */
     public Map<String, Object> getManagerOverrideableProperties()
     {
-        Map<String, Object> props = managerOverrideableProperties;
-        if (props != null) 
+        if (managerOverrideableProperties != null) 
         {
-            return props;
+            return managerOverrideableProperties;
         }
-        props = new LinkedHashMap<String, Object>();
-        for (Map.Entry<String, PropertyMapping> entry : propertyMappings.entrySet())
+
+        Map<String, Object> props = new LinkedHashMap<>();
+        for (PropertyMapping mapping : propertyMappings.values())
         {
-            PropertyMapping mapping = entry.getValue();
             if (mapping.managerOverride)
             {
                 String propName = mapping.internalName != null ? mapping.internalName.toLowerCase(Locale.ENGLISH) : mapping.name.toLowerCase(Locale.ENGLISH);
@@ -218,9 +218,9 @@ public class Configuration extends PropertyStore implements Serializable
                 }
             }
         }
-        props = Collections.unmodifiableMap(props);
-        this.managerOverrideableProperties = props;        
-        return props;
+
+        managerOverrideableProperties = Collections.unmodifiableMap(props);        
+        return managerOverrideableProperties;
     }
 
     /**
@@ -283,14 +283,18 @@ public class Configuration extends PropertyStore implements Serializable
         {
             for (Map.Entry<String, Object> entry : props.entrySet())
             {
-                PropertyMapping mapping = propertyMappings.get(entry.getKey().toLowerCase(Locale.ENGLISH));
+                String key = entry.getKey();
+                String keyLC = key.toLowerCase(Locale.ENGLISH);
+
+                PropertyMapping mapping = propertyMappings.get(keyLC);
                 Object propValue = entry.getValue();
                 if (mapping != null && mapping.validatorName != null && propValue instanceof String)
                 {
                     propValue = getValueForPropertyWithValidator((String)propValue, mapping.validatorName);
                 }
-                defaultProperties.put(entry.getKey().toLowerCase(Locale.ENGLISH), propValue);
-                defaultFrequentProperties.setProperty(entry.getKey(), propValue);
+
+                defaultProperties.put(keyLC, propValue);
+                defaultFrequentProperties.setProperty(keyLC, propValue);
             }
         }
     }
@@ -309,13 +313,15 @@ public class Configuration extends PropertyStore implements Serializable
     {
         managerOverrideableProperties = null;
 
-        // Add the mapping
-        propertyMappings.put(name.toLowerCase(Locale.ENGLISH), new PropertyMapping(name, internalName, validatorName, datastore, managerOverrideable));
+        String nameLC = name.toLowerCase(Locale.ENGLISH);
 
-        String storedName = internalName != null ? internalName.toLowerCase(Locale.ENGLISH) : name.toLowerCase(Locale.ENGLISH);
+        // Add the mapping, keyed by lower case name
+        propertyMappings.put(nameLC, new PropertyMapping(name, internalName, validatorName, datastore, managerOverrideable));
+
+        String storedName = internalName != null ? internalName.toLowerCase(Locale.ENGLISH) : nameLC;
         if (!defaultProperties.containsKey(storedName))
         {
-            // Check if provided via a System property, otherwise use passed default
+            // Check if provided via a System property (case sensitive), otherwise use passed default
             Object propValue = System.getProperty(name);
             if (propValue == null)
             {
@@ -353,11 +359,11 @@ public class Configuration extends PropertyStore implements Serializable
     @Override
     public boolean hasProperty(String name)
     {
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return true;
         }
-        else if (defaultProperties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        else if (defaultProperties.containsKey(name))
         {
             return true;
         }
@@ -373,11 +379,11 @@ public class Configuration extends PropertyStore implements Serializable
     public Object getProperty(String name)
     {
         // Use local property value if present, otherwise relay back to default value
-        if (properties.containsKey(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.containsKey(name))
         {
             return super.getProperty(name);
         }
-        return defaultProperties.get(name.toLowerCase(Locale.ENGLISH));
+        return defaultProperties.get(name);
     }
 
     /**
@@ -434,16 +440,21 @@ public class Configuration extends PropertyStore implements Serializable
         return Collections.unmodifiableMap(properties);
     }
 
+    /**
+     * Accessor for all properties starting with the provided prefix.
+     * @param prefix Prefix (lowercase, since all properties are stored in lowercase)
+     * @return The properties with this prefix
+     */
     public Set<String> getPropertyNamesWithPrefix(String prefix)
     {
         Set<String> propNames = null;
         for (String name : properties.keySet())
         {
-            if (name.startsWith(prefix.toLowerCase(Locale.ENGLISH)))
+            if (name.startsWith(prefix))
             {
                 if (propNames == null)
                 {
-                    propNames = new HashSet<String>();
+                    propNames = new HashSet<>();
                 }
                 propNames.add(name);
             }

@@ -204,8 +204,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_MAX_IDLE, null, 20, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION, null, "exception", CorePropertyValidator.class.getName(), false, false);
 
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_STATE_MANAGER_REAPER_THREAD, null, false, false, false);
-        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_STATE_MANAGER_MAX_IDLE, null, 0, false, false);
+//        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_STATE_MANAGER_REAPER_THREAD, null, false, false, false);
+//        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_STATE_MANAGER_MAX_IDLE, null, 0, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_STATE_MANAGER_CLASS_NAME, null, null, null, false, false);
 
         conf.addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE, null, "datanucleus", null, false, false);
