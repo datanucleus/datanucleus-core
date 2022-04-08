@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.connection;
 
+import org.datanucleus.PropertyNames;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -55,12 +56,12 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
         else if (resourceName.equals(RESOURCE_NAME_TX))
         {
             // Transactional
-            resourceType = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION_RESOURCE_TYPE);
+            resourceType = storeMgr.getStringProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE);
         }
         else
         {
             // Non-transactional
-            resourceType = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION2_RESOURCE_TYPE);
+            resourceType = storeMgr.getStringProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2);
         }
     }
 

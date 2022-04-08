@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.properties;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -41,8 +40,9 @@ public abstract class PropertyStore
      */
     protected void setPropertyInternal(String name, Object value)
     {
-        this.properties.put(name.toLowerCase(Locale.ENGLISH), value);
-        this.frequentProperties.setProperty(name.toLowerCase(Locale.ENGLISH), value);
+        // Stored in lower case
+        this.properties.put(name.toLowerCase(), value);
+        this.frequentProperties.setProperty(name.toLowerCase(), value);
     }
 
     /**

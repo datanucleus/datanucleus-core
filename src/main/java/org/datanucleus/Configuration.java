@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -186,7 +185,7 @@ public class Configuration extends PropertyStore implements Serializable
 
     public String getInternalNameForProperty(String name)
     {
-        PropertyMapping mapping = propertyMappings.get(name.toLowerCase(Locale.ENGLISH));
+        PropertyMapping mapping = propertyMappings.get(name.toLowerCase());
         return mapping != null && mapping.internalName != null ? mapping.internalName : name;
     }
 
@@ -206,15 +205,15 @@ public class Configuration extends PropertyStore implements Serializable
         {
             if (mapping.managerOverride)
             {
-                String propName = mapping.internalName != null ? mapping.internalName.toLowerCase(Locale.ENGLISH) : mapping.name.toLowerCase(Locale.ENGLISH);
+                String propName = mapping.internalName != null ? mapping.internalName.toLowerCase() : mapping.name.toLowerCase();
                 props.put(propName, getProperty(propName));
             }
             else if (mapping.internalName != null)
             {
-                PropertyMapping intMapping = propertyMappings.get(mapping.internalName.toLowerCase(Locale.ENGLISH));
+                PropertyMapping intMapping = propertyMappings.get(mapping.internalName.toLowerCase());
                 if (intMapping != null && intMapping.managerOverride)
                 {
-                    props.put(mapping.name.toLowerCase(Locale.ENGLISH), getProperty(mapping.internalName));
+                    props.put(mapping.name.toLowerCase(), getProperty(mapping.internalName));
                 }
             }
         }
@@ -284,7 +283,7 @@ public class Configuration extends PropertyStore implements Serializable
             for (Map.Entry<String, Object> entry : props.entrySet())
             {
                 String key = entry.getKey();
-                String keyLC = key.toLowerCase(Locale.ENGLISH);
+                String keyLC = key.toLowerCase();
 
                 PropertyMapping mapping = propertyMappings.get(keyLC);
                 Object propValue = entry.getValue();
@@ -313,12 +312,12 @@ public class Configuration extends PropertyStore implements Serializable
     {
         managerOverrideableProperties = null;
 
-        String nameLC = name.toLowerCase(Locale.ENGLISH);
+        String nameLC = name.toLowerCase();
 
         // Add the mapping, keyed by lower case name
         propertyMappings.put(nameLC, new PropertyMapping(name, internalName, validatorName, datastore, managerOverrideable));
 
-        String storedName = internalName != null ? internalName.toLowerCase(Locale.ENGLISH) : nameLC;
+        String storedName = internalName != null ? internalName.toLowerCase() : nameLC;
         if (!defaultProperties.containsKey(storedName))
         {
             // Check if provided via a System property (case sensitive), otherwise use passed default
@@ -487,7 +486,7 @@ public class Configuration extends PropertyStore implements Serializable
         if (name != null)
         {
             String propertyName = name.trim();
-            PropertyMapping mapping = propertyMappings.get(propertyName.toLowerCase(Locale.ENGLISH));
+            PropertyMapping mapping = propertyMappings.get(propertyName.toLowerCase());
             if (mapping != null)
             {
                 if (mapping.validatorName != null)
@@ -524,7 +523,7 @@ public class Configuration extends PropertyStore implements Serializable
     public void validatePropertyValue(String name, Object value)
     {
         String validatorName = null;
-        PropertyMapping mapping = propertyMappings.get(name.toLowerCase(Locale.ENGLISH));
+        PropertyMapping mapping = propertyMappings.get(name.toLowerCase());
         if (mapping != null)
         {
             validatorName = mapping.validatorName;

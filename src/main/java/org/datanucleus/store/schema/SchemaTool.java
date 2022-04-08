@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -577,7 +576,7 @@ public class SchemaTool
         PersistenceUnitMetaData pumd = null;
         if (persistenceUnitName != null)
         {
-            props.put(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME.toLowerCase(), persistenceUnitName);
+            props.put(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME, persistenceUnitName);
 
             // Extract the persistence-unit metadata
             String filename = nucleusCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
@@ -625,7 +624,7 @@ public class SchemaTool
             for (Object key : userProps.keySet())
             {
                 String propName = (String)key;
-                props.put(propName.toLowerCase(Locale.ENGLISH), userProps.get(propName));
+                props.put(propName.toLowerCase(), userProps.get(propName));
             }
         }
 
@@ -651,10 +650,10 @@ public class SchemaTool
         {
             if (System.getProperty(propNames[i]) != null)
             {
-                props.put(propNames[i].toLowerCase(Locale.ENGLISH), System.getProperty(propNames[i]));
+                props.put(propNames[i].toLowerCase(), System.getProperty(propNames[i]));
             }
         }
-        props.put(PropertyNames.PROPERTY_AUTOSTART_MECHANISM.toLowerCase(), "None"); // Interferes with usage
+        props.put(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, "None"); // Interferes with usage
 
         // Tag on the mandatory props that we must have for each mode
         if (mode == Mode.CREATE)
@@ -662,64 +661,64 @@ public class SchemaTool
             if (ddlFile != null)
             {
                 // the tables must not be created in the DB, so do not validate (DDL is being output to a file)
-                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES.toLowerCase(), "false");
-                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS.toLowerCase(), "false");
-                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS.toLowerCase(), "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, "false");
             }
-            props.remove(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL.toLowerCase()); // use tables/columns/constraints settings
-            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase()))
+            props.remove(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL); // use tables/columns/constraints settings
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES))
             {
-                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase(), "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
             }
-            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase()))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS))
             {
-                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase(), "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
             }
-            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase()))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS))
             {
-                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase(), "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
             }
-            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY.toLowerCase(), "false");
+            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY, "false");
             props.put("datanucleus.rdbms.checkexisttablesorviews", "true");
         }
         else if (mode == Mode.DELETE)
         {
-            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY.toLowerCase(), "false");
+            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY, "false");
         }
         else if (mode == Mode.DELETE_CREATE)
         {
             if (ddlFile != null)
             {
                 // the tables must not be created in the DB, so do not validate (DDL is being output to a file)
-                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES.toLowerCase(), "false");
-                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS.toLowerCase(), "false");
-                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS.toLowerCase(), "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, "false");
             }
-            props.remove(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL.toLowerCase()); // use tables/columns/constraints settings
-            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase()))
+            props.remove(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL); // use tables/columns/constraints settings
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES))
             {
-                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase(), "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
             }
-            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase()))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS))
             {
-                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase(), "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
             }
-            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase()))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS))
             {
-                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase(), "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
             }
-            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY.toLowerCase(), "false");
+            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY, "false");
             props.put("datanucleus.rdbms.checkexisttablesorviews", "true");
         }
         else if (mode == Mode.VALIDATE)
         {
-            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL.toLowerCase(), "false");
-            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase(), "false");
-            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase(), "false");
-            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase(), "false");
-            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES.toLowerCase(), "true");
-            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS.toLowerCase(), "true");
-            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS.toLowerCase(), "true");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, "true");
+            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, "true");
+            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, "true");
         }
         if (ignoreMetaDataForMissingClasses)
         {
@@ -760,7 +759,7 @@ public class SchemaTool
                 {
                     display = false;
                 }
-                else if (key.equals(PropertyNames.PROPERTY_CONNECTION_PASSWORD.toLowerCase()))
+                else if (key.equals(PropertyNames.PROPERTY_CONNECTION_PASSWORD))
                 {
                     // Don't show passwords
                     display = false;

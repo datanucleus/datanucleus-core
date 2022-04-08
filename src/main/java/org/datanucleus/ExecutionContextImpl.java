@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -961,11 +960,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return;
         }
 
-        if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
+        if (properties.hasProperty(name.toLowerCase()))
         {
             String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
             getNucleusContext().getConfiguration().validatePropertyValue(intName, value);
-            properties.setProperty(intName.toLowerCase(Locale.ENGLISH), value);
+            properties.setProperty(intName.toLowerCase(), value);
         }
         else
         {
@@ -973,7 +972,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (intName != null && !intName.equalsIgnoreCase(name))
             {
                 getNucleusContext().getConfiguration().validatePropertyValue(intName, value);
-                properties.setProperty(intName.toLowerCase(Locale.ENGLISH), value);
+                properties.setProperty(intName.toLowerCase(), value);
             }
             else
             {

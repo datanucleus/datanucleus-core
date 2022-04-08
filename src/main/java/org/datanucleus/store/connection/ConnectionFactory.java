@@ -27,12 +27,6 @@ import org.datanucleus.ExecutionContext;
  */
 public interface ConnectionFactory
 {
-    /** User-visible configuration property name */
-    public static final String DATANUCLEUS_CONNECTION_RESOURCE_TYPE = "datanucleus.connection.resourceType";
-
-    /** User-visible configuration property name */
-    public static final String DATANUCLEUS_CONNECTION2_RESOURCE_TYPE = "datanucleus.connection2.resourceType";
-
     /**
      * Create the ManagedConnection. 
      * <b>Only used by ConnectionManager so do not call this.</b>

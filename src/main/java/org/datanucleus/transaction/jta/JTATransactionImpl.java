@@ -33,9 +33,9 @@ import javax.transaction.UserTransaction;
 
 import org.datanucleus.Configuration;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.properties.PropertyStore;
-import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionResourceType;
 import org.datanucleus.transaction.NucleusTransactionException;
 import org.datanucleus.transaction.TransactionImpl;
@@ -92,12 +92,12 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
 
         // we only make sense in combination with ResourceType.JTA. Verify this has been set.
         Configuration conf = ec.getNucleusContext().getConfiguration();
-        if (!(ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(ConnectionFactory.DATANUCLEUS_CONNECTION_RESOURCE_TYPE)) && 
-            ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(ConnectionFactory.DATANUCLEUS_CONNECTION2_RESOURCE_TYPE))))
+        if (!(ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE)) && 
+            ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2))))
         {
             throw new NucleusException("Internal error: either " +
-                ConnectionFactory.DATANUCLEUS_CONNECTION_RESOURCE_TYPE + " or " +
-                ConnectionFactory.DATANUCLEUS_CONNECTION2_RESOURCE_TYPE + 
+                PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE + " or " +
+                PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2 + 
                 " have not been set to JTA; this should have happened automatically.");
         }
 

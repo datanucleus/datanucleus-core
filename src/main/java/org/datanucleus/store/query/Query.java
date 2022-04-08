@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -569,7 +568,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         {
             extensions = new HashMap<>();
         }
-        extensions.put(key.toLowerCase(Locale.ENGLISH), value);
+        extensions.put(key.toLowerCase(), value); // Stored in lowercase
         if (key.equals(EXTENSION_EXCLUDE_SUBCLASSES))
         {
             subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
@@ -601,7 +600,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
             this.extensions = new HashMap<>();
             for (Map.Entry<String, Object> entry : extensions.entrySet())
             {
-                this.extensions.put(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
+                this.extensions.put(entry.getKey().toLowerCase(), entry.getValue());
             }
 
             if (this.extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))

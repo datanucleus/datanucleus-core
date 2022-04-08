@@ -19,7 +19,6 @@ package org.datanucleus.properties;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.datanucleus.PropertyNames;
@@ -31,7 +30,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class FrequentlyAccessedProperties
 {
-    private static Map<String, Field> fieldMap = new HashMap<String, Field>();
+    private static Map<String, Field> fieldMap = new HashMap<>();
 
     private FrequentlyAccessedProperties defaults;
 
@@ -70,7 +69,7 @@ public class FrequentlyAccessedProperties
             return;
         }
 
-        Field f = fieldMap.get(property.toLowerCase(Locale.ENGLISH));
+        Field f = fieldMap.get(property.toLowerCase());
         if (f == null)
         {
             return;
@@ -176,7 +175,7 @@ public class FrequentlyAccessedProperties
     {
         Field f = FrequentlyAccessedProperties.class.getDeclaredField(fieldName);
         f.setAccessible(true);
-        fieldMap.put(propertyName.toLowerCase(Locale.ENGLISH), f);
+        fieldMap.put(propertyName.toLowerCase(), f);
     }
 
     static

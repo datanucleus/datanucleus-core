@@ -17,42 +17,40 @@ Contributors:
 **********************************************************************/
 package org.datanucleus;
 
-import java.util.Locale;
-
 /**
  * Utility providing convenience naming of core persistence properties.
  */
 public class PropertyNames
 {
-    public static final String PROPERTY_PLUGIN_REGISTRY_CLASSNAME = "datanucleus.plugin.pluginRegistryClassName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_PLUGIN_ALLOW_USER_BUNDLES = "datanucleus.plugin.allowUserBundles".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_PLUGIN_VALIDATEPLUGINS = "datanucleus.plugin.validatePlugins".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_PLUGIN_REGISTRYBUNDLECHECK = "datanucleus.plugin.pluginRegistryBundleCheck".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_PLUGIN_REGISTRY_CLASSNAME = "datanucleus.plugin.pluginRegistryClassName".toLowerCase();
+    public static final String PROPERTY_PLUGIN_ALLOW_USER_BUNDLES = "datanucleus.plugin.allowUserBundles".toLowerCase();
+    public static final String PROPERTY_PLUGIN_VALIDATEPLUGINS = "datanucleus.plugin.validatePlugins".toLowerCase();
+    public static final String PROPERTY_PLUGIN_REGISTRYBUNDLECHECK = "datanucleus.plugin.pluginRegistryBundleCheck".toLowerCase();
 
-    public static final String PROPERTY_CLASSLOADER_RESOLVER_NAME = "datanucleus.classLoaderResolverName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CLASSLOADER_PRIMARY = "datanucleus.primaryClassLoader".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_CLASSLOADER_RESOLVER_NAME = "datanucleus.classLoaderResolverName".toLowerCase();
+    public static final String PROPERTY_CLASSLOADER_PRIMARY = "datanucleus.primaryClassLoader".toLowerCase();
 
-    public static final String PROPERTY_METADATA_IGNORE_METADATA_FOR_MISSING_CLASSES = "datanucleus.metadata.ignoreMetaDataForMissingClasses".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_ALWAYS_DETACHABLE = "datanucleus.metadata.alwaysDetachable".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_METADATA_IGNORE_METADATA_FOR_MISSING_CLASSES = "datanucleus.metadata.ignoreMetaDataForMissingClasses".toLowerCase();
+    public static final String PROPERTY_METADATA_ALWAYS_DETACHABLE = "datanucleus.metadata.alwaysDetachable".toLowerCase();
     public static final String PROPERTY_METADATA_XML_VALIDATE = "datanucleus.metadata.xml.validate";
     public static final String PROPERTY_METADATA_XML_NAMESPACE_AWARE = "datanucleus.metadata.xml.namespaceaware";
     public static final String PROPERTY_METADATA_AUTOREGISTER = "datanucleus.metadata.autoregistration";
-    public static final String PROPERTY_METADATA_ALLOW_XML = "datanucleus.metadata.allowXML".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_ALLOW_ANNOTATIONS = "datanucleus.metadata.allowAnnotations".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_ALLOW_LOAD_AT_RUNTIME = "datanucleus.metadata.allowLoadAtRuntime".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_SUPPORT_ORM = "datanucleus.metadata.supportORM".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_JDO_SUFFIX = "datanucleus.metadata.jdoFileExtension".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_ORM_SUFFIX = "datanucleus.metadata.ormFileExtension".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_JDOQUERY_SUFFIX = "datanucleus.metadata.jdoqueryFileExtension".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_METADATA_ALLOW_XML = "datanucleus.metadata.allowXML".toLowerCase();
+    public static final String PROPERTY_METADATA_ALLOW_ANNOTATIONS = "datanucleus.metadata.allowAnnotations".toLowerCase();
+    public static final String PROPERTY_METADATA_ALLOW_LOAD_AT_RUNTIME = "datanucleus.metadata.allowLoadAtRuntime".toLowerCase();
+    public static final String PROPERTY_METADATA_SUPPORT_ORM = "datanucleus.metadata.supportORM".toLowerCase();
+    public static final String PROPERTY_METADATA_JDO_SUFFIX = "datanucleus.metadata.jdoFileExtension".toLowerCase();
+    public static final String PROPERTY_METADATA_ORM_SUFFIX = "datanucleus.metadata.ormFileExtension".toLowerCase();
+    public static final String PROPERTY_METADATA_JDOQUERY_SUFFIX = "datanucleus.metadata.jdoqueryFileExtension".toLowerCase();
     public static final String PROPERTY_METADATA_SCANNER = "datanucleus.metadata.scanner";
-    public static final String PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY = "datanucleus.metadata.defaultInheritanceStrategy".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY = "datanucleus.metadata.defaultInheritanceStrategy".toLowerCase();
     public static final String PROPERTY_METADATA_EMBEDDED_PC_FLAT = "datanucleus.metadata.embedded.flat";
-    public static final String PROPERTY_METADATA_DEFAULT_NULLABLE = "datanucleus.metadata.defaultNullable".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_METADATA_DEFAULT_NULLABLE = "datanucleus.metadata.defaultNullable".toLowerCase();
     public static final String PROPERTY_METADATA_LISTENER_OBJECT = "datanucleus.metadata.listener.object";
-    public static final String PROPERTY_METADATA_JAVAX_VALIDATION_SHORTCUTS = "datanucleus.metadata.javaxValidationShortcuts".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_METADATA_JAVAX_VALIDATION_SHORTCUTS = "datanucleus.metadata.javaxValidationShortcuts".toLowerCase();
 
-    public static final String PROPERTY_METADATA_USE_DISCRIMINATOR_FOR_SINGLE_TABLE = "datanucleus.metadata.useDiscriminatorForSingleTable".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_METADATA_USE_DISCRIMINATOR_DEFAULT_CLASS_NAME = "datanucleus.metadata.useDiscriminatorClassNameByDefault".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_METADATA_USE_DISCRIMINATOR_FOR_SINGLE_TABLE = "datanucleus.metadata.useDiscriminatorForSingleTable".toLowerCase();
+    public static final String PROPERTY_METADATA_USE_DISCRIMINATOR_DEFAULT_CLASS_NAME = "datanucleus.metadata.useDiscriminatorClassNameByDefault".toLowerCase();
 
     public static final String PROPERTY_IGNORE_CACHE = "datanucleus.ignorecache";
     public static final String PROPERTY_OPTIMISTIC = "datanucleus.optimistic";
@@ -62,23 +60,23 @@ public class PropertyNames
     public static final String PROPERTY_SERIALIZE_READ = "datanucleus.serializeread";
     public static final String PROPERTY_PMF_NAME = "datanucleus.name";
     public static final String PROPERTY_PERSISTENCE_UNIT_NAME = "datanucleus.persistenceunitname";
-    public static final String PROPERTY_PERSISTENCE_XML_FILENAME = "datanucleus.persistenceXmlFilename".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SERVER_TIMEZONE_ID = "datanucleus.serverTimeZoneID".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_PROPERTIES_FILE = "datanucleus.propertiesFile".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_PERSISTENCE_UNIT_LOAD_CLASSES = "datanucleus.persistenceUnitLoadClasses".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DELETION_POLICY = "datanucleus.deletionPolicy".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT = "datanucleus.persistenceByReachabilityAtCommit".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_MANAGE_RELATIONSHIPS = "datanucleus.manageRelationships".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_MANAGE_RELATIONSHIPS_CHECKS = "datanucleus.manageRelationshipsChecks".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_FIND_OBJECT_TYPE_CONVERSION = "datanucleus.findobject.typeConversion".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED = "datanucleus.findobject.validateWhenCached".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_ALLOW_CALLBACKS = "datanucleus.allowCallbacks".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DATASTORE_IDENTITY_TYPE = "datanucleus.datastoreIdentityType".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE = "datanucleus.identityStringTranslatorType".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_IDENTITY_KEY_TRANSLATOR_TYPE = "datanucleus.identityKeyTranslatorType".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_USE_IMPLEMENTATION_CREATOR = "datanucleus.useImplementationCreator".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_PERSISTENCE_XML_FILENAME = "datanucleus.persistenceXmlFilename".toLowerCase();
+    public static final String PROPERTY_SERVER_TIMEZONE_ID = "datanucleus.serverTimeZoneID".toLowerCase();
+    public static final String PROPERTY_PROPERTIES_FILE = "datanucleus.propertiesFile".toLowerCase();
+    public static final String PROPERTY_PERSISTENCE_UNIT_LOAD_CLASSES = "datanucleus.persistenceUnitLoadClasses".toLowerCase();
+    public static final String PROPERTY_DELETION_POLICY = "datanucleus.deletionPolicy".toLowerCase();
+    public static final String PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT = "datanucleus.persistenceByReachabilityAtCommit".toLowerCase();
+    public static final String PROPERTY_MANAGE_RELATIONSHIPS = "datanucleus.manageRelationships".toLowerCase();
+    public static final String PROPERTY_MANAGE_RELATIONSHIPS_CHECKS = "datanucleus.manageRelationshipsChecks".toLowerCase();
+    public static final String PROPERTY_FIND_OBJECT_TYPE_CONVERSION = "datanucleus.findobject.typeConversion".toLowerCase();
+    public static final String PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED = "datanucleus.findobject.validateWhenCached".toLowerCase();
+    public static final String PROPERTY_ALLOW_CALLBACKS = "datanucleus.allowCallbacks".toLowerCase();
+    public static final String PROPERTY_DATASTORE_IDENTITY_TYPE = "datanucleus.datastoreIdentityType".toLowerCase();
+    public static final String PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE = "datanucleus.identityStringTranslatorType".toLowerCase();
+    public static final String PROPERTY_IDENTITY_KEY_TRANSLATOR_TYPE = "datanucleus.identityKeyTranslatorType".toLowerCase();
+    public static final String PROPERTY_USE_IMPLEMENTATION_CREATOR = "datanucleus.useImplementationCreator".toLowerCase();
 
-    public static final String PROPERTY_RELATION_IDENTITY_STORAGE_MODE = "datanucleus.relation.identityStorageMode".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_RELATION_IDENTITY_STORAGE_MODE = "datanucleus.relation.identityStorageMode".toLowerCase();
 
     public static final String PROPERTY_TYPE_WRAPPER_BASIS = "datanucleus.type.wrapper.basis";
 
@@ -90,8 +88,8 @@ public class PropertyNames
     public static final String PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD = "datanucleus.executioncontext.reaperthread";
     public static final String PROPERTY_EXECUTION_CONTEXT_MAX_IDLE = "datanucleus.executioncontext.maxidle";
     public static final String PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION = "datanucleus.executioncontext.closeactivetxaction";
-//    public static final String PROPERTY_STATE_MANAGER_REAPER_THREAD = "datanucleus.stateManager.reaperThread".toLowerCase(Locale.ENGLISH);
-//    public static final String PROPERTY_STATE_MANAGER_MAX_IDLE = "datanucleus.stateManager.maxIdle".toLowerCase(Locale.ENGLISH);
+//    public static final String PROPERTY_STATE_MANAGER_REAPER_THREAD = "datanucleus.stateManager.reaperThread".toLowerCase();
+//    public static final String PROPERTY_STATE_MANAGER_MAX_IDLE = "datanucleus.stateManager.maxIdle".toLowerCase();
     public static final String PROPERTY_STATE_MANAGER_CLASS_NAME = "datanucleus.statemanager.classname";
 
     public static final String PROPERTY_TRANSACTION_TYPE = "datanucleus.transaction.type";
@@ -103,34 +101,34 @@ public class PropertyNames
     public static final String PROPERTY_TRANSACTION_NONTX_ATOMIC = "datanucleus.transaction.nontx.atomic";
 
     public static final String PROPERTY_FLUSH_MODE = "datanucleus.flush.mode";
-    public static final String PROPERTY_FLUSH_AUTO_OBJECT_LIMIT = "datanucleus.flush.auto.objectLimit".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_FLUSH_AUTO_OBJECT_LIMIT = "datanucleus.flush.auto.objectLimit".toLowerCase();
 
-    public static final String PROPERTY_ATTACH_SAME_DATASTORE = "datanucleus.attachSameDatastore".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DETACH_ALL_ON_COMMIT = "datanucleus.detachAllOnCommit".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DETACH_ALL_ON_ROLLBACK = "datanucleus.detachAllOnRollback".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DETACH_ON_CLOSE = "datanucleus.detachOnClose".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_COPY_ON_ATTACH = "datanucleus.copyOnAttach".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DETACH_AS_WRAPPED = "datanucleus.detachAsWrapped".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DETACH_DETACHMENT_FIELDS = "datanucleus.detachmentFields".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_DETACH_DETACHED_STATE = "datanucleus.detachedState".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_ALLOW_ATTACH_OF_TRANSIENT = "datanucleus.allowAttachOfTransient".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_MAX_FETCH_DEPTH = "datanucleus.maxFetchDepth".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_ATTACH_SAME_DATASTORE = "datanucleus.attachSameDatastore".toLowerCase();
+    public static final String PROPERTY_DETACH_ALL_ON_COMMIT = "datanucleus.detachAllOnCommit".toLowerCase();
+    public static final String PROPERTY_DETACH_ALL_ON_ROLLBACK = "datanucleus.detachAllOnRollback".toLowerCase();
+    public static final String PROPERTY_DETACH_ON_CLOSE = "datanucleus.detachOnClose".toLowerCase();
+    public static final String PROPERTY_COPY_ON_ATTACH = "datanucleus.copyOnAttach".toLowerCase();
+    public static final String PROPERTY_DETACH_AS_WRAPPED = "datanucleus.detachAsWrapped".toLowerCase();
+    public static final String PROPERTY_DETACH_DETACHMENT_FIELDS = "datanucleus.detachmentFields".toLowerCase();
+    public static final String PROPERTY_DETACH_DETACHED_STATE = "datanucleus.detachedState".toLowerCase();
+    public static final String PROPERTY_ALLOW_ATTACH_OF_TRANSIENT = "datanucleus.allowAttachOfTransient".toLowerCase();
+    public static final String PROPERTY_MAX_FETCH_DEPTH = "datanucleus.maxFetchDepth".toLowerCase();
 
-    public static final String PROPERTY_CONNECTION_URL = "datanucleus.connectionURL".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_DRIVER_NAME = "datanucleus.connectionDriverName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_USER_NAME = "datanucleus.connectionUserName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_PASSWORD = "datanucleus.connectionPassword".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_PASSWORD_DECRYPTER = "datanucleus.connectionPasswordDecrypter".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_FACTORY_NAME = "datanucleus.connectionFactoryName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_FACTORY2_NAME = "datanucleus.connectionFactory2Name".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_FACTORY = "datanucleus.connectionFactory".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_FACTORY2 = "datanucleus.connectionFactory2".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_RESOURCETYPE = "datanucleus.connection.resourceType".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_RESOURCETYPE2 = "datanucleus.connection2.resourceType".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_POOLINGTYPE = "datanucleus.connectionPoolingType".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_POOLINGTYPE2 = "datanucleus.connectionPoolingType.nontx".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE = "datanucleus.connection.nontx.releaseAfterUse".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CONNECTION_SINGLE_CONNECTION = "datanucleus.connection.singleConnectionPerExecutionContext".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_CONNECTION_URL = "datanucleus.connectionURL".toLowerCase();
+    public static final String PROPERTY_CONNECTION_DRIVER_NAME = "datanucleus.connectionDriverName".toLowerCase();
+    public static final String PROPERTY_CONNECTION_USER_NAME = "datanucleus.connectionUserName".toLowerCase();
+    public static final String PROPERTY_CONNECTION_PASSWORD = "datanucleus.connectionPassword".toLowerCase();
+    public static final String PROPERTY_CONNECTION_PASSWORD_DECRYPTER = "datanucleus.connectionPasswordDecrypter".toLowerCase();
+    public static final String PROPERTY_CONNECTION_FACTORY_NAME = "datanucleus.connectionFactoryName".toLowerCase();
+    public static final String PROPERTY_CONNECTION_FACTORY2_NAME = "datanucleus.connectionFactory2Name".toLowerCase();
+    public static final String PROPERTY_CONNECTION_FACTORY = "datanucleus.connectionFactory".toLowerCase();
+    public static final String PROPERTY_CONNECTION_FACTORY2 = "datanucleus.connectionFactory2".toLowerCase();
+    public static final String PROPERTY_CONNECTION_RESOURCETYPE = "datanucleus.connection.resourceType".toLowerCase();
+    public static final String PROPERTY_CONNECTION_RESOURCETYPE2 = "datanucleus.connection2.resourceType".toLowerCase();
+    public static final String PROPERTY_CONNECTION_POOLINGTYPE = "datanucleus.connectionPoolingType".toLowerCase();
+    public static final String PROPERTY_CONNECTION_POOLINGTYPE2 = "datanucleus.connectionPoolingType.nontx".toLowerCase();
+    public static final String PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE = "datanucleus.connection.nontx.releaseAfterUse".toLowerCase();
+    public static final String PROPERTY_CONNECTION_SINGLE_CONNECTION = "datanucleus.connection.singleConnectionPerExecutionContext".toLowerCase();
 
     public static final String PROPERTY_DATASTORE_READ_TIMEOUT = "datanucleus.datastorereadtimeout";
     public static final String PROPERTY_DATASTORE_WRITE_TIMEOUT = "datanucleus.datastorewritetimeout";
@@ -158,16 +156,16 @@ public class PropertyNames
     public static final String PROPERTY_CACHE_L2_UPDATE_MODE = "datanucleus.cache.level2.updatemode";
     public static final String PROPERTY_CACHE_L2_CONFIG_FILE = "datanucleus.cache.level2.configurationfile";
 
-    public static final String PROPERTY_CACHE_QUERYCOMPILE_TYPE = "datanucleus.cache.queryCompilation.type".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYCOMPILE_NAME = "datanucleus.cache.queryCompilation.cacheName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYCOMPILEDATASTORE_TYPE = "datanucleus.cache.queryCompilationDatastore.type".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYCOMPILEDATASTORE_NAME = "datanucleus.cache.queryCompilationDatastore.cacheName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYRESULTS_TYPE = "datanucleus.cache.queryResults.type".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYRESULTS_NAME = "datanucleus.cache.queryResults.cacheName".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYRESULTS_MAXSIZE = "datanucleus.cache.queryResults.maxSize".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYRESULTS_CLEARATCLOSE = "datanucleus.cache.queryResults.clearAtClose".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYRESULTS_EXPIRY_MILLIS = "datanucleus.cache.queryResults.expiryMillis".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_CACHE_QUERYRESULTS_CONFIG_FILE = "datanucleus.cache.queryResults.configurationFile".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_CACHE_QUERYCOMPILE_TYPE = "datanucleus.cache.queryCompilation.type".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYCOMPILE_NAME = "datanucleus.cache.queryCompilation.cacheName".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYCOMPILEDATASTORE_TYPE = "datanucleus.cache.queryCompilationDatastore.type".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYCOMPILEDATASTORE_NAME = "datanucleus.cache.queryCompilationDatastore.cacheName".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYRESULTS_TYPE = "datanucleus.cache.queryResults.type".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYRESULTS_NAME = "datanucleus.cache.queryResults.cacheName".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYRESULTS_MAXSIZE = "datanucleus.cache.queryResults.maxSize".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYRESULTS_CLEARATCLOSE = "datanucleus.cache.queryResults.clearAtClose".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYRESULTS_EXPIRY_MILLIS = "datanucleus.cache.queryResults.expiryMillis".toLowerCase();
+    public static final String PROPERTY_CACHE_QUERYRESULTS_CONFIG_FILE = "datanucleus.cache.queryResults.configurationFile".toLowerCase();
 
     public static final String PROPERTY_MAPPING = "datanucleus.mapping";
     public static final String PROPERTY_MAPPING_CATALOG = "datanucleus.mapping.catalog";
@@ -204,18 +202,18 @@ public class PropertyNames
 
     public static final String PROPERTY_SCHEMA_LOAD_SCRIPT = "datanucleus.schema.loadscript";
 
-    public static final String PROPERTY_SCHEMA_AUTOCREATE_ALL = "datanucleus.schema.autoCreateAll".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_AUTOCREATE_DATABASE = "datanucleus.schema.autoCreateDatabase".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_AUTOCREATE_TABLES = "datanucleus.schema.autoCreateTables".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_AUTOCREATE_COLUMNS = "datanucleus.schema.autoCreateColumns".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS = "datanucleus.schema.autoCreateConstraints".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR = "datanucleus.schema.autoCreateWarnOnError".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_AUTODELETE_COLUMNS = "datanucleus.schema.autoDeleteColumns".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_VALIDATE_ALL = "datanucleus.schema.validateAll".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_VALIDATE_TABLES = "datanucleus.schema.validateTables".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_VALIDATE_COLUMNS = "datanucleus.schema.validateColumns".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS = "datanucleus.schema.validateConstraints".toLowerCase(Locale.ENGLISH);
-    public static final String PROPERTY_SCHEMA_TXN_ISOLATION = "datanucleus.schema.transactionIsolation".toLowerCase(Locale.ENGLISH);
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_ALL = "datanucleus.schema.autoCreateAll".toLowerCase();
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_DATABASE = "datanucleus.schema.autoCreateDatabase".toLowerCase();
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_TABLES = "datanucleus.schema.autoCreateTables".toLowerCase();
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_COLUMNS = "datanucleus.schema.autoCreateColumns".toLowerCase();
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS = "datanucleus.schema.autoCreateConstraints".toLowerCase();
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR = "datanucleus.schema.autoCreateWarnOnError".toLowerCase();
+    public static final String PROPERTY_SCHEMA_AUTODELETE_COLUMNS = "datanucleus.schema.autoDeleteColumns".toLowerCase();
+    public static final String PROPERTY_SCHEMA_VALIDATE_ALL = "datanucleus.schema.validateAll".toLowerCase();
+    public static final String PROPERTY_SCHEMA_VALIDATE_TABLES = "datanucleus.schema.validateTables".toLowerCase();
+    public static final String PROPERTY_SCHEMA_VALIDATE_COLUMNS = "datanucleus.schema.validateColumns".toLowerCase();
+    public static final String PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS = "datanucleus.schema.validateConstraints".toLowerCase();
+    public static final String PROPERTY_SCHEMA_TXN_ISOLATION = "datanucleus.schema.transactionIsolation".toLowerCase();
 
     public static final String PROPERTY_VALIDATION_MODE = "datanucleus.validation.mode";
     public static final String PROPERTY_VALIDATION_GROUP_PREPERSIST = "datanucleus.validation.group.pre-persist";

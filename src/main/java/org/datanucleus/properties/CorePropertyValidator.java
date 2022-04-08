@@ -20,7 +20,6 @@ package org.datanucleus.properties;
 import java.util.TimeZone;
 
 import org.datanucleus.PropertyNames;
-import org.datanucleus.store.connection.ConnectionFactory;
 
 /**
  * Validator for persistence properties used by core.
@@ -189,8 +188,8 @@ public class CorePropertyValidator implements PropertyValidator
                 }
             }
         }
-        else if (name.equalsIgnoreCase(ConnectionFactory.DATANUCLEUS_CONNECTION_RESOURCE_TYPE) 
-                || name.equalsIgnoreCase(ConnectionFactory.DATANUCLEUS_CONNECTION2_RESOURCE_TYPE))
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE) 
+                || name.equalsIgnoreCase(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2))
         {
             if (value instanceof String)
             {
