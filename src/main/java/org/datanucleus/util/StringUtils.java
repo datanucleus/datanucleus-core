@@ -314,7 +314,7 @@ public class StringUtils
      */
     public static String[] split(String valuesString, String token)
     {
-        String[] values;
+        String[] values = null;
         if (valuesString != null)
         {
             StringTokenizer tokenizer = new StringTokenizer(valuesString,token);
@@ -326,10 +326,6 @@ public class StringUtils
                 values[count++] = tokenizer.nextToken();
             }           
         }
-        else
-        {
-            values = null;
-        }
         return values;
     }
 
@@ -340,7 +336,7 @@ public class StringUtils
      */
     public static Set<String> convertCommaSeparatedStringToSet(String str)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<>();
 
         StringTokenizer tokens = new StringTokenizer(str, ",");
         while (tokens.hasMoreTokens())

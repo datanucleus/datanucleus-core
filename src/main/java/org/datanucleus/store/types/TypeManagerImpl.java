@@ -128,6 +128,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
     /** Map of ContainerHandlers, keyed by the container type class name. */
     protected Map<Class, ContainerHandler> containerHandlersByClass = new ConcurrentHashMap<>();
 
+    /** Cache of classes that don't need a ContainerHandler. */
+    protected Set<Class> classesWithoutContainerHandler = Collections.synchronizedSet(new HashSet<>());
+
     /** Map of TypeConverter keyed by their symbolic name. */
     protected Map<String, TypeConverter> typeConverterByName = new ConcurrentHashMap<>();
 
@@ -668,32 +671,46 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public <H extends ContainerHandler> H getContainerHandler(Class containerClass)
     {
-        ContainerHandler containerHandler = containerHandlersByClass.get(containerClass);
-        if (containerHandler == null)
+        if (classesWithoutContainerHandler.contains(containerClass))
         {
-            // Try to find the container handler using the registered type
-            JavaType type = findJavaTypeForClass(containerClass);
-            if (type != null && type.containerHandlerType != null)
-            {
-                Class[] parameterTypes = null;
-                Object[] parameters = null;
-                
-                Class[] classParameterTypes = new Class[]{Class.class};
-
-                // Allow ContainerHandlers that receive the container type on the constructor. e.g. ArrayHandler
-                if (ClassUtils.getConstructorWithArguments(type.containerHandlerType, classParameterTypes) != null )
-                {
-                    parameterTypes = classParameterTypes;
-                    parameters = new Object[] {containerClass};
-                }
-                
-                containerHandler = ClassUtils.newInstance(type.containerHandlerType, parameterTypes, parameters);
-
-                containerHandlersByClass.put(containerClass, containerHandler);
-            }
+            return null;
         }
 
-        return (H) containerHandler;
+        ContainerHandler containerHandler = containerHandlersByClass.get(containerClass);
+        if (containerHandler != null)
+        {
+            return (H) containerHandler;
+        }
+
+        // Try to find the container handler using the registered type
+        JavaType type = findJavaTypeForClass(containerClass);
+        if (type != null)
+        {
+            if (type.containerHandlerType == null)
+            {
+                classesWithoutContainerHandler.add(containerClass);
+                return null;
+            }
+
+            Class[] parameterTypes = null;
+            Object[] parameters = null;
+
+            Class[] classParameterTypes = new Class[]{Class.class};
+
+            // Allow ContainerHandlers that receive the container type on the constructor. e.g. ArrayHandler
+            if (ClassUtils.getConstructorWithArguments(type.containerHandlerType, classParameterTypes) != null)
+            {
+                parameterTypes = classParameterTypes;
+                parameters = new Object[] {containerClass};
+            }
+
+            containerHandler = ClassUtils.newInstance(type.containerHandlerType, parameterTypes, parameters);
+
+            containerHandlersByClass.put(containerClass, containerHandler);
+            return (H) containerHandler;
+        }
+
+        return null;
     }
 
     /* (non-Javadoc)
