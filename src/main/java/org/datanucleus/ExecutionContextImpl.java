@@ -4531,53 +4531,59 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void putObjectIntoLevel1Cache(DNStateManager sm)
     {
+        if (cache == null)
+        {
+            return;
+        }
         if (sm.isEmbedded())
         {
             NucleusLogger.PERSISTENCE.warn("Attempt to L1 cache an embedded object! How did this occur? Trying to use an object as embedded yet also independently persistable? : " + sm, new Exception());
             return;
         }
-        if (cache != null)
-        {
-            Object id = sm.getInternalObjectId();
-            if (id == null || sm.getObject() == null)
-            {
-                NucleusLogger.CACHE.warn(Localiser.msg("003006"));
-                return;
-            }
 
-            // TODO This creates problem in JPA1 TCK entityTest.oneXmany.test3 Investigate it
-/*            if (cache.containsKey(id))
+        Object id = sm.getInternalObjectId();
+        if (id == null || sm.getObject() == null)
+        {
+            NucleusLogger.CACHE.warn(Localiser.msg("003006"));
+            return;
+        }
+
+        // TODO This creates problem in JPA1 TCK entityTest.oneXmany.test3 Investigate it
+        /*            if (cache.containsKey(id))
             {
                 // Id already has an object in the L1 cache, so no need to update
                 // Note : can only have a single object with a particular id for an ExecutionContext
                 return;
             }*/
 
-            if (sm.getClassMetaData().getUniqueMetaData() != null)
+        if (sm.getClassMetaData().getUniqueMetaData() != null)
+        {
+            // Check for any unique keys on this object, and cache against the unique key also
+            List<UniqueMetaData> unimds = sm.getClassMetaData().getUniqueMetaData();
+            if (unimds != null && !unimds.isEmpty())
             {
-                // Check for any unique keys on this object, and cache against the unique key also
-                List<UniqueMetaData> unimds = sm.getClassMetaData().getUniqueMetaData();
-                if (unimds != null && !unimds.isEmpty())
+                for (UniqueMetaData unimd : unimds)
                 {
-                    for (UniqueMetaData unimd : unimds)
+                    CacheUniqueKey uniKey = getCacheUniqueKeyForStateManager(sm, unimd);
+                    if (uniKey != null)
                     {
-                        CacheUniqueKey uniKey = getCacheUniqueKeyForStateManager(sm, unimd);
-                        if (uniKey != null)
-                        {
-                            cache.putUnique(uniKey, sm);
-                        }
+                        cache.putUnique(uniKey, sm);
                     }
                 }
             }
+        }
 
-            // Put into Level 1 Cache
-            DNStateManager oldSM = cache.put(id, sm);
-            if (NucleusLogger.CACHE.isDebugEnabled())
+        // Put into Level 1 Cache
+        DNStateManager oldSM = cache.put(id, sm);
+        if (NucleusLogger.CACHE.isDebugEnabled())
+        {
+            if (oldSM == null)
             {
-                if (oldSM == null)
-                {
-                    NucleusLogger.CACHE.debug(Localiser.msg("003004", IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(sm.getLoadedFields())));
-                }
+                NucleusLogger.CACHE.debug(Localiser.msg("003004", IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(sm.getLoadedFields())));
+            }
+            else
+            {
+                NucleusLogger.CACHE.debug(Localiser.msg("003005", IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(sm.getLoadedFields())));
             }
         }
     }
