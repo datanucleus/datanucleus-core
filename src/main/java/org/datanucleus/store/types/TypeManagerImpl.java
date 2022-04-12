@@ -72,11 +72,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
@@ -429,114 +427,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.TypeManager#createSCOInstance(org.datanucleus.state.DNStateManager, org.datanucleus.metadata.AbstractMemberMetaData, java.lang.Class, java.lang.Object, boolean)
-     */
-    @Override
-    public SCO createSCOInstance(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean replaceField)
-    {
-        if (value != null && value instanceof SCO)
-        {
-            // Passed in value is a wrapper type already, so just return it!
-            if (replaceField)
-            {
-                // Replace the field with this value
-                ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), value);
-            }
-            return (SCO) value;
-        }
-
-        // Create new wrapper of the required type
-        Class requiredType = value != null ? value.getClass() : instantiatedType; // Default to instantiated type
-        if ("declared".equalsIgnoreCase(nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_TYPE_WRAPPER_BASIS)))
-        {
-            // Use declared type of the field to define the wrapper type
-            requiredType = mmd.getType();
-        }
-        SCO sco = createSCOInstance(ownerSM, mmd, requiredType);
-
-        if (replaceField)
-        {
-            // Replace the field in the owner with the wrapper before initialising it
-            ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), sco);
-        }
-
-        // Initialise the SCO for use
-        if (value != null)
-        {
-            // Apply the existing value
-            sco.initialise(value);
-        }
-        else
-        {
-            // Just create it empty and load from the datastore
-            sco.initialise();
-        }
-
-        return sco;
-    }
-
-    /**
-     * Method to create a new SCO wrapper for the specified field replacing the old value with the new value. 
-     * If the member value is a SCO already will just return the (new) value.
-     * @param ownerSM StateManager of the owner object
-     * @param memberNumber The member number in the owner
-     * @param newValue The value to initialise the wrapper with (if any) for this member
-     * @param oldValue The previous value that we are replacing with this value
-     * @param replaceFieldIfChanged Whether to replace the member in the object if wrapping the value
-     * @return The wrapper (or original value if not wrappable)
-     */
-    public Object wrapAndReplaceSCOField(DNStateManager ownerSM, int memberNumber, Object newValue, Object oldValue, boolean replaceFieldIfChanged)
-    {
-        if (newValue == null || !ownerSM.getClassMetaData().getSCOMutableMemberFlags()[memberNumber])
-        {
-            // We don't wrap null objects currently
-            return newValue;
-        }
-
-        if (!(newValue instanceof SCO) || ownerSM.getObject() != ((SCO)newValue).getOwner())
-        {
-            // Not a SCO wrapper, or is a SCO wrapper but not owned by this object
-            AbstractMemberMetaData mmd = ownerSM.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
-            if (replaceFieldIfChanged)
-            {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", 
-                        ownerSM.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()) : ownerSM.getInternalObjectId(), 
-                        mmd.getName()));
-                }
-            }
-
-            if (newValue instanceof SCO)
-            {
-                // Passed in value is a wrapper type already, so just return it!
-                if (replaceFieldIfChanged)
-                {
-                    // Replace the field with this value
-                    ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), newValue);
-                }
-                return newValue;
-            }
-
-            // Create new wrapper of the required type
-            Class requiredType = newValue.getClass();
-            SCO sco = createSCOInstance(ownerSM, mmd, requiredType);
-
-            if (replaceFieldIfChanged)
-            {
-                // Replace the field in the owner with the wrapper before initialising it
-                ownerSM.replaceField(mmd.getAbsoluteFieldNumber(), sco);
-            }
-
-            // Initialise the SCO for use, providing new and old values so the wrapper has the ability to do something intelligent
-            sco.initialise(newValue, oldValue);
-
-            return sco;
-        }
-        return newValue;
-    }
-
     /**
      * Method to create a new SCO wrapper for member type.
      * Will find a wrapper suitable for the instantiated type (if provided), otherwise suitable for the member metadata type.
@@ -546,18 +436,13 @@ public class TypeManagerImpl implements TypeManager, Serializable
      * @return The wrapper object of the required type
      * @throws NucleusUserException if an error occurred when creating the SCO instance
      */
-    private SCO createSCOInstance(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType)
+    public SCO createSCOWrapper(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType)
     {
         String typeName = (instantiatedType != null) ? instantiatedType.getName() : mmd.getTypeName();
 
-        // Find the SCO wrapper type most suitable
+        // Find the SCO wrapper type most suitable. Can't have backed wrapper if serialised
         StoreManager storeMgr = ownerSM.getExecutionContext().getStoreManager();
-        boolean backedWrapper = storeMgr.useBackedSCOWrapperForMember(mmd, ownerSM.getExecutionContext());
-        if (mmd.isSerialized())
-        {
-            // If we have all elements serialised into a column then cannot have backing stores
-            backedWrapper = false;
-        }
+        boolean backedWrapper = mmd.isSerialized() ? false : storeMgr.useBackedSCOWrapperForMember(mmd, ownerSM.getExecutionContext());
 
         Class<? extends SCO> wrapperType = backedWrapper ?
             getBackedWrapperTypeForType(mmd.getType(), instantiatedType, typeName) : getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName);

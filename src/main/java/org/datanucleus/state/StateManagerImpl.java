@@ -3184,7 +3184,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             if (needsSCOUpdating)
             {
                 // Wrap with SCO so we can detect future updates
-                newValue = myEC.getTypeManager().wrapAndReplaceSCOField(this, fieldNumber, newValue, oldValue, true);
+                newValue = SCOUtils.wrapAndReplaceSCOField(this, fieldNumber, newValue, oldValue, true);
             }
 
             if (oldValue != null && newValue == null)

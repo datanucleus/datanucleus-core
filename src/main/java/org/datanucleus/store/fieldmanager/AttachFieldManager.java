@@ -218,7 +218,7 @@ public class AttachFieldManager extends AbstractFieldManager
                     {
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", IdentityUtils.getPersistableIdentityForId(attachedSM.getInternalObjectId()), mmd.getName()));
                     }
-                    sco = ec.getTypeManager().createSCOInstance(attachedSM, mmd, value.getClass(), null, false);
+                    sco = SCOUtils.wrapSCOField(attachedSM, mmd, value.getClass(), null, false);
                     if (sco instanceof SCOContainer)
                     {
                         // Load any containers to avoid update issues

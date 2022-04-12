@@ -20,6 +20,7 @@ package org.datanucleus.store.types;
 import java.util.Collection;
 import java.util.Set;
 
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.containers.ContainerAdapter;
@@ -113,31 +114,15 @@ public interface TypeManager
     Class getWrappedTypeBackedForType(String className);
 
     /**
-     * Method to create a new SCO wrapper for the specified field replacing the old value with the new value. 
-     * If the member value is a SCO already will just return the (new) value.
-     * @param ownerSM StateManager of the owner object
-     * @param memberNumber The member number in the owner
-     * @param newValue The value to initialise the wrapper with (if any) for this member
-     * @param oldValue The previous value that we are replacing with this value
-     * @param replaceFieldIfChanged Whether to replace the member in the object if wrapping the value
-     * @return The wrapper (or original value if not wrappable)
+     * Method to create a new SCO wrapper for member type.
+     * Will find a wrapper suitable for the instantiated type (if provided), otherwise suitable for the member metadata type.
+     * @param ownerSM StateManager for the owning object
+     * @param mmd The MetaData for the related member.
+     * @param instantiatedType Type to instantiate the member as (if known), otherwise falls back to the type from metadata
+     * @return The wrapper object of the required type
+     * @throws NucleusUserException if an error occurred when creating the SCO instance
      */
-    Object wrapAndReplaceSCOField(DNStateManager ownerSM, int memberNumber, Object newValue, Object oldValue, boolean replaceFieldIfChanged);
-
-    /**
-     * Method to create a new SCO wrapper for the specified member.
-     * The SCO wrapper will be appropriate for the passed value (which represents the instantiated type of the field) unless it is null 
-     * when the wrapper will be appropriate for the declared type of the field. 
-     * While the "instantiated type" and the type of "value" should be the same when value is non-null, there are situations where we need to create a List based
-     * collection yet have no value so pass in the declaredType as Collection, instantiatedType as ArrayList, and value as null.
-     * @param ownerSM StateManager managing the instance
-     * @param mmd Metadata for the member in question
-     * @param instantiatedType The instantiated type
-     * @param value The value to wrap
-     * @param replaceField Whether to replace the field in the owner object
-     * @return The SCO wrapper
-     */
-    SCO createSCOInstance(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean replaceField);
+    SCO createSCOWrapper(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType);
 
     /**
      * Accessor for whether the type is a SCO wrapper itself.
