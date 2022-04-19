@@ -21,7 +21,6 @@ package org.datanucleus.metadata;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -204,13 +203,11 @@ public class FileMetaData extends MetaData
             return null;
         }
 
-        Iterator<PackageMetaData> iter = packages.iterator();
-        while (iter.hasNext())
+        for (PackageMetaData pmd : packages)
         {
-            PackageMetaData p = iter.next();
-            if (p.name.equals(name))
+            if (pmd.name.equals(name))
             {
-                return p;
+                return pmd;
             }
         }
         return null;
@@ -305,13 +302,11 @@ public class FileMetaData extends MetaData
         else
         {
             // Check if already exists and return the current one if so
-            Iterator<PackageMetaData> iter = packages.iterator();
-            while (iter.hasNext())
+            for (PackageMetaData packageMD : packages)
             {
-                PackageMetaData p = iter.next();
-                if (pmd.getName().equals(p.getName()))
+                if (pmd.getName().equals(packageMD.getName()))
                 {
-                    return p;
+                    return packageMD;
                 }
             }
         }

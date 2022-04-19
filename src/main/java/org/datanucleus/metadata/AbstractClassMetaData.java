@@ -579,10 +579,8 @@ public abstract class AbstractClassMetaData extends MetaData
             else
             {
                 int noOfPkKeys = 0;
-                Iterator<AbstractMemberMetaData> memberIter = members.iterator();
-                while (memberIter.hasNext())
+                for (AbstractMemberMetaData mmd : members)
                 {
-                    AbstractMemberMetaData mmd = memberIter.next();
                     if (mmd.isPrimaryKey())
                     {
                         noOfPkKeys++;
@@ -808,10 +806,8 @@ public abstract class AbstractClassMetaData extends MetaData
                 // TODO Allow for overriding superclass members
                 // Check whether the superclass defines PK fields and this class defines some more
                 int noOfPkKeys = 0;
-                Iterator<AbstractMemberMetaData> memberIter = members.iterator();
-                while (memberIter.hasNext())
+                for (AbstractMemberMetaData mmd : members)
                 {
-                    AbstractMemberMetaData mmd = memberIter.next();
                     if (mmd.isPrimaryKey())
                     {
                         if (mmd.fieldBelongsToClass())
@@ -1167,10 +1163,8 @@ public abstract class AbstractClassMetaData extends MetaData
         // Validate any unmapped columns
         if (unmappedColumns != null && !unmappedColumns.isEmpty())
         {
-            Iterator unmappedIter = unmappedColumns.iterator();
-            while (unmappedIter.hasNext())
+            for (ColumnMetaData colmd : unmappedColumns)
             {
-                ColumnMetaData colmd = (ColumnMetaData)unmappedIter.next();
                 if (colmd.getName() == null)
                 {
                     throw new InvalidClassMetaDataException("044119", fullName);
@@ -2027,10 +2021,8 @@ public abstract class AbstractClassMetaData extends MetaData
         }
 
         List<String> memberNames = new ArrayList<>(); // Use list to preserve ordering
-        Iterator<AbstractMemberMetaData> iter = members.iterator();
-        while (iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
             if (Boolean.TRUE.equals(mmd.primaryKey))
             {
                 memberNames.add(mmd.name);
@@ -2053,10 +2045,8 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public boolean hasMember(String memberName)
     {
-        Iterator<AbstractMemberMetaData> iter = members.iterator();
-        while (iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
             if (mmd.getName().equals(memberName))
             {
                 return true;
@@ -2092,10 +2082,8 @@ public abstract class AbstractClassMetaData extends MetaData
             return null;
         }
 
-        Iterator<AbstractMemberMetaData> iter = members.iterator();
-        while (iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
             if (mmd.getName().equals(name))
             {
                 return mmd;
@@ -2177,10 +2165,8 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     protected AbstractMemberMetaData getMemberBeingOverridden(String name)
     {
-        Iterator<AbstractMemberMetaData> iter = members.iterator();
-        while(iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
             if (mmd.name.equals(name) && mmd.fieldBelongsToClass())
             {
                 return mmd;
@@ -2371,11 +2357,9 @@ public abstract class AbstractClassMetaData extends MetaData
             return pcSuperclassMetaData.getNoOfPopulatedPKMembers();
         }
 
-        Iterator<AbstractMemberMetaData> fields_iter = members.iterator();
         int noOfPks = 0;
-        while (fields_iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = fields_iter.next();
             if (mmd.isPrimaryKey())
             {
                 noOfPks++;
@@ -2508,11 +2492,9 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         // Do double pass on members - first pass to get number of members, and second to set up array
         // Could do single pass with ArrayList but want primitives and in JDK1.3/4 can't put direct in ArrayList
-        Iterator<AbstractMemberMetaData> iter = members.iterator();
         int numBasics = 0;
-        while (iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
             if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr) &&
                 !Collection.class.isAssignableFrom(mmd.getType()) &&
                 !Map.class.isAssignableFrom(mmd.getType()) &&
@@ -2537,10 +2519,8 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
-        iter = members.iterator();
-        while (iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
             if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr) &&
                 !Collection.class.isAssignableFrom(mmd.getType()) && !Map.class.isAssignableFrom(mmd.getType()) && !mmd.getType().isArray())
             {

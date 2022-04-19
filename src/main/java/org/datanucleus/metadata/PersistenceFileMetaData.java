@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.metadata;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -69,13 +68,11 @@ public class PersistenceFileMetaData extends MetaData
      */
     public PersistenceUnitMetaData getPersistenceUnit(String name)
     {
-        Iterator<PersistenceUnitMetaData> iter = persistenceUnits.iterator();
-        while (iter.hasNext())
+        for (PersistenceUnitMetaData pumd : persistenceUnits)
         {
-            PersistenceUnitMetaData p = iter.next();
-            if (p.name.equals(name))
+            if (pumd.name.equals(name))
             {
-                return p;
+                return pumd;
             }
         }
         return null;
@@ -116,12 +113,10 @@ public class PersistenceFileMetaData extends MetaData
         }
 
         pumd.parent = this;
-        Iterator<PersistenceUnitMetaData> iter = persistenceUnits.iterator();
-        while (iter.hasNext())
+        for (PersistenceUnitMetaData persistenceUnitMD : persistenceUnits)
         {
-            PersistenceUnitMetaData p = iter.next();
             // Check if already exists
-            if (pumd.getName().equals(p.getName()))
+            if (pumd.getName().equals(persistenceUnitMD.getName()))
             {
                 return;
             }
@@ -147,10 +142,9 @@ public class PersistenceFileMetaData extends MetaData
         sb.append("<persistence>\n");
 
         // Add persistence units
-        Iterator<PersistenceUnitMetaData> iter = persistenceUnits.iterator();
-        while (iter.hasNext())
+        for (PersistenceUnitMetaData pumd : persistenceUnits)
         {
-            sb.append(iter.next().toString(indent, indent));
+            sb.append(pumd.toString(indent, indent));
         }
 
         sb.append("</persistence>");

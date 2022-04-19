@@ -63,12 +63,6 @@ public class EnhancementHelper extends java.lang.Object
 
     public static EnhancementHelper getInstance()/* throws SecurityException*/
     {
-        /*SecurityManager sec = System.getSecurityManager();
-        if (sec != null)
-        {
-            // throws exception if caller is not authorized
-            sec.checkPermission(JDOPermission.GET_METADATA);
-        }*/
         return singletonHelper;
     }
 

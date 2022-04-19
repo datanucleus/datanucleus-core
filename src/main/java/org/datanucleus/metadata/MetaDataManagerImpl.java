@@ -1702,10 +1702,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             while (loadedIter.hasNext())
             {
                 AbstractClassMetaData acmd = loadedIter.next();
-                Iterator<MetaDataListener> iter = listeners.iterator();
-                while (iter.hasNext())
+                for (MetaDataListener listener : listeners)
                 {
-                    MetaDataListener listener = iter.next();
                     listener.loaded(acmd);
                 }
             }
@@ -1856,16 +1854,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             String[] classNames = new String[numClasses];
             int i = 0;
 
-            Iterator<Class> classIter = classes.iterator();
-            while (classIter.hasNext())
+            for (Class cls : classes)
             {
-                classNames[i++] = classIter.next().getName();
+                classNames[i++] = cls.getName();
             }
 
-            Iterator<String> classNameIter = generatedClassNames.iterator();
-            while (classNameIter.hasNext())
+            for (String className : generatedClassNames)
             {
-                classNames[i++] = classNameIter.next();
+                classNames[i++] = className;
             }
             return classNames;
         }
@@ -2964,11 +2960,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (includeDescendents) 
             {
-                Iterator subClassNameIter = subclasses.iterator();
-                while (subClassNameIter.hasNext())
+                for (String subClassName : subclasses)
                 {
                     //go deeper in subclasses
-                    provideSubclassesForClass((String)subClassNameIter.next(), includeDescendents, consumer);
+                    provideSubclassesForClass(subClassName, includeDescendents, consumer);
                 }
             }
         }

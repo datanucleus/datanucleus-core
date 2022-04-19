@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.metadata;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -191,55 +190,49 @@ public class MetaDataMerger
         if (ormCmd.joins != null)
         {
             primaryCmd.joins = null;
-            Iterator iter = ormCmd.joins.iterator();
-            while (iter.hasNext())
+            for (JoinMetaData joinmd : ormCmd.joins)
             {
-                primaryCmd.addJoin((JoinMetaData)iter.next());
+                primaryCmd.addJoin(joinmd);
             }
         }
         if (ormCmd.indexes != null)
         {
             primaryCmd.indexes = null;
-            Iterator iter = ormCmd.indexes.iterator();
-            while (iter.hasNext())
+            for (IndexMetaData idxmd : ormCmd.indexes)
             {
-                primaryCmd.addIndex((IndexMetaData)iter.next());
+                primaryCmd.addIndex(idxmd);
             }
         }
         if (ormCmd.foreignKeys != null)
         {
             primaryCmd.foreignKeys = null;
-            Iterator iter = ormCmd.foreignKeys.iterator();
-            while (iter.hasNext())
+            for (ForeignKeyMetaData fkmd : ormCmd.foreignKeys)
             {
-                primaryCmd.addForeignKey((ForeignKeyMetaData)iter.next());
+                primaryCmd.addForeignKey(fkmd);
             }
         }
         if (ormCmd.uniqueConstraints != null)
         {
             primaryCmd.uniqueConstraints = null;
-            Iterator iter = ormCmd.uniqueConstraints.iterator();
-            while (iter.hasNext())
+            for (UniqueMetaData unimd : ormCmd.uniqueConstraints)
             {
-                primaryCmd.addUniqueConstraint((UniqueMetaData)iter.next());
+                primaryCmd.addUniqueConstraint(unimd);
             }
         }
         if (ormCmd.fetchGroups != null)
         {
             primaryCmd.fetchGroups = null;
-            Iterator iter = ormCmd.fetchGroups.iterator();
-            while (iter.hasNext())
+            for (FetchGroupMetaData fgmd : ormCmd.fetchGroups)
             {
-                primaryCmd.addFetchGroup((FetchGroupMetaData)iter.next());
+                primaryCmd.addFetchGroup(fgmd);
             }
         }
         if (ormCmd.unmappedColumns != null)
         {
             primaryCmd.unmappedColumns = null;
-            Iterator<ColumnMetaData> iter = ormCmd.unmappedColumns.iterator();
-            while (iter.hasNext())
+            for (ColumnMetaData colmd : ormCmd.unmappedColumns)
             {
-                primaryCmd.addUnmappedColumn(iter.next());
+                primaryCmd.addUnmappedColumn(colmd);
             }
         }
 
@@ -599,10 +592,9 @@ public class MetaDataMerger
         if (primaryCmd.listeners == null && annotCmd.listeners != null)
         {
             // No XML listeners so just use those of the annotations
-            Iterator iter = annotCmd.listeners.iterator();
-            while (iter.hasNext())
+            for (EventListenerMetaData elmd : annotCmd.listeners)
             {
-                primaryCmd.addListener((EventListenerMetaData)iter.next());
+                primaryCmd.addListener(elmd);
             }
         }
         else if (primaryCmd.listeners != null && annotCmd.listeners != null)
@@ -620,11 +612,9 @@ public class MetaDataMerger
             else if (primaryCmd.getListenerForClass(primaryCmd.getFullClassName()) != null && primaryCmd.getListeners().size() == 1)
             {
                 // XML has just callbacks and no listeners so take any listeners from annotations
-                List annotListeners = annotCmd.getListeners();
-                Iterator annotIter = annotListeners.iterator();
-                while (annotIter.hasNext())
+                List<EventListenerMetaData> annotListeners = annotCmd.getListeners();
+                for (EventListenerMetaData elmd : annotListeners)
                 {
-                    EventListenerMetaData elmd = (EventListenerMetaData)annotIter.next();
                     if (!elmd.getClassName().equals(primaryCmd.getFullClassName()))
                     {
                         // Add on listeners from annotations
@@ -644,50 +634,44 @@ public class MetaDataMerger
 
         if (primaryCmd.queries == null && annotCmd.queries != null)
         {
-            Iterator iter = annotCmd.queries.iterator();
-            while (iter.hasNext())
+            for (QueryMetaData qmd : annotCmd.queries)
             {
-                primaryCmd.addQuery((QueryMetaData)iter.next());
+                primaryCmd.addQuery(qmd);
             }
         }
         if (primaryCmd.joins == null && annotCmd.joins != null)
         {
-            Iterator iter = annotCmd.joins.iterator();
-            while (iter.hasNext())
+            for (JoinMetaData joinmd : annotCmd.joins)
             {
-                primaryCmd.addJoin((JoinMetaData)iter.next());
+                primaryCmd.addJoin(joinmd);
             }
         }
         if (primaryCmd.indexes == null && annotCmd.indexes != null)
         {
-            Iterator iter = annotCmd.indexes.iterator();
-            while (iter.hasNext())
+            for (IndexMetaData idxmd : annotCmd.indexes)
             {
-                primaryCmd.addIndex((IndexMetaData)iter.next());
+                primaryCmd.addIndex(idxmd);
             }
         }
         if (primaryCmd.foreignKeys == null && annotCmd.foreignKeys != null)
         {
-            Iterator iter = annotCmd.foreignKeys.iterator();
-            while (iter.hasNext())
+            for (ForeignKeyMetaData fkmd : annotCmd.foreignKeys)
             {
-                primaryCmd.addForeignKey((ForeignKeyMetaData)iter.next());
+                primaryCmd.addForeignKey(fkmd);
             }
         }
         if (primaryCmd.uniqueConstraints == null && annotCmd.uniqueConstraints != null)
         {
-            Iterator iter = annotCmd.uniqueConstraints.iterator();
-            while (iter.hasNext())
+            for (UniqueMetaData unimd : annotCmd.uniqueConstraints)
             {
-                primaryCmd.addUniqueConstraint((UniqueMetaData)iter.next());
+                primaryCmd.addUniqueConstraint(unimd);
             }
         }
         if (primaryCmd.fetchGroups == null && annotCmd.fetchGroups != null)
         {
-            Iterator iter = annotCmd.fetchGroups.iterator();
-            while (iter.hasNext())
+            for (FetchGroupMetaData fgmd : annotCmd.fetchGroups)
             {
-                primaryCmd.addFetchGroup((FetchGroupMetaData)iter.next());
+                primaryCmd.addFetchGroup(fgmd);
             }
         }
 

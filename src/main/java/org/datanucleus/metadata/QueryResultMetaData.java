@@ -19,7 +19,6 @@ package org.datanucleus.metadata;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -101,10 +100,8 @@ public class QueryResultMetaData extends MetaData
         }
         else
         {
-            Iterator<PersistentTypeMapping> iter = persistentTypeMappings.iterator();
-            while (iter.hasNext())
+            for (PersistentTypeMapping mapping : persistentTypeMappings)
             {
-                PersistentTypeMapping mapping = iter.next();
                 if (mapping.className.equals(className))
                 {
                     m = mapping;

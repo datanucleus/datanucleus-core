@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -190,11 +189,9 @@ public class ClassMetaData extends AbstractClassMetaData
             applyDefaultDiscriminatorValueWhenNotSpecified();
 
             // Process all members marked as UNKNOWN (i.e override from JPA) and eliminate clashes with any generic overrides from addMetaDataForMembersNotInMetaData(...)
-            Iterator<AbstractMemberMetaData> memberIter = members.iterator();
             Set<AbstractMemberMetaData> membersToDelete = null;
-            while (memberIter.hasNext())
+            for (AbstractMemberMetaData mmd : members)
             {
-                AbstractMemberMetaData mmd = memberIter.next();
                 if (mmd.className != null && mmd.className.equals("#UNKNOWN"))
                 {
                     // Field is for a superclass but we didn't know which at creation so resolve it
@@ -221,10 +218,8 @@ public class ClassMetaData extends AbstractClassMetaData
                             mmd.storeInLob = superFmd.storeInLob;
                             // TODO Copy across more attributes
 
-                            Iterator<AbstractMemberMetaData> existingMemberIter = members.iterator();
-                            while (existingMemberIter.hasNext())
+                            for (AbstractMemberMetaData existingMmd : members)
                             {
-                                AbstractMemberMetaData existingMmd = existingMemberIter.next();
                                 if (existingMmd.getName().equals(mmd.getName()) && existingMmd != mmd)
                                 {
                                     mmd.type = existingMmd.getType();
@@ -734,10 +729,8 @@ public class ClassMetaData extends AbstractClassMetaData
         Collections.sort(members);
 
         // Populate the real field values. This will populate any containers in these members also
-        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
-        while (memberIter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = memberIter.next();
             if (pkMembers == mmd.isPrimaryKey())
             {
                 Class fieldCls = cls;
@@ -912,13 +905,10 @@ public class ClassMetaData extends AbstractClassMetaData
             validateObjectIdClass(clr);
 
             // Count the fields/properties of the relevant category
-            Iterator membersIter = members.iterator();
             int numManaged = 0;
             int numOverridden = 0;
-            while (membersIter.hasNext())
+            for (AbstractMemberMetaData mmd : members)
             {
-                AbstractMemberMetaData mmd = (AbstractMemberMetaData)membersIter.next();
-    
                 // Initialise the FieldMetaData (and its sub-objects)
                 mmd.initialise(clr);
                 if (mmd.isFieldToBePersisted())
@@ -938,13 +928,11 @@ public class ClassMetaData extends AbstractClassMetaData
             managedMembers = new AbstractMemberMetaData[numManaged];
             overriddenMembers = new AbstractMemberMetaData[numOverridden];
 
-            membersIter = members.iterator();
             int memberId = 0;
             int overriddenMemberId = 0;
-            memberPositionsByName = new HashMap();
-            while (membersIter.hasNext())
+            memberPositionsByName = new HashMap<>();
+            for (AbstractMemberMetaData mmd : members)
             {
-                AbstractMemberMetaData mmd = (AbstractMemberMetaData)membersIter.next();
                 if (mmd.isFieldToBePersisted())
                 {
                     if (mmd.fieldBelongsToClass())

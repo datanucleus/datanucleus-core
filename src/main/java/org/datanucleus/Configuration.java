@@ -185,7 +185,7 @@ public class Configuration extends PropertyStore implements Serializable
 
     public String getInternalNameForProperty(String name)
     {
-        PropertyMapping mapping = propertyMappings.get(name.toLowerCase());
+        PropertyMapping mapping = propertyMappings.get(name);
         return mapping != null && mapping.internalName != null ? mapping.internalName : name;
     }
 
@@ -239,6 +239,12 @@ public class Configuration extends PropertyStore implements Serializable
         return propNames;
     }
 
+    /**
+     * Accessor for the case-sensitive (external) name for the passed (likely lowercase) name and prefix.
+     * @param propName The (likely lowercase) name
+     * @param propPrefix The prefix for the property name
+     * @return The case-sensitive (external) property name
+     */
     public String getPropertyNameWithInternalPropertyName(String propName, String propPrefix)
     {
         if (propName == null)
@@ -255,6 +261,12 @@ public class Configuration extends PropertyStore implements Serializable
         return null;
     }
 
+    /**
+     * Accessor for the case-sensitive name for the passed (lowercase) name.
+     * Works on the basis that the <I>propertyMappings</i> keys are stored in the case-senistive form.
+     * @param propName The (lowercase) name
+     * @return Case sensitive name
+     */
     public String getCaseSensitiveNameForPropertyName(String propName)
     {
         if (propName == null)

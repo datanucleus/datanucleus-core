@@ -20,7 +20,6 @@ package org.datanucleus.metadata;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -144,10 +143,8 @@ public class PackageMetaData extends MetaData
      */
     public InterfaceMetaData getInterface(String name)
     {
-        Iterator iter=interfaces.iterator();
-        while (iter.hasNext())
+        for (InterfaceMetaData imd : interfaces)
         {
-            InterfaceMetaData imd = (InterfaceMetaData)iter.next();
             if (imd.getName().equals(name))
             {
                 return imd;
@@ -182,10 +179,8 @@ public class PackageMetaData extends MetaData
      */
     public ClassMetaData getClass(String name)
     {
-        Iterator iter=classes.iterator();
-        while (iter.hasNext())
+        for (ClassMetaData cmd : classes)
         {
-            ClassMetaData cmd = (ClassMetaData)iter.next();
             if (cmd.getName().equals(name))
             {
                 return cmd;
@@ -219,10 +214,8 @@ public class PackageMetaData extends MetaData
      */
     public SequenceMetaData getSequence(String name)
     {
-        Iterator iter = sequences.iterator();
-        while (iter.hasNext())
+        for (SequenceMetaData seqmd : sequences)
         {
-            SequenceMetaData seqmd = (SequenceMetaData)iter.next();
             if (seqmd.getName().equals(name))
             {
                 return seqmd;
@@ -256,10 +249,8 @@ public class PackageMetaData extends MetaData
      */
     public TableGeneratorMetaData getTableGenerator(String name)
     {
-        Iterator iter = tableGenerators.iterator();
-        while (iter.hasNext())
+        for (TableGeneratorMetaData tgmd : tableGenerators)
         {
-            TableGeneratorMetaData tgmd = (TableGeneratorMetaData)iter.next();
             if (tgmd.getName().equals(name))
             {
                 return tgmd;
@@ -288,13 +279,11 @@ public class PackageMetaData extends MetaData
         else
         {
             // Check if already exists and return the current one if so
-            Iterator iter = classes.iterator();
-            while (iter.hasNext())
+            for (ClassMetaData classMD : classes)
             {
-                AbstractClassMetaData c = (AbstractClassMetaData)iter.next();
-                if (cmd.getName().equals(c.getName()) && c instanceof ClassMetaData)
+                if (cmd.getName().equals(classMD.getName()))
                 {
-                    return (ClassMetaData)c;
+                    return classMD;
                 }
             }
         }
@@ -350,13 +339,11 @@ public class PackageMetaData extends MetaData
         else
         {
             // Check if already exists and return the current one if so
-            Iterator iter = interfaces.iterator();
-            while (iter.hasNext())
+            for (InterfaceMetaData interfaceMD : interfaces)
             {
-                AbstractClassMetaData c = (AbstractClassMetaData)iter.next();
-                if (imd.getName().equals(c.getName()) && c instanceof InterfaceMetaData)
+                if (imd.getName().equals(interfaceMD.getName()))
                 {
-                    return (InterfaceMetaData)c;
+                    return interfaceMD;
                 }
             }
         }

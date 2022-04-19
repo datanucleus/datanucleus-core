@@ -24,7 +24,6 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -186,18 +185,15 @@ public class InterfaceMetaData extends AbstractClassMetaData
             validateObjectIdClass(clr);
 
             // Count the fields of the relevant category
-            Iterator<AbstractMemberMetaData> fields_iter = members.iterator();
             int no_of_managed_fields = 0;
             int no_of_overridden_fields = 0;
-            while (fields_iter.hasNext())
+            for (AbstractMemberMetaData mmd : members)
             {
-                AbstractMemberMetaData fmd = fields_iter.next();
-
                 // Initialise the AbstractMemberMetaData (and its sub-objects)
-                fmd.initialise(clr);
-                if (fmd.isFieldToBePersisted())
+                mmd.initialise(clr);
+                if (mmd.isFieldToBePersisted())
                 {
-                    if (fmd.fieldBelongsToClass())
+                    if (mmd.fieldBelongsToClass())
                     {
                         no_of_managed_fields++;
                     }
@@ -212,26 +208,23 @@ public class InterfaceMetaData extends AbstractClassMetaData
             managedMembers = new AbstractMemberMetaData[no_of_managed_fields];
             overriddenMembers = new AbstractMemberMetaData[no_of_overridden_fields];
 
-            fields_iter = members.iterator();
             int field_id = 0;
             int overridden_field_id = 0;
             memberPositionsByName = new HashMap();
-            while (fields_iter.hasNext())
+            for (AbstractMemberMetaData mmd : members)
             {
-                AbstractMemberMetaData fmd = fields_iter.next();
-
-                if (fmd.isFieldToBePersisted())
+                if (mmd.isFieldToBePersisted())
                 {
-                    if (fmd.fieldBelongsToClass())
+                    if (mmd.fieldBelongsToClass())
                     {
-                        fmd.setFieldId(field_id);
-                        managedMembers[field_id] = fmd;
-                        memberPositionsByName.put(fmd.getName(), Integer.valueOf(field_id));
+                        mmd.setFieldId(field_id);
+                        managedMembers[field_id] = mmd;
+                        memberPositionsByName.put(mmd.getName(), Integer.valueOf(field_id));
                         field_id++;
                     }
                     else
                     {
-                        overriddenMembers[overridden_field_id++] = fmd;
+                        overriddenMembers[overridden_field_id++] = mmd;
                     }
                 }
             }
@@ -366,28 +359,26 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
         // Populate the AbstractMemberMetaData with their real field values
         // This will populate any containers in these fields also
-        Iterator<AbstractMemberMetaData> fields_iter = members.iterator();
-        while (fields_iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData fmd = fields_iter.next();
-            if (pkFields == fmd.isPrimaryKey())
+            if (pkFields == mmd.isPrimaryKey())
             {
                 Class fieldCls = cls;
-                if (!fmd.fieldBelongsToClass())
+                if (!mmd.fieldBelongsToClass())
                 {
                     // Field overrides a field in a superclass, so find the class
                     try
                     {
-                        fieldCls = clr.classForName(fmd.getClassName(), primary);
+                        fieldCls = clr.classForName(mmd.getClassName(), primary);
                     }
                     catch (ClassNotResolvedException cnre)
                     {
                         // Not found at specified location, so try the same package as this class
-                        String fieldClassName = getPackageName() + "." + fmd.getClassName();
+                        String fieldClassName = getPackageName() + "." + mmd.getClassName();
                         try
                         {
                             fieldCls = clr.classForName(fieldClassName, primary);
-                            fmd.setClassName(fieldClassName);
+                            mmd.setClassName(fieldClassName);
                         }
                         catch (ClassNotResolvedException cnre2)
                         {
@@ -400,21 +391,21 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 Method cls_method = null;
                 try
                 {
-                    cls_method = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(fmd.getName(),true));
+                    cls_method = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),true));
                 }
                 catch (Exception e)
                 {
                     try 
                     {
-                        cls_method = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(fmd.getName(),false));
+                        cls_method = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),false));
                     }
                     catch (Exception e2)
                     {
                         // MetaData method doesn't exist in the class!
-                        throw new InvalidClassMetaDataException("044072", fullName, fmd.getFullFieldName());
+                        throw new InvalidClassMetaDataException("044072", fullName, mmd.getFullFieldName());
                     }
                 }
-                fmd.populate(clr, null, cls_method, primary, mmgr);
+                mmd.populate(clr, null, cls_method, primary, mmgr);
             }
         }
     }
