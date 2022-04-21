@@ -79,24 +79,32 @@ public abstract class NucleusLogger
         // Set the log type to be used based on what is available from this ClassLoader
         // Note that we could have registered in the PluginManager but that needs to log too
         Class loggerClass = null;
-        try
+        String loggerType = System.getProperty("datanucleus.loggingType");
+        if (!StringUtils.isWhitespace(loggerType) && "none".equals(loggerType))
         {
-            // Default to Log4j v1 if present
-            NucleusLogger.class.getClassLoader().loadClass("org.apache.log4j.Logger");
-            loggerClass = org.datanucleus.util.Log4JLogger.class;
+            loggerClass = NullLogger.class;
         }
-        catch (Exception e)
+        else
         {
             try
             {
-                // Fallback to Log4j v2. Would be nice to swap this over to be the default but code in PluginParserTest needs migrating first
+                // Default to Log4j v2 if present.
                 NucleusLogger.class.getClassLoader().loadClass("org.apache.logging.log4j.Logger");
                 loggerClass = org.datanucleus.util.Log4J2Logger.class;
             }
-            catch (Exception e2)
+            catch (Exception e)
             {
-                // Fallback to JRE logging
-                loggerClass = org.datanucleus.util.JDK14Logger.class;
+                try
+                {
+                    // Try Log4j v1 if present
+                    NucleusLogger.class.getClassLoader().loadClass("org.apache.log4j.Logger");
+                    loggerClass = org.datanucleus.util.Log4JLogger.class;
+                }
+                catch (Exception e2)
+                {
+                    // Fallback to JRE logging
+                    loggerClass = org.datanucleus.util.JDK14Logger.class;
+                }
             }
         }
         LOGGER_CLASS = loggerClass;
