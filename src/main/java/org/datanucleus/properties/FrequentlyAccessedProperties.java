@@ -46,7 +46,7 @@ public class FrequentlyAccessedProperties
 
     private Boolean serialiseRead = null;
 
-    private Boolean optimisticTransaction = null;
+    private Boolean optimisticLocking = null;
 
     /**
      * Set default properties that are read when property is not defined in this instance
@@ -162,13 +162,13 @@ public class FrequentlyAccessedProperties
         return serialiseRead;
     }
 
-    public Boolean getOptimisticTransaction()
+    public Boolean getOptimisticLocking()
     {
-        if (optimisticTransaction == null && defaults != null)
+        if (optimisticLocking == null && defaults != null)
         {
-            return defaults.getOptimisticTransaction();
+            return defaults.getOptimisticLocking();
         }
-        return optimisticTransaction;
+        return optimisticLocking;
     }
 
     private static void addField(String propertyName, String fieldName) throws NoSuchFieldException, SecurityException
@@ -188,7 +188,7 @@ public class FrequentlyAccessedProperties
             addField(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE, "level2CacheStoreMode");
             addField(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE, "level2CacheRetrieveMode");
             addField(PropertyNames.PROPERTY_SERIALIZE_READ, "serialiseRead");
-            addField(PropertyNames.PROPERTY_OPTIMISTIC, "optimisticTransaction");
+            addField(PropertyNames.PROPERTY_OPTIMISTIC, "optimisticLocking");
         }
         catch (Exception e)
         {

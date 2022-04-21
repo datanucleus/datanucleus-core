@@ -22,28 +22,20 @@ import java.util.Map;
 
 import org.junit.Assert;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.Configuration;
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.ExecutionContextImpl;
-import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.store.AbstractStoreManager;
-import org.datanucleus.store.query.Query;
 import org.junit.Test;
 
 public class FrequentlyAccessedPropertiesTest
 {
-
     @Test
     public void testConfiguration()
     {
-        
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(PropertyNames.PROPERTY_DETACH_ON_CLOSE, "true");
         props.put(PropertyNames.PROPERTY_OPTIMISTIC, "true");
-        props.put("datanucleus.storeManagerType", StoreManagerStub.class.getName());
 
         PersistenceNucleusContextImpl ctx = new PersistenceNucleusContextImpl(null, props) {
             private static final long serialVersionUID = 6287389368679465707L;
@@ -61,7 +53,7 @@ public class FrequentlyAccessedPropertiesTest
         Assert.assertTrue(ec.getTransaction().getOptimistic());
         ec.setProperty(PropertyNames.PROPERTY_OPTIMISTIC, "false");
         Assert.assertFalse(ec.getTransaction().getOptimistic());
-        Assert.assertTrue(conf.getFrequentProperties().getOptimisticTransaction());
+        Assert.assertTrue(conf.getFrequentProperties().getOptimisticLocking());
     }
     
     @Test
@@ -78,47 +70,10 @@ public class FrequentlyAccessedPropertiesTest
         FrequentlyAccessedProperties defaults = new FrequentlyAccessedProperties();
         props.setDefaults(defaults);
         
-        Assert.assertNull(props.getOptimisticTransaction());
+        Assert.assertNull(props.getOptimisticLocking());
         
         defaults.setProperty(PropertyNames.PROPERTY_OPTIMISTIC, true);
-        Assert.assertTrue(props.getOptimisticTransaction());
-    }
-
-    public static class StoreManagerStub extends AbstractStoreManager 
-    {
-        public StoreManagerStub(ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext, Map<String, Object> props)
-        {
-            super("test", clr, nucleusContext, props);
-        }
-
-        @Override
-        protected void registerConnectionMgr()
-        {
-        }
-
-        @Override
-        public Query newQuery(String language, ExecutionContext ec)
-        {
-            return null;
-        }
-
-        @Override
-        public Query newQuery(String language, ExecutionContext ec, String queryString)
-        {
-            return null;
-        }
-
-        @Override
-        public Query newQuery(String language, ExecutionContext ec, Query q)
-        {
-            return null;
-        }
-
-        @Override
-        public boolean supportsQueryLanguage(String language)
-        {
-            return true;
-        }
+        Assert.assertTrue(props.getOptimisticLocking());
     }
 }
 

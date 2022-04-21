@@ -298,7 +298,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         properties.getFrequentProperties().setDefaults(conf.getFrequentProperties());
 
         // Set up FetchPlan
-        fetchPlan = new FetchPlan(this, clr).setMaxFetchDepth(conf.getIntProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH));
+        fetchPlan = new FetchPlan(this, clr).setMaxFetchDepth(properties.getIntProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH));
 
         // Set up the transaction based on the environment
         if (TransactionType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_TYPE)))
@@ -761,7 +761,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected void initialiseLevel1Cache()
     {
-        String level1Type = getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
+        String level1Type = getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE); // TODO This is not listed as overrideable on the manager
         if (level1Type == null)
         {
             level1Type = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
@@ -1002,8 +1002,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (properties.hasProperty(name))
         {
-            assertIsOpen();
-            return properties.getBooleanProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
+            return properties.getBooleanProperty(name);
         }
         return null;
     }
@@ -1013,8 +1012,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (properties.hasProperty(name))
         {
-            assertIsOpen();
-            return properties.getIntProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
+            return properties.getIntProperty(name);
         }
         return null;
     }
@@ -1024,8 +1022,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (properties.hasProperty(name))
         {
-            assertIsOpen();
-            return properties.getStringProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
+            return properties.getStringProperty(name);
         }
         return null;
     }
@@ -1035,8 +1032,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (properties.hasProperty(name))
         {
-            assertIsOpen();
-            return properties.getProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
+            return properties.getProperty(name);
         }
         return null;
     }
@@ -1341,7 +1337,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     private boolean isNonTxAtomic()
     {
-        return getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_ATOMIC);
+        return properties.getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_ATOMIC);
     }
 
     /**
@@ -1700,11 +1696,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         ThreadContextInfo threadInfo = acquireThreadContextInfo();
         try
         {
-            boolean allowMergeOfTransient = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT, false);
-            if (getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT) != null)
-            {
-                allowMergeOfTransient = getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT);
-            }
+            boolean allowMergeOfTransient = getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT);
             if (merging && allowMergeOfTransient)
             {
                 threadInfo.merging = true;
@@ -3192,7 +3184,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        boolean performValidationWhenCached = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED);
+        boolean performValidationWhenCached = getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED);
         List<DNStateManager> smsToValidate = new ArrayList<>();
         if (validate)
         {
@@ -3430,7 +3422,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        boolean performValidationWhenCached = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED);
+        boolean performValidationWhenCached = getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED);
         if (validate && (!fromCache || performValidationWhenCached))
         {
             // User requests validation of the instance so go to the datastore to validate it
@@ -5259,18 +5251,27 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Within a transaction, and serializeRead set for txn
             return tx.getSerializeRead();
         }
-        else if (getProperty(PropertyNames.PROPERTY_SERIALIZE_READ) != null)
+        Boolean serialiseRead = getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
+        if (serialiseRead != null)
         {
-            // Set for the context as a property
-            return properties.getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
-        }
-        else if (className != null)
-        {
-            // Set for the class
-            AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
-            if (cmd != null)
+            if (serialiseRead == Boolean.TRUE)
             {
-                return cmd.isSerializeRead();
+                // Globally ON TODO Should we allow a class to override the default ON
+                return serialiseRead;
+            }
+            else
+            {
+                // Globally OFF
+                if (className != null)
+                {
+                    // Set for the class
+                    AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
+                    if (cmd != null)
+                    {
+                        return cmd.isSerializeRead();
+                    }
+                }
+                return false;
             }
         }
         return false;
@@ -5319,7 +5320,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return callbackHandler;
         }
 
-        if (getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS))
+        if (getBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS))
         {
             String callbackHandlerClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension(
                 "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name");

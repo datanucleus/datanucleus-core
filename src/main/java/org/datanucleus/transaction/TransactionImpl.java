@@ -107,10 +107,14 @@ public class TransactionImpl implements Transaction
         } 
         else 
         {
-            Boolean serialiseReadProp = config.getBooleanObjectProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
+            Boolean serialiseReadProp = null;
             if (ec.getProperty(PropertyNames.PROPERTY_SERIALIZE_READ) != null)
             {
                 serialiseReadProp = ec.getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
+            }
+            if (serialiseReadProp == null)
+            {
+                serialiseReadProp = config.getFrequentProperties().getSerialiseRead();
             }
             if (serialiseReadProp != null)
             {
@@ -656,7 +660,7 @@ public class TransactionImpl implements Transaction
     {
         if (properties != null)
         {
-            return properties.getFrequentProperties().getOptimisticTransaction();
+            return properties.getFrequentProperties().getOptimisticLocking();
         }
         return ec.getBooleanProperty(PropertyNames.PROPERTY_OPTIMISTIC);
     }
