@@ -18,14 +18,15 @@ Contributors:
 package org.datanucleus;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.FetchGroupMemberMetaData;
 import org.datanucleus.metadata.FetchGroupMetaData;
-import org.datanucleus.util.MultiMap;
 
 /**
  * Manager for dynamic fetch groups.
@@ -36,7 +37,8 @@ import org.datanucleus.util.MultiMap;
 public class FetchGroupManager
 {
     /** Map of dynamic fetch groups, keyed by the group name. */
-    private MultiMap fetchGroupByName;
+    private Map<String, Set<FetchGroup>> fetchGroupByName;
+//    private MultiMap fetchGroupByName;
 
     /** Context that we are operating in. */
     private NucleusContext nucleusCtx;
@@ -58,28 +60,38 @@ public class FetchGroupManager
     {
         if (fetchGroupByName == null)
         {
-            fetchGroupByName = new MultiMap();
+            fetchGroupByName = new HashMap<>();
+            Set<FetchGroup> coll = new HashSet<>();
+            coll.add(grp);
+            fetchGroupByName.put(grp.getName(), coll);
         }
-
-        // Check for existing group with this name for this type
-        Collection<FetchGroup> coll = (Collection<FetchGroup>)fetchGroupByName.get(grp.getName());
-        if (coll != null)
+        else
         {
-            // Check for existing entry for this name and class
-            Iterator<FetchGroup> iter = coll.iterator();
-            while (iter.hasNext())
+            // Check for existing group with this name for this type
+            Set<FetchGroup> coll = fetchGroupByName.get(grp.getName());
+            if (coll != null)
             {
-                FetchGroup existingGrp = iter.next();
-                if (existingGrp.getName().equals(grp.getName()) && existingGrp.getType().getName().equals(grp.getType().getName()))
+                // Check for existing entry for this name and class
+                Iterator<FetchGroup> iter = coll.iterator();
+                while (iter.hasNext())
                 {
-                    // Already have a group for this name+class so replace it
-                    existingGrp.disconnectFromListeners(); // Remove the old group from use
-                    iter.remove(); // Remove the old group
+                    FetchGroup existingGrp = iter.next();
+                    if (existingGrp.getName().equals(grp.getName()) && existingGrp.getType().getName().equals(grp.getType().getName()))
+                    {
+                        // Already have a group for this name+class so replace it
+                        existingGrp.disconnectFromListeners(); // Remove the old group from use
+                        iter.remove(); // Remove the old group
+                    }
                 }
+                coll.add(grp);
+            }
+            else
+            {
+                coll = new HashSet<>();
+                coll.add(grp);
+                fetchGroupByName.put(grp.getName(), coll);
             }
         }
-
-        fetchGroupByName.put(grp.getName(), grp);
     }
 
     /**
@@ -90,7 +102,7 @@ public class FetchGroupManager
     {
         if (fetchGroupByName != null)
         {
-            Collection<FetchGroup> coll = (Collection<FetchGroup>) fetchGroupByName.get(grp.getName());
+            Collection<FetchGroup> coll = fetchGroupByName.get(grp.getName());
             if (coll != null)
             {
                 Iterator<FetchGroup> iter = coll.iterator();
@@ -120,7 +132,7 @@ public class FetchGroupManager
     {
         if (fetchGroupByName != null)
         {
-            Collection<FetchGroup> coll = (Collection) fetchGroupByName.get(name);
+            Collection<FetchGroup> coll = fetchGroupByName.get(name);
             if (coll != null)
             {
                 for (FetchGroup grp : coll)
@@ -194,7 +206,7 @@ public class FetchGroupManager
     {
         if (fetchGroupByName != null)
         {
-            Collection coll = (Collection) fetchGroupByName.get(name);
+            Collection<FetchGroup> coll = fetchGroupByName.get(name);
             if (coll != null)
             {
                 return new HashSet<>(coll);
@@ -210,13 +222,14 @@ public class FetchGroupManager
     {
         if (fetchGroupByName != null)
         {
-            Collection fetchGroups = fetchGroupByName.values();
-            Iterator iter = fetchGroups.iterator();
-            while (iter.hasNext())
+            for (Set<FetchGroup> fgrps : fetchGroupByName.values())
             {
-                FetchGroup grp = (FetchGroup)iter.next();
-                grp.disconnectFromListeners(); // Remove the group from use
+                for (FetchGroup grp : fgrps)
+                {
+                    grp.disconnectFromListeners(); // Remove the group from use
+                }
             }
+
             fetchGroupByName.clear();
         }
     }

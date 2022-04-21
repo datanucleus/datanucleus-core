@@ -56,7 +56,6 @@ import org.datanucleus.metadata.annotations.AnnotationManager;
 import org.datanucleus.metadata.annotations.AnnotationManagerImpl;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.MultiMap;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -165,7 +164,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     protected Map<String, QueryResultMetaData> queryResultMetaDataByName = null;
 
     /** Map of class metadata, keyed by the application-id object-id class name (not SingleField). */
-    protected MultiMap classMetaDataByAppIdClassName = new MultiMap();
+    protected Map<String, Collection<AbstractClassMetaData>> classMetaDataByAppIdClassName = new HashMap<>();
 
     /** Listeners for metadata load. */
     protected Set<MetaDataListener> listeners = null;
@@ -1263,11 +1262,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
             }
 
-            Iterator<Map.Entry> entryIter = classMetaDataByAppIdClassName.entrySet().iterator();
-            while (entryIter.hasNext())
+            Collection<Collection<AbstractClassMetaData>> classMetaDataByAppIdValues = classMetaDataByAppIdClassName.values();
+            Iterator<Collection<AbstractClassMetaData>> classMetaDataByAppIdValuesIter = classMetaDataByAppIdValues.iterator();
+            while (classMetaDataByAppIdValuesIter.hasNext())
             {
-                Map.Entry entry = entryIter.next();
-                Collection<AbstractClassMetaData> collCmds = (Collection<AbstractClassMetaData>) entry.getValue();
+                Collection<AbstractClassMetaData> collCmds = classMetaDataByAppIdValuesIter.next();
                 if (!collCmds.isEmpty())
                 {
                     collCmds.remove(cmd);
@@ -1532,7 +1531,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     @Override
     public Collection<AbstractClassMetaData> getClassMetaDataWithApplicationId(String objectIdClassName)
     {
-        return (Collection<AbstractClassMetaData>)classMetaDataByAppIdClassName.get(objectIdClassName);
+        return classMetaDataByAppIdClassName.get(objectIdClassName);
     }
 
     /* (non-Javadoc)
@@ -2878,7 +2877,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         if (cmd.getIdentityType() == IdentityType.APPLICATION && !cmd.usesSingleFieldIdentityClass())
         {
             // Register the app-id object-id class lookup
-            classMetaDataByAppIdClassName.put(cmd.getObjectidClass(), cmd);
+            Collection<AbstractClassMetaData> appIdCmds = classMetaDataByAppIdClassName.get(cmd.getObjectidClass());
+            if (appIdCmds == null)
+            {
+                appIdCmds = new HashSet<>();
+                classMetaDataByAppIdClassName.put(cmd.getObjectidClass(), appIdCmds);
+                appIdCmds.add(cmd);
+            }
+            else
+            {
+                appIdCmds.add(cmd);
+            }
         }
 
         if (cmd instanceof ClassMetaData)
