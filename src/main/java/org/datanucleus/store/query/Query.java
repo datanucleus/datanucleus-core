@@ -78,20 +78,26 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_USE_FETCH_PLAN = PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN;
     public static final String EXTENSION_RESULT_SIZE_METHOD = PropertyNames.PROPERTY_QUERY_RESULT_SIZE_METHOD;
     public static final String EXTENSION_LOAD_RESULTS_AT_COMMIT = PropertyNames.PROPERTY_QUERY_LOAD_RESULTS_AT_COMMIT;
-    public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultcachetype";
+    public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType".toLowerCase();
     public static final String EXTENSION_RESULT_CACHE_VALIDATE_OBJECTS = PropertyNames.PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS;
     public static final String EXTENSION_RESULTS_CACHED = PropertyNames.PROPERTY_QUERY_RESULTS_CACHED;
     public static final String EXTENSION_COMPILATION_CACHED = PropertyNames.PROPERTY_QUERY_COMPILATION_CACHED;
     public static final String EXTENSION_EVALUATE_IN_MEMORY = PropertyNames.PROPERTY_QUERY_EVALUATE_IN_MEMORY;
-    public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeresultsatmanagerclose";
+    public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose".toLowerCase();
     public static final String EXTENSION_CHECK_UNUSED_PARAMETERS = PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS;
+    public static final String EXTENSION_COMPILE_OPTIMISE_VAR_THIS = PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS;
 
+    public static final String EXTENSION_JDOQL_ALLOW_ALL = PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL;
     public static final String EXTENSION_JDOQL_STRICT = PropertyNames.PROPERTY_QUERY_JDOQL_STRICT;
+
+    public static final String EXTENSION_JPQL_ALLOW_RANGE = PropertyNames.PROPERTY_QUERY_JPQL_ALLOW_RANGE;
     public static final String EXTENSION_JPQL_STRICT = PropertyNames.PROPERTY_QUERY_JPQL_STRICT;
+
+    public static final String EXTENSION_SQL_ALLOW_ALL = PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL;
     public static final String EXTENSION_SQL_SYNTAX_CHECKS = PropertyNames.PROPERTY_QUERY_SQL_SYNTAXCHECKS;
 
     /** Extension for the benefit of JPQL so that we can exclude subclasses (not possible with JPA API). */
-    public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludesubclasses";
+    public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludeSubclasses".toLowerCase();
 
     public static final String EXTENSION_QUERY_TYPE = "datanucleus.query.type";
 
@@ -663,6 +669,12 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
             }
             return Boolean.valueOf((String)value);
         }
+
+        Boolean propVal = ec.getBooleanProperty(name);
+        if (propVal != null)
+        {
+            return propVal;
+        }
         return ec.getNucleusContext().getConfiguration().getBooleanProperty(name, resultIfNotSet);
     }
 
@@ -670,8 +682,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Convenience accessor to return whether an extension is set (or whether the persistence property
      * of the same name is set), and what is its String value. Returns "resultIfNotSet" if not set.
      * @param name The extension/property name
-     * @param resultIfNotSet The value to return if there is neither an extension nor a persistence
-     *                       property of the same name
+     * @param resultIfNotSet The value to return if there is neither an extension nor a persistence property of the same name
      * @return The String value
      */
     public String getStringExtensionProperty(String name, String resultIfNotSet)
@@ -681,7 +692,12 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
             return (String)extensions.get(name);
         }
 
-        String value = ec.getNucleusContext().getConfiguration().getStringProperty(name);
+        String value = ec.getStringProperty(name);
+        if (value != null)
+        {
+            return value;
+        }
+        value = ec.getNucleusContext().getConfiguration().getStringProperty(name);
         return value != null ? value : resultIfNotSet;
     }
 

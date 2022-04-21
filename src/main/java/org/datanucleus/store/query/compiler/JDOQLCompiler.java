@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistenceNucleusContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.query.JDOQLQueryHelper;
 import org.datanucleus.store.query.Query;
@@ -177,9 +176,9 @@ public class JDOQLCompiler extends JavaQueryCompiler
         // Apply compilation optimisations
         if (options != null)
         {
-            if (options.containsKey(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS))
+            if (options.containsKey(Query.EXTENSION_COMPILE_OPTIMISE_VAR_THIS))
             {
-                Boolean val = (Boolean)options.get(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS);
+                Boolean val = (Boolean)options.get(Query.EXTENSION_COMPILE_OPTIMISE_VAR_THIS);
                 if (val == Boolean.TRUE)
                 {
                     // Perform "var == this" optimisation TODO Enable this using a query extension

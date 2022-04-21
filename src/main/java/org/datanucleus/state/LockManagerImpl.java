@@ -285,10 +285,14 @@ public class LockManagerImpl implements LockManager
             if (currentVersion == null)
             {
                 // Get the initial value from the VersionMetaData extension if provided, otherwise the global default (for the context)
-                Integer initValue = ec.getIntProperty(PropertyNames.PROPERTY_VERSION_NUMBER_INITIAL_VALUE);
+                Integer initValue = null;
                 if (vermd.hasExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE))
                 {
                     initValue = Integer.valueOf(vermd.getValueForExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE));
+                }
+                else
+                {
+                    initValue = ec.getIntProperty(PropertyNames.PROPERTY_VERSION_NUMBER_INITIAL_VALUE);
                 }
 
                 if (vermd.getMemberName() != null)

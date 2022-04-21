@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.query.compiler.JDOQLCompiler;
@@ -107,16 +106,13 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
 
         // Parse the single-string query for errors
         JDOQLSingleStringParser parser = new JDOQLSingleStringParser(this, query);
-        boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
-        if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
-        {
-            allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
-        }
-        if (allowAllSyntax)
+
+        if (getBooleanExtensionProperty(EXTENSION_JDOQL_ALLOW_ALL, false))
         {
             parser.setAllowDelete(true);
             parser.setAllowUpdate(true);
         }
+
         parser.parse();
 
         if (candidateClassName != null)
@@ -371,21 +367,19 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
         }
         JDOQLCompiler compiler = new JDOQLCompiler(ec.getNucleusContext(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, explicitVariables, this.update);
-        if (getBooleanExtensionProperty(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS, false))
+        if (getBooleanExtensionProperty(EXTENSION_COMPILE_OPTIMISE_VAR_THIS, false))
         {
-            compiler.setOption(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS, true);
+            compiler.setOption(EXTENSION_COMPILE_OPTIMISE_VAR_THIS, true);
         }
         if (getBooleanExtensionProperty(EXTENSION_JDOQL_STRICT, false))
         {
             compiler.setOption(EXTENSION_JDOQL_STRICT, "true");
         }
 
-        boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
-        if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
+        if (getBooleanExtensionProperty(EXTENSION_JDOQL_ALLOW_ALL, false))
         {
-            allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
+            compiler.setAllowAll(true);
         }
-        compiler.setAllowAll(allowAllSyntax);
 
         compilation = compiler.compile(parameterValues, subqueries);
         if (QueryUtils.queryReturnsSingleRow(this))
@@ -478,12 +472,10 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
                 subCompiler.setOption(EXTENSION_JDOQL_STRICT, "true");
             }
 
-            boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
-            if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
+            if (getBooleanExtensionProperty(EXTENSION_JDOQL_ALLOW_ALL, false))
             {
-                allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
+                subCompiler.setAllowAll(true);
             }
-            subCompiler.setAllowAll(allowAllSyntax);
 
             subCompiler.setLinkToParentQuery(parentCompiler, subqueryDefinition.getParameterMap());
             QueryCompilation subqueryCompilation = subCompiler.compile(parameterValues, null);

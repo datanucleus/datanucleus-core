@@ -21,7 +21,6 @@ import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistableObjectType;
-import org.datanucleus.Configuration;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.cache.CachedPC;
@@ -48,10 +47,8 @@ public class StateManagerFactoryImpl implements StateManagerFactory
 
     public StateManagerFactoryImpl(PersistenceNucleusContext nucCtx)
     {
-        Configuration conf = nucCtx.getConfiguration();
-
         // Load class for default StateManager
-        String smClassName = conf.getStringProperty(PropertyNames.PROPERTY_STATE_MANAGER_CLASS_NAME);
+        String smClassName = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_STATE_MANAGER_CLASS_NAME);
         if (StringUtils.isWhitespace(smClassName))
         {
             // Use default StateManager for the StoreManager

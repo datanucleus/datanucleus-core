@@ -1395,7 +1395,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     protected void updateLevel2CacheForFields(int[] fieldNumbers)
     {
-        String updateMode = (String)myEC.getProperty(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE);
+        String updateMode = myEC.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE);
         if (updateMode != null && updateMode.equalsIgnoreCase("commit-only"))
         {
             return;
