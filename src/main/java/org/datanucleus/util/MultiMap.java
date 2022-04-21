@@ -29,9 +29,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /** 
- * An implementation of a <code>MultiMap</code>, which is basically a Map
- * with multiple values for a key. This will be removed when SUN see sense and
- * include it in the JDK java.util package as standard.
+ * An implementation of a <code>MultiMap</code>, which is basically a Map with multiple values for a key. 
+ * This will be removed when SUN see sense and include it in the JDK java.util package as standard.
+ * TODO Genericise this
  */
 public class MultiMap extends HashMap
 {
@@ -48,7 +48,6 @@ public class MultiMap extends HashMap
 
     /**
      * Constructor.
-     * 
      * @param initialCapacity  the initial capacity
      */
     public MultiMap(int initialCapacity)
@@ -59,7 +58,7 @@ public class MultiMap extends HashMap
     /**
      * Constructor.
      * @param initialCapacity initial capacity
-     * @param loadFactor      load factor for the Map.
+     * @param loadFactor load factor for the Map.
      */
     public MultiMap(int initialCapacity, float loadFactor)
     {
@@ -86,7 +85,6 @@ public class MultiMap extends HashMap
 
     /**
      * Check if the map contains the passed value.
-     *
      * @param value  the value to search for
      * @return true if the list contains the value
      */
@@ -107,14 +105,13 @@ public class MultiMap extends HashMap
 
     /**
      * Add a key, and its value, to the map.
-     * 
-     * @param key   the key to set
+     * @param key the key to set
      * @param value the value to set the key to
      * @return the value added when successful, or null if an error
      */
-    public Object put(Object key,Object value)
+    public Object put(Object key, Object value)
     {
-        Collection c=(Collection)super.get(key);
+        Collection c = (Collection)super.get(key);
         if (c == null)
         {
             c = createCollection(null);
@@ -128,9 +125,8 @@ public class MultiMap extends HashMap
     /**
      * Removes a specific key,value pairing from map.
      * The item is removed from the collection mapped to the specified key.
-     * 
-     * @param key  the key to remove from
-     * @param item  the value to remove
+     * @param key the key to remove from
+     * @param item the value to remove
      * @return the value removed (which was passed in)
      */
     public Object removeKeyValue(Object key, Object item)

@@ -210,7 +210,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
             int field_id = 0;
             int overridden_field_id = 0;
-            memberPositionsByName = new HashMap();
+            memberPositionsByName = new HashMap<>();
             for (AbstractMemberMetaData mmd : members)
             {
                 if (mmd.isFieldToBePersisted())
@@ -272,7 +272,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
             if (fetchGroups != null)
             {
-                fetchGroupMetaDataByName = new HashMap();
+                fetchGroupMetaDataByName = new HashMap<>();
                 for (FetchGroupMetaData fgmd : fetchGroups)
                 {
                     fgmd.initialise(clr);

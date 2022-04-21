@@ -65,7 +65,7 @@ public class EmbeddedMetaData extends MetaData
     protected DiscriminatorMetaData discriminatorMetaData;
 
     /** Member definition of the embedded object. */
-    protected final List<AbstractMemberMetaData> members = new ArrayList();
+    protected final List<AbstractMemberMetaData> members = new ArrayList<>();
 
     /**
      * Constructor to create a copy of the passed metadata.

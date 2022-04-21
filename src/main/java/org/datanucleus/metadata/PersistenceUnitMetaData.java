@@ -61,7 +61,7 @@ public class PersistenceUnitMetaData extends MetaData
     Set<String> classNames = null;
 
     /** Names/URLs of the JAR files specified. */
-    Set jarFiles = null;
+    Set<Object> jarFiles = null;
 
     /** Names of the mapping files specified. */
     Set<String> mappingFileNames = null;
@@ -201,7 +201,7 @@ public class PersistenceUnitMetaData extends MetaData
     {
         if (classNames == null)
         {
-            this.classNames = new HashSet();
+            this.classNames = new HashSet<>();
         }
         this.classNames.add(className);
     }
@@ -210,7 +210,7 @@ public class PersistenceUnitMetaData extends MetaData
     {
         if (this.classNames == null)
         {
-            this.classNames = new HashSet();
+            this.classNames = new HashSet<>();
         }
         this.classNames.addAll(classNames);
     }
@@ -219,7 +219,7 @@ public class PersistenceUnitMetaData extends MetaData
     {
         if (jarFiles == null)
         {
-            jarFiles = new HashSet();
+            jarFiles = new HashSet<>();
         }
         jarFiles.add(jarName);
     }
@@ -228,7 +228,7 @@ public class PersistenceUnitMetaData extends MetaData
     {
         if (jarFiles == null)
         {
-            jarFiles = new HashSet();
+            jarFiles = new HashSet<>();
         }
         jarFiles.addAll(jarNames);
     }
@@ -241,7 +241,7 @@ public class PersistenceUnitMetaData extends MetaData
     {
         if (jarFiles == null)
         {
-            jarFiles = new HashSet();
+            jarFiles = new HashSet<>();
         }
         jarFiles.add(jarURL);
     }
@@ -262,7 +262,7 @@ public class PersistenceUnitMetaData extends MetaData
     {
         if (mappingFileNames == null)
         {
-            mappingFileNames = new HashSet();
+            mappingFileNames = new HashSet<>();
         }
         mappingFileNames.add(mappingFile);
     }

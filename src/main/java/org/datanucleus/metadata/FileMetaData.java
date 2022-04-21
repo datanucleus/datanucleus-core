@@ -246,7 +246,7 @@ public class FileMetaData extends MetaData
 
         if (queries == null)
         {
-            queries = new HashSet();
+            queries = new HashSet<>();
         }
         queries.add(qmd);
         qmd.parent = this;
@@ -265,7 +265,7 @@ public class FileMetaData extends MetaData
 
         if (storedProcs == null)
         {
-            storedProcs = new HashSet();
+            storedProcs = new HashSet<>();
         }
         storedProcs.add(qmd);
         qmd.parent = this;
@@ -279,7 +279,7 @@ public class FileMetaData extends MetaData
 
         if (fetchPlans == null)
         {
-            fetchPlans = new HashSet();
+            fetchPlans = new HashSet<>();
         }
         fetchPlans.add(fpmd);
         fpmd.parent = this;
@@ -297,7 +297,7 @@ public class FileMetaData extends MetaData
         PackageMetaData pmd = new PackageMetaData(name);
         if (packages == null)
         {
-            packages = new ArrayList();
+            packages = new ArrayList<>();
         }
         else
         {
@@ -324,7 +324,7 @@ public class FileMetaData extends MetaData
     {
         if (listeners == null)
         {
-            listeners = new ArrayList();
+            listeners = new ArrayList<>();
         }
         if (!listeners.contains(listener))
         {
@@ -350,7 +350,7 @@ public class FileMetaData extends MetaData
     {
         if (queryResultMetaData == null)
         {
-            queryResultMetaData = new HashSet();
+            queryResultMetaData = new HashSet<>();
         }
         if (!queryResultMetaData.contains(resultMetaData))
         {

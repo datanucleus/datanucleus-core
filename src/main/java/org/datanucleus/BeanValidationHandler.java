@@ -79,7 +79,7 @@ public class BeanValidationHandler
         {
             throw new javax.validation.ConstraintViolationException(
                 "Validation failed for " + StringUtils.toJVMIDString(pc) + " during " + callbackName +
-                " for groups "+StringUtils.objectArrayToString(groups) + " - exceptions are attached", (Set<ConstraintViolation<?>>)(Object)(violations)); 
+                " for groups "+StringUtils.objectArrayToString(groups) + " - exceptions are attached", violations); 
         }
     }
 

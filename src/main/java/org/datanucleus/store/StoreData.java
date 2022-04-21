@@ -53,7 +53,7 @@ public class StoreData
     protected Table table;
 
     /** Extension props. Available for store manager to save additional info if required. */
-    protected Map properties = new HashMap();
+    protected Map<String, Object> properties = new HashMap<>();
 
     /**
      * Constructor.
@@ -161,7 +161,7 @@ public class StoreData
      * Accessor for extension props, if utilised by the store manager.
      * @return Extension props
      */
-    public Map getProperties()
+    public Map<String, Object> getProperties()
     {
         return properties;
     }

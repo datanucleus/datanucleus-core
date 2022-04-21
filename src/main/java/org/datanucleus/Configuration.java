@@ -67,7 +67,7 @@ public class Configuration extends PropertyStore implements Serializable
     /** Map of default properties, used as a fallback. Key is lower-case. */
     private Map<String, Object> defaultProperties = new HashMap<>();
 
-    private Map<String, PropertyValidator> propertyValidators = new HashMap();
+    private Map<String, PropertyValidator> propertyValidators = new HashMap<>();
     
     private volatile Map<String, Object> managerOverrideableProperties;
     

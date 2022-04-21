@@ -44,7 +44,7 @@ public class ImplementsMetaData extends MetaData
     protected String name;
 
     /** Properties implemented. */
-    protected final List<PropertyMetaData> properties = new ArrayList();
+    protected final List<PropertyMetaData> properties = new ArrayList<>();
 
     /**
      * Constructor.

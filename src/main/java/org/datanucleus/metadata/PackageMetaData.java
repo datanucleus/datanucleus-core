@@ -274,7 +274,7 @@ public class PackageMetaData extends MetaData
         }
         if (classes == null)
         {
-            classes = new ArrayList();
+            classes = new ArrayList<>();
         }
         else
         {
@@ -334,7 +334,7 @@ public class PackageMetaData extends MetaData
         }
         if (interfaces == null)
         {
-            interfaces = new ArrayList();
+            interfaces = new ArrayList<>();
         }
         else
         {
@@ -377,7 +377,7 @@ public class PackageMetaData extends MetaData
 
         if (sequences == null)
         {
-            sequences = new HashSet();
+            sequences = new HashSet<>();
         }
         sequences.add(seqmd);
         seqmd.parent = this;
@@ -409,7 +409,7 @@ public class PackageMetaData extends MetaData
 
         if (tableGenerators == null)
         {
-            tableGenerators = new HashSet();
+            tableGenerators = new HashSet<>();
         }
         tableGenerators.add(tabmd);
         tabmd.parent = this;
@@ -426,7 +426,7 @@ public class PackageMetaData extends MetaData
 
         if (tableGenerators == null)
         {
-            tableGenerators = new HashSet();
+            tableGenerators = new HashSet<>();
         }
         tableGenerators.add(tgmd);
         tgmd.parent = this;

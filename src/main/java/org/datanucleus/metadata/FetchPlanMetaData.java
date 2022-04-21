@@ -39,7 +39,7 @@ public class FetchPlanMetaData extends MetaData
     protected int fetchSize = -1;
 
     /** Series of Fetch Groups used in this FetchPlan. Only used during construction. */
-    protected List<FetchGroupMetaData> fetchGroups = new ArrayList();    
+    protected List<FetchGroupMetaData> fetchGroups = new ArrayList<>();    
 
     /**
      * Constructor for a fetch plan with a name. Set fields using setters, before populate().

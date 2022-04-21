@@ -1020,7 +1020,7 @@ public class ClassMetaData extends AbstractClassMetaData
     
             if (fetchGroups != null)
             {
-                fetchGroupMetaDataByName = new HashMap();
+                fetchGroupMetaDataByName = new HashMap<>();
                 for (FetchGroupMetaData fgmd : fetchGroups)
                 {
                     fgmd.initialise(clr);
@@ -1135,7 +1135,7 @@ public class ClassMetaData extends AbstractClassMetaData
 
         if (implementations == null)
         {
-            implementations = new ArrayList();
+            implementations = new ArrayList<>();
         }
         implementations.add(implmd);
         implmd.parent = this;

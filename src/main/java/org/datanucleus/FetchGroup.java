@@ -20,7 +20,6 @@ package org.datanucleus;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,13 +57,13 @@ public class FetchGroup<T> implements Serializable
     private boolean postLoad = false;
 
     /** Names of the fields/properties of the class that are part of this group. */
-    private Set<String> memberNames = Collections.newSetFromMap(new ConcurrentHashMap());
+    private Set<String> memberNames = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /** Map of recursion depth, keyed by the member name. Only has entries when not using default. */
     private Map<String, Integer> recursionDepthByMemberName = null;
 
     /** FetchPlans listening to this group for changes. */
-    private Collection<FetchPlan> planListeners = Collections.newSetFromMap(new ConcurrentHashMap());
+    private Collection<FetchPlan> planListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /** Whether this group can be modified. */
     private boolean unmodifiable = false;
@@ -100,7 +99,7 @@ public class FetchGroup<T> implements Serializable
 
         if (grp.recursionDepthByMemberName != null)
         {
-            recursionDepthByMemberName = new ConcurrentHashMap(grp.recursionDepthByMemberName);
+            recursionDepthByMemberName = new ConcurrentHashMap<>(grp.recursionDepthByMemberName);
         }
     }
 
@@ -177,7 +176,7 @@ public class FetchGroup<T> implements Serializable
             {
                 if (recursionDepthByMemberName == null)
                 {
-                    recursionDepthByMemberName = new ConcurrentHashMap();
+                    recursionDepthByMemberName = new ConcurrentHashMap<>();
                 }
                 recursionDepthByMemberName.put(memberName, Integer.valueOf(recursionDepth));
             }
@@ -372,10 +371,9 @@ public class FetchGroup<T> implements Serializable
     {
         if (!planListeners.isEmpty())
         {
-            Iterator<FetchPlan> iter = planListeners.iterator();
-            while (iter.hasNext())
+            for (FetchPlan fp : planListeners)
             {
-                iter.next().notifyFetchGroupChange(this);
+                fp.notifyFetchGroupChange(this);
             }
         }
     }
@@ -413,10 +411,9 @@ public class FetchGroup<T> implements Serializable
     {
         if (!planListeners.isEmpty())
         {
-            Iterator<FetchPlan> iter = planListeners.iterator();
-            while (iter.hasNext())
+            for (FetchPlan fp : planListeners)
             {
-                iter.next().notifyFetchGroupRemove(this);
+                fp.notifyFetchGroupRemove(this);
             }
             planListeners.clear();
         }

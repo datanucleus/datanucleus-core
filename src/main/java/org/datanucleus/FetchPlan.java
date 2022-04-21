@@ -98,7 +98,7 @@ public class FetchPlan implements Serializable
     Class[] detachmentRootClasses = null;
 
     /** The instances used as the roots for detachment (DetachAllOnCommit). */
-    Collection detachmentRoots = null;
+    Collection<Object> detachmentRoots = null;
 
     /**
      * Constructor. Initially has the default fetch group.
@@ -398,7 +398,7 @@ public class FetchPlan implements Serializable
      * @param roots The roots of the detachment graph.
      * @return The fetch plan with these roots
      */
-    public FetchPlan setDetachmentRoots(Collection roots)
+    public FetchPlan setDetachmentRoots(Collection<Object> roots)
     {
         if (detachmentRootClasses != null || detachmentRoots != null)
         {

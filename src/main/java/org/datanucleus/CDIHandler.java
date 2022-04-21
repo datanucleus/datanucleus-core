@@ -82,7 +82,7 @@ public class CDIHandler
     {
         if (!injectionTargets.isEmpty())
         {
-            Set keys = new HashSet<>();
+            Set<Object> keys = new HashSet<>();
             synchronized(injectionTargets)
             {
                 keys.addAll(injectionTargets.keySet());

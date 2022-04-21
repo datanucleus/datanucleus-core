@@ -123,10 +123,8 @@ public class FetchGroupManager
             Collection<FetchGroup> coll = (Collection) fetchGroupByName.get(name);
             if (coll != null)
             {
-                Iterator<FetchGroup> iter = coll.iterator();
-                while (iter.hasNext())
+                for (FetchGroup grp : coll)
                 {
-                    FetchGroup<T> grp = iter.next();
                     if (grp.getType() == cls)
                     {
                         return grp;
@@ -156,7 +154,7 @@ public class FetchGroupManager
     public <T> FetchGroup<T> createFetchGroup(Class<T> cls, String name)
     {
         // Not present so create a new FetchGroup and add it
-        FetchGroup<T> fg = new FetchGroup(nucleusCtx, name, cls);
+        FetchGroup<T> fg = new FetchGroup<T>(nucleusCtx, name, cls);
         if (name.equals(FetchGroup.DEFAULT))
         {
             // Special case of wanting to create a group to override the DFG
@@ -199,7 +197,7 @@ public class FetchGroupManager
             Collection coll = (Collection) fetchGroupByName.get(name);
             if (coll != null)
             {
-                return new HashSet(coll);
+                return new HashSet<>(coll);
             }
         }
         return null;

@@ -31,7 +31,7 @@ public class ConfigurationElement
     /** child elements **/
     private ConfigurationElement[] children;
     /** attributes **/
-    final private Map attributes = new HashMap();
+    final private Map<String, String> attributes = new HashMap<>();
     /** attributes **/
     private String[] attributeNames;
     /** element name **/
@@ -90,7 +90,7 @@ public class ConfigurationElement
      */
     public String getAttribute(String name)
     {
-        return (String) attributes.get(name);
+        return attributes.get(name);
     }
     
     /**

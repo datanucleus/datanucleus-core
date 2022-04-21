@@ -216,7 +216,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     // should be used.
 
     /** Columns ColumnMetaData */
-    protected List<ColumnMetaData> columns = new ArrayList();
+    protected List<ColumnMetaData> columns = new ArrayList<>();
 
     /** Name of the target entity (when used with JPA MetaData on OneToOne, OneToMany etc) */
     protected String targetClassName = null;
@@ -2752,7 +2752,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 // The "other" class maybe has "mapped-by" across to this field so navigate through the fields to find this one
                 int[] otherFieldNumbers = otherCmd.getAllMemberPositions();
-                Set relatedFields = new HashSet();
+                Set<AbstractMemberMetaData> relatedFields = new HashSet<>();
                 for (int i=0;i<otherFieldNumbers.length;i++)
                 {
                     AbstractMemberMetaData otherFmd = otherCmd.getMetaDataForManagedMemberAtAbsolutePosition(otherFieldNumbers[i]);
@@ -2839,7 +2839,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 }
                 if (!relatedFields.isEmpty())
                 {
-                    relatedMemberMetaData = (AbstractMemberMetaData[])relatedFields.toArray(new AbstractMemberMetaData[relatedFields.size()]);
+                    relatedMemberMetaData = relatedFields.toArray(new AbstractMemberMetaData[relatedFields.size()]);
                     relatedFields.clear();
                     relatedFields = null;
                 }

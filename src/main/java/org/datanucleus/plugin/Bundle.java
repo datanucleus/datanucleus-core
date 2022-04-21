@@ -137,10 +137,8 @@ public class Bundle
     {
         private String bundleSymbolicName;
 
-        /**
-         * List of parameters for the BundleDescription
-         */
-        private Map parameters = new HashMap();
+        /** List of parameters for the BundleDescription. */
+        private Map<String, String> parameters = new HashMap<>();
 
         public String getBundleSymbolicName()
         {
@@ -154,7 +152,7 @@ public class Bundle
 
         public String getParameter(String name)
         {
-            return (String) parameters.get(name);
+            return parameters.get(name);
         }
 
         public void setParameter(String name, String value)
@@ -162,7 +160,7 @@ public class Bundle
             parameters.put(name, value);
         }    
 
-        public void setParameters(Map parameters)
+        public void setParameters(Map<String, String> parameters)
         {
             this.parameters.putAll(parameters);
         }    
