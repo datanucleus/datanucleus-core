@@ -554,7 +554,7 @@ public class JPQLSingleStringParser
             queryString = str.replace('\n', ' ');
 
             // Parse into tokens, taking care to keep any String literals together
-            List<String> tokenList = new ArrayList();
+            List<String> tokenList = new ArrayList<>();
             boolean withinSingleQuote = false;
             boolean withinDoubleQuote = false;
             StringBuilder currentToken = new StringBuilder();

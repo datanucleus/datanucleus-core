@@ -342,7 +342,7 @@ public class MetaData implements Serializable
 
         if (extensions == null)
         {
-            extensions = new HashMap();
+            extensions = new HashMap<>();
         }
         extensions.put(key, value);
         return this;

@@ -215,7 +215,7 @@ public class OperationQueue
         if (queuedOperations != null && !ec.getStoreManager().usesBackedSCOWrappers())
         {
             // Make use of OperationQueue for any cascade deletes that may be needed as a result of removal from collections/maps
-            List<Operation> opersToIgnore = new ArrayList();
+            List<Operation> opersToIgnore = new ArrayList<>();
             List<Object> objectsToCascadeDelete = null;
             Iterator<Operation> opersIter = queuedOperations.iterator();
             while (opersIter.hasNext())
@@ -265,7 +265,7 @@ public class OperationQueue
                         {
                             if (objectsToCascadeDelete == null)
                             {
-                                objectsToCascadeDelete = new ArrayList();
+                                objectsToCascadeDelete = new ArrayList<>();
                             }
                             NucleusLogger.PERSISTENCE.info(">> Flush collection element needs cascade delete " + collRemoveOper.getValue());
                             objectsToCascadeDelete.add(collRemoveOper.getValue());
@@ -318,7 +318,7 @@ public class OperationQueue
                             {
                                 if (objectsToCascadeDelete == null)
                                 {
-                                    objectsToCascadeDelete = new ArrayList();
+                                    objectsToCascadeDelete = new ArrayList<>();
                                 }
                                 objectsToCascadeDelete.add(mapRemoveOper.getKey());
                             }
@@ -363,7 +363,7 @@ public class OperationQueue
                             {
                                 if (objectsToCascadeDelete == null)
                                 {
-                                    objectsToCascadeDelete = new ArrayList();
+                                    objectsToCascadeDelete = new ArrayList<>();
                                 }
                                 objectsToCascadeDelete.add(mapRemoveOper.getValue());
                             }

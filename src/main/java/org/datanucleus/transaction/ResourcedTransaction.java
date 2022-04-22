@@ -75,16 +75,16 @@ public class ResourcedTransaction
     private List<Synchronization> synchronization = null;
 
     /** enlisted XAResource resources **/
-    private List<XAResource> enlistedResources = new ArrayList();
+    private List<XAResource> enlistedResources = new ArrayList<>();
 
     /** branches - each resource is a new branch **/
-    private Map<Xid, XAResource> branches = new HashMap();
+    private Map<Xid, XAResource> branches = new HashMap<>();
 
     /** active branches are resources that have not ended and are not suspended **/
-    private Map<XAResource, Xid> activeBranches = new HashMap();
+    private Map<XAResource, Xid> activeBranches = new HashMap<>();
 
     /** suspended branches **/
-    private Map<XAResource, Xid> suspendedResources = new HashMap();
+    private Map<XAResource, Xid> suspendedResources = new HashMap<>();
 
     private final String idString;
 
@@ -290,7 +290,7 @@ public class ResourcedTransaction
         }
         if (synchronization == null)
         {
-            synchronization = new ArrayList();
+            synchronization = new ArrayList<>();
         }
         synchronization.add(sync);
     }
@@ -332,7 +332,7 @@ public class ResourcedTransaction
                 }
             }
 
-            List failures = null;
+            List<Throwable> failures = null;
             boolean failed = false;
             if (enlistedResources.size() == 1)
             {
@@ -360,7 +360,7 @@ public class ResourcedTransaction
                         if (failures == null)
                         {
                             // lazy instantiate this, because we only need on failures
-                            failures = new ArrayList();
+                            failures = new ArrayList<>();
                         }
                         failures.add(e);
                         failed = true;
@@ -397,7 +397,7 @@ public class ResourcedTransaction
                         if (failures == null)
                         {
                             // lazy instantiate this, because we only need on failures
-                            failures = new ArrayList();
+                            failures = new ArrayList<>();
                         }
                         failures.add(e);
                         failed = true;
@@ -434,7 +434,7 @@ public class ResourcedTransaction
                             if (failures == null)
                             {
                                 // lazy instantiate this, because we only need on failures
-                                failures = new ArrayList();
+                                failures = new ArrayList<>();
                             }
                             failures.add(e);
                             failed = true;
@@ -462,7 +462,7 @@ public class ResourcedTransaction
                             if (failures == null)
                             {
                                 // lazy instantiate this, because we only need on failures
-                                failures = new ArrayList();
+                                failures = new ArrayList<>();
                             }
                             failures.add(e);
                             failed = true;
@@ -488,7 +488,7 @@ public class ResourcedTransaction
                 {
                     if (failures.size() == 1)
                     {
-                        throw new HeuristicRollbackException("Transaction rolled back due to failure during commit", (Throwable) failures.get(0));
+                        throw new HeuristicRollbackException("Transaction rolled back due to failure during commit", failures.get(0));
                     }
                     throw new HeuristicRollbackException("Multiple failures");
                 }
@@ -543,7 +543,7 @@ public class ResourcedTransaction
                     if (failures == null)
                     {
                         // lazy instantiate this, because we only need on failures
-                        failures = new ArrayList();
+                        failures = new ArrayList<>();
                     }
                     failures.add(e);
                     NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, getXAErrorCode(e), toString(), StringUtils.getMessageFromRootCauseOfThrowable(e)));

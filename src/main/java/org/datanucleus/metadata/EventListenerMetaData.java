@@ -33,7 +33,7 @@ public class EventListenerMetaData extends MetaData
     String className;
 
     /** Method names in the EventListener class keyed by their callback name (e.g javax.persistence.PrePersist, etc). */
-    Map<String, String> methodNamesByCallbackName = new HashMap();
+    Map<String, String> methodNamesByCallbackName = new HashMap<>();
 
     /**
      * Constructor for an EventListener MetaData
@@ -73,7 +73,7 @@ public class EventListenerMetaData extends MetaData
     {
         if (methodNamesByCallbackName == null)
         {
-            methodNamesByCallbackName = new HashMap();
+            methodNamesByCallbackName = new HashMap<>();
         }
         if (methodNamesByCallbackName.get(callbackClassName) != null)
         {

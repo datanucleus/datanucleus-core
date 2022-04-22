@@ -72,7 +72,7 @@ public class QueryResultMetaData extends MetaData
      * @param fieldColumnMap Map of column name, keyed by the field name in the persistent type
      * @param discrimColumn Name of any discriminator column
      */
-    public void addPersistentTypeMapping(String className, Map fieldColumnMap, String discrimColumn)
+    public void addPersistentTypeMapping(String className, Map<String, String> fieldColumnMap, String discrimColumn)
     {
         if (persistentTypeMappings == null)
         {
@@ -116,7 +116,7 @@ public class QueryResultMetaData extends MetaData
         }
         if (m.fieldColumnMap == null)
         {
-            m.fieldColumnMap = new HashMap();
+            m.fieldColumnMap = new HashMap<>();
         }
         // Add the field/column pair
         m.fieldColumnMap.put(fieldName, columnName);
@@ -141,7 +141,7 @@ public class QueryResultMetaData extends MetaData
     public static class PersistentTypeMapping
     {
         String className;
-        Map fieldColumnMap;
+        Map<String, String> fieldColumnMap;
         String discriminatorColumn;
         public String getClassName()
         {
@@ -157,7 +157,7 @@ public class QueryResultMetaData extends MetaData
             {
                 return null;
             }
-            return (String)fieldColumnMap.get(fieldName);
+            return fieldColumnMap.get(fieldName);
         }
     }
 
