@@ -4170,6 +4170,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     {
                         // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
                         loadUnloadedFieldsInFetchPlan();
+                        if (!loadedFields[fieldNumber])
+                        {
+                            // Case where the field is marked for storing, and was stored during the loadSpecifiedFields call, so load it now
+                            loadStoredField(fieldNumber);
+                        }
                     }
                 }
                 else
@@ -4178,6 +4183,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     {
                         // Just load this field
                         loadSpecifiedFields(new int[] {fieldNumber});
+                        if (!loadedFields[fieldNumber])
+                        {
+                            // Case where the field is marked for storing, and was stored during the loadSpecifiedFields call, so load it now
+                            loadStoredField(fieldNumber);
+                        }
                     }
                 }
             }
