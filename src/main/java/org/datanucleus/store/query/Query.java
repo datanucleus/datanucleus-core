@@ -87,6 +87,8 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_CHECK_UNUSED_PARAMETERS = PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS;
     public static final String EXTENSION_COMPILE_OPTIMISE_VAR_THIS = PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS;
 
+    public static final String EXTENSION_UPDATE_ALL_CANDIDATE_FIELDS = "datanucleus.query.updateAllCandidateFields".toLowerCase();
+
     public static final String EXTENSION_JDOQL_ALLOW_ALL = PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL;
     public static final String EXTENSION_JDOQL_STRICT = PropertyNames.PROPERTY_QUERY_JDOQL_STRICT;
 
