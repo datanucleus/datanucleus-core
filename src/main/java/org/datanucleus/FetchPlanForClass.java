@@ -95,6 +95,7 @@ public class FetchPlanForClass
     void markDirty()
     {
         dirty = true;
+        recursionDepthByMemberNumber.clear();
         plan.invalidateCachedIsToCallPostLoadFetchPlan(cmd);
     }
 
@@ -146,6 +147,7 @@ public class FetchPlanForClass
             recursionDepth = 1;
         }
 
+        // MetaData-based groups
         // TODO What should we do with recursionDepth if the same member is specified in multiple fetch groups? e.g 1 in groupA, and 2 in groupB
         Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (FetchGroupMetaData fgmd : fetchGroupsContainingField)
@@ -158,6 +160,24 @@ public class FetchPlanForClass
                     if (fgmmd.getName().equals(mmd.getName()))
                     {
                         recursionDepth = fgmmd.getRecursionDepth();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Dynamic groups
+        if (plan.dynamicGroups != null)
+        {
+            // Check Dynamic Fetch groups
+            String memberName = mmd.getName();
+            for (FetchGroup group : plan.dynamicGroups)
+            {
+                if (group.getType().getName().equals(cmd.getFullClassName()))
+                {
+                    if (group.getMembers().contains(memberName))
+                    {
+                        recursionDepth = group.getRecursionDepth(memberName);
                         break;
                     }
                 }
@@ -517,7 +537,7 @@ public class FetchPlanForClass
     }
 
     /**
-     * Get all the fetch groups where this member number is included.
+     * Get all the (MetaData-based) fetch groups where this member number is included.
      * @param fgmds The Fetch Groups
      * @param memberNum the member absolute number
      * @return The Fetch Groups

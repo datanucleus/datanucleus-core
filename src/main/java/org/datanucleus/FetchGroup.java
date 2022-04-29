@@ -485,6 +485,7 @@ public class FetchGroup<T> implements Serializable
         return "FetchGroup<" + cls.getName() + "> : " + name +
             " members=[" + StringUtils.collectionToString(memberNames) + "]" +
             ", modifiable=" + (!unmodifiable) +
+            ", recDepthsByMember=" + StringUtils.mapToString(recursionDepthByMemberName) +
             ", postLoad=" + postLoad +
             ", listeners.size=" + (planListeners != null ? planListeners.size() : 0);
     }
