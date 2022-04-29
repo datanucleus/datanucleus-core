@@ -4482,7 +4482,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 Object value = provideField(i);
                 if (value instanceof SCO)
                 {
-                    SCOUtils.unwrapSCOField(this, i, (SCO)value);
+                    SCOUtils.unwrapSCOField(this, i, value);
                 }
             }
         }

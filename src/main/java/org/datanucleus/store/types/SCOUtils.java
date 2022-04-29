@@ -69,12 +69,12 @@ public class SCOUtils
      * If the value is null then just returns since we don't wrap nulls.
      * @param ownerSM StateManager of the owner
      * @param memberNumber The member number in the owner
-     * @param sco The SCO value for the member
+     * @param value The value for the member (to be unwrapped)
      * @return The unwrapped member value
      */
-    public static Object unwrapSCOField(DNStateManager ownerSM, int memberNumber, SCO sco)
+    public static Object unwrapSCOField(DNStateManager ownerSM, int memberNumber, Object value)
     {
-        if (sco == null)
+        if (value == null)
         {
             return null;
         }
@@ -85,7 +85,7 @@ public class SCOUtils
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getName()));
         }
 
-        Object unwrappedValue = sco.getValue();
+        Object unwrappedValue = ((SCO)value).getValue();
         ownerSM.replaceField(memberNumber, unwrappedValue);
         return unwrappedValue;
     }

@@ -72,6 +72,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -940,10 +941,17 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(java.net.URI.class, null, true, true, null, null, null, "dn.uri-string");
 
         // date/time/java.time
-        addJavaType(java.sql.Date.class, null, true, true, org.datanucleus.store.types.wrappers.SqlDate.class, null, null, null);
-        addJavaType(java.sql.Time.class, null, true, true, org.datanucleus.store.types.wrappers.SqlTime.class, null, null, null);
-        addJavaType(java.sql.Timestamp.class, null, true, true, org.datanucleus.store.types.wrappers.SqlTimestamp.class, null, null, null);
-        addJavaType(java.util.Date.class, null, true, true, org.datanucleus.store.types.wrappers.Date.class, null, null, null);
+        boolean javaUtilDateIsMutable = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_TYPE_TREAT_JAVA_UTIL_DATE_AS_MUTABLE);
+
+        addJavaType(java.sql.Date.class, null, true, true, 
+            javaUtilDateIsMutable ? org.datanucleus.store.types.wrappers.SqlDate.class : null, null, null, null);
+        addJavaType(java.sql.Time.class, null, true, true, 
+            javaUtilDateIsMutable ? org.datanucleus.store.types.wrappers.SqlTime.class : null, null, null, null);
+        addJavaType(java.sql.Timestamp.class, null, true, true, 
+            javaUtilDateIsMutable ? org.datanucleus.store.types.wrappers.SqlTimestamp.class : null, null, null, null);
+        addJavaType(java.util.Date.class, null, true, true,
+            javaUtilDateIsMutable ? org.datanucleus.store.types.wrappers.Date.class : null, null, null, null);
+
         addJavaType(Calendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
         addJavaType(GregorianCalendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
 
@@ -967,14 +975,13 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(Currency.class, null, true, true, null, null, null, "dn.currency-string");
         addJavaType(UUID.class, null, true, true, null, null, null, "dn.uuid-string");
         addJavaType(TimeZone.class, null, true, true, null, null, null, "dn.timezone-string");
+        addJavaType(Optional.class, null, false, false, null, null, OptionalHandler.class, null);
 
+        // java.util container types
         addJavaType(ArrayList.class, null, false, false, org.datanucleus.store.types.wrappers.ArrayList.class, 
             org.datanucleus.store.types.wrappers.backed.ArrayList.class, ArrayListHandler.class, null);
-
-        Class arrayListInnerTypeCls = clr.classForName("java.util.Arrays$ArrayList");
-        addJavaType(arrayListInnerTypeCls, null, false, false, org.datanucleus.store.types.wrappers.List.class, org.datanucleus.store.types.wrappers.backed.List.class,
-            org.datanucleus.store.types.containers.ArrayListHandler.class, null);
-
+        addJavaType(clr.classForName("java.util.Arrays$ArrayList"), null, false, false, org.datanucleus.store.types.wrappers.List.class, 
+            org.datanucleus.store.types.wrappers.backed.List.class, org.datanucleus.store.types.containers.ArrayListHandler.class, null);
         addJavaType(BitSet.class, null, true, true, org.datanucleus.store.types.wrappers.BitSet.class, null, null, "dn.bitset-string");
         addJavaType(Collection.class, null, false, false, org.datanucleus.store.types.wrappers.Collection.class, org.datanucleus.store.types.wrappers.backed.Collection.class, 
             JDKCollectionHandler.class, null);
@@ -1014,7 +1021,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
             TreeSetHandler.class, null);
         addJavaType(Vector.class, null, false, false, org.datanucleus.store.types.wrappers.Vector.class, org.datanucleus.store.types.wrappers.backed.Vector.class,
             VectorHandler.class, null);
-        addJavaType(Optional.class, null, false, false, null, null, OptionalHandler.class, null);
 
         // arrays
         addJavaType(boolean[].class, null, true, false, null, null, ArrayHandler.class, null);

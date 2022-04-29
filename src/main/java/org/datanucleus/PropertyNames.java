@@ -79,6 +79,7 @@ public class PropertyNames
     public static final String PROPERTY_RELATION_IDENTITY_STORAGE_MODE = "datanucleus.relation.identityStorageMode".toLowerCase();
 
     public static final String PROPERTY_TYPE_WRAPPER_BASIS = "datanucleus.type.wrapper.basis";
+    public static final String PROPERTY_TYPE_TREAT_JAVA_UTIL_DATE_AS_MUTABLE = "datanucleus.type.treatJavaUtilDateAsMutable".toLowerCase();
 
     public static final String PROPERTY_VERSION_NUMBER_INITIAL_VALUE = "datanucleus.version.versionnumber.initialvalue";
 
