@@ -34,6 +34,8 @@ public class FrequentlyAccessedProperties
 
     private FrequentlyAccessedProperties defaults;
 
+    private Boolean manageRelationships = null;
+
     private Boolean reachabilityAtCommit = null;
 
     private Boolean detachOnClose = null;
@@ -106,6 +108,15 @@ public class FrequentlyAccessedProperties
             throw new NucleusUserException("Failed to set property: " + property + "=" + value + ": " + e, e);
         }
 
+    }
+
+    public Boolean getManageRelationships()
+    {
+        if (manageRelationships == null && defaults != null)
+        {
+            return defaults.getManageRelationships();
+        }
+        return manageRelationships;
     }
 
     public Boolean getReachabilityAtCommit()
@@ -183,6 +194,7 @@ public class FrequentlyAccessedProperties
         try
         {
             addField(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT, "reachabilityAtCommit");
+            addField(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS, "manageRelationships");
             addField(PropertyNames.PROPERTY_DETACH_ON_CLOSE, "detachOnClose");
             addField(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT, "detachAllOnCommit");
             addField(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE, "level2CacheStoreMode");

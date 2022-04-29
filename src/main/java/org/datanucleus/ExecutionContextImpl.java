@@ -342,7 +342,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         };
 
-        if (properties.getBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS))
+        if (properties.getFrequentProperties().getManageRelationships())
         {
             managedRelationsHandler = new ManagedRelationsHandler(properties.getBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS));
         }
