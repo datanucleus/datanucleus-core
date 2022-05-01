@@ -107,14 +107,14 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
         // Register the other SM to update us when it is inserted
         if (otherSM.insertionNotifyList == null)
         {
-            otherSM.insertionNotifyList = Collections.synchronizedList(new ArrayList(1));
+            otherSM.insertionNotifyList = Collections.synchronizedList(new ArrayList<>(1));
         }
         otherSM.insertionNotifyList.add(this);
 
         // Register that we should update this field when the other SM informs us
         if (fieldsToBeUpdatedAfterObjectInsertion == null)
         {
-            fieldsToBeUpdatedAfterObjectInsertion = new HashMap(1);
+            fieldsToBeUpdatedAfterObjectInsertion = new HashMap<>(1);
         }
         FieldContainer cont = fieldsToBeUpdatedAfterObjectInsertion.get(otherSM);
         if (cont == null)
