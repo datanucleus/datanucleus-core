@@ -70,14 +70,17 @@ public class FetchPlan implements Serializable
     /** Fetch size for the implementation to decide how many to load. */
     public static final int FETCH_SIZE_OPTIMAL = 0;
 
+    public static final int RECURSION_DEPTH_UNLIMITED = -1;
+    public static final int RECURSION_DEPTH_FK_ONLY = 0;
+
     /** Execution Context that this FetchPlan relates to. */
     transient final ExecutionContext ec; // Defined as transient to avoid Serializable problems
 
     /** ClassLoader resolver. */
     transient final ClassLoaderResolver clr; // Defined as transient to avoid Serializable problems
 
-    /** The "defined" fetch groups in the current FetchPlan. */
-    final Set<String> groups = new HashSet<>();
+    /** Names of the "defined" fetch groups in the current FetchPlan. */
+    final Set<String> groupNames = new HashSet<>();
 
     /** The "dynamic" fetch groups in the current FetchPlan. */
     transient Set<FetchGroup> dynamicGroups = null; // Defined as transient to avoid Serializable problems
@@ -109,7 +112,7 @@ public class FetchPlan implements Serializable
     {
         this.ec = ec;
         this.clr = clr;
-        groups.add(FetchPlan.DEFAULT);
+        groupNames.add(FetchPlan.DEFAULT);
 
         // Extension property to define the default detachmentOptions
         String flds = ec.getNucleusContext().getConfiguration().getStringProperty("datanucleus.detachmentFields");
@@ -165,8 +168,8 @@ public class FetchPlan implements Serializable
     public synchronized FetchPlan addGroup(String grpName)
     {
         if (grpName != null)
-        {
-            boolean changed = groups.add(grpName);
+       {
+            boolean changed = groupNames.add(grpName);
             boolean dynChanged = addDynamicGroup(grpName);
             if (changed || dynChanged)
             {
@@ -186,7 +189,7 @@ public class FetchPlan implements Serializable
         if (grpName != null)
         {
             boolean changed = false;
-            changed = groups.remove(grpName);
+            changed = groupNames.remove(grpName);
             if (dynamicGroups != null)
             {
                 Iterator<FetchGroup> iter = dynamicGroups.iterator();
@@ -217,7 +220,7 @@ public class FetchPlan implements Serializable
     public synchronized FetchPlan clearGroups()
     {
         clearDynamicGroups();
-        groups.clear();
+        groupNames.clear();
         markDirty();
         return this;
     }
@@ -229,7 +232,7 @@ public class FetchPlan implements Serializable
      */
     public synchronized Set<String> getGroups()
     {
-        return Collections.unmodifiableSet(new HashSet<String>(groups));
+        return Collections.unmodifiableSet(new HashSet<String>(groupNames));
     }
 
     /**
@@ -240,11 +243,11 @@ public class FetchPlan implements Serializable
     public synchronized FetchPlan setGroups(Collection<String> grpNames)
     {
         clearDynamicGroups();
-        groups.clear();
+        groupNames.clear();
 
         if (grpNames != null)
         {
-            groups.addAll(grpNames);
+            groupNames.addAll(grpNames);
 
             for (String grpName : grpNames)
             {
@@ -264,13 +267,13 @@ public class FetchPlan implements Serializable
     public synchronized FetchPlan setGroups(String[] grpNames)
     {
         clearDynamicGroups();
-        groups.clear();
+        groupNames.clear();
 
         if (grpNames != null)
         {
             for (int i=0;i<grpNames.length;i++)
             {
-                groups.add(grpNames[i]);
+                groupNames.add(grpNames[i]);
             }
             for (int i=0;i<grpNames.length;i++)
             {
@@ -290,11 +293,11 @@ public class FetchPlan implements Serializable
     public synchronized FetchPlan setGroup(String grpName)
     {
         clearDynamicGroups();
-        groups.clear();
+        groupNames.clear();
 
         if (grpName != null)
         {
-            groups.add(grpName);
+            groupNames.add(grpName);
             addDynamicGroup(grpName);
         }
 
@@ -479,15 +482,14 @@ public class FetchPlan implements Serializable
     }
 
     /**
-     * Mutator for the maximum fetch depth where
-     * -1 implies no restriction on the fetch depth and
-     * 0 is invalid and throws a JDOUserException.
+     * Mutator for the maximum fetch depth where -1 implies no restriction on the fetch depth.
      * @param max The maximum fetch depth to fetch to
      * @return The FetchPlan
+     * @throws NucleusUserException when an illegal value (either 0 or <= -2)
      */
     public synchronized FetchPlan setMaxFetchDepth(int max)
     {
-        if (max == 0)
+        if (max == 0 || max < -1)
         {
             throw new NucleusUserException(Localiser.msg("006002", max));
         }
@@ -558,8 +560,8 @@ public class FetchPlan implements Serializable
     {
         FetchPlan fp = new FetchPlan(ec, clr); // Includes DEFAULT
         fp.maxFetchDepth = maxFetchDepth;
-        fp.groups.remove(FetchPlan.DEFAULT);
-        fp.groups.addAll(this.groups);
+        fp.groupNames.remove(FetchPlan.DEFAULT);
+        fp.groupNames.addAll(this.groupNames);
         if (dynamicGroups != null)
         {
             fp.dynamicGroups = new HashSet<>(dynamicGroups);
@@ -626,11 +628,11 @@ public class FetchPlan implements Serializable
 
     public String toStringWithClasses()
     {
-        return "FetchPlan " + groups.toString() + " classes=" + StringUtils.collectionToString(Collections.unmodifiableCollection(fetchPlansByClassName.values()));
+        return "FetchPlan " + groupNames.toString() + " classes=" + StringUtils.collectionToString(Collections.unmodifiableCollection(fetchPlansByClassName.values()));
     }
 
     public String toString()
     {
-        return "FetchPlan " + groups.toString();
+        return "FetchPlan " + groupNames.toString();
     }
 }

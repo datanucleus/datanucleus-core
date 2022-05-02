@@ -4326,7 +4326,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
     /**
      * Called from the StoreManager to refresh data in the Persistable object associated with this StateManager.
-     * @param fieldNumbers An array of field numbers to be refreshed by the Store
+     * Typically called as a result of a query, so as to populate the query results into the associated persistable object(s).
+     * @param fieldNumbers Field numbers to be refreshed from the store data
      * @param fm The updated values are stored in this object. This object is only valid for the duration of this call.
      * @param replaceWhenDirty Whether to replace the fields when they are dirty here
      */

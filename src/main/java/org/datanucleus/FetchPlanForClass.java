@@ -149,6 +149,7 @@ public class FetchPlanForClass
 
         // MetaData-based groups
         // TODO What should we do with recursionDepth if the same member is specified in multiple fetch groups? e.g 1 in groupA, and 2 in groupB
+        String memberName = mmd.getName();
         Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (FetchGroupMetaData fgmd : fetchGroupsContainingField)
         {
@@ -157,7 +158,7 @@ public class FetchPlanForClass
             {
                 for (FetchGroupMemberMetaData fgmmd : fgmmds)
                 {
-                    if (fgmmd.getName().equals(mmd.getName()))
+                    if (fgmmd.getName().equals(memberName))
                     {
                         recursionDepth = fgmmd.getRecursionDepth();
                         break;
@@ -170,7 +171,6 @@ public class FetchPlanForClass
         if (plan.dynamicGroups != null)
         {
             // Check Dynamic Fetch groups
-            String memberName = mmd.getName();
             for (FetchGroup group : plan.dynamicGroups)
             {
                 if (group.getType().getName().equals(cmd.getFullClassName()))
@@ -315,22 +315,22 @@ public class FetchPlanForClass
         {
             for (FetchGroupMetaData fgmd : fgmds)
             {
-                if (plan.groups.contains(fgmd.getName()))
+                if (plan.groupNames.contains(fgmd.getName()))
                 {
                     memberNumbers.or(getMemberNumbersForFetchGroup(fgmd));
                 }
             }
         }
 
-        if (plan.groups.contains(FetchPlan.DEFAULT))
+        if (plan.groupNames.contains(FetchPlan.DEFAULT))
         {
             setAsDefault(memberNumbers);
         }
-        if (plan.groups.contains(FetchPlan.ALL))
+        if (plan.groupNames.contains(FetchPlan.ALL))
         {
             setAsAll(memberNumbers);
         }
-        if (plan.groups.contains(FetchPlan.NONE))
+        if (plan.groupNames.contains(FetchPlan.NONE))
         {
             setAsNone(memberNumbers);
         }

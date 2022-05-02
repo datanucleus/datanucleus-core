@@ -89,7 +89,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
 
             // Retrieve the recursion depth for this field type
             final int maxRecursionDepth = fpClass.getRecursionDepthForMember(fieldNumber);
-            if (maxRecursionDepth > 0)
+            if (maxRecursionDepth >= 1)
             {
                 // We have a limit on recursing so check if the recursive depth is reached for this type
                 if (state.getObjectDepthForType(fmd.getFullFieldName()) >= maxRecursionDepth)
