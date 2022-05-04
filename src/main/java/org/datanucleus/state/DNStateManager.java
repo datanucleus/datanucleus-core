@@ -504,13 +504,13 @@ public interface DNStateManager<T> extends StateManager
 
     /**
      * Refreshes from the database all fields currently loaded.
-     * Called by life-cycle transitions.
+     * Called by life-cycle transitions when making transactional or reading fields.
      */
     void refreshLoadedFields();
 
     /**
      * Refreshes from the database all fields in fetch plan.
-     * Called by life-cycle transitions.
+     * Called by life-cycle transitions when the object undergoes a "transitionRefresh".
      */
     void refreshFieldsInFetchPlan();
     
@@ -575,6 +575,12 @@ public interface DNStateManager<T> extends StateManager
      */
     String[] getLoadedFieldNames();
 
+    /**
+     * Returns the loaded setting for the field of the managed object.
+     * Refer to the javadoc of isLoaded(Persistable, int);
+     * @param fieldNumber the absolute field number
+     * @return always returns true (this implementation)
+     */
     boolean isLoaded(int absoluteFieldNumber);
 
     /**

@@ -134,18 +134,9 @@ public class FetchPlanForClass
             return recursionDepth;
         }
 
-        // Fallback to recursion depth for this member using its class' metadata definition
+        // Fallback to recursion depth for this member using its class' metadata definition, or the default for JDO/JPA (1)
         AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
-        if (mmd.getRecursionDepth() != null)
-        {
-            // Don't currently support 0 with the DFG
-            recursionDepth = (mmd.getRecursionDepth() != 0) ? mmd.getRecursionDepth() : 1;
-        }
-        else
-        {
-            // Fallback to 1, the JDO(/JPA) default
-            recursionDepth = 1;
-        }
+        recursionDepth = (mmd.getRecursionDepth() != null) ? mmd.getRecursionDepth() : 1;
 
         // MetaData-based groups
         // TODO What should we do with recursionDepth if the same member is specified in multiple fetch groups? e.g 1 in groupA, and 2 in groupB

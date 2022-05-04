@@ -3839,6 +3839,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         return hasStored;
     }
 
+    @Override
     public void loadUnloadedRelationFields()
     {
         int[] fieldsConsidered = cmd.getRelationMemberPositions(myEC.getClassLoaderResolver());
@@ -3882,17 +3883,14 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             }
 
             updateLevel2CacheForFields(fieldNumbers);
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
         }
     }
 
-    /**
-     * Fetch from the database all fields that are not currently loaded regardless of whether
-     * they are in the current fetch group or not. Called by lifecycle transitions.
-     */
+    @Override
     public void loadUnloadedFields()
     {
         int[] fieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, cmd.getAllMemberPositions(), false);
@@ -3931,17 +3929,14 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             }
 
             updateLevel2CacheForFields(fieldNumbers);
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
         }
     }
 
-    /**
-     * Fetchs from the database all fields that are not currently loaded and that are in the current
-     * fetch group. Called by lifecycle transitions.
-     */
+    @Override
     public void loadUnloadedFieldsInFetchPlan()
     {
         int[] fieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, myFP.getMemberNumbers(), false);
@@ -3954,7 +3949,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 loadFieldsFromDatastore(unloadedFieldNumbers);
                 updateLevel2CacheForFields(unloadedFieldNumbers);
             }
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
@@ -3962,7 +3957,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     }
 
     /**
-     * Fetchs from the database all fields in current fetch plan that are not currently loaded as well as the version. Called by lifecycle transitions.
+     * Fetch from the database all fields in current fetch plan that are not currently loaded as well as the version. Called by lifecycle transitions.
      */
     protected void loadUnloadedFieldsInFetchPlanAndVersion()
     {
@@ -3985,17 +3980,14 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 loadFieldsFromDatastore(unloadedFieldNumbers);
                 updateLevel2CacheForFields(unloadedFieldNumbers);
             }
-            if (callPostLoad && fieldNumbers.length > 0)
+            if (callPostLoad && fieldNumbers.length > 0 && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
         }
     }
 
-    /**
-     * Fetchs from the database all currently unloaded fields in the actual fetch plan.
-     * Called by life-cycle transitions.
-     */
+    @Override
     public void loadUnloadedFieldsOfClassInFetchPlan(FetchPlan fetchPlan)
     {
         FetchPlanForClass fpc = fetchPlan.getFetchPlanForClass(this.cmd);
@@ -4009,17 +4001,14 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 loadFieldsFromDatastore(unloadedFieldNumbers);
                 updateLevel2CacheForFields(unloadedFieldNumbers);
             }
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
         }
     }
 
-    /**
-     * Refreshes from the database all fields in fetch plan.
-     * Called by life-cycle transitions when the object undergoes a "transitionRefresh".
-     */
+    @Override
     public void refreshFieldsInFetchPlan()
     {
         int[] fieldNumbers = myFP.getMemberNumbers();
@@ -4082,10 +4071,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
     }
 
-    /**
-     * Refreshes from the database all fields currently loaded.
-     * Called by life-cycle transitions when making transactional or reading fields.
-     */
+    @Override
     public void refreshLoadedFields()
     {
         int[] fieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, myFP.getMemberNumbers(), true);
@@ -4107,12 +4093,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
     }
 
-    /**
-     * Returns the loaded setting for the field of the managed object.
-     * Refer to the javadoc of isLoaded(Persistable, int);
-     * @param fieldNumber the absolute field number
-     * @return always returns true (this implementation)
-     */
+    @Override
     public boolean isLoaded(int fieldNumber)
     {
         return isLoaded(myPC, fieldNumber);
@@ -5605,7 +5586,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                             boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
                             setTransactionalVersion(null); // Make sure we get the latest version
                             loadFieldsFromDatastore(fieldNumbers);
-                            if (callPostLoad)
+                            if (callPostLoad && areFieldsLoaded(fieldNumbers)) // If a FK is in the STORED cache then wont be marked as loaded yet
                             {
                                 postLoad();
                             }
