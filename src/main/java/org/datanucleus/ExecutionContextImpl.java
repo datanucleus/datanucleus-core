@@ -4572,7 +4572,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 NucleusLogger.CACHE.debug(Localiser.msg("003004", IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(sm.getLoadedFields())));
             }
-            else
+            else if (oldSM != sm)
             {
                 NucleusLogger.CACHE.debug(Localiser.msg("003005", IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(sm.getLoadedFields())));
             }
