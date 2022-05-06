@@ -80,6 +80,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
     {
         super();
 
+        NucleusLogger.PERSISTENCE.warn("The XMLAutoStarter is now deprecated and will be removed soon. Please use another start-up mechanism such as 'persistence.xml'");
         this.fileUrl = new URL("file:" + storeMgr.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE));
 
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
