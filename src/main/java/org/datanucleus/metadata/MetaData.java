@@ -156,9 +156,6 @@ public class MetaData implements Serializable
     /** Member : whether the field is (L2) cacheable (for JPA). */
     public static final String EXTENSION_MEMBER_CACHEABLE = "cacheable";
 
-    /** Member : whether to fetch just the FK (and not populate the related object). Equates to fetching the field with recursion-depth=0 */
-    public static final String EXTENSION_MEMBER_FETCH_FK_ONLY = "fetch-fk-only";
-
     /** Member : whether this member (collection/map/array) should allow null elements/keys/values. */
     public static final String EXTENSION_MEMBER_CONTAINER_ALLOW_NULLS = "allow-nulls";
 

@@ -27,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -1392,18 +1393,40 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
     }
 
-    /**
-     * Extension accessor where the user has requested that the fetch of this field fetch just the FK.
-     * Only applies to a 1-1 UNI, or 1-1 BI with FK at this side.
-     * @return Whether to fetch just the FK (and not join to get the fields of the other side)
-     */
-    public boolean fetchFKOnly()
+    /** Member : whether to fetch just the FK (and not populate the related object). Equates to fetching the field with recursion-depth=0 */ // TODO Remove this
+    public static final String EXTENSION_MEMBER_FETCH_FK_ONLY = "fetch-fk-only";
+
+    @Override
+    public MetaData addExtensions(Map<String, String> exts)
     {
-        if (hasExtension(MetaData.EXTENSION_MEMBER_FETCH_FK_ONLY))
+        // TODO Remove this in a later version
+        if (exts != null && exts.containsKey(EXTENSION_MEMBER_FETCH_FK_ONLY))
         {
-            return Boolean.valueOf(getValueForExtension(MetaData.EXTENSION_MEMBER_FETCH_FK_ONLY));
+            NucleusLogger.METADATA.warn("Use of '" + EXTENSION_MEMBER_FETCH_FK_ONLY + "' is now removed. Please make use of recursion-depth=0 for the fetch group in question");
         }
-        return false;
+        return super.addExtensions(exts);
+    }
+
+    @Override
+    public MetaData setExtensions(Map<String, String> exts)
+    {
+        // TODO Remove this in a later version
+        if (exts != null && exts.containsKey(EXTENSION_MEMBER_FETCH_FK_ONLY))
+        {
+            NucleusLogger.METADATA.warn("Use of '" + EXTENSION_MEMBER_FETCH_FK_ONLY + "' is now removed. Please make use of recursion-depth=0 for the fetch group in question");
+        }
+        return super.setExtensions(exts);
+    }
+
+    @Override
+    public MetaData addExtension(String key, String value)
+    {
+        // TODO Remove this in a later version
+        if (EXTENSION_MEMBER_FETCH_FK_ONLY.equalsIgnoreCase(key))
+        {
+            NucleusLogger.METADATA.warn("Use of '" + EXTENSION_MEMBER_FETCH_FK_ONLY + "' is now removed. Please make use of recursion-depth=0 for the fetch group in question");
+        }
+        return super.addExtension(key, value);
     }
 
     /**
