@@ -38,7 +38,6 @@ public class FetchGroupManager
 {
     /** Map of dynamic fetch groups, keyed by the group name. */
     private Map<String, Set<FetchGroup>> fetchGroupByName;
-//    private MultiMap fetchGroupByName;
 
     /** Context that we are operating in. */
     private NucleusContext nucleusCtx;

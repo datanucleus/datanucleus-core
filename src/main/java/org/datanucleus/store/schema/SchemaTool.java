@@ -49,7 +49,6 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.CommandLine;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.PersistenceUtils;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -292,7 +291,7 @@ public class SchemaTool
         PersistenceNucleusContext nucleusCtx = null;
         try
         {
-            Properties props = (propsFileName!=null) ? PersistenceUtils.setPropertiesUsingFile(propsFileName) : null;
+            Properties props = (propsFileName!=null) ? Configuration.getPropertiesFromPropertiesFile(propsFileName) : null;
             nucleusCtx = getNucleusContextForMode(mode, tool.getApi(), props, persistenceUnitName, ddlFilename, tool.isVerbose(), ignoreMetaDataForMissingClasses);
         }
         catch (Exception e)

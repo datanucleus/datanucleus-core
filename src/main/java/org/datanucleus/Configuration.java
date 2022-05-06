@@ -22,6 +22,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +46,6 @@ import org.datanucleus.properties.PropertyValidator;
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.PersistenceUtils;
 
 /**
  * Class providing configuration for the context. 
@@ -411,7 +415,7 @@ public class Configuration extends PropertyStore implements Serializable
         Map<String, Object> props = null;
         try
         {
-            Properties propsFromFile = PersistenceUtils.setPropertiesUsingFile(filename);
+            Properties propsFromFile = getPropertiesFromPropertiesFile(filename);
             props = new HashMap<>();
             for (String key : propsFromFile.stringPropertyNames()) 
             {
@@ -635,5 +639,61 @@ public class Configuration extends PropertyStore implements Serializable
     public int hashCode()
     {
         return (properties != null ? properties.hashCode() : 0) ^ (defaultProperties!=null ? defaultProperties.hashCode() : 0);
+    }
+
+    /**
+     * Method to return the persistence properties from the specified properties file.
+     * The lines of the file will be of format
+     * <pre>
+     * mypropertyname=myvalue
+     * </pre>
+     * @param filename Name of the file containing the properties
+     * @return the Persistence Properties in this file
+     * @throws NucleusUserException if file not readable
+     */
+    public static synchronized Properties getPropertiesFromPropertiesFile(String filename)
+    {
+        if (filename == null)
+        {
+            return null;
+        }
+
+        // try to load the properties file
+        Properties props = new Properties();
+        File file = new File(filename);
+        if (file.exists())
+        {
+            try
+            {
+                InputStream is = new FileInputStream(file);
+                props.load(is);
+                is.close();
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new NucleusUserException(Localiser.msg("008014", filename), e).setFatal();
+            }
+            catch (IOException e)
+            {
+                throw new NucleusUserException(Localiser.msg("008014", filename), e).setFatal();
+            }
+        }
+        else
+        {
+            // Try to load it as a resource in the CLASSPATH
+            try
+            {
+                InputStream is = Configuration.class.getClassLoader().getResourceAsStream(filename);
+                props.load(is);
+                is.close();
+            }
+            catch (Exception e)
+            {
+                // Still not loadable so throw exception
+                throw new NucleusUserException(Localiser.msg("008014", filename), e).setFatal();
+            }
+        }
+
+        return props;
     }
 }
