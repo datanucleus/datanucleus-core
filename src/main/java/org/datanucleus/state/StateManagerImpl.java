@@ -3788,6 +3788,48 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         loadSpecifiedFields(new int[]{fieldNumber});
     }
 
+    @Override
+    public boolean loadStoredField(int fieldNumber)
+    {
+        String assocValueKey = MEMBER_VALUE_STORED_PREFIX + fieldNumber;
+        boolean hasStored = containsAssociatedValue(assocValueKey);
+        if (hasStored)
+        {
+            // Instantiate object using the stored "id" value, and remove associated value
+            Object memberValue = getAssociatedValue(assocValueKey);
+            Object member = myEC.findObject(memberValue, false);
+            ObjectProvider memberSM = (member != null) ? myEC.findObjectProvider(member) : null;
+            if (memberSM != null && !memberSM.isDeleted()) // Only apply the stored value if found and not (being) deleted
+            {
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                if (mmd.getType().isAssignableFrom(member.getClass()))
+                {
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026038", mmd.getName(), this));
+                    }
+                    replaceField(myPC, fieldNumber, member);
+                }
+            }
+            removeAssociatedValue(assocValueKey);
+            updateLevel2CacheForFields(new int[] {fieldNumber});
+        }
+        return hasStored;
+    }
+
+    @Override
+    public void storeFieldValue(int fieldNumber, Object value)
+    {
+        if (!loadedFields[fieldNumber])
+        {
+            setAssociatedValue(ObjectProvider.MEMBER_VALUE_STORED_PREFIX + fieldNumber, value);
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026037", cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName(), this));
+            }
+        }
+    }
+
     public void loadUnloadedRelationFields()
     {
         int[] fieldsConsidered = cmd.getRelationMemberPositions(myEC.getClassLoaderResolver());
@@ -3831,7 +3873,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             }
 
             updateLevel2CacheForFields(fieldNumbers);
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
@@ -3880,7 +3922,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             }
 
             updateLevel2CacheForFields(fieldNumbers);
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
@@ -3903,7 +3945,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 loadFieldsFromDatastore(unloadedFieldNumbers);
                 updateLevel2CacheForFields(unloadedFieldNumbers);
             }
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
@@ -3958,7 +4000,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 loadFieldsFromDatastore(unloadedFieldNumbers);
                 updateLevel2CacheForFields(unloadedFieldNumbers);
             }
-            if (callPostLoad)
+            if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers())) // If a FK is in the STORED cache then wont be marked as loaded yet
             {
                 postLoad();
             }
@@ -4114,18 +4156,28 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 }
                 else if (!beingDeleted && myFP.hasMember(fieldNumber))
                 {
-                    if (!checkForAndRetrieveStoredValue(fieldNumber))
+                    if (!loadStoredField(fieldNumber))
                     {
                         // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
                         loadUnloadedFieldsInFetchPlan();
+                        if (!loadedFields[fieldNumber])
+                        {
+                            // Case where the field is marked for storing, and was stored during the loadSpecifiedFields call, so load it now
+                            loadStoredField(fieldNumber);
+                        }
                     }
                 }
                 else
                 {
-                    if (!checkForAndRetrieveStoredValue(fieldNumber))
+                    if (!loadStoredField(fieldNumber))
                     {
                         // Just load this field
                         loadSpecifiedFields(new int[] {fieldNumber});
+                        if (!loadedFields[fieldNumber])
+                        {
+                            // Case where the field is marked for storing, and was stored during the loadSpecifiedFields call, so load it now
+                            loadStoredField(fieldNumber);
+                        }
                     }
                 }
             }
@@ -4139,26 +4191,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             // Convert into an exception suitable for the current API since this is called from a user update of a field
             throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
         }
-    }
-
-    /**
-     * Convenience method to check whether the specified field number has a (FK) identity value stored for later loading, and set the field value accordingly.
-     * @param fieldNumber The absolute field number
-     * @return Whether the field (FK) value was stored
-     */
-    protected boolean checkForAndRetrieveStoredValue(int fieldNumber)
-    {
-        boolean hasStored = containsAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-        if (hasStored)
-        {
-            // Instantiate object using the stored "id" value, and remove associated value
-            Object memberValue = getAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-            Object member = myEC.findObject(memberValue, false);
-            // TODO What if the related object is not found, or deleted? (i.e deleted the other end but not set the FK!)
-            replaceField(myPC, fieldNumber, member);
-            removeAssociatedValue(MEMBER_VALUE_STORED_PREFIX + fieldNumber);
-        }
-        return hasStored;
     }
 
     /**
@@ -5551,7 +5583,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                             boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
                             setTransactionalVersion(null); // Make sure we get the latest version
                             loadFieldsFromDatastore(fieldNumbers);
-                            if (callPostLoad)
+                            if (callPostLoad && areFieldsLoaded(fieldNumbers)) // If a FK is in the STORED cache then wont be marked as loaded yet
                             {
                                 postLoad();
                             }

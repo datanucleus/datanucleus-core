@@ -51,6 +51,8 @@ public class FetchPlanForClass
     /** Whether the record is dirty and needs the fields recalculating. */
     boolean dirty = true;
 
+    Map<Integer, Integer> recursionDepthByMemberNumber = new HashMap<>();
+
     /** 
      * Cache of fetch groups by member number, as calculating them in getFetchGroupsForMemberNumber() 
      * is O(n^2) Map<Integer, Set<FetchGroupMetaData>>
@@ -95,6 +97,7 @@ public class FetchPlanForClass
     void markDirty()
     {
         dirty = true;
+        recursionDepthByMemberNumber.clear();
         plan.invalidateCachedIsToCallPostLoadFetchPlan(cmd);
     }
 
@@ -120,21 +123,24 @@ public class FetchPlanForClass
      */
     public int getMaxRecursionDepthForMember(int memberNum)
     {
-        // Fallback to recursion depth for this member using its class' metadata definition
-        Integer recursionDepth = null;
-        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
-        if (mmd.getRecursionDepth() != null)
+        if (dirty)
         {
-            // Don't currently support 0 with the DFG
-            recursionDepth = (mmd.getRecursionDepth() != 0) ? mmd.getRecursionDepth() : 1;
-        }
-        else
-        {
-            // Fallback to 1, the JDO(/JPA) default
-            recursionDepth = 1;
+            recursionDepthByMemberNumber.clear();
         }
 
-        // find FetchGroupMetaDatas that contain the member in question, and see if it has been overridden
+        Integer recursionDepth = recursionDepthByMemberNumber.get(memberNum);
+        if (recursionDepth != null)
+        {
+            return recursionDepth;
+        }
+
+        // Fallback to recursion depth for this member using its class' metadata definition, or the default for JDO/JPA (1)
+        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum);
+        recursionDepth = (mmd.getRecursionDepth() != null) ? mmd.getRecursionDepth() : 1;
+
+        // MetaData-based groups
+        // TODO What should we do with recursionDepth if the same member is specified in multiple fetch groups? e.g 1 in groupA, and 2 in groupB
+        String memberName = mmd.getName();
         Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
         for (Iterator<FetchGroupMetaData> iter = fetchGroupsContainingField.iterator(); iter.hasNext();)
         {
@@ -144,7 +150,7 @@ public class FetchPlanForClass
             {
                 for (FetchGroupMemberMetaData fgmmd : fgmmds)
                 {
-                    if (fgmmd.getName().equals(mmd.getName()))
+                    if (fgmmd.getName().equals(memberName))
                     {
                         // TODO Add concept of "max" as per this method's name
                         recursionDepth = fgmmd.getRecursionDepth();
@@ -152,6 +158,26 @@ public class FetchPlanForClass
                 }
             }
         }
+
+        // Dynamic groups
+        if (plan.dynamicGroups != null)
+        {
+            // Check Dynamic Fetch groups
+            for (FetchGroup group : plan.dynamicGroups)
+            {
+                if (group.getType().getName().equals(cmd.getFullClassName()))
+                {
+                    if (group.getMembers().contains(memberName))
+                    {
+                        recursionDepth = group.getRecursionDepth(memberName);
+                        break;
+                    }
+                }
+            }
+        }
+
+        recursionDepthByMemberNumber.put(memberNum, recursionDepth);
+
         return recursionDepth;
     }
 

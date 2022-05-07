@@ -471,6 +471,21 @@ public interface ObjectProvider<T> extends StateManager
     void loadField(int fieldNumber);
 
     /**
+     * Convenience method to load the specified field from the stored associated value cache if available.
+     * @param fieldNumber Absolute field number
+     * @return whether it was loaded from stored cache values
+     */
+    boolean loadStoredField(int fieldNumber);
+
+    /**
+     * Method to store the value for the specified field. 
+     * This is for use with fields that are of type Persistable, and we stored the "id" of the related object in case they need loading later rather than instantiating now.
+     * @param fieldNumber Absolute field number
+     * @param value The value to store (FK "id")
+     */
+    void storeFieldValue(int fieldNumber, Object value);
+
+    /**
      * Method to load all unloaded fields in the FetchPlan.
      * Recurses through the FetchPlan objects and loads fields of sub-objects where needed.
      * @param state The FetchPlan state
