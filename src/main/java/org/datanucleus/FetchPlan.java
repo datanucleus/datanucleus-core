@@ -483,9 +483,9 @@ public class FetchPlan implements Serializable
 
     /**
      * Mutator for the maximum fetch depth where -1 implies no restriction on the fetch depth.
+     * Throws NucleusUserException when an illegal value (either 0 or &le; -2)
      * @param max The maximum fetch depth to fetch to
      * @return The FetchPlan
-     * @throws NucleusUserException when an illegal value (either 0 or <= -2)
      */
     public synchronized FetchPlan setMaxFetchDepth(int max)
     {

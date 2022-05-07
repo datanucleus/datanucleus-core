@@ -581,7 +581,7 @@ public interface DNStateManager<T> extends StateManager
      * @param fieldNumber the absolute field number
      * @return always returns true (this implementation)
      */
-    boolean isLoaded(int absoluteFieldNumber);
+    boolean isLoaded(int fieldNumber);
 
     /**
      * Returns whether all fields are loaded.
