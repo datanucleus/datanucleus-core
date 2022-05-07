@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.datanucleus</groupId>
         <artifactId>datanucleus-maven-parent</artifactId>
-        <version>6.0.0-m2</version>
+        <version>6.0.0-release</version>
     </parent>
 
     <artifactId>datanucleus-core</artifactId>
