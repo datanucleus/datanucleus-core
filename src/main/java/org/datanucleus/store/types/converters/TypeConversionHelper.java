@@ -33,7 +33,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.I18nUtils;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -254,7 +253,7 @@ public class TypeConversionHelper
         {
             if (value instanceof String)
             {
-                return I18nUtils.getLocaleFromString((String)value);
+                return LocaleStringConverter.getLocaleFromString((String)value);
             }
         }
 
