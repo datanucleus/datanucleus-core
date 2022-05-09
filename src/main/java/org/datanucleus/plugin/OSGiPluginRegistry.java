@@ -25,7 +25,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,10 +42,10 @@ public class OSGiPluginRegistry implements PluginRegistry
     private static final String DATANUCLEUS_PKG = "org.datanucleus";
 
     /** extension points keyed by Unique Id (plugin.id +"."+ id) */
-    Map<String, ExtensionPoint> extensionPointsByUniqueId = new HashMap<String, ExtensionPoint>();
+    Map<String, ExtensionPoint> extensionPointsByUniqueId = new HashMap<>();
 
     /** registered bundles files keyed by bundle symbolic name */
-    Map<String, Bundle> registeredPluginByPluginId = new HashMap<String, Bundle>();
+    Map<String, Bundle> registeredPluginByPluginId = new HashMap<>();
 
     /** extension points */
     ExtensionPoint[] extensionPoints;
@@ -90,7 +89,7 @@ public class OSGiPluginRegistry implements PluginRegistry
         {
             return;
         }
-        List registeringExtensions = new ArrayList();
+        List<Extension> registeringExtensions = new ArrayList<>();
 
         org.osgi.framework.Bundle bdl = FrameworkUtil.getBundle(this.getClass());
         BundleContext ctx = bdl.getBundleContext();
@@ -128,9 +127,8 @@ public class OSGiPluginRegistry implements PluginRegistry
         extensionPoints = extensionPointsByUniqueId.values().toArray(new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
 
         // Register the extensions now that we have the extension-points all loaded
-        for (int i = 0; i < registeringExtensions.size(); i++)
+        for (Extension extension : registeringExtensions)
         {
-            Extension extension = (Extension) registeringExtensions.get(i);
             ExtensionPoint exPoint = getExtensionPoint(extension.getExtensionPointId());
             if (exPoint == null)
             {
@@ -180,13 +178,11 @@ public class OSGiPluginRegistry implements PluginRegistry
      * @param extPoints ExtensionPoints for this plugin
      * @param updateExtensionPointsArray Whether to update "extensionPoints" array
      */
-    protected void registerExtensionPointsForPluginInternal(List extPoints, boolean updateExtensionPointsArray)
+    protected void registerExtensionPointsForPluginInternal(List<ExtensionPoint> extPoints, boolean updateExtensionPointsArray)
     {
         // Register extension-points
-        Iterator<ExtensionPoint> pluginExtPointIter = extPoints.iterator();
-        while (pluginExtPointIter.hasNext())
+        for (ExtensionPoint exPoint : extPoints)
         {
-            ExtensionPoint exPoint = pluginExtPointIter.next();
             extensionPointsByUniqueId.put(exPoint.getUniqueId(), exPoint);
         }
         if (updateExtensionPointsArray)

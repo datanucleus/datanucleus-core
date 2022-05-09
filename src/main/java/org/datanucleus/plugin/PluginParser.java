@@ -82,14 +82,14 @@ class PluginParser
     private static List<Bundle.BundleDescription> getRequireBundle(Manifest mf)
     {
         String str = mf.getMainAttributes().getValue("Require-Bundle");
-        if( str == null || str.length() < 1 )
+        if (str == null || str.length() < 1)
         {
             return Collections.EMPTY_LIST;
         }
         Parser p = new Parser(str);
         List<Bundle.BundleDescription> requiredBundle = new ArrayList<Bundle.BundleDescription>();
         String bundleSymbolicName = p.parseSymbolicName();
-        while(bundleSymbolicName != null)
+        while (bundleSymbolicName != null)
         {
             Bundle.BundleDescription bd = new Bundle.BundleDescription();
             bd.setBundleSymbolicName(bundleSymbolicName);
@@ -110,7 +110,7 @@ class PluginParser
      */
     private static List<ExtensionPoint> parseExtensionPoints(Element rootElement, Bundle plugin, ClassLoaderResolver clr)
     {
-        List<ExtensionPoint> extensionPoints = new ArrayList<ExtensionPoint>();
+        List<ExtensionPoint> extensionPoints = new ArrayList<>();
         try
         {
             NodeList elements = rootElement.getElementsByTagName("extension-point");
@@ -377,52 +377,53 @@ class PluginParser
         Parser p = new Parser(interval);
         Bundle.BundleVersionRange versionRange = new Bundle.BundleVersionRange();
         
-        if( p.parseChar('['))
+        if (p.parseChar('['))
         {
             //inclusive
             versionRange.floor_inclusive = true;
         }
-        else if( p.parseChar('('))
+        else if (p.parseChar('('))
         {
             //exclusive
             versionRange.floor_inclusive = false;
         }
+
         versionRange.floor = new Bundle.BundleVersion();
         versionRange.floor.major = p.parseIntegerLiteral().intValue();
-        if( p.parseChar('.'))
+        if (p.parseChar('.'))
         {
             versionRange.floor.minor = p.parseIntegerLiteral().intValue();
         }
-        if( p.parseChar('.'))
+        if (p.parseChar('.'))
         {
             versionRange.floor.micro = p.parseIntegerLiteral().intValue();
         }
-        if( p.parseChar('.'))
+        if (p.parseChar('.'))
         {
             versionRange.floor.qualifier = p.parseIdentifier(); 
         }
-        if( p.parseChar(','))
+        if (p.parseChar(','))
         {
             versionRange.ceiling = new Bundle.BundleVersion();
             versionRange.ceiling.major = p.parseIntegerLiteral().intValue();
-            if( p.parseChar('.'))
+            if (p.parseChar('.'))
             {
                 versionRange.ceiling.minor = p.parseIntegerLiteral().intValue();
             }
-            if( p.parseChar('.'))
+            if (p.parseChar('.'))
             {
                 versionRange.ceiling.micro = p.parseIntegerLiteral().intValue();
             }
-            if( p.parseChar('.'))
+            if (p.parseChar('.'))
             {
                 versionRange.ceiling.qualifier = p.parseIdentifier(); 
             }
-            if( p.parseChar(']'))
+            if (p.parseChar(']'))
             {
                 //inclusive
                 versionRange.ceiling_inclusive = true;
             }
-            else if( p.parseChar(')'))
+            else if (p.parseChar(')'))
             {
                 //exclusive
                 versionRange.ceiling_inclusive = false;
@@ -635,9 +636,7 @@ class PluginParser
         public boolean parseStringIgnoreCase(String s)
         {
             String lowerCasedString = s.toLowerCase();
-            
             int savedIdx = skipWS();
-
             int len = lowerCasedString.length();
             char c = ci.current(); 
 
@@ -929,16 +928,16 @@ class PluginParser
                 skipWS();
                 String name = parseName();
                 skipWS();
-                if( !parseString(":=") && !parseString("=") )
+                if (!parseString(":=") && !parseString("="))
                 {
                     throw new NucleusUserException("Expected := or = symbols but found \""+remaining()+"\" at position "+this.getIndex()+" of text \""+input+"\"");
                 }
                 String argument = parseStringLiteral();
-                if( argument == null )
+                if (argument == null)
                 {
                     argument = parseIdentifier();
                 }
-                if( argument == null )
+                if (argument == null)
                 {
                     argument = parseInterval();
                 }                
@@ -950,12 +949,12 @@ class PluginParser
         
         public String parseSymbolicName()
         {
-            if( nextIsComma() )
+            if (nextIsComma())
             {
                 parseChar(',');
             }
             String name = parseName();
-            if( name == null && !parseEOS())
+            if (name == null && !parseEOS())
             {
                 throw new NucleusUserException("Invalid characters found \""+remaining()+"\" at position "+this.getIndex()+" of text \""+input+"\"");
             }

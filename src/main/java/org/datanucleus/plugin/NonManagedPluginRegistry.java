@@ -99,10 +99,10 @@ public class NonManagedPluginRegistry implements PluginRegistry
     private final ClassLoaderResolver clr;
 
     /** extension points keyed by Unique Id (plugin.id +"."+ id) */
-    Map<String, ExtensionPoint> extensionPointsByUniqueId = new HashMap();
+    Map<String, ExtensionPoint> extensionPointsByUniqueId = new HashMap<>();
 
     /** registered bundles files keyed by bundle symbolic name */
-    Map<String, Bundle> registeredPluginByPluginId = new HashMap();
+    Map<String, Bundle> registeredPluginByPluginId = new HashMap<>();
 
     /** extension points */
     ExtensionPoint[] extensionPoints;
@@ -157,36 +157,6 @@ public class NonManagedPluginRegistry implements PluginRegistry
     }
 
     /**
-     * Register extension and extension points for the specified plugin.
-     * @param pluginURL the URL to the plugin
-     * @param bundle the bundle
-     */
-    public void registerExtensionsForPlugin(URL pluginURL, Bundle bundle)
-    {
-        DocumentBuilder docBuilder = PluginParser.getDocumentBuilder();
-        List[] elements = PluginParser.parsePluginElements(docBuilder, this, pluginURL, bundle, clr);
-        registerExtensionPointsForPluginInternal(elements[0], true);
-
-        // Register extensions
-        Iterator<Extension> pluginExtensionIter = elements[1].iterator();
-        while (pluginExtensionIter.hasNext())
-        {
-            Extension extension = pluginExtensionIter.next();
-            ExtensionPoint exPoint = extensionPointsByUniqueId.get(extension.getExtensionPointId());
-            if (exPoint == null)
-            {
-                NucleusLogger.GENERAL.warn(Localiser.msg("024002", extension.getExtensionPointId(), 
-                    extension.getPlugin().getSymbolicName(), extension.getPlugin().getManifestLocation().toString()));
-            }
-            else
-            {
-                extension.setExtensionPoint(exPoint);
-                exPoint.addExtension(extension);
-            }
-        }
-    }
-
-    /**
      * Look for Bundles/Plugins and register them. 
      * Register also ExtensionPoints and Extensions declared in "/plugin.xml" files.
      */
@@ -197,7 +167,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             return;
         }
 
-        List registeringExtensions = new ArrayList();
+        List<Extension> registeringExtensions = new ArrayList<>();
 
         // parse the plugin files
         DocumentBuilder docBuilder = PluginParser.getDocumentBuilder();
@@ -235,9 +205,8 @@ public class NonManagedPluginRegistry implements PluginRegistry
         extensionPoints = extensionPointsByUniqueId.values().toArray(new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
 
         // Register the extensions now that we have the extension-points all loaded
-        for (int i = 0; i < registeringExtensions.size(); i++)
+        for (Extension extension : registeringExtensions)
         {
-            Extension extension = (Extension)registeringExtensions.get(i);
             ExtensionPoint exPoint = getExtensionPoint(extension.getExtensionPointId());
             if (exPoint == null)
             {
@@ -300,13 +269,11 @@ public class NonManagedPluginRegistry implements PluginRegistry
      * @param extPoints ExtensionPoints for this plugin
      * @param updateExtensionPointsArray Whether to update "extensionPoints" array
      */
-    protected void registerExtensionPointsForPluginInternal(List extPoints, boolean updateExtensionPointsArray)
+    protected void registerExtensionPointsForPluginInternal(List<ExtensionPoint> extPoints, boolean updateExtensionPointsArray)
     {
         // Register extension-points
-        Iterator<ExtensionPoint> pluginExtPointIter = extPoints.iterator();
-        while (pluginExtPointIter.hasNext())
+        for (ExtensionPoint exPoint : extPoints)
         {
-            ExtensionPoint exPoint = pluginExtPointIter.next();
             extensionPointsByUniqueId.put(exPoint.getUniqueId(), exPoint);
         }
         if (updateExtensionPointsArray)
@@ -681,15 +648,11 @@ public class NonManagedPluginRegistry implements PluginRegistry
      */
     public void resolveConstraints()
     {
-        Iterator<Bundle> it = registeredPluginByPluginId.values().iterator();
-        while (it.hasNext())
+        for (Bundle bundle : registeredPluginByPluginId.values())
         {
-            Bundle bundle = it.next();
             List<BundleDescription> set = bundle.getRequireBundle();
-            Iterator<BundleDescription> requiredBundles = set.iterator();
-            while (requiredBundles.hasNext())
+            for (BundleDescription bd : set)
             {
-                BundleDescription bd = requiredBundles.next();
                 String symbolicName = bd.getBundleSymbolicName();
 
                 Bundle requiredBundle = registeredPluginByPluginId.get(symbolicName);
@@ -761,5 +724,36 @@ public class NonManagedPluginRegistry implements PluginRegistry
     public Bundle[] getBundles()
     {
         return registeredPluginByPluginId.values().toArray(new Bundle[registeredPluginByPluginId.values().size()]);
+    }
+
+    /**
+     * Register extension and extension points for the specified plugin.
+     * <B>Note that this is only present for testing purposes.</B>
+     * @param pluginURL the URL to the plugin
+     * @param bundle the bundle
+     */
+    public void registerExtensionsForPlugin(URL pluginURL, Bundle bundle)
+    {
+        DocumentBuilder docBuilder = PluginParser.getDocumentBuilder();
+        List[] elements = PluginParser.parsePluginElements(docBuilder, this, pluginURL, bundle, clr);
+        registerExtensionPointsForPluginInternal(elements[0], true);
+
+        // Register extensions
+        Iterator<Extension> pluginExtensionIter = elements[1].iterator();
+        while (pluginExtensionIter.hasNext())
+        {
+            Extension extension = pluginExtensionIter.next();
+            ExtensionPoint exPoint = extensionPointsByUniqueId.get(extension.getExtensionPointId());
+            if (exPoint == null)
+            {
+                NucleusLogger.GENERAL.warn(Localiser.msg("024002", extension.getExtensionPointId(), 
+                    extension.getPlugin().getSymbolicName(), extension.getPlugin().getManifestLocation().toString()));
+            }
+            else
+            {
+                extension.setExtensionPoint(exPoint);
+                exPoint.addExtension(extension);
+            }
+        }
     }
 }
