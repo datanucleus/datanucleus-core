@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * <li>fatal maps to java.util.logging <i>severe</i></li>
  * </ul>
  */
-public class JDK14Logger extends NucleusLogger
+public class JRELogger extends NucleusLogger
 {
     /** The JDK1.4 Logger being used */
     private final Logger logger;
@@ -43,7 +43,7 @@ public class JDK14Logger extends NucleusLogger
      * Constructor for a JDK 1.4 Logger.
      * @param logName Name of the logger
      */
-    public JDK14Logger(String logName)
+    public JRELogger(String logName)
     {
         // Logging assumed to be configured by user via "java.util.logging.config.file"
         logger = Logger.getLogger(logName);
@@ -146,7 +146,7 @@ public class JDK14Logger extends NucleusLogger
             for (int i = 0; i < stacktrace.length; i++)
             {
                 StackTraceElement element = stacktrace[i];
-                if (!element.getClassName().equals(JDK14Logger.class.getName()))
+                if (!element.getClassName().equals(JRELogger.class.getName()))
                 {
                     result.setSourceClassName(element.getClassName());
                     result.setSourceMethodName(element.getMethodName());
