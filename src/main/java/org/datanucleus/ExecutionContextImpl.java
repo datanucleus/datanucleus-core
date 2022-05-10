@@ -260,7 +260,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         initialise(owner, options);
 
-        // Set up the Level 1 Cache
+        // Set up the Level 1 Cache, allowing reuse by subsequent uses of the ExecutionContext
         initialiseLevel1Cache();
     }
 
@@ -766,9 +766,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             level1Type = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
         }
+
         if (Level1Cache.NONE_NAME.equalsIgnoreCase(level1Type))
         {
-            return;
+            cache = null;
         }
         else if (SoftRefCache.NAME.equalsIgnoreCase(level1Type))
         {
@@ -784,14 +785,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         else
         {
-            // Find the L1 cache class name from its plugin name
-            String level1ClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_level1", "name", level1Type, "class-name");
-            if (level1ClassName == null)
-            {
-                // Plugin of this name not found
-                throw new NucleusUserException(Localiser.msg("003001", level1Type)).setFatal();
-            }
-
             try
             {
                 // Create an instance of the L1 Cache
@@ -804,6 +797,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
             catch (Exception e)
             {
+                // Exception on creation, so check the L1 cache class name from its plugin name
+                String level1ClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_level1", "name", level1Type, "class-name");
+                if (level1ClassName == null)
+                {
+                    // Plugin of this name not found
+                    throw new NucleusUserException(Localiser.msg("003001", level1Type)).setFatal();
+                }
                 // Class name for this L1 cache plugin is not found!
                 throw new NucleusUserException(Localiser.msg("003002", level1Type, level1ClassName),e).setFatal();
             }
@@ -949,7 +949,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         NucleusLogger.PERSISTENCE.warn("Can only disable L1 cache when it is empty. Ignored");
                         return;
                     }
-                    cache.clear();
                     cache = null;
                 }
             }

@@ -1312,10 +1312,20 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         return true;
     }
 
-    /**
-     * Method that will unload all fields that are not in the FetchPlan.
-     * This is typically for use when the instance is being refreshed.
-     */
+    @Override
+    public void unloadField(int fieldNumber)
+    {
+        if (isEmbedded())
+        {
+            // TODO When we have nested embedded objects that can have relations to non-embedded then this needs to change
+            throw new NucleusUserException("Cannot unload field/property of embedded object");
+        }
+
+        // Mark as not loaded
+        loadedFields[fieldNumber] = false;
+    }
+
+    @Override
     public void unloadNonFetchPlanFields()
     {
         int[] fpFieldNumbers = myFP.getMemberNumbers();
@@ -1771,25 +1781,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     protected void clearDirtyFlags(int[] fieldNumbers)
     {
         dirty = false;
-        ClassUtils.clearFlags(dirtyFields,fieldNumbers);
-    }
-
-    /**
-     * Convenience method to unload a field/property.
-     * @param fieldName Name of the field/property
-     * @throws NucleusUserException if the object managed by this StateManager is embedded
-     */
-    public void unloadField(String fieldName)
-    {
-        if (isEmbedded())
-        {
-            // TODO When we have nested embedded objects that can have relations to non-embedded then this needs to change
-            throw new NucleusUserException("Cannot unload field/property of embedded object");
-        }
-
-        // Mark as not loaded
-        AbstractMemberMetaData mmd = getClassMetaData().getMetaDataForMember(fieldName);
-        loadedFields[mmd.getAbsoluteFieldNumber()] = false;
+        ClassUtils.clearFlags(dirtyFields, fieldNumbers);
     }
 
     /**
@@ -4839,12 +4831,12 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                             if (!api.isDetached(value) && !(valueSM != null && valueSM.isDetaching()))
                             {
                                 // Field value is not detached or being detached so unload it
-                                String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i).getName();
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026032", IdentityUtils.getPersistableIdentityForId(myID), fieldName));
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026032", IdentityUtils.getPersistableIdentityForId(myID),
+                                        cmd.getMetaDataForManagedMemberAtAbsolutePosition(i).getName()));
                                 }
-                                unloadField(fieldName);
+                                unloadField(i);
                             }
                         }
                         // TODO What if we have collection/map that includes some objects that are not detached?

@@ -970,7 +970,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         {
                             // element is deleted so can't call remove since it may try to read fields from it
                             // so just unload the collection in the owner forcing it to be reloaded from the DB
-                            ownerSM.unloadField(mmd.getName());
+                            ownerSM.unloadField(mmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (sm.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()) && !sm.getLifecycleState().isDeleted)

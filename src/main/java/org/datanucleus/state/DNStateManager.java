@@ -25,6 +25,7 @@ import org.datanucleus.FetchPlanState;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
@@ -498,6 +499,13 @@ public interface DNStateManager<T> extends StateManager
     void loadUnloadedFields();
 
     /**
+     * Mark the specified field as not loaded so that it will be reloaded on next access.
+     * @param fieldNumber Absolute field number
+     * @throws NucleusUserException if the object managed by this StateManager is embedded
+     */
+    void unloadField(int fieldNumber);
+
+    /**
      * Method that will unload all fields that are not in the FetchPlan.
      */
     void unloadNonFetchPlanFields();
@@ -556,11 +564,9 @@ public interface DNStateManager<T> extends StateManager
     void clearLoadedFlags();
 
     /**
-     * Mark the specified field as not loaded so that it will be reloaded on next access.
-     * @param fieldName Name of the field
+     * Accessor for the loaded flags for all fields.
+     * @return Array of loaded flags for all fields
      */
-    void unloadField(String fieldName);
-
     boolean[] getLoadedFields();
 
     /**

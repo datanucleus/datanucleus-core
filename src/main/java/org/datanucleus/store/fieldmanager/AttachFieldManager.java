@@ -126,14 +126,14 @@ public class AttachFieldManager extends AbstractFieldManager
             // We have cascade-attach disabled for this member, so we unload it (forces load from DB)
             NucleusLogger.GENERAL.debug(">> AttachFM.storeObjectField mmd=" + mmd.getFullFieldName() + " but not allowed to merge it, so unloading field");
             // Member is tagged to not attach, so unload it
-            attachedSM.unloadField(mmd.getName());
+            attachedSM.unloadField(mmd.getAbsoluteFieldNumber());
             return;
         }
         else if (RelationType.isRelationMultiValued(relationType) && !mmd.isCascadeAttach())
         {
             NucleusLogger.GENERAL.debug(">> AttachFM.storeObjectField mmd=" + mmd.getFullFieldName() + " but not allowed to merge it, so unloading field");
             // Member is tagged to not attach, so unload it
-            attachedSM.unloadField(mmd.getName());
+            attachedSM.unloadField(mmd.getAbsoluteFieldNumber());
             return;
         }
 
