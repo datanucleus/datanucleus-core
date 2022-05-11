@@ -43,6 +43,17 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class IdentityManagerImpl implements IdentityManager
 {
+    private static final Class[] CTR_CLASS_LONG_ARG_TYPES = new Class[] {Class.class, Long.class};
+    private static final Class[] CTR_CLASS_INTEGER_ARG_TYPES = new Class[] {Class.class, Integer.class};
+    private static final Class[] CTR_CLASS_SHORT_ARG_TYPES = new Class[] {Class.class, Short.class};
+    private static final Class[] CTR_CLASS_BYTE_ARG_TYPES = new Class[] {Class.class, Byte.class};
+    private static final Class[] CTR_CLASS_CHARACTER_ARG_TYPES = new Class[] {Class.class, Character.class};
+    private static final Class[] CTR_CLASS_OBJECT_ARG_TYPES = new Class[] {Class.class, Object.class};
+    private static final Class[] CTR_CLASS_STRING_ARG_TYPES = new Class[] {Class.class, String.class};
+    private static final Class[] CTR_STRING_OBJECT_ARG_TYPES = new Class[] {String.class, Object.class};
+    private static final Class[] CTR_STRING_ARG_TYPES = new Class[] {String.class};
+    private static final Class[] CTR_LONG_ARG_TYPES = new Class[] {Long.class};
+
     /** Default DatastoreId implementation used by DataNucleus. */
     protected Class datastoreIdClass = null;
 
@@ -139,34 +150,31 @@ public class IdentityManagerImpl implements IdentityManager
     protected String getConstructorNameForCache(Class type, Class[] ctrArgTypes)
     {
         StringBuilder name = new StringBuilder(type.getName());
-        if (ctrArgTypes != null)
+        for (int i=0;i<ctrArgTypes.length; i++)
         {
-            for (int i=0;i<ctrArgTypes.length; i++)
-            {
-                name.append("-").append(ctrArgTypes[i].getName());
-            }
+            name.append("-").append(ctrArgTypes[i].getName());
         }
         return name.toString();
     }
 
+    @Override
     public Class getDatastoreIdClass()
     {
         return datastoreIdClass;
     }
 
+    @Override
     public IdentityStringTranslator getIdentityStringTranslator()
     {
         return idStringTranslator;
     }
 
+    @Override
     public IdentityKeyTranslator getIdentityKeyTranslator()
     {
         return idKeyTranslator;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.IdentityManager#getDatastoreId(java.lang.String, java.lang.Object)
-     */
     @Override
     public DatastoreId getDatastoreId(String className, Object value)
     {
@@ -179,7 +187,7 @@ public class IdentityManagerImpl implements IdentityManager
         // Others are pluggable
         try
         {
-            Class[] ctrArgTypes = new Class[] {String.class, Object.class};
+            Class[] ctrArgTypes = CTR_STRING_OBJECT_ARG_TYPES;
             String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
             Constructor ctr = constructorCache.get(ctrName);
             if (ctr == null)
@@ -196,9 +204,6 @@ public class IdentityManagerImpl implements IdentityManager
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.IdentityManager#getDatastoreId(long)
-     */
     @Override
     public DatastoreId getDatastoreId(long value)
     {
@@ -211,7 +216,7 @@ public class IdentityManagerImpl implements IdentityManager
         // Others are pluggable
         try
         {
-            Class[] ctrArgTypes = new Class[] {Long.class};
+            Class[] ctrArgTypes = CTR_LONG_ARG_TYPES;
             String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
             Constructor ctr = constructorCache.get(ctrName);
             if (ctr == null)
@@ -228,9 +233,6 @@ public class IdentityManagerImpl implements IdentityManager
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.IdentityManager#getDatastoreId(java.lang.String)
-     */
     @Override
     public DatastoreId getDatastoreId(String idString)
     {
@@ -243,7 +245,7 @@ public class IdentityManagerImpl implements IdentityManager
         // Others are pluggable
         try
         {
-            Class[] ctrArgTypes = new Class[] {String.class};
+            Class[] ctrArgTypes = CTR_STRING_ARG_TYPES;
             String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
             Constructor ctr = constructorCache.get(ctrName);
             if (ctr == null)
@@ -260,14 +262,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
     }
 
-    /**
-     * Utility to create a new SingleFieldId using reflection when you know the type of the Persistable, and also which SingleFieldId type, and the value of the key.
-     * @param idType Type of SingleFieldId
-     * @param pcType Type of the Persistable
-     * @param key The value for the identity (the Long, or Int, or ... etc).
-     * @return Single field identity
-     * @throws NucleusException if invalid input is received
-     */
+    @Override
     public SingleFieldId getSingleFieldId(Class idType, Class pcType, Object key)
     {
         if (idType == null)
@@ -287,11 +282,10 @@ public class IdentityManagerImpl implements IdentityManager
             throw new NucleusException(Localiser.msg("029002", idType.getName(), pcType.getName())).setFatal();
         }
 
-        SingleFieldId id = null;
-        Class keyType = null;
+        Class[] ctrArgTypes = null;
         if (idType == ClassConstants.IDENTITY_SINGLEFIELD_LONG)
         {
-            keyType = Long.class;
+            ctrArgTypes = CTR_CLASS_LONG_ARG_TYPES;
             if (!(key instanceof Long))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Long")).setFatal();
@@ -299,7 +293,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_INT)
         {
-            keyType = Integer.class;
+            ctrArgTypes = CTR_CLASS_INTEGER_ARG_TYPES;
             if (!(key instanceof Integer))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Integer")).setFatal();
@@ -307,7 +301,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_STRING)
         {
-            keyType = String.class;
+            ctrArgTypes = CTR_CLASS_STRING_ARG_TYPES;
             if (!(key instanceof String))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "String")).setFatal();
@@ -315,7 +309,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_BYTE)
         {
-            keyType = Byte.class;
+            ctrArgTypes = CTR_CLASS_BYTE_ARG_TYPES;
             if (!(key instanceof Byte))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Byte")).setFatal();
@@ -323,7 +317,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_SHORT)
         {
-            keyType = Short.class;
+            ctrArgTypes = CTR_CLASS_SHORT_ARG_TYPES;
             if (!(key instanceof Short))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Short")).setFatal();
@@ -331,7 +325,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_CHAR)
         {
-            keyType = Character.class;
+            ctrArgTypes = CTR_CLASS_CHARACTER_ARG_TYPES;
             if (!(key instanceof Character))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Character")).setFatal();
@@ -340,37 +334,28 @@ public class IdentityManagerImpl implements IdentityManager
         else
         {
             // ObjectIdentity
-            keyType = Object.class;
+            ctrArgTypes = CTR_CLASS_OBJECT_ARG_TYPES;
         }
 
         try
         {
-            Class[] ctrArgs = new Class[] {Class.class, keyType};
-            String ctrName = getConstructorNameForCache(idType, ctrArgs);
+            String ctrName = getConstructorNameForCache(idType, ctrArgTypes);
             Constructor ctr = constructorCache.get(ctrName);
             if (ctr == null)
             {
-                ctr = idType.getConstructor(ctrArgs);
+                ctr = idType.getConstructor(ctrArgTypes);
                 constructorCache.put(ctrName, ctr);
             }
-            id = (SingleFieldId)ctr.newInstance(new Object[] {pcType, key});
+            return (SingleFieldId)ctr.newInstance(new Object[] {pcType, key});
         }
         catch (Exception e)
         {
             NucleusLogger.PERSISTENCE.error("Error encountered while creating SingleFieldIdentity instance of type \"" + idType.getName() + "\"", e);
             return null;
         }
-
-        return id;
     }
 
-    /**
-     * Utility to create a new application identity when you know the metadata for the target class, and the toString() output of the identity.
-     * @param clr ClassLoader resolver
-     * @param acmd MetaData for the target class
-     * @param keyToString String form of the key
-     * @return The identity
-     */
+    @Override
     public Object getApplicationId(ClassLoaderResolver clr, AbstractClassMetaData acmd, String keyToString)
     {
         if (acmd.getIdentityType() != IdentityType.APPLICATION)
@@ -389,11 +374,11 @@ public class IdentityManagerImpl implements IdentityManager
                 Class[] ctrArgTypes;
                 if (ClassConstants.IDENTITY_SINGLEFIELD_OBJECT.isAssignableFrom(idType))
                 {
-                    ctrArgTypes = new Class[] {Class.class, Object.class};
+                    ctrArgTypes = CTR_CLASS_OBJECT_ARG_TYPES;
                 }
                 else
                 {
-                    ctrArgTypes = new Class[] {Class.class, String.class};
+                    ctrArgTypes = CTR_CLASS_STRING_ARG_TYPES;
                 }
                 String ctrName = getConstructorNameForCache(idType, ctrArgTypes);
                 Constructor ctr = constructorCache.get(ctrName);
@@ -416,7 +401,7 @@ public class IdentityManagerImpl implements IdentityManager
             try
             {
                 Class type = clr.classForName(acmd.getObjectidClass());
-                Class[] ctrArgTypes = new Class[] {String.class};
+                Class[] ctrArgTypes = CTR_STRING_ARG_TYPES;
                 String ctrName = getConstructorNameForCache(type, ctrArgTypes);
                 Constructor ctr = constructorCache.get(ctrName);
                 if (ctr == null)
@@ -438,12 +423,7 @@ public class IdentityManagerImpl implements IdentityManager
         return EnhancementHelper.getInstance().newObjectIdInstance(targetClass, keyToString);
     }
 
-    /**
-     * Method to create a new (application) identity for the passed object with the supplied MetaData (when using APPLICATION identity).
-     * @param pc The persistable object
-     * @param cmd Metadata for the persistable object
-     * @return The new identity object
-     */
+    @Override
     public Object getApplicationId(Object pc, AbstractClassMetaData cmd)
     {
         if (pc == null || cmd == null)
@@ -483,12 +463,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
     }
 
-    /**
-     * Method to return a new object identity for the specified class, and key (possibly toString() output).
-     * @param cls Persistable class
-     * @param key form of the object id
-     * @return The object identity
-     */
+    @Override
     public Object getApplicationId(Class cls, Object key)
     {
         return EnhancementHelper.getInstance().newObjectIdInstance(cls, key);
