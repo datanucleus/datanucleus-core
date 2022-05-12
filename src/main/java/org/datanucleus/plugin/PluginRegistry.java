@@ -63,9 +63,9 @@ public interface PluginRegistry
      * Loads a class (do not initialize) from an attribute of {@link ConfigurationElement}
      * @param confElm the configuration element
      * @param name the attribute name
-     * @param argsClass Classes of the args
+     * @param argTypes Types of the constructor arguments
      * @param args The arguments
-     * @return the Class
+     * @return the instance
      * @throws ClassNotFoundException If an error occurs
      * @throws NoSuchMethodException If an error occurs
      * @throws SecurityException  If an error occurs
@@ -74,7 +74,7 @@ public interface PluginRegistry
      * @throws InstantiationException  If an error occurs
      * @throws IllegalArgumentException  If an error occurs
      */
-    Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argsClass, Object[] args)
+    Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argTypes, Object[] args)
         throws ClassNotFoundException,
         SecurityException,
         NoSuchMethodException,

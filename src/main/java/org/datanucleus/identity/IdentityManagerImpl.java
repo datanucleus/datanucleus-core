@@ -43,16 +43,16 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class IdentityManagerImpl implements IdentityManager
 {
-    private static final Class[] CTR_CLASS_LONG_ARG_TYPES = new Class[] {Class.class, Long.class};
-    private static final Class[] CTR_CLASS_INTEGER_ARG_TYPES = new Class[] {Class.class, Integer.class};
-    private static final Class[] CTR_CLASS_SHORT_ARG_TYPES = new Class[] {Class.class, Short.class};
-    private static final Class[] CTR_CLASS_BYTE_ARG_TYPES = new Class[] {Class.class, Byte.class};
-    private static final Class[] CTR_CLASS_CHARACTER_ARG_TYPES = new Class[] {Class.class, Character.class};
+    private static final Class[] CTR_CLASS_LONG_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_LONG};
+    private static final Class[] CTR_CLASS_INTEGER_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_INTEGER};
+    private static final Class[] CTR_CLASS_SHORT_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_SHORT};
+    private static final Class[] CTR_CLASS_BYTE_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_BYTE};
+    private static final Class[] CTR_CLASS_CHARACTER_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_CHARACTER};
     private static final Class[] CTR_CLASS_OBJECT_ARG_TYPES = new Class[] {Class.class, Object.class};
-    private static final Class[] CTR_CLASS_STRING_ARG_TYPES = new Class[] {Class.class, String.class};
-    private static final Class[] CTR_STRING_OBJECT_ARG_TYPES = new Class[] {String.class, Object.class};
-    private static final Class[] CTR_STRING_ARG_TYPES = new Class[] {String.class};
-    private static final Class[] CTR_LONG_ARG_TYPES = new Class[] {Long.class};
+    private static final Class[] CTR_CLASS_STRING_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_STRING};
+    private static final Class[] CTR_STRING_OBJECT_ARG_TYPES = new Class[] {ClassConstants.JAVA_LANG_STRING, Object.class};
+    private static final Class[] CTR_STRING_ARG_TYPES = new Class[] {ClassConstants.JAVA_LANG_STRING};
+    private static final Class[] CTR_LONG_ARG_TYPES = new Class[] {ClassConstants.JAVA_LANG_LONG};
 
     /** Default DatastoreId implementation used by DataNucleus. */
     protected Class datastoreIdClass = null;
@@ -64,7 +64,7 @@ public class IdentityManagerImpl implements IdentityManager
     protected IdentityKeyTranslator idKeyTranslator = null;
 
     /** Cache of id class Constructor, keyed by string of the type+args. */
-    private Map<String, Constructor<?>> constructorCache = new ConcurrentHashMap<String, Constructor<?>>();
+    private Map<String, Constructor<?>> constructorCache = new ConcurrentHashMap<>();
 
     public IdentityManagerImpl(PersistenceNucleusContext nucCtx)
     {
@@ -178,10 +178,18 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public DatastoreId getDatastoreId(String className, Object value)
     {
+        // Hardcoded for performance
         if (datastoreIdClass == ClassConstants.IDENTITY_DATASTORE_IMPL)
         {
-            // Hardcoded for performance
             return new DatastoreIdImpl(className, value);
+        }
+        else if (datastoreIdClass == DatastoreIdImplKodo.class)
+        {
+            return new DatastoreIdImplKodo(className, value);
+        }
+        else if (datastoreIdClass == DatastoreIdImplXcalia.class)
+        {
+            return new DatastoreIdImplXcalia(className, value);
         }
 
         // Others are pluggable

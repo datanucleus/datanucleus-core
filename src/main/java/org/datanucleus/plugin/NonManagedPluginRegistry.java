@@ -128,38 +128,25 @@ public class NonManagedPluginRegistry implements PluginRegistry
         this.allowUserBundles = allowUserBundles;
     }
 
-    /**
-     * Accessor for the ExtensionPoint with the specified id.
-     * @param id the unique id of the extension point
-     * @return null if the ExtensionPoint is not registered
-     */
+    @Override
     public ExtensionPoint getExtensionPoint(String id)
     {
         return extensionPointsByUniqueId.get(id);
     }
 
-    /**
-     * Accessor for the currently registered ExtensionPoints.
-     * @return array of ExtensionPoints
-     */
+    @Override
     public ExtensionPoint[] getExtensionPoints()
     {
         return extensionPoints;
     }
 
-    /**
-     * Look for Bundles/Plugins and register them. 
-     * Register also ExtensionPoints and Extensions declared in "/plugin.xml" files
-     */
+    @Override
     public void registerExtensionPoints()
     {
         registerExtensions();
     }
 
-    /**
-     * Look for Bundles/Plugins and register them. 
-     * Register also ExtensionPoints and Extensions declared in "/plugin.xml" files.
-     */
+    @Override
     public void registerExtensions()
     {
         if (extensionPoints.length > 0)
@@ -598,13 +585,8 @@ public class NonManagedPluginRegistry implements PluginRegistry
         return null;
     }
 
-    /**
-     * Loads a class (do not initialize) from an attribute of {@link ConfigurationElement}
-     * @param confElm the configuration element
-     * @param name the attribute name
-     * @return the Class
-     */
-    public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argsClass, Object[] args)
+    @Override
+    public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argTypes, Object[] args)
         throws ClassNotFoundException,
         SecurityException,
         NoSuchMethodException,
@@ -614,38 +596,23 @@ public class NonManagedPluginRegistry implements PluginRegistry
         InvocationTargetException
     {
         Class cls = clr.classForName(confElm.getAttribute(name),org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-        Constructor constructor = cls.getConstructor(argsClass);
+        Constructor constructor = cls.getConstructor(argTypes);
         return constructor.newInstance(args);
     }
 
-    /**
-     * Loads a class (do not initialize)
-     * @param pluginId the plugin id
-     * @param className the class name
-     * @return the Class
-     * @throws ClassNotFoundException if an error occurs in loading
-     */
+    @Override
     public Class loadClass(String pluginId, String className) throws ClassNotFoundException
     {
         return clr.classForName(className, org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
     }
 
-    /**
-     * Converts a URL that uses a user-defined protocol into a URL that uses the file protocol.
-     * @param url the url to be converted
-     * @return the converted URL
-     * @throws IOException if an error occurs
-     */
+    @Override
     public URL resolveURLAsFileURL(URL url) throws IOException
     {
         return url;
     }
 
-    /**
-     * Resolve constraints declared in bundle manifest.mf files. 
-     * This must be invoked after registering all bundles.
-     * Should log errors if bundles are not resolvable, or raise runtime exceptions.
-     */
+    @Override
     public void resolveConstraints()
     {
         for (Bundle bundle : registeredPluginByPluginId.values())
@@ -716,11 +683,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
         return result;
     }
 
-    /**
-     * Accessor for all registered bundles
-     * @return the bundles
-     * @throws UnsupportedOperationException if this operation is not supported by the implementation
-     */    
+    @Override
     public Bundle[] getBundles()
     {
         return registeredPluginByPluginId.values().toArray(new Bundle[registeredPluginByPluginId.values().size()]);
@@ -728,7 +691,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
 
     /**
      * Register extension and extension points for the specified plugin.
-     * <B>Note that this is only present for testing purposes.</B>
+     * <B>Note that this is only present for testing purposes, hence also why it is public.</B>
      * @param pluginURL the URL to the plugin
      * @param bundle the bundle
      */

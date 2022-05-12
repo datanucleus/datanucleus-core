@@ -20,7 +20,6 @@ Contributors:
  **********************************************************************/
 package org.datanucleus;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -95,6 +94,7 @@ import org.datanucleus.transaction.TransactionEventListener;
 import org.datanucleus.transaction.TransactionImpl;
 import org.datanucleus.transaction.jta.JTAJCATransactionImpl;
 import org.datanucleus.transaction.jta.JTATransactionImpl;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.datanucleus.util.Localiser;
@@ -3688,8 +3688,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     try
                     {
-                        Constructor c = clr.classForName(cmd.getObjectidClass()).getDeclaredConstructor(new Class[] {java.lang.String.class});
-                        id = c.newInstance(new Object[] {(String)key});
+                        id = ClassUtils.newInstance(clr.classForName(cmd.getObjectidClass()), new Class[] {java.lang.String.class}, new Object[] {(String)key});
                     }
                     catch(Exception e) 
                     {

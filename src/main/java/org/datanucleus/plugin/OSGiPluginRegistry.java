@@ -59,30 +59,25 @@ public class OSGiPluginRegistry implements PluginRegistry
         extensionPoints = new ExtensionPoint[0];
     }
 
-    /**
-     * Accessor for the ExtensionPoint with the specified id.
-     * @param id the unique id of the extension point
-     * @return null if the ExtensionPoint is not registered
-     */
+    @Override
     public ExtensionPoint getExtensionPoint(String id)
     {
         return extensionPointsByUniqueId.get(id);
     }
 
+    @Override
     public ExtensionPoint[] getExtensionPoints()
     {
        return extensionPoints;
     }
 
-    /**
-     * Look for Bundles/Plugins and register them. 
-     * Register also ExtensionPoints and Extensions declared in "/plugin.xml" files
-     */
+    @Override
     public void registerExtensionPoints()
     {
         registerExtensions();
     }
 
+    @Override
     public void registerExtensions()
     {
         if (extensionPoints.length > 0)
@@ -217,19 +212,8 @@ public class OSGiPluginRegistry implements PluginRegistry
         return bundle;
     }
 
-    /**
-     * Loads a class (do not initialize) from an attribute of {@link ConfigurationElement}
-     * @param confElm the configuration element
-     * @param name the attribute name
-     * @return the Class
-     * @throws NoSuchMethodException if an error occurs
-     * @throws SecurityException if an error occurs
-     * @throws InvocationTargetException if an error occurs
-     * @throws IllegalAccessException if an error occurs
-     * @throws InstantiationException if an error occurs
-     * @throws IllegalArgumentException if an error occurs
-     */
-    public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argsClass, Object[] args)
+    @Override
+    public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argTypes, Object[] args)
         throws ClassNotFoundException,
         SecurityException,
         NoSuchMethodException,
@@ -242,7 +226,7 @@ public class OSGiPluginRegistry implements PluginRegistry
         String attribute = confElm.getAttribute(name);
         org.osgi.framework.Bundle osgiBundle = getOsgiBundle(symbolicName);
         Class cls = osgiBundle.loadClass(attribute);
-        Constructor constructor = cls.getConstructor(argsClass);
+        Constructor constructor = cls.getConstructor(argTypes);
 
         try
         {
@@ -270,37 +254,25 @@ public class OSGiPluginRegistry implements PluginRegistry
         }
     }
 
-    /**
-     * Loads a class (do not initialize)
-     * @param pluginId the plugin id
-     * @param className the class name
-     * @return the Class
-     * @throws ClassNotFoundException if there is a problem in loading
-     */
+    @Override
     public Class loadClass(String pluginId, String className) throws ClassNotFoundException
     {
         return getOsgiBundle(pluginId).loadClass(className);
     }
 
+    @Override
     public URL resolveURLAsFileURL(URL url) throws IOException
     {
         return null;
     }
 
-    /**
-     * Resolve constraints declared in bundle manifest.mf files. This must be invoked after registering all
-     * bundles. Should log errors if bundles are not resolvable, or raise runtime exceptions.
-     */
+    @Override
     public void resolveConstraints()
     {
         // ignored. OSGi Framework will handle this
     }
 
-    /**
-     * Accessor for all registered bundles.
-     * @return the bundles
-     * @throws UnsupportedOperationException if this operation is not supported by the implementation
-     */
+    @Override
     public Bundle[] getBundles()
     {
         return registeredPluginByPluginId.values().toArray(new Bundle[registeredPluginByPluginId.values().size()]);

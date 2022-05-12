@@ -22,7 +22,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.valuegenerator;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 import java.util.Properties;
@@ -34,6 +33,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -316,8 +316,7 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
             }
             Class[] argTypes = new Class[] {StoreManager.class, String.class, Properties.class};
             Object[] args = new Object[] {storeMgr, seqName, props};
-            Constructor ctor = generatorClass.getConstructor(argTypes);
-            generator = (ValueGenerator)ctor.newInstance(args);
+            generator = (ValueGenerator)ClassUtils.newInstance(generatorClass, argTypes, args);
         }
         catch (Exception e)
         {
