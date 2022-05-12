@@ -21,6 +21,7 @@ package org.datanucleus.plugin;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -78,8 +79,8 @@ public class PluginRegistryFactory
                     NucleusLogger.GENERAL.debug(Localiser.msg("024005", registryClassName));
                 }
             }
-            return (PluginRegistry) clr.classForName(registryClassName, org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER).getConstructor(
-                new Class[] { ClassConstants.CLASS_LOADER_RESOLVER }).newInstance(new Object[] { clr });
+            return (PluginRegistry) ClassUtils.newInstance(clr.classForName(registryClassName, org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER), 
+                new Class[] {ClassConstants.CLASS_LOADER_RESOLVER}, new Object[] { clr });
         }
         catch (Exception e)
         {

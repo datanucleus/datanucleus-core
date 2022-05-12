@@ -29,8 +29,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -54,6 +52,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.plugin.Bundle.BundleDescription;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
@@ -588,16 +587,9 @@ public class NonManagedPluginRegistry implements PluginRegistry
     @Override
     public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argTypes, Object[] args)
         throws ClassNotFoundException,
-        SecurityException,
-        NoSuchMethodException,
-        IllegalArgumentException,
-        InstantiationException,
-        IllegalAccessException,
-        InvocationTargetException
+        SecurityException
     {
-        Class cls = clr.classForName(confElm.getAttribute(name),org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-        Constructor constructor = cls.getConstructor(argTypes);
-        return constructor.newInstance(args);
+        return ClassUtils.newInstance(clr.classForName(confElm.getAttribute(name),org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER), argTypes, args);
     }
 
     @Override

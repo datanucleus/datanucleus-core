@@ -19,8 +19,6 @@ package org.datanucleus.plugin;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,6 +29,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.osgi.framework.BundleContext;
@@ -215,43 +214,15 @@ public class OSGiPluginRegistry implements PluginRegistry
     @Override
     public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argTypes, Object[] args)
         throws ClassNotFoundException,
-        SecurityException,
-        NoSuchMethodException,
-        IllegalArgumentException,
-        InstantiationException,
-        IllegalAccessException,
-        InvocationTargetException
+        SecurityException
     {
         String symbolicName = confElm.getExtension().getPlugin().getSymbolicName();
-        String attribute = confElm.getAttribute(name);
         org.osgi.framework.Bundle osgiBundle = getOsgiBundle(symbolicName);
-        Class cls = osgiBundle.loadClass(attribute);
-        Constructor constructor = cls.getConstructor(argTypes);
 
-        try
-        {
-            return constructor.newInstance(args);
-        }
-        catch (InstantiationException e1)
-        {
-            NucleusLogger.GENERAL.error(e1.getMessage(), e1);
-            throw e1;
-        }
-        catch (IllegalAccessException e2)
-        {
-            NucleusLogger.GENERAL.error(e2.getMessage(), e2);
-            throw e2;
-        }
-        catch (IllegalArgumentException e3)
-        {
-            NucleusLogger.GENERAL.error(e3.getMessage(), e3);
-            throw e3;
-        }
-        catch (InvocationTargetException e4)
-        {
-            NucleusLogger.GENERAL.error(e4.getMessage(), e4);
-            throw e4;
-        }
+        String attribute = confElm.getAttribute(name);
+        Class cls = osgiBundle.loadClass(attribute);
+
+        return ClassUtils.newInstance(cls, argTypes, args);
     }
 
     @Override

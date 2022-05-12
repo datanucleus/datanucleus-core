@@ -43,11 +43,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class IdentityManagerImpl implements IdentityManager
 {
-    private static final Class[] CTR_CLASS_LONG_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_LONG};
-    private static final Class[] CTR_CLASS_INTEGER_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_INTEGER};
-    private static final Class[] CTR_CLASS_SHORT_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_SHORT};
-    private static final Class[] CTR_CLASS_BYTE_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_BYTE};
-    private static final Class[] CTR_CLASS_CHARACTER_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_CHARACTER};
     private static final Class[] CTR_CLASS_OBJECT_ARG_TYPES = new Class[] {Class.class, Object.class};
     private static final Class[] CTR_CLASS_STRING_ARG_TYPES = new Class[] {Class.class, ClassConstants.JAVA_LANG_STRING};
     private static final Class[] CTR_STRING_OBJECT_ARG_TYPES = new Class[] {ClassConstants.JAVA_LANG_STRING, Object.class};
@@ -192,7 +187,7 @@ public class IdentityManagerImpl implements IdentityManager
             return new DatastoreIdImplXcalia(className, value);
         }
 
-        // Others are pluggable
+        // Pluggable type
         try
         {
             Class[] ctrArgTypes = CTR_STRING_OBJECT_ARG_TYPES;
@@ -221,7 +216,7 @@ public class IdentityManagerImpl implements IdentityManager
             return new DatastoreUniqueLongId(value);
         }
 
-        // Others are pluggable
+        // Pluggable type
         try
         {
             Class[] ctrArgTypes = CTR_LONG_ARG_TYPES;
@@ -244,13 +239,21 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public DatastoreId getDatastoreId(String idString)
     {
+        // Hardcoded for performance
         if (datastoreIdClass == ClassConstants.IDENTITY_DATASTORE_IMPL)
         {
-            // Hardcoded for performance
             return new DatastoreIdImpl(idString);
         }
+        else if (datastoreIdClass == DatastoreIdImplKodo.class)
+        {
+            return new DatastoreIdImplKodo(idString);
+        }
+        else if (datastoreIdClass == DatastoreIdImplXcalia.class)
+        {
+            return new DatastoreIdImplXcalia(idString);
+        }
 
-        // Others are pluggable
+        // Pluggable type
         try
         {
             Class[] ctrArgTypes = CTR_STRING_ARG_TYPES;
@@ -290,76 +293,58 @@ public class IdentityManagerImpl implements IdentityManager
             throw new NucleusException(Localiser.msg("029002", idType.getName(), pcType.getName())).setFatal();
         }
 
-        Class[] ctrArgTypes = null;
         if (idType == ClassConstants.IDENTITY_SINGLEFIELD_LONG)
         {
-            ctrArgTypes = CTR_CLASS_LONG_ARG_TYPES;
             if (!(key instanceof Long))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Long")).setFatal();
             }
+            return new LongId(pcType, (Long)key);
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_INT)
         {
-            ctrArgTypes = CTR_CLASS_INTEGER_ARG_TYPES;
             if (!(key instanceof Integer))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Integer")).setFatal();
             }
+            return new IntId(pcType, (Integer)key);
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_STRING)
         {
-            ctrArgTypes = CTR_CLASS_STRING_ARG_TYPES;
             if (!(key instanceof String))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "String")).setFatal();
             }
+            return new StringId(pcType, (String)key);
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_BYTE)
         {
-            ctrArgTypes = CTR_CLASS_BYTE_ARG_TYPES;
             if (!(key instanceof Byte))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Byte")).setFatal();
             }
+            return new ByteId(pcType, (Byte)key);
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_SHORT)
         {
-            ctrArgTypes = CTR_CLASS_SHORT_ARG_TYPES;
             if (!(key instanceof Short))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Short")).setFatal();
             }
+            return new ShortId(pcType, (Short)key);
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_CHAR)
         {
-            ctrArgTypes = CTR_CLASS_CHARACTER_ARG_TYPES;
             if (!(key instanceof Character))
             {
                 throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Character")).setFatal();
             }
+            return new CharId(pcType, (Character)key);
         }
         else
         {
             // ObjectIdentity
-            ctrArgTypes = CTR_CLASS_OBJECT_ARG_TYPES;
-        }
-
-        try
-        {
-            String ctrName = getConstructorNameForCache(idType, ctrArgTypes);
-            Constructor ctr = constructorCache.get(ctrName);
-            if (ctr == null)
-            {
-                ctr = idType.getConstructor(ctrArgTypes);
-                constructorCache.put(ctrName, ctr);
-            }
-            return (SingleFieldId)ctr.newInstance(new Object[] {pcType, key});
-        }
-        catch (Exception e)
-        {
-            NucleusLogger.PERSISTENCE.error("Error encountered while creating SingleFieldIdentity instance of type \"" + idType.getName() + "\"", e);
-            return null;
+            return new ObjectId(pcType, key);
         }
     }
 

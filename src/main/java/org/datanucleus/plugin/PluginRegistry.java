@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.plugin;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 /**
@@ -67,21 +66,10 @@ public interface PluginRegistry
      * @param args The arguments
      * @return the instance
      * @throws ClassNotFoundException If an error occurs
-     * @throws NoSuchMethodException If an error occurs
      * @throws SecurityException  If an error occurs
-     * @throws InvocationTargetException  If an error occurs
-     * @throws IllegalAccessException  If an error occurs
-     * @throws InstantiationException  If an error occurs
-     * @throws IllegalArgumentException  If an error occurs
      */
     Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argTypes, Object[] args)
-        throws ClassNotFoundException,
-        SecurityException,
-        NoSuchMethodException,
-        IllegalArgumentException,
-        InstantiationException,
-        IllegalAccessException,
-        InvocationTargetException;
+        throws ClassNotFoundException, SecurityException;
 
     /**
      * Loads a class (do not initialize)
