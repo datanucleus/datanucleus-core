@@ -121,9 +121,11 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     protected transient ClassLoaderResolver clr;
 
+    private static final Class[] SCO_WRAPPER_CONSTRUCTOR_ARG_TYPES = new Class[]{DNStateManager.class, AbstractMemberMetaData.class};
+
     /** Map of java types, keyed by the class name. */
     protected Map<String, JavaType> javaTypes = new ConcurrentHashMap<>();
-    
+
     /** Map of ContainerHandlers, keyed by the container type class name. */
     protected Map<Class, ContainerHandler> containerHandlersByClass = new ConcurrentHashMap<>();
 
@@ -455,7 +457,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         // Create the SCO wrapper
         try
         {
-            return ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
+            return ClassUtils.newInstance(wrapperType, SCO_WRAPPER_CONSTRUCTOR_ARG_TYPES, new Object[]{ownerSM, mmd});
         }
         catch (UnsupportedOperationException uoe)
         {
@@ -464,7 +466,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             {
                 NucleusLogger.PERSISTENCE.warn("Creation of backed wrapper for " + mmd.getFullFieldName() + " unsupported, so trying simple wrapper");
                 wrapperType = getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName);
-                return ClassUtils.newInstance(wrapperType, new Class[]{DNStateManager.class, AbstractMemberMetaData.class}, new Object[]{ownerSM, mmd});
+                return ClassUtils.newInstance(wrapperType, SCO_WRAPPER_CONSTRUCTOR_ARG_TYPES, new Object[]{ownerSM, mmd});
             }
 
             throw uoe;
