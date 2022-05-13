@@ -192,6 +192,10 @@ public interface DNStateManager<T> extends StateManager
      */
     Object getInternalObjectId();
 
+    /**
+     * Return an object id that the user can use.
+     * @return the object id
+     */
     Object getExternalObjectId();
 
     /**

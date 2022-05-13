@@ -2341,8 +2341,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     {
                         if (vermd.getMemberName() != null)
                         {
-                            AbstractMemberMetaData verMmd = cmd.getMetaDataForMember(vermd.getMemberName());
-                            loadFieldFromDatastore(verMmd.getAbsoluteFieldNumber());
+                            loadFieldFromDatastore(cmd.getMetaDataForMember(vermd.getMemberName()).getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -3474,38 +3473,38 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
     }
 
-    // -------------------------- Object Id Methods -----------------------------
+    // -------------------------- Object Identity Methods -----------------------------
 
     /**
      * Accessor for the internal object id of the object we are managing.
-     * This will return the "id" if it has been set, otherwise a temporary id based on this StateManager.
+     * This will return the "id" if it has been set, otherwise a temporary id (IdentityReference).
      * @return The internal object id
      */
+    @Override
     public Object getInternalObjectId()
     {
         if (myID != null)
         {
             return myID;
         }
-        else if (myInternalID == null)
+
+        if (myInternalID == null)
         {
             // Assign a temporary internal "id" based on the object itself until our real identity is assigned
             myInternalID = new IdentityReference(myPC);
-            return myInternalID;
         }
-        else
-        {
-            return myInternalID;
-        }
+        return myInternalID;
     }
 
     /**
-     * Return the object representing the JDO identity of the calling instance.
-     * According to the JDO specification, if the JDO identity is being changed in the current transaction, 
-     * this method returns the JDO identify as of the beginning of the transaction.
+     * Return the object representing the persistent identity of the calling instance.
+     * According to the JDO specification, if the persistent identity is being changed in the current transaction, 
+     * this method returns the persistent identify as of the beginning of the transaction.
+     * In DataNucleus we don't allow change of identity so this is always the same as the result of getExternalObjectId(Persistable).
      * @param pc the calling Persistable instance
-     * @return the object representing the JDO identity of the calling instance
+     * @return the object representing the persistent identity of the calling instance
      */
+    @Override
     public Object getObjectId(Persistable pc)
     {
         if (disconnectClone(pc))
@@ -3515,27 +3514,80 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
         try
         {
-            return getExternalObjectId(pc);
+            return getExternalObjectId();
         }
         catch (NucleusException ne)
         {
-            // This can be called from user-facing methods (e.g JDOHelper.getObjectId) so wrap any exception with API variant
+            // This method can be called from user-facing methods (e.g JDOHelper.getObjectId) so wrap any exception with API variant
             throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
         }
     }
 
     /**
-     * Return the object representing the JDO identity of the calling instance.  
-     * If the JDO identity is being changed in the current transaction, this method returns the 
-     * current identity as changed in the transaction. In this implementation we don't allow
-     * change of identity so this is always the same as the result of getObjectId(Persistable).
-     *
+     * Return the object representing the persistent identity of the calling instance.  
+     * If the persistent identity is being changed in the current transaction, this method returns the current identity as changed in the transaction. 
+     * In DataNucleus we don't allow change of identity so this is always the same as the result of getObjectId(Persistable).
      * @param pc the calling Persistable instance
-     * @return the object representing the JDO identity of the calling instance
+     * @return the object representing the persistent identity of the calling instance
      */
+    @Override
     public Object getTransactionalObjectId(Persistable pc)
     {
         return getObjectId(pc);
+    }
+
+    @Override
+    public Object getExternalObjectId()
+    {
+        if (myID != null)
+        {
+            // Id already set and we don't support changing id, so return it
+            return myID;
+        }
+        else if (isEmbedded())
+        {
+            // Embedded object has no id
+            return null;
+        }
+
+        // Ensure that the id is generated
+        if (cmd.getIdentityType() == IdentityType.DATASTORE)
+        {
+            if (!isFlushing())
+            {
+                // Flush any datastore changes so that myID is set by the time we return
+                if (!isFlushedNew() && (flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && myLC.stateType() == LifeCycleState.P_NEW)
+                {
+                    if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, -1))
+                    {
+                        flush();
+                    }
+                }
+            }
+        }
+        else if (cmd.getIdentityType() == IdentityType.APPLICATION)
+        {
+            // Note that we always create a new application identity since it is mutable and we can't allow the user to change it. 
+            // The only drawback of this is that we *must* have the relevant fields set when this method is called, so that the identity can be generated.
+            if (!isFlushing())
+            {
+                // Flush any datastore changes so that we have all necessary fields populated only if the datastore generates the field numbers
+                if (!isFlushedNew() && (flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && myLC.stateType() == LifeCycleState.P_NEW)
+                {
+                    int[] pkMemberNumbers = cmd.getPKMemberPositions();
+                    for (int i = 0; i < pkMemberNumbers.length; i++)
+                    {
+                        if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumbers[i]))
+                        {
+                            flush();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return myID;
     }
 
     /**
@@ -3609,7 +3661,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             // Update the id with the ExecutionContext if it is changing
             myEC.replaceObjectId(myPC, myInternalID, myID);
 
-            this.myInternalID = myID;
+            myInternalID = myID;
         }
     }
 
@@ -3623,12 +3675,12 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             if (IdentityUtils.isDatastoreIdentity(id))
             {
-                // Provided an OID direct
+                // Provided the id direct
                 myID = id;
             }
             else
             {
-                // OID "key" value provided
+                // id "key" value provided
                 myID = myEC.getNucleusContext().getIdentityManager().getDatastoreId(cmd.getFullClassName(), id);
             }
         }
@@ -3641,12 +3693,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 int[] pkMemberNumbers = cmd.getPKMemberPositions();
                 for (int i=0;i<pkMemberNumbers.length;i++)
                 {
-                    int pkMemberNumber = pkMemberNumbers[i];
-                    AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberNumber);
-                    if (pkMmd.isPrimaryKey() && getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumber))
+                    AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberNumbers[i]);
+                    if (pkMmd.isPrimaryKey() && getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumbers[i]))
                     {
                         //replace the value of the id, but before convert the value to the field type if needed
-                        replaceField(myPC, pkMemberNumber, TypeConversionHelper.convertTo(id, pkMmd.getType()), false);
+                        replaceField(myPC, pkMemberNumbers[i], TypeConversionHelper.convertTo(id, pkMmd.getType()), false);
                     }
                 }
             }
@@ -3667,67 +3718,6 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
             myInternalID = myID;
         }
-    }
-
-    /**
-     * Return an object id that the user can use.
-     * @param obj the Persistable object
-     * @return the object id
-     */
-    protected Object getExternalObjectId(Object obj)
-    {
-        if (isEmbedded())
-        {
-            // Embedded object has no id
-            return myID;
-        }
-
-        if (cmd.getIdentityType() == IdentityType.DATASTORE)
-        {
-            if (!isFlushing())
-            {
-                // Flush any datastore changes so that myID is set by the time we return
-                if (!isFlushedNew() && (flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && myLC.stateType() == LifeCycleState.P_NEW)
-                {
-                    if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, -1))
-                    {
-                        flush();
-                    }
-                }
-            }
-        }
-        else if (cmd.getIdentityType() == IdentityType.APPLICATION)
-        {
-            // Note that we always create a new application identity since it is mutable and we can't allow the user to change it. 
-            // The only drawback of this is that we *must* have the relevant fields set when this method is called, so that the identity can be generated.
-            if (!isFlushing())
-            {
-                // Flush any datastore changes so that we have all necessary fields populated only if the datastore generates the field numbers
-                if (!isFlushedNew() && (flags&FLAG_INSERTING) == 0 && (flags&FLAG_INSERTING_CALLBACKS) == 0 && myLC.stateType() == LifeCycleState.P_NEW)
-                {
-                    int[] pkMemberNumbers = cmd.getPKMemberPositions();
-                    for (int i = 0; i < pkMemberNumbers.length; i++)
-                    {
-                        if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberNumbers[i]))
-                        {
-                            flush();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return myID;
-    }
-
-    /**
-     * Return an object identity that can be used by the user for the managed object.
-     * @return the object id
-     */
-    public Object getExternalObjectId()
-    {
-        return getExternalObjectId(myPC);
     }
 
     // --------------------------- Load Field Methods --------------------------
@@ -4982,7 +4972,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
                 // Create a SM for our copy object
                 DNStateManager smDetachedPC = new StateManagerImpl(myEC, cmd);
-                smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(myPC), getVersion(myPC));
+                smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(), getVersion(myPC));
                 myEC.setAttachDetachReferencedObject(smDetachedPC, myPC);
 
                 // If detached copy already existed, take note of fields previously loaded
@@ -5321,7 +5311,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
                 // Add a state manager to the detached PC so that we can retrieve its detached state
                 smDetachedPC = new StateManagerImpl(myEC, cmd);
-                smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(detachedPC), null);
+                smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(), null);
 
                 // Cross-reference the attached and detached objects for the attach process
                 myEC.setAttachDetachReferencedObject(smDetachedPC, myPC);
@@ -5343,7 +5333,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
                 // Add a state manager to the detached PC so that we can retrieve its detached state
                 smDetachedPC = new StateManagerImpl(myEC, cmd);
-                smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(detachedPC), null);
+                smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(), null);
 
                 // Cross-reference the attached and detached objects for the attach process
                 myEC.setAttachDetachReferencedObject(smDetachedPC, myPC);
