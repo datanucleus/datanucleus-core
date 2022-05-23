@@ -59,9 +59,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     @Override
     public synchronized void threadLock()
     {
-        if (lockCounter == 0 && lock == null)
+        if (lock == null)
         {
             lock = new ReentrantLock();
+        }
+        if (lockCounter == 0)
+        {
+            lock.lock();
         }
         lockCounter++;
     }
