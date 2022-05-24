@@ -40,15 +40,15 @@ public enum FlushMode
     {
         if (value != null)
         {
-            if (FlushMode.AUTO.toString().equalsIgnoreCase(value))
+            if (FlushMode.AUTO.name().equalsIgnoreCase(value))
             {
                 return FlushMode.AUTO;
             }
-            else if (FlushMode.QUERY.toString().equalsIgnoreCase(value))
+            else if (FlushMode.QUERY.name().equalsIgnoreCase(value))
             {
                 return FlushMode.QUERY;
             }
-            else if (FlushMode.MANUAL.toString().equalsIgnoreCase(value))
+            else if (FlushMode.MANUAL.name().equalsIgnoreCase(value))
             {
                 return FlushMode.MANUAL;
             }

@@ -38,136 +38,136 @@ public class CorePropertyValidator implements PropertyValidator
         {
             return false;
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_AUTOSTART_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_AUTOSTART_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("Quiet") ||
-                    strVal.equalsIgnoreCase("Ignored") ||
-                    strVal.equalsIgnoreCase("Checked"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("quiet") ||
+                    strVal.equals("ignored") ||
+                    strVal.equals("checked"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_FLUSH_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_FLUSH_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("Auto") ||
-                    strVal.equalsIgnoreCase("Manual") ||
-                    strVal.equalsIgnoreCase("Query"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("auto") ||
+                    strVal.equals("manual") ||
+                    strVal.equals("query"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION))
+        else if (name.equals(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("EXCEPTION") ||
-                    strVal.equalsIgnoreCase("LOG"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("exception") ||
+                    strVal.equals("log"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_DELETION_POLICY))
+        else if (name.equals(PropertyNames.PROPERTY_DELETION_POLICY))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("JDO2") ||
-                    strVal.equalsIgnoreCase("DataNucleus"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("jdo2") ||
+                    strVal.equals("datanucleus"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY))
+        else if (name.equals(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("JDO2") ||
-                    strVal.equalsIgnoreCase("TABLE_PER_CLASS"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("jdo2") ||
+                    strVal.equals("table_per_class"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_IDENTIFIER_CASE))
+        else if (name.equals(PropertyNames.PROPERTY_IDENTIFIER_CASE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("UPPERCASE") ||
-                    strVal.equalsIgnoreCase("lowercase") ||
-                    strVal.equalsIgnoreCase("MixedCase"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("uppercase") ||
+                    strVal.equals("lowercase") ||
+                    strVal.equals("mixedcase"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE))
+        else if (name.equals(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("NEW") ||
-                    strVal.equalsIgnoreCase("EXISTING"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("new") ||
+                    strVal.equals("existing"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION) ||
-                (name.equalsIgnoreCase(PropertyNames.PROPERTY_TRANSACTION_ISOLATION)))
+        else if (name.equals(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION) ||
+                (name.equals(PropertyNames.PROPERTY_TRANSACTION_ISOLATION)))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("none") ||
-                    strVal.equalsIgnoreCase("read-committed") ||
-                    strVal.equalsIgnoreCase("read-uncommitted") ||
-                    strVal.equalsIgnoreCase("repeatable-read") ||
-                    strVal.equalsIgnoreCase("serializable") ||
-                    strVal.equalsIgnoreCase("snapshot"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("none") ||
+                    strVal.equals("read-committed") ||
+                    strVal.equals("read-uncommitted") ||
+                    strVal.equals("repeatable-read") ||
+                    strVal.equals("serializable") ||
+                    strVal.equals("snapshot"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK))
+        else if (name.equals(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("EXCEPTION") ||
-                    strVal.equalsIgnoreCase("LOG") ||
-                    strVal.equalsIgnoreCase("NONE"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("exception") ||
+                    strVal.equals("log") ||
+                    strVal.equals("none"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_TRANSACTION_TYPE))
+        else if (name.equals(PropertyNames.PROPERTY_TRANSACTION_TYPE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("RESOURCE_LOCAL") ||
-                    strVal.equalsIgnoreCase("JTA"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("resource_local") ||
+                    strVal.equals("jta"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID))
+        else if (name.equals(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID))
         {
             if (value instanceof String)
             {
@@ -188,173 +188,173 @@ public class CorePropertyValidator implements PropertyValidator
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE) 
-                || name.equalsIgnoreCase(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2))
+        else if (name.equals(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE) 
+                || name.equals(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("RESOURCE_LOCAL") ||
-                    strVal.equalsIgnoreCase("JTA"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("resource_local") ||
+                    strVal.equals("jta"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase("datanucleus.schemaTool.mode"))
+        else if (name.equals("datanucleus.schemaTool.mode"))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("create") ||
-                    strVal.equalsIgnoreCase("delete") ||
-                    strVal.equalsIgnoreCase("validate") ||
-                    strVal.equalsIgnoreCase("schemainfo") ||
-                    strVal.equalsIgnoreCase("dbinfo"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("create") ||
+                    strVal.equals("delete") ||
+                    strVal.equals("validate") ||
+                    strVal.equals("schemainfo") ||
+                    strVal.equals("dbinfo"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_DETACH_DETACHMENT_FIELDS))
+        else if (name.equals(PropertyNames.PROPERTY_DETACH_DETACHMENT_FIELDS))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("load-fields") ||
-                    strVal.equalsIgnoreCase("unload-fields") ||
-                    strVal.equalsIgnoreCase("load-unload-fields"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("load-fields") ||
+                    strVal.equals("unload-fields") ||
+                    strVal.equals("load-unload-fields"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_DETACH_DETACHED_STATE))
+        else if (name.equals(PropertyNames.PROPERTY_DETACH_DETACHED_STATE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("all") ||
-                    strVal.equalsIgnoreCase("fetch-groups") ||
-                    strVal.equalsIgnoreCase("loaded"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("all") ||
+                    strVal.equals("fetch-groups") ||
+                    strVal.equals("loaded"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_VALIDATION_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_VALIDATION_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("auto") ||
-                    strVal.equalsIgnoreCase("none") ||
-                    strVal.equalsIgnoreCase("callback"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("auto") ||
+                    strVal.equals("none") ||
+                    strVal.equals("callback"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CACHE_L2_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_CACHE_L2_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("ENABLE_SELECTIVE") ||
-                    strVal.equalsIgnoreCase("DISABLE_SELECTIVE") ||
-                    strVal.equalsIgnoreCase("ALL") ||
-                    strVal.equalsIgnoreCase("NONE") ||
-                    strVal.equalsIgnoreCase("UNSPECIFIED"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("enable_selective") ||
+                    strVal.equals("disable_selective") ||
+                    strVal.equals("all") ||
+                    strVal.equals("none") ||
+                    strVal.equals("unspecified"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE) ||
-                name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE) ||
+                name.equals(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("none") ||
-                    strVal.equalsIgnoreCase("create") ||
-                    strVal.equalsIgnoreCase("drop-and-create") ||
-                    strVal.equalsIgnoreCase("drop"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("none") ||
+                    strVal.equals("create") ||
+                    strVal.equals("drop-and-create") ||
+                    strVal.equals("drop"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("use") ||
-                    strVal.equalsIgnoreCase("bypass"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("use") ||
+                    strVal.equals("bypass"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("use") ||
-                    strVal.equalsIgnoreCase("bypass") ||
-                    strVal.equalsIgnoreCase("refresh"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("use") ||
+                    strVal.equals("bypass") ||
+                    strVal.equals("refresh"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE))
+        else if (name.equals(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("commit-and-datastore-read") ||
-                    strVal.equalsIgnoreCase("commit-only"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("commit-and-datastore-read") ||
+                    strVal.equals("commit-only"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION))
+        else if (name.equals(PropertyNames.PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("rollback") || strVal.equalsIgnoreCase("exception"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("rollback") || strVal.equals("exception"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_TYPE_WRAPPER_BASIS))
+        else if (name.equals(PropertyNames.PROPERTY_TYPE_WRAPPER_BASIS))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("instantiated") ||
-                    strVal.equalsIgnoreCase("declared"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("instantiated") ||
+                    strVal.equals("declared"))
                 {
                     return true;
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER) ||
-                name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER))
+        else if (name.equals(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER) ||
+                name.equals(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER))
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("script") ||
-                    strVal.equalsIgnoreCase("metadata") || 
-                    strVal.equalsIgnoreCase("metadata-then-script") ||
-                    strVal.equalsIgnoreCase("script-then-metadata"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("script") ||
+                    strVal.equals("metadata") || 
+                    strVal.equals("metadata-then-script") ||
+                    strVal.equals("script-then-metadata"))
                 {
                     return true;
                 }

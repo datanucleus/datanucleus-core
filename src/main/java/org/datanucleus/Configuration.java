@@ -507,7 +507,7 @@ public class Configuration extends PropertyStore implements Serializable
             {
                 if (mapping.validatorName != null)
                 {
-                    validatePropertyValue(mapping.internalName != null ? mapping.internalName : propertyName, value, mapping.validatorName);
+                    validatePropertyValue(mapping.internalName != null ? mapping.internalName.toLowerCase() : propertyName.toLowerCase(), value, mapping.validatorName);
 
                     if (value != null && value instanceof String)
                     {
@@ -545,7 +545,7 @@ public class Configuration extends PropertyStore implements Serializable
             validatorName = mapping.validatorName;
             if (validatorName != null)
             {
-                validatePropertyValue(name, value, validatorName);
+                validatePropertyValue(name.toLowerCase(), value, validatorName);
             }
         }
     }

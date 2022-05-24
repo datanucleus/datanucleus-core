@@ -129,23 +129,24 @@ public class TransactionUtils
      */
     public static int getTransactionIsolationLevelForName(String isolationName)
     {
-        if (isolationName.equalsIgnoreCase("none"))
+        String name = isolationName.toLowerCase();
+        if (name.equals("none"))
         {
             return TransactionIsolation.NONE;
         }
-        else if (isolationName.equalsIgnoreCase("read-committed"))
+        else if (name.equals("read-committed"))
         {
             return TransactionIsolation.READ_COMMITTED;
         }
-        else if (isolationName.equalsIgnoreCase("read-uncommitted"))
+        else if (name.equals("read-uncommitted"))
         {
             return TransactionIsolation.READ_UNCOMMITTED;
         }
-        else if (isolationName.equalsIgnoreCase("repeatable-read"))
+        else if (name.equals("repeatable-read"))
         {
             return TransactionIsolation.REPEATABLE_READ;
         }
-        else if (isolationName.equalsIgnoreCase("serializable"))
+        else if (name.equals("serializable"))
         {
             return TransactionIsolation.SERIALIZABLE;
         }

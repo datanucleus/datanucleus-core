@@ -50,8 +50,8 @@ public class BooleanPropertyValidator implements PropertyValidator
         }
         else if (value instanceof String)
         {
-            String val = ((String)value).trim();
-            if (val.equalsIgnoreCase("true") || val.equalsIgnoreCase("false"))
+            String val = ((String)value).trim().toLowerCase();
+            if (val.equals("true") || val.equals("false"))
             {
                 return true;
             }
