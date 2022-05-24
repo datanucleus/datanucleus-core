@@ -40,15 +40,15 @@ public enum QueryLanguage
             // Default to JDOQL if nothing passed in
             return QueryLanguage.JDOQL;
         }
-        else if (QueryLanguage.JDOQL.toString().equalsIgnoreCase(value))
+        else if (QueryLanguage.JDOQL.name().equalsIgnoreCase(value))
         {
             return QueryLanguage.JDOQL;
         }
-        else if (QueryLanguage.SQL.toString().equalsIgnoreCase(value))
+        else if (QueryLanguage.SQL.name().equalsIgnoreCase(value))
         {
             return QueryLanguage.SQL;
         }
-        else if (QueryLanguage.JPQL.toString().equalsIgnoreCase(value))
+        else if (QueryLanguage.JPQL.name().equalsIgnoreCase(value))
         {
             return QueryLanguage.JPQL;
         }

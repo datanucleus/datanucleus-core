@@ -50,6 +50,7 @@ import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.metadata.TableGeneratorMetaData;
 import org.datanucleus.properties.PropertyStore;
@@ -60,7 +61,6 @@ import org.datanucleus.store.connection.ConnectionManagerImpl;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.query.DefaultCandidateExtent;
 import org.datanucleus.store.query.Extent;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryManagerImpl;
 import org.datanucleus.store.schema.DefaultStoreSchemaHandler;
@@ -732,8 +732,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         // All StoreManagers should support a minimum of JDOQL/JPQL
         Collection<String> languages = new HashSet<>();
-        languages.add(Query.LANGUAGE_JDOQL);
-        languages.add(Query.LANGUAGE_JPQL);
+        languages.add(QueryLanguage.JDOQL.name());
+        languages.add(QueryLanguage.JPQL.name());
         return languages;
     }
 
@@ -744,7 +744,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public boolean supportsQueryLanguage(String language)
     {
         // All StoreManagers should support a minimum of JDOQL/JPQL
-        return (language != null && (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL) || language.equalsIgnoreCase(Query.LANGUAGE_JPQL)));
+        return (language != null && (language.equals(QueryLanguage.JDOQL.name()) || language.equals(QueryLanguage.JPQL.name())));
     }
 
     /* (non-Javadoc)

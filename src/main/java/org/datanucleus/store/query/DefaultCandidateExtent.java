@@ -25,6 +25,7 @@ import java.util.Map;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.QueryLanguage;
 
 /**
  * Extent that does a simple JDOQL query for the candidate with/without subclasses.
@@ -51,7 +52,7 @@ public class DefaultCandidateExtent<T> extends AbstractExtent<T> implements Auto
     {
         super(ec, cls, subclasses, cmd);
 
-        query = ec.getStoreManager().newQuery(Query.LANGUAGE_JDOQL, ec);
+        query = ec.getStoreManager().newQuery(QueryLanguage.JDOQL.name(), ec);
         fetchPlan = query.getFetchPlan();
         query.setCandidateClass(cls);
         query.setSubclasses(subclasses);

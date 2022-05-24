@@ -59,20 +59,15 @@ import org.datanucleus.util.StringUtils;
 /**
  * Abstract implementation for all queries in DataNucleus.
  * Implementations of JDOQL, SQL, JPQL, etc should extend this.
- * Parameters can be implicit (defined in the query via syntaxes such as ":name", "?1")
- * or explicit (defined via declareParameters). They can also be named or numbered.
- * When passing a map of parameters with values, they are keyed by String (named parameters)
- * or Integer (numbered parameters).
+ * Parameters can be implicit (defined in the query via syntaxes such as ":name", "?1") or explicit (defined via declareParameters). 
+ * They can also be named or numbered.
+ * When passing a map of parameters with values, they are keyed by String (named parameters) or Integer (numbered parameters).
  * 
  * @param <T> Type of the candidate of this query
  */
 public abstract class Query<T> implements Serializable, ExecutionContextListener
 {
     private static final long serialVersionUID = 7820102897590182771L;
-
-    public static final String LANGUAGE_JDOQL = "JDOQL";
-    public static final String LANGUAGE_JPQL = "JPQL";
-    public static final String LANGUAGE_SQL = "SQL";
 
     public static final String EXTENSION_FLUSH_BEFORE_EXECUTION = PropertyNames.PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE;
     public static final String EXTENSION_USE_FETCH_PLAN = PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN;

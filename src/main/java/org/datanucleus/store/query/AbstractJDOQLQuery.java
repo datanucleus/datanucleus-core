@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.ClassNotResolvedException;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.query.compiler.JDOQLCompiler;
 import org.datanucleus.store.query.compiler.JavaQueryCompiler;
@@ -503,6 +504,6 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
      */
     public String getLanguage()
     {
-        return Query.LANGUAGE_JDOQL;
+        return QueryLanguage.JDOQL.name();
     }
 }

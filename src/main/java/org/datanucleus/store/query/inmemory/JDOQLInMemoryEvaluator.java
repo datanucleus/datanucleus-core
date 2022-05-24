@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.compiler.QueryCompilation;
 
@@ -41,7 +42,7 @@ public class JDOQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      */
     public JDOQLInMemoryEvaluator(Query query, Collection candidates, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr)
     {
-        super(Query.LANGUAGE_JDOQL, query, compilation, parameterValues, clr, candidates);
+        super(QueryLanguage.JDOQL.name(), query, compilation, parameterValues, clr, candidates);
     }
 
     /**

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.compiler.QueryCompilation;
 import org.datanucleus.store.query.expression.Expression;
@@ -45,7 +46,7 @@ public class JPQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      */
     public JPQLInMemoryEvaluator(Query query, Collection candidates, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr)
     {
-        super(Query.LANGUAGE_JPQL, query, compilation, parameterValues, clr, candidates);
+        super(QueryLanguage.JPQL.name(), query, compilation, parameterValues, clr, candidates);
 
         if (this.parameterValues != null && !this.parameterValues.isEmpty())
         {

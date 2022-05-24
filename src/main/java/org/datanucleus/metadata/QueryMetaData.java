@@ -83,7 +83,7 @@ public class QueryMetaData extends MetaData
         if (language == null)
         {
             // Default to JDOQL
-            language = QueryLanguage.JDOQL.toString();
+            language = QueryLanguage.JDOQL.name();
         }
         return language;
     }

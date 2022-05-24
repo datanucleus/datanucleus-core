@@ -24,6 +24,7 @@ import java.util.Set;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.query.compiler.JPQLCompiler;
 import org.datanucleus.store.query.compiler.JavaQueryCompiler;
@@ -451,6 +452,6 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
      */
     public String getLanguage()
     {
-        return Query.LANGUAGE_JPQL;
+        return QueryLanguage.JPQL.name();
     }
 }

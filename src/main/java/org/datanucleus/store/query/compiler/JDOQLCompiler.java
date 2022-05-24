@@ -27,6 +27,7 @@ import java.util.Map;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.query.JDOQLQueryHelper;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.expression.DyadicExpression;
@@ -410,7 +411,7 @@ public class JDOQLCompiler extends JavaQueryCompiler
      */
     public String getLanguage()
     {
-        return Query.LANGUAGE_JDOQL;
+        return QueryLanguage.JDOQL.name();
     }
 
     /**

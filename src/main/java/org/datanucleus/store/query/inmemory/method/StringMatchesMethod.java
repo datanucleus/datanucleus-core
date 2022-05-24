@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.store.query.inmemory.method;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.query.Query;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.query.QueryUtils;
 import org.datanucleus.store.query.expression.InvokeExpression;
 import org.datanucleus.store.query.expression.Literal;
@@ -83,7 +83,7 @@ public class StringMatchesMethod implements InvocationEvaluator
         }
 
         arg = QueryUtils.getStringValue(argObj);
-        if (eval.getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
+        if (eval.getQueryLanguage().equals(QueryLanguage.JPQL.name()))
         {
             // Convert JPQL like expression to String.matches input
             String matchesArg = arg;

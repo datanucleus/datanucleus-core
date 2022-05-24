@@ -27,6 +27,7 @@ import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.query.JPQLQueryHelper;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.expression.Expression;
@@ -172,7 +173,7 @@ public class JPQLCompiler extends JavaQueryCompiler
      */
     public String getLanguage()
     {
-        return Query.LANGUAGE_JPQL;
+        return QueryLanguage.JPQL.name();
     }
 
     /**

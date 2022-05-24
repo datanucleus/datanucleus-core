@@ -29,6 +29,7 @@ import java.util.Map;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
 import org.datanucleus.util.Localiser;
 
@@ -330,10 +331,10 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
             else if (query.getCompilation() != null)
             {
                 ExecutionContext ec = query.getExecutionContext();
-                if (query.getCompilation().getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JDOQL))
+                if (query.getCompilation().getQueryLanguage().equals(QueryLanguage.JDOQL.name()))
                 {
                     // JDOQL : "count([DISTINCT ]this)" query
-                    Query countQuery = query.getStoreManager().newQuery(Query.LANGUAGE_JDOQL, ec, query);
+                    Query countQuery = query.getStoreManager().newQuery(QueryLanguage.JDOQL.name(), ec, query);
                     if (query.getResultDistinct())
                     {
                         countQuery.setResult("COUNT(DISTINCT this)");
@@ -371,10 +372,10 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
                     countQuery.closeAll();
                     return Math.toIntExact(count);
                 }
-                else if (query.getCompilation().getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
+                else if (query.getCompilation().getQueryLanguage().equalsIgnoreCase(QueryLanguage.JPQL.name()))
                 {
                     // JPQL : "count()" query
-                    Query countQuery = query.getStoreManager().newQuery(Query.LANGUAGE_JPQL, ec, query);
+                    Query countQuery = query.getStoreManager().newQuery(QueryLanguage.JPQL.name(), ec, query);
                     countQuery.setResult("count(" + query.getCompilation().getCandidateAlias() + ")");
                     countQuery.setOrdering(null);
                     countQuery.setRange(null); // Don't want range to interfere with the query

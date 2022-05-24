@@ -686,7 +686,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             for (String queryName : queryNames)
             {
                 QueryMetaData qmd = mmgr.getMetaDataForQuery(null, clr, queryName);
-                if (qmd.getLanguage().equals(QueryLanguage.JPQL.toString()) || qmd.getLanguage().equals(QueryLanguage.JDOQL.toString()))
+                if (qmd.getLanguage().equals(QueryLanguage.JPQL.name()) || qmd.getLanguage().equals(QueryLanguage.JDOQL.name()))
                 {
                     if (NucleusLogger.QUERY.isDebugEnabled())
                     {

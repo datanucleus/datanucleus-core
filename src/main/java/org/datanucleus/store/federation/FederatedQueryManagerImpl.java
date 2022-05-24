@@ -22,6 +22,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryManagerImpl;
@@ -73,7 +74,7 @@ public class FederatedQueryManagerImpl extends QueryManagerImpl
             // Single-string query
             String queryString = (String)query;
             String candidateName = null;
-            if (languageImpl.equalsIgnoreCase(Query.LANGUAGE_JDOQL) && queryString.toUpperCase().indexOf(" FROM ") > 0)
+            if (languageImpl.equals(QueryLanguage.JDOQL.name()) && queryString.toUpperCase().indexOf(" FROM ") > 0)
             {
                 int candidateStart = queryString.toUpperCase().indexOf(" FROM ") + 6;
                 int candidateEnd = queryString.indexOf(" ", candidateStart+1);

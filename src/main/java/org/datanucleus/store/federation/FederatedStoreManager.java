@@ -338,11 +338,11 @@ public class FederatedStoreManager implements StoreManager
     public Query newQuery(String language, ExecutionContext ec, String queryString)
     {
         String candidateClassName = null;
-        if (QueryLanguage.JDOQL.toString().equalsIgnoreCase(language))
+        if (QueryLanguage.JDOQL.name().equalsIgnoreCase(language))
         {
             candidateClassName = JDOQLQueryHelper.getCandidateFromJDOQLString(queryString);
         }
-        else if (QueryLanguage.JPQL.toString().equalsIgnoreCase(language))
+        else if (QueryLanguage.JPQL.name().equalsIgnoreCase(language))
         {
             String candidateEntityName = JPQLQueryHelper.getEntityNameFromJPQLString(queryString);
             if (candidateEntityName != null)

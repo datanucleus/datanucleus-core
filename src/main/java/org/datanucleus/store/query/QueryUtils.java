@@ -44,6 +44,7 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.query.compiler.JPQLCompiler;
 import org.datanucleus.store.query.compiler.JavaQueryCompiler;
 import org.datanucleus.store.query.compiler.QueryCompilation;
@@ -1246,7 +1247,7 @@ public class QueryUtils
      */
     public static List orderCandidates(List candidates, Class type, String ordering, ExecutionContext ec, ClassLoaderResolver clr)
     {
-        return orderCandidates(candidates, type, ordering, ec, clr, Query.LANGUAGE_JDOQL);
+        return orderCandidates(candidates, type, ordering, ec, clr, QueryLanguage.JDOQL.name());
     }
 
     /**

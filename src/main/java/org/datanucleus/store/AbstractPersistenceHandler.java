@@ -28,6 +28,7 @@ import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaData;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.util.Localiser;
@@ -69,7 +70,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                 jdoqlStr.append(" && ");
             }
         }
-        Query q = storeMgr.newQuery(Query.LANGUAGE_JDOQL, ec, jdoqlStr.toString());
+        Query q = storeMgr.newQuery(QueryLanguage.JDOQL.name(), ec, jdoqlStr.toString());
         List results = (List)q.executeWithMap(paramValueMap);
         if (results == null || results.size() == 0)
         {
