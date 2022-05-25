@@ -123,7 +123,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
         this.clr = clr;
         extensionPoints = new ExtensionPoint[0];
 
-        this.bundleCheckType = bundleCheckType != null ? bundleCheckType : "EXCEPTION";
+        this.bundleCheckType = bundleCheckType != null ? bundleCheckType.toUpperCase() : "EXCEPTION";
         this.allowUserBundles = allowUserBundles;
     }
 
@@ -463,11 +463,11 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 !bundle.getManifestLocation().toExternalForm().equals(previousBundle.getManifestLocation().toExternalForm()))
             {
                 String msg = Localiser.msg("024009", bundle.getSymbolicName(), bundle.getManifestLocation(), previousBundle.getManifestLocation());
-                if (bundleCheckType.equalsIgnoreCase("EXCEPTION"))
+                if (bundleCheckType.equals("EXCEPTION"))
                 {
                     throw new NucleusException(msg);
                 }
-                else if (bundleCheckType.equalsIgnoreCase("LOG"))
+                else if (bundleCheckType.equals("LOG"))
                 {
                     NucleusLogger.GENERAL.warn(msg);
                 }
@@ -617,7 +617,8 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 Bundle requiredBundle = registeredPluginByPluginId.get(symbolicName);
                 if (requiredBundle == null) // TODO Add option of only logging problems in DataNucleus deps
                 {
-                    if (bd.getParameter("resolution") != null && bd.getParameter("resolution").equalsIgnoreCase("optional"))
+                    String resolution = bd.getParameter("resolution");
+                    if (resolution != null && resolution.toLowerCase().equals("optional"))
                     {
                         NucleusLogger.GENERAL.debug(Localiser.msg("024013", bundle.getSymbolicName(), symbolicName));
                     }

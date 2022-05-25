@@ -4767,12 +4767,12 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         {
             setDetaching(true);
 
-            String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE);
-            if (detachedState.equalsIgnoreCase("all"))
+            String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE).toLowerCase();
+            if (detachedState.equals("all"))
             {
                 loadUnloadedFields();
             }
-            else if (detachedState.equalsIgnoreCase("loaded"))
+            else if (detachedState.equals("loaded"))
             {
                 // Do nothing since just using currently loaded fields
             }
@@ -5048,12 +5048,12 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     private int[] getFieldsNumbersToDetach()
     {
-        String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE);
-        if (detachedState.equalsIgnoreCase("all"))
+        String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE).toLowerCase();
+        if (detachedState.equals("all"))
         {
             return cmd.getAllMemberPositions();
         }
-        else if (detachedState.equalsIgnoreCase("loaded"))
+        else if (detachedState.equals("loaded"))
         {
             return getLoadedFieldNumbers();
         }

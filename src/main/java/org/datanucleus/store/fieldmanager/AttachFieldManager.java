@@ -107,7 +107,7 @@ public class AttachFieldManager extends AbstractFieldManager
         if (mmd.hasExtension("attach"))
         {
             // Undocumented extension, allow a user to mark a field as never attach. Arguably we should unload the (attached) field, so it goes to DB for original value
-            if (mmd.getValueForExtension("attach").equalsIgnoreCase("never"))
+            if (mmd.getValueForExtension("attach").toLowerCase().equals("never"))
             {
                 // Member is tagged to not attach, so put a null
                 attachedSM.replaceFieldMakeDirty(fieldNumber, null);

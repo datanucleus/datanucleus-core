@@ -345,11 +345,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             String identifierCase = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE);
             if (identifierCase != null)
             {
-                if (identifierCase.equalsIgnoreCase("lowercase"))
+                identifierCase = identifierCase.toLowerCase();
+                if (identifierCase.equals("lowercase"))
                 {
                     namingFactory.setNamingCase(NamingCase.LOWER_CASE);
                 }
-                else if (identifierCase.equalsIgnoreCase("UPPERCASE"))
+                else if (identifierCase.equals("uppercase"))
                 {
                     namingFactory.setNamingCase(NamingCase.UPPER_CASE);
                 }

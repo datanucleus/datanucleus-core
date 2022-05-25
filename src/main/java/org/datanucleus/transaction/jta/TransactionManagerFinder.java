@@ -114,55 +114,56 @@ public class TransactionManagerFinder
 
     protected TransactionManagerLocator getTransactionManagerLocatorForName(PluginManager pluginMgr, String name)
     {
-        if ("jboss".equalsIgnoreCase(name))
+        String nameLower = name.toLowerCase();
+        if ("jboss".equals(nameLower))
         {
             return new JBossTransactionManagerLocator(nucleusContext);
         }
-        else if ("jonas".equalsIgnoreCase(name))
+        else if ("jonas".equals(nameLower))
         {
             return new JOnASTransactionManagerLocator(nucleusContext);
         }
-        else if ("jotm".equalsIgnoreCase(name))
+        else if ("jotm".equals(nameLower))
         {
             return new JOTMTransactionManagerLocator(nucleusContext);
         }
-        else if ("oc4j".equalsIgnoreCase(name))
+        else if ("oc4j".equals(nameLower))
         {
             return new OC4JTransactionManagerLocator(nucleusContext);
         }
-        else if ("orion".equalsIgnoreCase(name))
+        else if ("orion".equals(nameLower))
         {
             return new OrionTransactionManagerLocator(nucleusContext);
         }
-        else if ("resin".equalsIgnoreCase(name))
+        else if ("resin".equals(nameLower))
         {
             return new ResinTransactionManagerLocator(nucleusContext);
         }
-        else if ("sap".equalsIgnoreCase(name))
+        else if ("sap".equals(nameLower))
         {
             return new SAPWebASTransactionManagerLocator(nucleusContext);
         }
-        else if ("sun".equalsIgnoreCase(name))
+        else if ("sun".equals(nameLower))
         {
             return new SunTransactionManagerLocator(nucleusContext);
         }
-        else if ("weblogic".equalsIgnoreCase(name))
+        else if ("weblogic".equals(nameLower))
         {
             return new WebLogicTransactionManagerLocator(nucleusContext);
         }
-        else if ("websphere".equalsIgnoreCase(name))
+        else if ("websphere".equals(nameLower))
         {
             return new WebSphereTransactionManagerLocator(nucleusContext);
         }
-        else if ("custom_jndi".equalsIgnoreCase(name))
+        else if ("custom_jndi".equals(nameLower))
         {
             return new CustomJNDITransactionManagerLocator(nucleusContext);
         }
-        else if ("atomikos".equalsIgnoreCase(name))
+        else if ("atomikos".equals(nameLower))
         {
             return new AtomikosTransactionManagerLocator(nucleusContext);
         }
-        else if ("bitronix".equalsIgnoreCase(name))
+        else if ("bitronix".equals(nameLower))
         {
             return new BTMTransactionManagerLocator(nucleusContext);
         }

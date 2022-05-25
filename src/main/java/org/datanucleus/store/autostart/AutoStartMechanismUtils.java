@@ -53,12 +53,10 @@ public class AutoStartMechanismUtils
     public static AutoStartMechanism createAutoStartMechanism(PersistenceNucleusContext nucCtx, ClassLoaderResolver clr, String mechanism, String mode)
     throws DatastoreInitialisationException
     {
-        AutoStartMechanism starter = null;
-
         StoreManager storeMgr = nucCtx.getStoreManager();
-        PluginManager pluginMgr = nucCtx.getPluginManager();
 
         // Create the starter
+        AutoStartMechanism starter = null;
         if ("Classes".equalsIgnoreCase(mechanism))
         {
             starter = new ClassesAutoStarter(storeMgr, clr);
@@ -82,6 +80,7 @@ public class AutoStartMechanismUtils
         else
         {
             // Fallback to the plugin mechanism
+            PluginManager pluginMgr = nucCtx.getPluginManager();
             String autoStarterClassName = pluginMgr.getAttributeValueForExtension("org.datanucleus.autostart", "name", mechanism, "class-name");
             if (autoStarterClassName != null)
             {
@@ -102,21 +101,22 @@ public class AutoStartMechanismUtils
             return null;
         }
 
-        if (mode.equalsIgnoreCase("None"))
+        mode = mode.toUpperCase();
+        if (mode.equals(AutoStartMechanism.Mode.NONE.name()))
         {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.NONE);
+            starter.setMode(AutoStartMechanism.Mode.NONE);
         }
-        else if (mode.equalsIgnoreCase("Checked"))
+        else if (mode.equals(AutoStartMechanism.Mode.CHECKED.name()))
         {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.CHECKED);
+            starter.setMode(AutoStartMechanism.Mode.CHECKED);
         }
-        else if (mode.equalsIgnoreCase("Quiet"))
+        else if (mode.equals(AutoStartMechanism.Mode.QUIET.name()))
         {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.QUIET);
+            starter.setMode(AutoStartMechanism.Mode.QUIET);
         }
-        else if (mode.equalsIgnoreCase("Ignored"))
+        else if (mode.equals(AutoStartMechanism.Mode.IGNORED.name()))
         {
-            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.IGNORED);
+            starter.setMode(AutoStartMechanism.Mode.IGNORED);
         }
 
         // Initialise the starter

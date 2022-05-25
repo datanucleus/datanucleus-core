@@ -65,19 +65,20 @@ public class IdentityManagerImpl implements IdentityManager
     {
         // Datastore Identity type
         String dsidName = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE);
-        if ("datanucleus".equalsIgnoreCase(dsidName))
+        String dsidNameLower = dsidName.toLowerCase();
+        if ("datanucleus".equals(dsidNameLower))
         {
             datastoreIdClass = DatastoreIdImpl.class;
         }
-        else if ("kodo".equalsIgnoreCase(dsidName))
+        else if ("kodo".equals(dsidNameLower))
         {
             datastoreIdClass = DatastoreIdImplKodo.class;
         }
-        else if ("xcalia".equalsIgnoreCase(dsidName))
+        else if ("xcalia".equals(dsidNameLower))
         {
             datastoreIdClass = DatastoreIdImplXcalia.class;
         }
-        else if ("unique".equalsIgnoreCase(dsidName))
+        else if ("unique".equals(dsidNameLower))
         {
             datastoreIdClass = DatastoreUniqueLongId.class;
         }
@@ -121,7 +122,7 @@ public class IdentityManagerImpl implements IdentityManager
         String stringTranslatorType = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE);
         if (stringTranslatorType != null)
         {
-            if ("xcalia".equalsIgnoreCase(stringTranslatorType))
+            if ("xcalia".equals(stringTranslatorType.toLowerCase()))
             {
                 idStringTranslator = new XcaliaIdentityStringTranslator();
             }

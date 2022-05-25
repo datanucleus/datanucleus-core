@@ -158,7 +158,7 @@ public class CompleteClassTable implements Table
                     {
                         nested = !storeMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT);
                         String nestedStr = mmd.getValueForExtension("nested");
-                        if (nestedStr != null && nestedStr.equalsIgnoreCase("" + !nested))
+                        if (nestedStr != null && nestedStr.toLowerCase().equals("" + !nested))
                         {
                             nested = !nested;
                         }
@@ -867,7 +867,7 @@ public class CompleteClassTable implements Table
                     {
                         nested = !storeMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT);
                         String nestedStr = mmd.getValueForExtension("nested");
-                        if (nestedStr != null && nestedStr.equalsIgnoreCase("" + !nested))
+                        if (nestedStr != null && nestedStr.toLowerCase().equals("" + !nested))
                         {
                             nested = !nested;
                         }

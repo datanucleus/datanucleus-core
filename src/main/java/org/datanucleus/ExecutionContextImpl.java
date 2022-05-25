@@ -374,11 +374,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             String closeActionTxAction = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION);
             if (closeActionTxAction != null)
             {
-                if (closeActionTxAction.equalsIgnoreCase("exception"))
+                closeActionTxAction = closeActionTxAction.toLowerCase();
+                if (closeActionTxAction.equals("exception"))
                 {
                     throw new TransactionActiveOnCloseException(this);
                 }
-                else if (closeActionTxAction.equalsIgnoreCase("rollback"))
+                else if (closeActionTxAction.equals("rollback"))
                 {
                     NucleusLogger.GENERAL.warn("ExecutionContext closed with active transaction, so rolling back the active transaction");
                     tx.rollback();

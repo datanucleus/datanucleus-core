@@ -1002,11 +1002,13 @@ public abstract class AbstractClassMetaData extends MetaData
         if (inheritanceMetaData.getStrategy() == null)
         {
             // User has included <inheritance> but not set the strategy, so populate it for them
-            if (getBaseInheritanceStrategy() != null)
+            String treeStrategy = getBaseInheritanceStrategy();
+            if (treeStrategy != null)
             {
                 // They set a tree strategy for this level (applying to this and all levels below)
-                String treeStrategy = getBaseInheritanceStrategy();
-                if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE.equalsIgnoreCase(treeStrategy))
+                treeStrategy = treeStrategy.toUpperCase();
+
+                if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE.equals(treeStrategy))
                 {
                     if (pcSuperclassMetaData != null)
                     {
@@ -1044,11 +1046,11 @@ public abstract class AbstractClassMetaData extends MetaData
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
                     }
                 }
-                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS.equalsIgnoreCase(treeStrategy))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS.equals(treeStrategy))
                 {
                     inheritanceMetaData.strategy = InheritanceStrategy.COMPLETE_TABLE;
                 }
-                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equalsIgnoreCase(treeStrategy))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equals(treeStrategy))
                 {
                     inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
                 }
@@ -1057,17 +1059,21 @@ public abstract class AbstractClassMetaData extends MetaData
 
             if (pcSuperclassMetaData != null)
             {
-                String treeStrategy = getBaseInheritanceStrategy();
+                treeStrategy = getBaseInheritanceStrategy();
+                if (treeStrategy != null)
+                {
+                    treeStrategy = treeStrategy.toUpperCase();
+                }
                 InheritanceStrategy baseStrategy = null;
-                if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE.equalsIgnoreCase(treeStrategy))
+                if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE.equals(treeStrategy))
                 {
                     baseStrategy = InheritanceStrategy.SUPERCLASS_TABLE;
                 }
-                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS.equalsIgnoreCase(treeStrategy))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS.equals(treeStrategy))
                 {
                     baseStrategy = InheritanceStrategy.COMPLETE_TABLE;
                 }
-                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equalsIgnoreCase(treeStrategy))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equals(treeStrategy))
                 {
                     baseStrategy = InheritanceStrategy.NEW_TABLE;
                 }
@@ -1094,7 +1100,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 else
                 {
                     // Superclass exists and has a table or uses its superclass, so default based on that
-                    if (mmgr.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY).equalsIgnoreCase("TABLE_PER_CLASS"))
+                    if (mmgr.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY).equalsIgnoreCase(InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS))
                     {
                         // Each class has its own table
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;

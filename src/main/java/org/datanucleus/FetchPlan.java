@@ -118,15 +118,16 @@ public class FetchPlan implements Serializable
         String flds = ec.getNucleusContext().getConfiguration().getStringProperty("datanucleus.detachmentFields");
         if (flds != null)
         {
+            flds = flds.toLowerCase();
             if (flds.equals("load-unload-fields"))
             {
                 detachmentOptions = FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS;
             }
-            else if (flds.equalsIgnoreCase("unload-fields"))
+            else if (flds.equals("unload-fields"))
             {
                 detachmentOptions = FetchPlan.DETACH_UNLOAD_FIELDS;
             }
-            else if (flds.equalsIgnoreCase("load-fields"))
+            else if (flds.equals("load-fields"))
             {
                 detachmentOptions = FetchPlan.DETACH_LOAD_FIELDS;
             }

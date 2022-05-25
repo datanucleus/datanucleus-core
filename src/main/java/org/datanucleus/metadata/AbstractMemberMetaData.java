@@ -1093,54 +1093,22 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_PERSIST))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_PERSIST);
-            if (cascadeValue.equalsIgnoreCase("true"))
-            {
-                cascadePersist = true;
-            }
-            else if (cascadeValue.equalsIgnoreCase("false"))
-            {
-                cascadePersist = false;
-            }
+            cascadePersist = Boolean.valueOf(getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_PERSIST));
         }
         if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_ATTACH))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_ATTACH);
-            if (cascadeValue.equalsIgnoreCase("true"))
-            {
-                cascadeAttach = true;
-            }
-            else if (cascadeValue.equalsIgnoreCase("false"))
-            {
-                cascadeAttach = false;
-            }
+            cascadeAttach = Boolean.valueOf(getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_ATTACH));
         }
         if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_DETACH))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_DETACH);
-            if (cascadeValue.equalsIgnoreCase("true"))
-            {
-                cascadeDetach = true;
-            }
-            else if (cascadeValue.equalsIgnoreCase("false"))
-            {
-                cascadeDetach = false;
-            }
+            cascadeDetach = Boolean.valueOf(getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_DETACH));
         }
         if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_REFRESH))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_REFRESH);
-            if (cascadeValue.equalsIgnoreCase("true"))
-            {
-                cascadeRefresh = true;
-            }
-            else if (cascadeValue.equalsIgnoreCase("false"))
-            {
-                cascadeRefresh = false;
-            }
+            cascadeRefresh = Boolean.valueOf(getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_REFRESH));
         }
 
         setInitialised();
@@ -1319,7 +1287,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         if (hasExtension(MetaData.EXTENSION_MEMBER_CACHEABLE))
         {
             // JPA/Jakarta doesn't have way of specifying field cacheability so use extension
-            return getValueForExtension(MetaData.EXTENSION_MEMBER_CACHEABLE).equalsIgnoreCase("false") ? false : true;
+            return Boolean.valueOf(getValueForExtension(MetaData.EXTENSION_MEMBER_CACHEABLE));
         }
         return cacheable;
     }
@@ -3118,16 +3086,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     {
         if (hasExtension("is-second-class"))
         {
-            String isSecondClass = getValueForExtension("is-second-class");
-            if (isSecondClass.equalsIgnoreCase("true"))
+            String isSecondClass = getValueForExtension("is-second-class").toLowerCase();
+            if (isSecondClass.equals("true"))
             {
                 return true;
             }
-            else if (isSecondClass.equalsIgnoreCase("false"))
+            else if (isSecondClass.equals("false"))
             {
                 return false;
             }
-            else if (isSecondClass.equalsIgnoreCase("default"))
+            else if (isSecondClass.equals("default"))
             {
                 // fall through to default behaviour
             }

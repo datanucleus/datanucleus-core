@@ -174,12 +174,13 @@ public class PluginManager
                         }
                         else
                         {
-                            if (confElm[j].getAttribute(discrimAttrName[k]) == null)
+                            String attrVal = confElm[j].getAttribute(discrimAttrName[k]);
+                            if (attrVal == null)
                             {
                                 equals = false;
                                 break;
                             }
-                            else if (!confElm[j].getAttribute(discrimAttrName[k]).equalsIgnoreCase(discrimAttrValue[k]))
+                            else if (!attrVal.equalsIgnoreCase(discrimAttrValue[k]))
                             {
                                 equals = false;
                                 break;

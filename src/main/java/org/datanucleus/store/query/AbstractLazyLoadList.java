@@ -54,19 +54,20 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
         // Process any supported extensions
         if (cacheType != null)
         {
-            if (cacheType.equalsIgnoreCase("soft"))
+            cacheType = cacheType.toLowerCase();
+            if (cacheType.equals("soft"))
             {
                 itemsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
             }
-            else if (cacheType.equalsIgnoreCase("weak"))
+            else if (cacheType.equals("weak"))
             {
                 itemsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
             }
-            else if (cacheType.equalsIgnoreCase("strong"))
+            else if (cacheType.equals("strong"))
             {
                 itemsByIndex = new HashMap();
             }
-            else if (cacheType.equalsIgnoreCase("none"))
+            else if (cacheType.equals("none"))
             {
                 itemsByIndex = null;
             }

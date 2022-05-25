@@ -123,9 +123,9 @@ public class Configuration extends PropertyStore implements Serializable
                 String value = propElements[i].getAttribute("value");
                 String datastoreString = propElements[i].getAttribute("datastore");
                 String validatorName = propElements[i].getAttribute("validator");
-                boolean datastore = datastoreString != null && datastoreString.equalsIgnoreCase("true");
+                boolean datastore = Boolean.valueOf(datastoreString);
                 String mgrOverrideString = propElements[i].getAttribute("manager-overrideable");
-                boolean mgrOverride = mgrOverrideString != null && mgrOverrideString.equalsIgnoreCase("true");
+                boolean mgrOverride = Boolean.valueOf(mgrOverrideString);
 
                 addDefaultProperty(name, intName, value, validatorName, datastore, mgrOverride);
             }

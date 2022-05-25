@@ -287,12 +287,12 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
                     {
                         // Of the form "{field} {ordering}"
                         fieldName = nextToken.substring(0, spacePos);
-                        String direction = nextToken.substring(spacePos+1).trim();
-                        if (direction.equalsIgnoreCase("DESC"))
+                        String direction = nextToken.substring(spacePos+1).trim().toUpperCase();
+                        if (direction.equals("DESC"))
                         {
                             forward = false;
                         }
-                        else if (!direction.equalsIgnoreCase("ASC"))
+                        else if (!direction.equals("ASC"))
                         {
                             throw new InvalidMemberMetaDataException("044139", fmd.getClassName(), fmd.getName(), direction);
                         }

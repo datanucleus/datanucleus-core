@@ -87,14 +87,7 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
             
             if (keyCascadeVal != null)
             {
-                if (keyCascadeVal.equalsIgnoreCase("true"))
-                {
-                    mapMd.setDependentKey(true);
-                }
-                else
-                {
-                    mapMd.setDependentKey(false);
-                }
+                mapMd.setDependentKey(Boolean.valueOf(keyCascadeVal));
             }
             
             mapMd.populate(clr, primary);

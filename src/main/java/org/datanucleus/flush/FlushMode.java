@@ -40,15 +40,16 @@ public enum FlushMode
     {
         if (value != null)
         {
-            if (FlushMode.AUTO.name().equalsIgnoreCase(value))
+            String valueUpper = value.toUpperCase();
+            if (FlushMode.AUTO.name().equals(valueUpper))
             {
                 return FlushMode.AUTO;
             }
-            else if (FlushMode.QUERY.name().equalsIgnoreCase(value))
+            else if (FlushMode.QUERY.name().equals(valueUpper))
             {
                 return FlushMode.QUERY;
             }
-            else if (FlushMode.MANUAL.name().equalsIgnoreCase(value))
+            else if (FlushMode.MANUAL.name().equals(valueUpper))
             {
                 return FlushMode.MANUAL;
             }

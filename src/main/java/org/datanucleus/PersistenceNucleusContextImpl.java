@@ -1504,18 +1504,18 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             return false;
         }
 
-        String cacheMode = config.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_MODE);
-        if (cacheMode.equalsIgnoreCase("ALL"))
+        String cacheMode = config.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_MODE).toUpperCase();
+        if (cacheMode.equals("ALL"))
         {
             // Everything is cached
             return true;
         }
-        else if (cacheMode.equalsIgnoreCase("NONE"))
+        else if (cacheMode.equals("NONE"))
         {
             // Nothing is cached
             return false;
         }
-        else if (cacheMode.equalsIgnoreCase("ENABLE_SELECTIVE"))
+        else if (cacheMode.equals("ENABLE_SELECTIVE"))
         {
             // Default to not cached unless set otherwise
             if (cmd == null)
@@ -1529,7 +1529,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             }
             return false;
         }
-        else if (cacheMode.equalsIgnoreCase("DISABLE_SELECTIVE"))
+        else if (cacheMode.equals("DISABLE_SELECTIVE"))
         {
             // Default to cached unless set otherwise
             if (cmd == null)
