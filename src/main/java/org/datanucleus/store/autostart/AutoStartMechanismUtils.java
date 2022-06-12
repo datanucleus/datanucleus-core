@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.autostart;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -60,18 +59,6 @@ public class AutoStartMechanismUtils
         if ("Classes".equalsIgnoreCase(mechanism))
         {
             starter = new ClassesAutoStarter(storeMgr, clr);
-        }
-        else if ("XML".equalsIgnoreCase(mechanism))
-        {
-            try
-            {
-                starter = new XMLAutoStarter(storeMgr, clr);
-            }
-            catch (MalformedURLException mue)
-            {
-                NucleusLogger.PERSISTENCE.warn("Unable to create XML AutoStarter due to ", mue);
-                starter = null;
-            }
         }
         else if ("MetaData".equalsIgnoreCase(mechanism))
         {
