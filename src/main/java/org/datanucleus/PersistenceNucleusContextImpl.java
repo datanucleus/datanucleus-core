@@ -370,7 +370,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         // Auto-Start Mechanism
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, null, "None", null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MODE, null, "Quiet", CorePropertyValidator.class.getName(), true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE, null, "datanucleusAutoStart.xml", null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_CLASSNAMES, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_METADATAFILES, null, null, null, true, false);
 

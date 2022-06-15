@@ -226,7 +226,6 @@ public class PropertyNames
 
     public static final String PROPERTY_AUTOSTART_MECHANISM = "datanucleus.autostartmechanism";
     public static final String PROPERTY_AUTOSTART_MODE = "datanucleus.autostartmechanismmode";
-    public static final String PROPERTY_AUTOSTART_XMLFILE = "datanucleus.autostartmechanismxmlfile";
     public static final String PROPERTY_AUTOSTART_CLASSNAMES = "datanucleus.autostartclassnames";
     public static final String PROPERTY_AUTOSTART_METADATAFILES = "datanucleus.autostartmetadatafiles";
 
