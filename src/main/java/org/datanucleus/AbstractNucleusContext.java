@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -252,7 +251,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
 
         if (classLoaderResolverMap == null)
         {
-            classLoaderResolverMap = new HashMap<String, ClassLoaderResolver>();
+            classLoaderResolverMap = new ConcurrentHashMap<String, ClassLoaderResolver>();
         }
         ClassLoaderResolver clr = classLoaderResolverMap.get(key);
         if (clr != null)
