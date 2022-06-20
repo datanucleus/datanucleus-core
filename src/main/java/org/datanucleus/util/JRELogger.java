@@ -22,9 +22,8 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
- * JDK1.4 logger (java.util.logging) implementation of a NucleusLogger.
- * Assumes that all configuration of the loggers are done by external
- * configuration (System property "java.util.logging.config.file").
+ * JRE logger (java.util.logging) implementation of a NucleusLogger.
+ * Assumes that all configuration of the loggers are done by external configuration (System property "java.util.logging.config.file").
  * Maps logging levels as follows :
  * <ul>
  * <li>debug maps to java.util.logging <i>fine</i></li>
@@ -36,11 +35,11 @@ import java.util.logging.Logger;
  */
 public class JRELogger extends NucleusLogger
 {
-    /** The JDK1.4 Logger being used */
+    /** The JRE Logger being used */
     private final Logger logger;
 
     /**
-     * Constructor for a JDK 1.4 Logger.
+     * Constructor for a JRE Logger.
      * @param logName Name of the logger
      */
     public JRELogger(String logName)

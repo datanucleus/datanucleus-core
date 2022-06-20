@@ -22,8 +22,7 @@ import org.apache.log4j.Logger;
 /**
  * Log4J implementation of a NucleusLogger.
  * See http://logging.apache.org/log4j for details of Log4J.
- * Assumes that all configuration of the loggers are done by external
- * configuration (System property "log4j.configuration").
+ * Assumes that all configuration of the loggers are done by external configuration (System property "log4j.configuration").
  * Maps logging levels as follows :
  * <ul>
  * <li>debug maps to Log4J <i>DEBUG</i></li>
