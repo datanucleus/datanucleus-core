@@ -20,6 +20,7 @@ package org.datanucleus.metadata.xml;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
@@ -40,6 +41,8 @@ public class AbstractXmlMetaDataHandler extends DefaultHandler
 {
     /** Manager for the MetaData. */
     protected final MetaDataManager mmgr;
+
+    protected ClassLoaderResolver clr;
 
     /** Filename containing the XML metadata */
     protected final String filename;
@@ -73,6 +76,7 @@ public class AbstractXmlMetaDataHandler extends DefaultHandler
     {
         super();
         this.mmgr = mmgr;
+        this.clr = (mmgr != null) ? mmgr.getNucleusContext().getClassLoaderResolver(null) : null;
         this.filename = filename;
         this.entityResolver = resolver;
     }

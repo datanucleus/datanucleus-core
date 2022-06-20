@@ -62,6 +62,9 @@ public abstract class AbstractNucleusContext implements NucleusContext
     /** Map of the ClassLoaderResolver, keyed by the clr class and the primaryLoader name. */
     protected transient Map<String, ClassLoaderResolver> classLoaderResolverMap = new ConcurrentHashMap<>();
 
+    /** Default ClassLoaderResolver, when no primaryLoader is specified. */
+    protected ClassLoaderResolver defaultCLR = null;
+
     public static final Set<String> STARTUP_PROPERTIES = new HashSet<>();
 
     static
@@ -241,6 +244,11 @@ public abstract class AbstractNucleusContext implements NucleusContext
     @Override
     public ClassLoaderResolver getClassLoaderResolver(ClassLoader primaryLoader)
     {
+        if (primaryLoader == null && defaultCLR != null)
+        {
+            return defaultCLR;
+        }
+
         // Set the key we will refer to this loader by
         String resolverName = config.getStringProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
         String key = resolverName!=null ? resolverName : "datanucleus";
@@ -249,24 +257,30 @@ public abstract class AbstractNucleusContext implements NucleusContext
             key += ":[" + StringUtils.toJVMIDString(primaryLoader) + "]"; 
         }
 
-        if (classLoaderResolverMap == null)
+        ClassLoaderResolver clr = null;
+        if (classLoaderResolverMap != null)
+        {
+            clr = classLoaderResolverMap.get(key);
+            if (clr != null)
+            {
+                // Return the cached loader resolver
+                return clr;
+            }
+        }
+        else
         {
             classLoaderResolverMap = new ConcurrentHashMap<String, ClassLoaderResolver>();
-        }
-        ClassLoaderResolver clr = classLoaderResolverMap.get(key);
-        if (clr != null)
-        {
-            // Return the cached loader resolver
-            return clr;
         }
 
         // Create the ClassLoaderResolver of the required type with this primary loader
         if (resolverName == null)
         {
+            // Use built-in ClassLoaderResolver
             clr = new ClassLoaderResolverImpl(primaryLoader);
         }
         else
         {
+            // User-type ClassLoaderResolver
             try
             {
                 clr = (ClassLoaderResolver)pluginManager.createExecutableExtension("org.datanucleus.classloader_resolver", "name", resolverName, 
@@ -281,8 +295,22 @@ public abstract class AbstractNucleusContext implements NucleusContext
                 throw new NucleusUserException(Localiser.msg("001003", classLoaderResolverClassName), e).setFatal();
             }
         }
-        clr.registerUserClassLoader((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY));
-        classLoaderResolverMap.put(key, clr);
+
+        // Add user ClassLoader if defined
+        ClassLoader userCL = (ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY);
+        if (userCL != null)
+        {
+            clr.registerUserClassLoader(userCL);
+        }
+
+        if (primaryLoader == null && primaryLoader == null)
+        {
+            defaultCLR = clr;
+        }
+        else
+        {
+            classLoaderResolverMap.put(key, clr);
+        }
 
         return clr;
     }
