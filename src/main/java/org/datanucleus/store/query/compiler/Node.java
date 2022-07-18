@@ -41,10 +41,10 @@ public class Node
     protected Node parent;
 
     /** List of child nodes in the tree below here. */
-    protected List<Node> childNodes = new ArrayList();
+    protected List<Node> childNodes = new ArrayList<>();
 
     /** List of properties for the node. Used for invocation of methods, representing the arguments. */
-    protected List<Node> properties = null;
+    private List<Node> properties = null;
 
     public Node(NodeType nodeType)
     {
@@ -86,7 +86,7 @@ public class Node
     {
         if (properties == null)
         {
-            this.properties = new ArrayList();
+            this.properties = new ArrayList<>();
         }
         this.properties.add(node);
     }

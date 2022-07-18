@@ -57,7 +57,7 @@ public class ValueGenerationBlock<T> implements Serializable
      */
     public ValueGenerationBlock(List<T> oid)
     {
-        valueList = new ArrayList(oid);
+        valueList = new ArrayList<>(oid);
     }
 
     /**

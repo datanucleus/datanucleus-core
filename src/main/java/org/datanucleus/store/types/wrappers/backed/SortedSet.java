@@ -955,7 +955,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -966,7 +966,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -977,7 +977,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {

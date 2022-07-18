@@ -56,7 +56,7 @@ public abstract class JavaQueryInMemoryEvaluator
     protected String candidateAlias = "this";
 
     /** Candidates objects to evaluate. */
-    protected Collection candidates;
+    protected Collection<Object> candidates;
 
     /** Underlying "string-based" query. */
     protected Query query;
@@ -127,7 +127,7 @@ public abstract class JavaQueryInMemoryEvaluator
             return candidates;
         }
 
-        Collection executeCandidates = new ArrayList();
+        Collection<Object> executeCandidates = new ArrayList<>();
         Expression[] result = compilation.getExprResult();
         if (candidates != null)
         {
@@ -184,7 +184,7 @@ public abstract class JavaQueryInMemoryEvaluator
         }
 
         // Evaluate filter
-        List resultSet = new ArrayList(executeCandidates);
+        List<Object> resultSet = new ArrayList(executeCandidates);
         Expression filter = compilation.getExprFilter();
         if (applyFilter && filter != null)
         {
@@ -236,8 +236,8 @@ public abstract class JavaQueryInMemoryEvaluator
             }
 
             // Apply grouping
-            List aggregateList = new ArrayList();
-            List s = resultSet;
+            List<Object> aggregateList = new ArrayList<>();
+            List<Object> s = resultSet;
             Expression[] grouping = compilation.getExprGrouping();
             if (grouping != null)
             {
@@ -254,7 +254,7 @@ public abstract class JavaQueryInMemoryEvaluator
 
             if (query.getResultDistinct())
             {
-                List tmpList = new ArrayList();
+                List<Object> tmpList = new ArrayList<>();
                 Iterator iter = resultSet.iterator();
                 while (iter.hasNext())
                 {
@@ -295,7 +295,7 @@ public abstract class JavaQueryInMemoryEvaluator
         // Store current results in case we have an aggregate in the filter
         state.put(RESULTS_SET, set);
 
-        List result = new ArrayList();
+        List<Object> result = new ArrayList<>();
         Iterator it = set.iterator();
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
@@ -399,7 +399,7 @@ public abstract class JavaQueryInMemoryEvaluator
             return Collections.EMPTY_LIST;
         }
 
-        List resultList = new ArrayList();
+        List resultList = new ArrayList<>();
         Iterator it = set.iterator();
         // skipping the unnecessary objects
         for (long l = 0; l < fromIncl && it.hasNext(); l++)
@@ -415,12 +415,12 @@ public abstract class JavaQueryInMemoryEvaluator
         return resultList;
     }
 
-    private List sortByGrouping(List set)
+    private List sortByGrouping(List<Object> set)
     {
         Object[] o = set.toArray();
         // TODO Shouldn't we handle "having" within this?
         final Expression[] grouping = compilation.getExprGrouping();
-        Arrays.sort(o, new Comparator()
+        Arrays.sort(o, new Comparator<Object>()
         {
             public int compare(Object arg0, Object arg1)
             {
@@ -479,7 +479,7 @@ public abstract class JavaQueryInMemoryEvaluator
     private List handleAggregates(List resultSet)
     {
         final Expression[] grouping = compilation.getExprGrouping();
-        Comparator c = new Comparator()
+        Comparator<Object> c = new Comparator<>()
         {
             public int compare(Object arg0, Object arg1)
             {
@@ -504,7 +504,7 @@ public abstract class JavaQueryInMemoryEvaluator
                     }
                     else
                     {
-                        int result = ((Comparable)a).compareTo(b);
+                        int result = ((Comparable<Object>)a).compareTo(b);
                         if (result != 0)
                         {
                             return result;
@@ -515,30 +515,30 @@ public abstract class JavaQueryInMemoryEvaluator
             }
         };
     
-        List groups = new ArrayList();
-        List group = new ArrayList();
+        List<List<Object>> groups = new ArrayList<>();
+        List<Object> group = new ArrayList<>();
         groups.add(group);
         for (int i=0; i<resultSet.size(); i++)
         {
             if (i > 0)
             {
-                if (c.compare(resultSet.get(i-1),resultSet.get(i)) != 0)
+                if (c.compare(resultSet.get(i-1), resultSet.get(i)) != 0)
                 {
-                    group = new ArrayList();
+                    group = new ArrayList<>();
                     groups.add(group);
                 }
             }
             group.add(resultSet.get(i));
         }
-        List result = new ArrayList();
+        List<Object> result = new ArrayList<>();
         Expression having = compilation.getExprHaving();
         if (having != null)
         {
             for (int i=0; i<groups.size(); i++)
             {
-                if (satisfiesHavingClause((List) groups.get(i)))
+                if (satisfiesHavingClause(groups.get(i)))
                 {
-                    result.addAll((Collection) groups.get(i));
+                    result.addAll(groups.get(i));
                 }
             }
         }
@@ -546,7 +546,7 @@ public abstract class JavaQueryInMemoryEvaluator
         {
             for (int i = 0; i < groups.size(); i++)
             {
-                result.addAll((Collection) groups.get(i));
+                result.addAll(groups.get(i));
             }
         }
         return result;
@@ -574,13 +574,13 @@ public abstract class JavaQueryInMemoryEvaluator
      * @param resultSet The resultSet containing all elements
      * @return A list with aggregated elements
      */
-    private List handleResult(List resultSet)
+    private List<Object> handleResult(List<Object> resultSet)
     {
-        List result = new ArrayList();
+        List<Object> result = new ArrayList<>();
         final Expression[] grouping = compilation.getExprGrouping();
         if (grouping != null)
         {
-            Comparator c = new Comparator()
+            Comparator<Object> c = new Comparator<>()
             {
                 public int compare(Object arg0, Object arg1)
                 {
@@ -606,7 +606,7 @@ public abstract class JavaQueryInMemoryEvaluator
                         }
                         else
                         {
-                            int result = ((Comparable) a).compareTo(b);
+                            int result = ((Comparable<Object>) a).compareTo(b);
                             if (result != 0)
                             {
                                 return result;
@@ -617,8 +617,8 @@ public abstract class JavaQueryInMemoryEvaluator
                 }
             };
     
-            List groups = new ArrayList();
-            List group = new ArrayList();
+            List<List<Object>> groups = new ArrayList<>();
+            List<Object> group = new ArrayList<>();
             if (!resultSet.isEmpty())
             {
                 groups.add(group);
@@ -629,7 +629,7 @@ public abstract class JavaQueryInMemoryEvaluator
                 {
                     if (c.compare(resultSet.get(i - 1), resultSet.get(i)) != 0)
                     {
-                        group = new ArrayList();
+                        group = new ArrayList<>();
                         groups.add(group);
                     }
                 }
@@ -639,7 +639,7 @@ public abstract class JavaQueryInMemoryEvaluator
             // Apply the result to the generated groups
             for (int i = 0; i < groups.size(); i++)
             {
-                group = (List)groups.get(i);
+                group = groups.get(i);
                 result.add(result(group));
             }
         }
@@ -694,7 +694,7 @@ public abstract class JavaQueryInMemoryEvaluator
         if (!result.isEmpty() && ((Object[])result.get(0)).length == 1)
         {
             List r = result;
-            result = new ArrayList();
+            result = new ArrayList<>();
             for (int i = 0; i < r.size(); i++)
             {
                 result.add(((Object[]) r.get(i))[0]);

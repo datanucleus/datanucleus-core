@@ -830,7 +830,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
     }
 
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -841,7 +841,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
     }
 
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -852,7 +852,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
     }
 
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {

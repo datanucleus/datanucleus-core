@@ -94,12 +94,11 @@ public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>im
     }
 
     /**
-     * Based on Apache Collections 3.2 implementation. Specific implementation for Object arrays which will
-     * perform better.
+     * Based on Apache Collections 3.2 implementation. Specific implementation for Object arrays which will perform better.
      */
-    private final class ObjectArrayIterator implements Iterator
+    private final class ObjectArrayIterator<E> implements Iterator<E>
     {
-        protected Object[] array = null;
+        protected E[] array = null;
 
         /** The end index to loop to */
         protected int endIndex = 0;
@@ -112,7 +111,7 @@ public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>im
          * @param array the array to iterate over
          * @throws NullPointerException if <code>array</code> is <code>null</code>
          */
-        public ObjectArrayIterator(Object[] array)
+        public ObjectArrayIterator(E[] array)
         {
             this.array = array;
             this.endIndex = array.length;
@@ -136,7 +135,7 @@ public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>im
          * @return the next element in the array
          * @throws NoSuchElementException if all the elements in the array have already been returned
          */
-        public Object next()
+        public E next()
         {
             if (hasNext() == false)
             {

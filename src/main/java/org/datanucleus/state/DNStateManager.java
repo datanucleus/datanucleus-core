@@ -81,6 +81,7 @@ public interface DNStateManager<T> extends StateManager
      * @param pcClass Class of the object that this will manage the state for
      * @deprecated Remove use of this and use initialiseForHollow
      */
+    @Deprecated
     void initialiseForHollowAppId(FieldValues fv, Class<T> pcClass);
 
     /**
@@ -803,6 +804,7 @@ public interface DNStateManager<T> extends StateManager
      * @param fv the initial field values of the object.
      * @deprecated Dont use this, to be removed
      */
+    @Deprecated
     void checkInheritance(FieldValues fv);
 
     /**

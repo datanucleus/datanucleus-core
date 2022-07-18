@@ -210,7 +210,7 @@ public class AttachFieldManager extends AbstractFieldManager
                     }
                 }
 
-                SCO sco;
+                SCO<Object> sco;
                 if (oldValue == null || !(oldValue instanceof SCO))
                 {
                     // Detached object didn't use wrapped field

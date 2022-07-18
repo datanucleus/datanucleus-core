@@ -274,7 +274,7 @@ public class FetchPlanForClass
         if (plan.dynamicGroups != null)
         {
             // dynamic fetch groups
-            for (FetchGroup grp : plan.dynamicGroups)
+            for (FetchGroup<?> grp : plan.dynamicGroups)
             {
                 if (grp.getType().getName().equals(cmd.getFullClassName()))
                 {
@@ -503,11 +503,11 @@ public class FetchPlanForClass
                             {
                                 // Dynamic Fetch groups
                                 String fieldName = mmd.getName();
-                                Class cls = plan.clr.classForName(cmd.getFullClassName());
+                                Class<?> cls = plan.clr.classForName(cmd.getFullClassName());
                                 for (FetchGroup group : plan.dynamicGroups)
                                 {
-                                    Set groupMembers = group.getMembers();
-                                    if (group.getType().isAssignableFrom(cls) && groupMembers.contains(fieldName) && group.getPostLoad())
+                                    Class<?> groupType = group.getType();
+                                    if (groupType.isAssignableFrom(cls) && group.getMembers().contains(fieldName) && group.getPostLoad())
                                     {
                                         result = Boolean.TRUE;
                                     }

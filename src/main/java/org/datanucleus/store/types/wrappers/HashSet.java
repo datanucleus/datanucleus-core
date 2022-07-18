@@ -591,7 +591,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -600,7 +600,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }

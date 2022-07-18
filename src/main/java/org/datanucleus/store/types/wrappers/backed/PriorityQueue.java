@@ -75,7 +75,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
 
     /**
      * Constructor. 
-     * @param sm StateManager for this set.
+     * @param sm StateManager for this set.SCO
      * @param mmd Metadata for the member
      */
     public PriorityQueue(DNStateManager sm, AbstractMemberMetaData mmd)
@@ -870,7 +870,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     }
 
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -881,7 +881,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     }
 
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {

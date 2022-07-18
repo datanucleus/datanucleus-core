@@ -96,14 +96,14 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      */
     protected void initialiseDelegate()
     {
-        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
+        Comparator<E> comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
-            this.delegate = new java.util.TreeSet(comparator);
+            this.delegate = new java.util.TreeSet<E>(comparator);
         }
         else
         {
-            this.delegate = new java.util.TreeSet();
+            this.delegate = new java.util.TreeSet<E>();
         }
     }
 
@@ -204,17 +204,17 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @param state State for detachment process
      * @return The detached container
      */
-    public java.util.TreeSet detachCopy(FetchPlanState state)
+    public java.util.TreeSet<E> detachCopy(FetchPlanState state)
     {
-        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
-        java.util.TreeSet detached = null;
+        Comparator<E> comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
+        java.util.TreeSet<E> detached = null;
         if (comparator != null)
         {
-            detached = new java.util.TreeSet(comparator);
+            detached = new java.util.TreeSet<>(comparator);
         } 
         else
         {
-            detached = new java.util.TreeSet();
+            detached = new java.util.TreeSet<>();
         }
         SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
@@ -258,7 +258,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * Accessor for the comparator.
      * @return The comparator
      */
-    public Comparator comparator()
+    public Comparator<? super E> comparator()
     {
         return delegate.comparator();
     }
@@ -315,9 +315,9 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * Accessor for an iterator for the Set.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
-        return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
+        return new SCOCollectionIterator<>(this, ownerSM, delegate, null, true);
     }
 
     /**
@@ -325,7 +325,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @param toElement the element to return up to.
      * @return The set of elements meeting the input
      */
-    public SortedSet headSet(E toElement)
+    public SortedSet<E> headSet(E toElement)
     {
         return delegate.headSet(toElement);
     }
@@ -336,7 +336,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @param toElement The end element
      * @return The set of elements meeting the input
      */
-    public SortedSet subSet(E fromElement, E toElement)
+    public SortedSet<E> subSet(E fromElement, E toElement)
     {
         return delegate.subSet(fromElement, toElement);
     }
@@ -346,7 +346,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @param fromElement The start element
      * @return The set of elements meeting the input
      */
-    public SortedSet tailSet(E fromElement)
+    public SortedSet<E> tailSet(E fromElement)
     {
         return delegate.headSet(fromElement);
     }
@@ -405,7 +405,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
             if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
@@ -438,7 +438,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
             {
                 for (Object element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }
             }
             makeDirty();
@@ -459,7 +459,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
         {
             // Relationship management
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            for (Object elem : delegate)
+            for (E elem : delegate)
             {
                 relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
@@ -471,16 +471,16 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
-                Iterator iter = delegate.iterator();
+                Iterator<E> iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
                 // Perform the cascade delete
-                Iterator iter = delegate.iterator();
+                Iterator<E> iter = delegate.iterator();
                 while (iter.hasNext())
                 {
                     ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
@@ -528,7 +528,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
@@ -585,7 +585,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
                 // Queue the cascade delete
                 for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -621,7 +621,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
         {
             throw new NullPointerException("Input collection was null");
         }
-        Collection collToRemove = new java.util.TreeSet();
+        Collection collToRemove = new java.util.TreeSet<>();
         for (Object o : delegate)
         {
             if (!c.contains(o))
@@ -639,7 +639,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
                 // Queue any cascade delete
                 for (Object elem : collToRemove)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -674,14 +674,14 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      */
     protected Object writeReplace() throws ObjectStreamException
     {
-        return new java.util.TreeSet(delegate);
+        return new java.util.TreeSet<>(delegate);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -690,7 +690,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }
@@ -699,7 +699,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @see java.util.TreeSet#spliterator()
      */
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         return delegate.spliterator();
     }

@@ -43,9 +43,9 @@ public class RuntimeEnhancer
 
     private final NucleusContext nucleusContext;
 
-    Map<ClassLoader, EnhancerClassLoader> runtimeLoaderByLoader = new HashMap();
+    Map<ClassLoader, EnhancerClassLoader> runtimeLoaderByLoader = new HashMap<>();
 
-    List<String> classEnhancerOptions = new ArrayList<String>();
+    List<String> classEnhancerOptions = new ArrayList<>();
 
     /**
      *  This classloader is used to load any classes that are necessary during enhancement process, 

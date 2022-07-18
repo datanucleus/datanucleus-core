@@ -29,13 +29,13 @@ import java.util.Map;
 public class CommandLine
 {
     /** Appended options */
-    protected Map<String, Option> options = new HashMap();
+    protected Map<String, Option> options = new HashMap<>();
 
     /** Appended options */
-    protected Map<String, Option> valueOptions = new HashMap();
+    protected Map<String, Option> valueOptions = new HashMap<>();
 
     /** Appended options */
-    protected List<Option> optionList = new ArrayList<Option>();
+    protected List<Option> optionList = new ArrayList<>();
 
     /** Default arguments */
     protected String defaultArg[];
@@ -174,7 +174,7 @@ public class CommandLine
      */
     public void parse(String args[])
     {
-        List<String> defaultArg = new ArrayList();
+        List<String> defaultArg = new ArrayList<>();
         if (args == null || (args.length == 0))
         {
             return;

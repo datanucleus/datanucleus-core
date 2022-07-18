@@ -353,7 +353,7 @@ public abstract class AbstractStatistics
      */
     public static class SMA
     {
-        private LinkedList values = new LinkedList();
+        private LinkedList<Double> values = new LinkedList<>();
 
         private int length;
 
@@ -389,7 +389,7 @@ public abstract class AbstractStatistics
         {
             if (values.size() == length && length > 0)
             {
-                sum -= ((Double) values.getFirst()).doubleValue();
+                sum -= values.getFirst().doubleValue();
                 values.removeFirst();
             }
             sum += value;

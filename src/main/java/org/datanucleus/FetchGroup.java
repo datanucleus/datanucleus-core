@@ -293,10 +293,6 @@ public class FetchGroup<T> implements Serializable
         return names;
     }
 
-    /**
-     * Accessor for the members that are in this fetch group.
-     * @return Set of member names.
-     */
     public Set<String> getMembers()
     {
         return memberNames;

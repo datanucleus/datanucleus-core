@@ -343,7 +343,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
         try
         {
-            Boolean result = ((Class)right).isAssignableFrom(left.getClass()) ? Boolean.TRUE : Boolean.FALSE;
+            Boolean result = ((Class<?>)right).isAssignableFrom(left.getClass()) ? Boolean.TRUE : Boolean.FALSE;
             stack.push(result);
             return result;
         }
@@ -612,7 +612,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
      */
     protected Object processCreatorExpression(CreatorExpression expr)
     {
-        List params = new ArrayList();
+        List<Object> params = new ArrayList<>();
         for (int i = 0; i < expr.getArguments().size(); i++)
         {
             params.add((expr.getArguments().get(i)).evaluate(this));
@@ -839,7 +839,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             // Static function
             if (method.toLowerCase().equals("count"))
             {
-                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<?> coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -858,7 +858,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("sum"))
             {
-                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<?> coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -877,7 +877,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("avg"))
             {
-                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<?> coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -896,7 +896,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("min"))
             {
-                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<?> coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -915,7 +915,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("max"))
             {
-                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<?> coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -1169,7 +1169,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                         if (value != null)
                         {
                             // TODO Do this in the compilation stage, and check for ClassNotResolvedException
-                            Class castClass = imports.resolveClassDeclaration(castClassName, clr, null);
+                            Class<?> castClass = imports.resolveClassDeclaration(castClassName, clr, null);
                             if (!castClass.isAssignableFrom(value.getClass()))
                             {
                                 NucleusLogger.QUERY.debug("In-memory query requires cast of " + StringUtils.toJVMIDString(value) + 
@@ -1185,7 +1185,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                         if (value != null)
                         {
                             // TODO Do this in the compilation stage, and check for ClassNotResolvedException
-                            Class castClass = imports.resolveClassDeclaration(castClassName, clr, null);
+                            Class<?> castClass = imports.resolveClassDeclaration(castClassName, clr, null);
                             if (!castClass.isAssignableFrom(value.getClass()))
                             {
                                 NucleusLogger.QUERY.debug("In-memory query requires cast of " + StringUtils.toJVMIDString(value) + 

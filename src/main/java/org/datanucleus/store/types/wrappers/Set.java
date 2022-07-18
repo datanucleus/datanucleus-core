@@ -614,7 +614,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -623,7 +623,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }
@@ -632,7 +632,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @see java.util.Set#spliterator()
      */
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         return delegate.spliterator();
     }

@@ -453,11 +453,11 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
-        { // uses iterator() implicitly
+        {
             action.accept(t);
         }
     }
@@ -486,11 +486,11 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         {
             loadFromStore();
         }
-        return new SCOCollectionIterator(this, ownerSM, delegate, backingStore, useCache);
+        return new SCOCollectionIterator<>(this, ownerSM, delegate, backingStore, useCache);
     }
 
     @Override
-    public SortedSet headSet(E toElement)
+    public SortedSet<E> headSet(E toElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -511,7 +511,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     }
 
     @Override
-    public SortedSet subSet(E fromElement, E toElement)
+    public SortedSet<E> subSet(E fromElement, E toElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -532,7 +532,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     }
 
     @Override
-    public SortedSet tailSet(E fromElement)
+    public SortedSet<E> tailSet(E fromElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -652,7 +652,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, element));
             }
             else
             {
@@ -704,7 +704,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             {
                 for (Object element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, (E)element));
                 }
             }
             else
@@ -740,7 +740,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         {
             // Relationship management
             RelationshipManager relMgr = ownerSM.getExecutionContext().getRelationshipManager(ownerSM);
-            for (Object elem : delegate)
+            for (E elem : delegate)
             {
                 relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), elem);
             }
@@ -804,7 +804,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
                 backingSuccess = contained;
                 if (backingSuccess)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, allowCascadeDelete));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, backingStore, (E)element, allowCascadeDelete));
                 }
             }
             else
@@ -867,7 +867,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Check which are contained before updating the delegate
-                Collection contained = new java.util.HashSet();
+                Collection<Object> contained = new java.util.HashSet<>();
                 for (Object elem : elements)
                 {
                     if (contains(elem))
@@ -881,7 +881,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
                     for (Object element : contained)
                     {
                         backingSuccess = true;
-                        ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, true));
+                        ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, backingStore, (E)element, true));
                     }
                 }
             }
@@ -948,15 +948,15 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         if (useCache)
         {
             loadFromStore();
-            return new java.util.TreeSet(delegate);
+            return new java.util.TreeSet<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.TreeSet(delegate);
+        return new java.util.TreeSet<>(delegate);
     }
 
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -967,7 +967,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     }
 
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -978,7 +978,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     }
 
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {

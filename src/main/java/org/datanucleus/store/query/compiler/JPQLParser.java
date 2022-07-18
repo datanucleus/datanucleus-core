@@ -162,7 +162,7 @@ public class JPQLParser extends AbstractParser
     public Node[][] parseVariables(String expression)
     {
         lexer = new Lexer(expression, paramPrefixes, false);
-        List nodes = new ArrayList();
+        List<Node[]> nodes = new ArrayList<>();
         do
         {
             processPrimary();
@@ -179,7 +179,7 @@ public class JPQLParser extends AbstractParser
             nodes.add(new Node[]{nodeType, nodeVariable});
         }
         while (lexer.parseString(";"));
-        return (Node[][]) nodes.toArray(new Node[nodes.size()][2]);
+        return nodes.toArray(new Node[nodes.size()][2]);
     }
 
     /* (non-Javadoc)
@@ -188,7 +188,7 @@ public class JPQLParser extends AbstractParser
     public Node[][] parseParameters(String expression)
     {
         lexer = new Lexer(expression, paramPrefixes, false);
-        List nodes = new ArrayList();
+        List<Node[]> nodes = new ArrayList<>();
         do
         {
             processPrimary();
@@ -205,7 +205,7 @@ public class JPQLParser extends AbstractParser
             nodes.add(new Node[]{nodeType, nodeVariable});
         }
         while (lexer.parseString(","));
-        return (Node[][]) nodes.toArray(new Node[nodes.size()][2]);
+        return nodes.toArray(new Node[nodes.size()][2]);
     }
 
     /**
@@ -915,7 +915,7 @@ public class JPQLParser extends AbstractParser
             return;
         }
 
-        List<Node> valueNodes = new ArrayList();
+        List<Node> valueNodes = new ArrayList<>();
         do
         {
             // "IN ((literal|parameter) [, (literal|parameter)])"

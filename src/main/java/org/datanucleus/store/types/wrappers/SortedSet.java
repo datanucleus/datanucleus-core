@@ -322,7 +322,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * Accessor for an iterator for the Set.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
     }
@@ -696,7 +696,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -705,7 +705,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }
@@ -714,7 +714,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @see java.util.SortedSet#spliterator()
      */
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         return delegate.spliterator();
     }

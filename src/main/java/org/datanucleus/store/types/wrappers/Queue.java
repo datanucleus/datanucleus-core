@@ -595,7 +595,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -604,7 +604,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }

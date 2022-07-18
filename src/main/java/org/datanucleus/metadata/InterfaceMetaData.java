@@ -353,7 +353,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
      * @throws InvalidMetaDataException if the Class for a declared type in a field cannot be loaded by the <code>clr</code>
      * @throws InvalidMetaDataException if a field declared in the MetaData does not exist in the Class
      */
-    protected void populatePropertyMetaData(ClassLoaderResolver clr, Class cls, boolean pkFields, ClassLoader primary)
+    protected void populatePropertyMetaData(ClassLoaderResolver clr, Class<?> cls, boolean pkFields, ClassLoader primary)
     {
         Collections.sort(members);
 
@@ -363,7 +363,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
         {
             if (pkFields == mmd.isPrimaryKey())
             {
-                Class fieldCls = cls;
+                Class<?> fieldCls = cls;
                 if (!mmd.fieldBelongsToClass())
                 {
                     // Field overrides a field in a superclass, so find the class
@@ -388,16 +388,16 @@ public class InterfaceMetaData extends AbstractClassMetaData
                     }
                 }
 
-                Method cls_method = null;
+                Method getMethod = null;
                 try
                 {
-                    cls_method = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),true));
+                    getMethod = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),true));
                 }
                 catch (Exception e)
                 {
                     try 
                     {
-                        cls_method = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),false));
+                        getMethod = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(),false));
                     }
                     catch (Exception e2)
                     {
@@ -405,7 +405,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                         throw new InvalidClassMetaDataException("044072", fullName, mmd.getFullFieldName());
                     }
                 }
-                mmd.populate(clr, null, cls_method, primary, mmgr);
+                mmd.populate(clr, null, getMethod, primary, mmgr);
             }
         }
     }

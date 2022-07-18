@@ -57,7 +57,6 @@ public class TimestampGenerator extends AbstractGenerator<Timestamp>
         Calendar cal = Calendar.getInstance();
         Timestamp[] ts = new Timestamp[1];
         ts[0] = new Timestamp(cal.getTimeInMillis());
-        ValueGenerationBlock block = new ValueGenerationBlock(ts);
-        return block;
+        return new ValueGenerationBlock<Timestamp>(ts);
     }
 }

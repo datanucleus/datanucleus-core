@@ -150,7 +150,7 @@ public class ClassMetaData extends AbstractClassMetaData
             }
             populating = true;
 
-            Class cls = loadClass(clr, primary);
+            Class<?> cls = loadClass(clr, primary);
 
             isAbstract = Modifier.isAbstract(cls.getModifiers());
 
@@ -724,7 +724,7 @@ public class ClassMetaData extends AbstractClassMetaData
      * @throws InvalidMetaDataException if the Class for a declared type in a field cannot be loaded by the <code>clr</code>
      * @throws InvalidMetaDataException if a field declared in the MetaData does not exist in the Class
      */
-    protected void populateMemberMetaData(ClassLoaderResolver clr, Class cls, boolean pkMembers, ClassLoader primary)
+    protected void populateMemberMetaData(ClassLoaderResolver clr, Class<?> cls, boolean pkMembers, ClassLoader primary)
     {
         Collections.sort(members);
 
@@ -733,7 +733,7 @@ public class ClassMetaData extends AbstractClassMetaData
         {
             if (pkMembers == mmd.isPrimaryKey())
             {
-                Class fieldCls = cls;
+                Class<?> fieldCls = cls;
                 if (!mmd.fieldBelongsToClass())
                 {
                     // Field overrides a field in a superclass, so find the class
@@ -829,8 +829,8 @@ public class ClassMetaData extends AbstractClassMetaData
                     else if (setMethod != null && getMethod != null)
                     {
                         // Check types of getter/setter
-                        Class getType = getMethod.getReturnType();
-                        Class setType = setMethod.getParameterTypes()[0];
+                        Class<?> getType = getMethod.getReturnType();
+                        Class<?> setType = setMethod.getParameterTypes()[0];
                         if (!getType.isAssignableFrom(setType) && !setType.isAssignableFrom(getType))
                         {
                             throw new InvalidMetaDataException("044167", fullName, mmd.getName(), getType.getName(), setType.getName());

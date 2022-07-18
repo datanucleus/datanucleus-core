@@ -149,15 +149,14 @@ public class DeleteFieldManager extends AbstractFieldManager
     private void processContainer(AbstractMemberMetaData mmd, Object container, ExecutionContext ec, RelationType relationType)
     {
         TypeManager typeManager = sm.getExecutionContext().getTypeManager();
-        ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
 
         if (mmd.hasMap())
         {
-            processMapContainer(mmd, container, containerHandler);
+            processMapContainer(mmd, container, typeManager.getContainerHandler(mmd.getType()));
         }
         else
         {
-            processElementContainer(mmd, container, containerHandler, ec, relationType);
+            processElementContainer(mmd, container, typeManager.getContainerHandler(mmd.getType()), ec, relationType);
         }
     }
     

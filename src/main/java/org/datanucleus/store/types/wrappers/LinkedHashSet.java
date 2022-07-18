@@ -603,7 +603,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -612,7 +612,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }

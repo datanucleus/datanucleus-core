@@ -280,7 +280,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
     }
@@ -614,7 +614,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -623,7 +623,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }

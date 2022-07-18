@@ -217,7 +217,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Named parameters are keyed by String form of the name.
      * Numbered parameters are keyed by the position (Integer).
      */
-    protected transient Map implicitParameters = null;
+    protected transient Map<Object, Object> implicitParameters = null;
 
     /** The imports definition. */
     protected transient Imports parsedImports = null;
@@ -1027,7 +1027,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         if (implicitParameters == null)
         {
-            implicitParameters = new HashMap();
+            implicitParameters = new HashMap<>();
         }
         implicitParameters.put(Integer.valueOf(position), value);
 
@@ -1900,7 +1900,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * @see #executeQuery(Map parameters)
      * @throws NoQueryResultsException Thrown if no results were returned from the query.
      */
-    public Object executeWithMap(Map parameters)
+    public Object executeWithMap(Map<Object, Object> parameters)
     {
         assertIsOpen();
         if (!ec.getTransaction().isActive() && !ec.getTransaction().getNontransactionalRead())
@@ -1911,13 +1911,13 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         return executeQuery(parameters);
     }
 
-    protected Map inputParameters;
+    protected Map<Object, Object> inputParameters;
 
     /**
      * Accessor for the input parameters for this query.
      * @return The input parameters map, with param values keyed by param name
      */
-    public Map getInputParameters()
+    public Map<Object, Object> getInputParameters()
     {
         return inputParameters;
     }
@@ -1940,7 +1940,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * @throws NoQueryResultsException Thrown if no results were returned from the query.
      * @throws QueryNotUniqueException Thrown if multiple results, yet expected one
      */
-    protected Object executeQuery(final Map parameters)
+    protected Object executeQuery(final Map<Object, Object> parameters)
     {
         try
         {
@@ -1949,7 +1949,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                 clr.setPrimary(candidateClass.getClassLoader());
             }
 
-            this.inputParameters = new HashMap<>();
+            this.inputParameters = new HashMap<Object, Object>();
             if (implicitParameters != null)
             {
                 inputParameters.putAll(implicitParameters);
@@ -2378,10 +2378,10 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * @param parameterValues Parameter values
      * @return The parameter map.
      */
-    protected Map getParameterMapForValues(Object[] parameterValues)
+    protected Map<Object, Object> getParameterMapForValues(Object[] parameterValues)
     {
         // Generate a parameter map from the parameter names to these input values
-        Map parameterMap = new HashMap<>();
+        Map<Object, Object> parameterMap = new HashMap<>();
         int position = 0;
         if (explicitParameters != null)
         {

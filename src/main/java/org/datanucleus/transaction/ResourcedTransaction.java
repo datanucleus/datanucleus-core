@@ -526,7 +526,7 @@ public class ResourcedTransaction
                 throw new IllegalStateException();
             }
 
-            List failures = null;
+            List<Throwable> failures = null;
             status = STATUS_ROLLING_BACK;
             Iterator<Map.Entry<Xid, XAResource>> branchesEntryIter = branches.entrySet().iterator();
             while (branchesEntryIter.hasNext())

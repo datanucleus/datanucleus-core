@@ -65,7 +65,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
             }
             else if (cacheType.equals("strong"))
             {
-                itemsByIndex = new HashMap();
+                itemsByIndex = new HashMap<>();
             }
             else if (cacheType.equals("none"))
             {
@@ -219,7 +219,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
     /* (non-Javadoc)
      * @see java.util.List#listIterator()
      */
-    public ListIterator listIterator()
+    public ListIterator<E> listIterator()
     {
         return listIterator(0);
     }
@@ -227,7 +227,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
     /* (non-Javadoc)
      * @see java.util.List#listIterator(int)
      */
-    public ListIterator listIterator(int index)
+    public ListIterator<E> listIterator(int index)
     {
         // TODO Support index
         return new LazyLoadListIterator();
@@ -268,7 +268,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
     /* (non-Javadoc)
      * @see java.util.List#set(int, java.lang.Object)
      */
-    public Object set(int index, Object element)
+    public E set(int index, Object element)
     {
         throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
@@ -290,7 +290,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
     /* (non-Javadoc)
      * @see java.util.List#subList(int, int)
      */
-    public List subList(int fromIndex, int toIndex)
+    public List<E> subList(int fromIndex, int toIndex)
     {
         throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
@@ -346,7 +346,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
     /**
      * Iterator for the elements of the List.
      */
-    private class LazyLoadListIterator implements ListIterator
+    private class LazyLoadListIterator implements ListIterator<E>
     {
         private int iteratorIndex = 0; // The index of the next object
 
@@ -374,7 +374,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
             return iteratorIndex > 0;
         }
 
-        public Object next()
+        public E next()
         {
             if (!isOpen())
             {
@@ -410,7 +410,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
             return size();
         }
 
-        public Object previous()
+        public E previous()
         {
             if (!isOpen())
             {

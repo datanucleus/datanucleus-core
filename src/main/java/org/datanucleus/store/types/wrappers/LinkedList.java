@@ -822,7 +822,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -831,7 +831,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }
@@ -840,7 +840,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @see java.lang.Iterable#forEach(java.util.function.Consumer)
      */
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         delegate.forEach(action);
     }
@@ -849,7 +849,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @see java.util.Iterable#spliterator()
      */
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         return delegate.spliterator();
     }

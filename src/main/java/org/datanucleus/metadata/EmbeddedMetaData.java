@@ -323,7 +323,7 @@ public class EmbeddedMetaData extends MetaData
 
         for (AbstractMemberMetaData mmd : members)
         {
-            Class embMmdClass = embeddedClass;
+            Class<?> embMmdClass = embeddedClass;
             if (!mmd.fieldBelongsToClass())
             {
                 try

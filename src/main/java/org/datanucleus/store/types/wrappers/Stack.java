@@ -294,7 +294,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * Method to retrieve an iterator for the list.
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public synchronized Iterator<E> iterator()
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, -1);
     }
@@ -303,7 +303,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public synchronized ListIterator listIterator()
+    public synchronized ListIterator<E> listIterator()
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, -1);
     }
@@ -313,7 +313,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * @param index The start point 
      * @return The iterator
      **/
-    public synchronized ListIterator listIterator(int index)
+    public synchronized ListIterator<E> listIterator(int index)
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, index);
     }
@@ -856,7 +856,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -865,7 +865,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }
@@ -892,7 +892,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * @see java.lang.Iterable#forEach(java.util.function.Consumer)
      */
     @Override
-    public synchronized void forEach(Consumer action)
+    public synchronized void forEach(Consumer<? super E> action)
     {
         delegate.forEach(action);
     }
@@ -901,7 +901,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * @see java.util.Iterable#spliterator()
      */
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         return delegate.spliterator();
     }

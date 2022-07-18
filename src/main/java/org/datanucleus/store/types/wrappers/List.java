@@ -306,7 +306,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * Accessor for an iterator for the List
      * @return The iterator
      **/
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, -1);
     }
@@ -315,7 +315,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public ListIterator listIterator()
+    public ListIterator<E> listIterator()
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, -1);
     }
@@ -325,7 +325,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param index The start point 
      * @return The iterator
      **/
-    public ListIterator listIterator(int index)
+    public ListIterator<E> listIterator(int index)
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, index);
     }
@@ -768,7 +768,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -777,7 +777,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }
@@ -786,7 +786,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @see java.lang.Iterable#forEach(java.util.function.Consumer)
      */
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         delegate.forEach(action);
     }

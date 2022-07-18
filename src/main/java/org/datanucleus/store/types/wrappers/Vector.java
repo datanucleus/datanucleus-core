@@ -380,7 +380,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public synchronized ListIterator listIterator()
+    public synchronized ListIterator<E> listIterator()
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, -1);
     }
@@ -390,7 +390,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * @param index The start point 
      * @return The iterator
      **/
-    public synchronized ListIterator listIterator(int index)
+    public synchronized ListIterator<E> listIterator(int index)
     {
         return new SCOListIterator(this, ownerSM, delegate, null, true, index);
     }
@@ -881,7 +881,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * @see java.util.Collection#stream()
      */
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         return delegate.stream();
     }
@@ -890,7 +890,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * @see java.util.Collection#parallelStream()
      */
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         return delegate.parallelStream();
     }
@@ -926,7 +926,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * @see java.util.Iterable#spliterator()
      */
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         return delegate.spliterator();
     }

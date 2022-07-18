@@ -1077,7 +1077,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     }
 
     @Override
-    public Spliterator spliterator()
+    public Spliterator<E> spliterator()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -1088,7 +1088,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     }
 
     @Override
-    public Stream stream()
+    public Stream<E> stream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {
@@ -1099,7 +1099,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     }
 
     @Override
-    public Stream parallelStream()
+    public Stream<E> parallelStream()
     {
         if (backingStore != null && useCache && !isCacheLoaded)
         {

@@ -52,7 +52,7 @@ import org.datanucleus.util.StringUtils;
  * This class is extended for fields (FieldMetaData) and properties (PropertyMetaData) to provide
  * the explicit support for those components.
  */
-public abstract class AbstractMemberMetaData extends MetaData implements Comparable, ColumnMetaDataContainer
+public abstract class AbstractMemberMetaData extends MetaData implements Comparable<AbstractMemberMetaData>, ColumnMetaDataContainer
 {
     private static final long serialVersionUID = -7689828287704042919L;
 
@@ -194,7 +194,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     protected String fullFieldName = null;
 
     /** Field type being represented. */
-    protected Class type;
+    protected Class<?> type;
 
     /** The member (field/method) being represented here. Note, this prevents Serialization. */
     protected Member memberRepresented;
@@ -448,7 +448,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 }
             }
 
-            Class fieldClass = null;
+            Class<?> fieldClass = null;
             try
             {
                 fieldClass = clr.classForName(className);
@@ -2787,10 +2787,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                                 }
                                 if (elementType != null)
                                 {
-                                    Class elementCls = clr.classForName(elementType);
+                                    Class<?> elementCls = clr.classForName(elementType);
                                     if (elementCls.isInterface())
                                     {
-                                        Class thisCls = clr.classForName(getClassName(true));
+                                        Class<?> thisCls = clr.classForName(getClassName(true));
                                         if (elementCls.isAssignableFrom(thisCls))
                                         {
                                             relatedFields.add(otherFmd);
@@ -2811,8 +2811,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                         else
                         {
                             // 1-1, 1-N
-                            Class cls = clr.classForName(getClassName(true));
-                            if (otherFmd.getType().isAssignableFrom(cls) || cls.isAssignableFrom(otherFmd.getType()))
+                            Class<?> cls = clr.classForName(getClassName(true));
+                            Class<?> otherType = otherFmd.getType();
+                            if (otherType.isAssignableFrom(cls) || cls.isAssignableFrom(otherType))
                             {
                                 // Consistent 1-1, 1-N types (allow subclasses of the defined types)
                                 relatedFields.add(otherFmd);
@@ -3004,10 +3005,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             if (relationType == RelationType.ONE_TO_ONE_BI)
             {
                 AbstractMemberMetaData relMmd = relatedMemberMetaData[i];
-                Class relatedType = relMmd.isSingleCollection() ? clr.classForName(relMmd.getCollection().getElementType()) : relMmd.getType();
-                Class type = isSingleCollection() ? clr.classForName(getCollection().getElementType()) : getType(); 
-                if (relatedType.isAssignableFrom(thisPC.getClass()) &&
-                    type.isAssignableFrom(otherPC.getClass()))
+                Class<?> relatedType = relMmd.isSingleCollection() ? clr.classForName(relMmd.getCollection().getElementType()) : relMmd.getType();
+                Class<?> type = isSingleCollection() ? clr.classForName(getCollection().getElementType()) : getType(); 
+                if (relatedType.isAssignableFrom(thisPC.getClass()) && type.isAssignableFrom(otherPC.getClass()))
                 {
                     return relatedMemberMetaData[i];
                 }
@@ -3015,26 +3015,24 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             else if (relationType == RelationType.MANY_TO_ONE_BI)
             {
                 // Just allow for Collections
+                Class<?> thisType = getType();
                 if (relatedMemberMetaData[i].hasCollection())
                 {
-                    Class elementType = clr.classForName(relatedMemberMetaData[i].getCollection().getElementType());
-                    if (elementType.isAssignableFrom(thisPC.getClass()) &&
-                        getType().isAssignableFrom(otherPC.getClass()))
+                    Class<?> elementType = clr.classForName(relatedMemberMetaData[i].getCollection().getElementType());
+                    if (elementType.isAssignableFrom(thisPC.getClass()) && thisType.isAssignableFrom(otherPC.getClass()))
                     {
                         return relatedMemberMetaData[i];
                     }
                 }
                 else if (relatedMemberMetaData[i].hasMap())
                 {
-                    Class valueType = clr.classForName(relatedMemberMetaData[i].getMap().getValueType());
-                    if (valueType.isAssignableFrom(thisPC.getClass()) &&
-                        getType().isAssignableFrom(otherPC.getClass()))
+                    Class<?> valueType = clr.classForName(relatedMemberMetaData[i].getMap().getValueType());
+                    if (valueType.isAssignableFrom(thisPC.getClass()) && thisType.isAssignableFrom(otherPC.getClass()))
                     {
                         return relatedMemberMetaData[i];
                     }
-                    Class keyType = clr.classForName(relatedMemberMetaData[i].getMap().getKeyType());
-                    if (keyType.isAssignableFrom(thisPC.getClass()) &&
-                        getType().isAssignableFrom(otherPC.getClass()))
+                    Class<?> keyType = clr.classForName(relatedMemberMetaData[i].getMap().getKeyType());
+                    if (keyType.isAssignableFrom(thisPC.getClass()) && thisType.isAssignableFrom(otherPC.getClass()))
                     {
                         return relatedMemberMetaData[i];
                     }
@@ -3191,17 +3189,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     /**
      * Comparator method. This allows the ClassMetaData to search for an AbstractMemberMetaData with a particular name.
-     * @param o The object to compare against
+     * @param other The object to compare against
      * @return The comparison result
      */ 
-    public int compareTo(Object o)
+    public int compareTo(AbstractMemberMetaData other)
     {
-        if (o instanceof AbstractMemberMetaData)
-        {
-            // TODO Currently only uses the name since we only use sorting from ClassMetaData; maybe an idea to use the className also (see equals/hashCode).
-            AbstractMemberMetaData c = (AbstractMemberMetaData)o;
-            return this.name.compareTo(c.name);
-        }
-        throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
+        // TODO Currently only uses the name since we only use sorting from ClassMetaData; maybe an idea to use the className also (see equals/hashCode).
+        return this.name.compareTo(other.name);
     }
 }

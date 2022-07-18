@@ -311,7 +311,7 @@ public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap
      * Accessor for the set of keys in the Map.
      * @return Set of keys.
      **/
-    public java.util.Set keySet()
+    public java.util.Set<K> keySet()
     {
         return delegate.keySet();
     }
@@ -329,7 +329,7 @@ public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap
      * Accessor for the set of values in the Map.
      * @return Set of values.
      **/
-    public Collection values()
+    public Collection<V> values()
     {
         return delegate.values();
     }

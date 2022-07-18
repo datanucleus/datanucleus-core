@@ -377,8 +377,9 @@ public class FetchPlan implements Serializable
         Collection<FetchPlanForClass> fpClasses = fetchPlansByClassName.values();
         for (FetchPlanForClass fpClass : fpClasses)
         {
-            Class cls = clr.classForName(fpClass.cmd.getFullClassName());
-            if (cls.isAssignableFrom(group.getType()) || group.getType().isAssignableFrom(cls))
+            Class<?> cls = clr.classForName(fpClass.cmd.getFullClassName());
+            Class<?> groupType = group.getType();
+            if (cls.isAssignableFrom(group.getType()) || groupType.isAssignableFrom(cls))
             {
                 // Mark all potentially related fetch plans dirty so they recalculate
                 fpClass.markDirty();
