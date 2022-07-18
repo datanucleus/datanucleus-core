@@ -21,7 +21,7 @@ public class SCOUtilsTest extends TestCase
      */
     public void testToArrayCollectionStoreStateManager()
     {
-        java.util.List elm = new java.util.ArrayList();
+        java.util.List<String> elm = new java.util.ArrayList<>();
         elm.add("TEST1");
         elm.add("TEST2");
         String[] arr = (String[]) SCOUtils.toArray(new BackingStore(elm),null,new String[2]);
@@ -34,7 +34,7 @@ public class SCOUtilsTest extends TestCase
      */
     public void testToArrayCollectionStoreStateManagerObjectArray()
     {
-        java.util.List elm = new java.util.ArrayList();
+        java.util.List<String> elm = new java.util.ArrayList<>();
         elm.add("TEST1");
         elm.add("TEST2");
         Object[] arr = SCOUtils.toArray(new BackingStore(elm),null);

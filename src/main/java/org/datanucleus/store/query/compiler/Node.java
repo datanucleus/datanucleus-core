@@ -72,6 +72,15 @@ public class Node
         return nodeValue;
     }
 
+    public String getNodeValueAsString()
+    {
+        if (nodeValue == null)
+        {
+            return null;
+        }
+        return nodeValue.toString();
+    }
+
     public boolean hasProperties()
     {
         return properties != null;

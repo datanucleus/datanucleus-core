@@ -48,7 +48,7 @@ public class SCOListIteratorTest extends TestCase
         List<String> sco = new ArrayList<String>();
         sco.addAll(list);
 
-        SCOListIterator iter = new SCOListIterator(sco, null, list, null, true, 0);
+        SCOListIterator<String> iter = new SCOListIterator<>(sco, null, list, null, true, 0);
 
         assertTrue("hasNext returns false!", iter.hasNext());
         try
@@ -100,7 +100,7 @@ public class SCOListIteratorTest extends TestCase
         List<String> sco = new ArrayList<String>();
         sco.addAll(list);
 
-        SCOListIterator iter = new SCOListIterator(sco, null, list, null, true, -1);
+        SCOListIterator<String> iter = new SCOListIterator<>(sco, null, list, null, true, -1);
 
         assertTrue("hasNext returns false!", iter.hasNext());
         try
@@ -150,7 +150,7 @@ public class SCOListIteratorTest extends TestCase
         List<String> sco = new ArrayList<String>();
         sco.addAll(list);
 
-        SCOListIterator iter = new SCOListIterator(sco, null, list, null, true, 0);
+        SCOListIterator<String> iter = new SCOListIterator<>(sco, null, list, null, true, 0);
 
         try
         {

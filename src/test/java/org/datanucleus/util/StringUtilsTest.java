@@ -133,7 +133,7 @@ public class StringUtilsTest extends TestCase
      */
     public void testCollectionToString()
     {
-        Collection coll=new ArrayList();
+        Collection<String> coll=new ArrayList<>();
         coll.add("JPOX version 1.0");
         coll.add("JPOX version 1.1.0-alpha-3");
         coll.add("BCEL version 5.1");

@@ -19,11 +19,11 @@ public abstract class ReferenceValueMapTestCase extends TestCase
         super(name);
     }
 
-    protected abstract Map newReferenceValueMap();
+    protected abstract Map<String, Object> newReferenceValueMap();
 
     public void testMemoryReclamation()
     {
-        Map map = newReferenceValueMap();
+        Map<String, Object> map = newReferenceValueMap();
         Runtime rt = Runtime.getRuntime();
 
         rt.gc();
@@ -52,7 +52,7 @@ public abstract class ReferenceValueMapTestCase extends TestCase
 
     public void testBasicFunction()
     {
-        Map map = newReferenceValueMap();
+        Map<String, Object> map = newReferenceValueMap();
         String[] keyArray = new String[NUM_TEST_ENTRIES];
         Integer[] valueArray = new Integer[NUM_TEST_ENTRIES];
 
@@ -65,7 +65,7 @@ public abstract class ReferenceValueMapTestCase extends TestCase
         }
         checkMapContents(map, keyArray, valueArray);
 
-        Map map2 = newReferenceValueMap();
+        Map<String, Object> map2 = newReferenceValueMap();
         map2.putAll(map);
         map.clear();
         assertEquals(0, map.size());
@@ -86,7 +86,7 @@ public abstract class ReferenceValueMapTestCase extends TestCase
     /**
      * Tests Map.get(), Map.containsKey(), Map.containsValue(), Map.entrySet(), Map.keySet(), Map.values()
      */
-    protected void checkMapContents(Map map, String[] keyArray, Integer[] valueArray)
+    protected void checkMapContents(Map<String, Object> map, String[] keyArray, Integer[] valueArray)
     {
         assertEquals(keyArray.length, map.size());
 

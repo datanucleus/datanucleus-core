@@ -71,8 +71,8 @@ public class ExpressionCompiler
             Node nameNode = node.getFirstChild();
             if (node.getChildNodes().size() > 1)
             {
-                String node1Value = (String)node.getNextChild().getNodeValue();
-                String node2Value = node.hasNextChild() ? (String)node.getNextChild().getNodeValue() : null;
+                String node1Value = node.getNextChild().getNodeValueAsString();
+                String node2Value = node.hasNextChild() ? node.getNextChild().getNodeValueAsString() : null;
                 String ordering = null;
                 String nullOrdering = null;
                 if (node1Value.equalsIgnoreCase("ascending") || node1Value.equalsIgnoreCase("descending"))
@@ -109,10 +109,10 @@ public class ExpressionCompiler
         {
             Node aliasNode = node.getFirstChild();
 
-            ClassExpression clsExpr = new ClassExpression((String)aliasNode.getNodeValue());
+            ClassExpression clsExpr = new ClassExpression(aliasNode.getNodeValueAsString());
             if (classIsExpression)
             {
-                clsExpr.setCandidateExpression((String)node.getNodeValue());
+                clsExpr.setCandidateExpression(node.getNodeValueAsString());
             }
 
             // Process any joins, chained down off the ClassExpression
@@ -125,7 +125,7 @@ public class ExpressionCompiler
                 Node childNode = (Node)childIter.next();
                 if (childNode.getNodeType() == NodeType.OPERATOR)
                 {
-                    String joinType = (String)childNode.getNodeValue();
+                    String joinType = childNode.getNodeValueAsString();
                     JoinType joinTypeId = JoinType.JOIN_INNER;
                     if (joinType.equals(JavaQueryCompiler.JOIN_INNER_FETCH))
                     {
@@ -152,7 +152,7 @@ public class ExpressionCompiler
                     Expression joinedExpr = compilePrimaryExpression(joinedNode);
 
                     Node joinedAliasNode = childNode.getNextChild();
-                    JoinExpression joinExpr = new JoinExpression(joinedExpr, (String)joinedAliasNode.getNodeValue(), joinTypeId);
+                    JoinExpression joinExpr = new JoinExpression(joinedExpr, joinedAliasNode.getNodeValueAsString(), joinTypeId);
                     if (currentJoinExpr != null)
                     {
                         currentJoinExpr.setJoinExpression(joinExpr);
@@ -295,7 +295,7 @@ public class ExpressionCompiler
                     Node valueNode = childNodeIter.next();
                     if (valueNode.getNodeType() == NodeType.IDENTIFIER)
                     {
-                        String value = (String)valueNode.getNodeValue();
+                        String value = valueNode.getNodeValueAsString();
                         collValues.add(value);
                     }
                 }
@@ -403,7 +403,7 @@ public class ExpressionCompiler
                 throw new QueryCompilerSyntaxException("Dont support compilation of " + node);
             }
             Expression currentExpr = compileExpression(currentNode);
-            String methodName = (String)invokeNode.getNodeValue();
+            String methodName = invokeNode.getNodeValueAsString();
             List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(invokeNode);
             Expression invokeExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
             return invokeExpr;
@@ -411,18 +411,18 @@ public class ExpressionCompiler
         else if (node.getNodeType() == NodeType.IDENTIFIER)
         {
             Node currentNode = node;
-            List tupple = new ArrayList();
+            List<String> tupple = new ArrayList<>();
             Expression currentExpr = null;
             while (currentNode != null)
             {
-                tupple.add(currentNode.getNodeValue());
+                tupple.add(currentNode.getNodeValueAsString());
 
                 if (currentNode.getNodeType() == NodeType.INVOKE)
                 {
                     if (currentExpr == null && tupple.size() > 1)
                     {
                         // Check for starting with parameter/variable
-                        String first = (String)tupple.get(0);
+                        String first = tupple.get(0);
                         Symbol firstSym = symtbl.getSymbol(first);
                         if (firstSym != null)
                         {
@@ -453,7 +453,7 @@ public class ExpressionCompiler
                         currentExpr = new PrimaryExpression(currentExpr, tupple.subList(0, tupple.size()-1));
                     }
 
-                    String methodName = (String)tupple.get(tupple.size()-1);
+                    String methodName = tupple.get(tupple.size()-1);
                     if (currentExpr instanceof PrimaryExpression)
                     {
                         // Check if this is a defined method prefix, and if so use the alias
@@ -469,7 +469,7 @@ public class ExpressionCompiler
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
 
                     currentNode = currentNode.getFirstChild();
-                    tupple = new ArrayList();
+                    tupple = new ArrayList<>();
                 }
                 else if (currentNode.getNodeType() == NodeType.CAST)
                 {
@@ -497,11 +497,11 @@ public class ExpressionCompiler
                         }
                     }
 
-                    String className = (String)tupple.get(tupple.size()-1);
+                    String className = tupple.get(tupple.size()-1);
                     currentExpr = new DyadicExpression(currentExpr, Expression.OP_CAST, new Literal(className));
 
                     currentNode = currentNode.getFirstChild();
-                    tupple = new ArrayList();
+                    tupple = new ArrayList<>();
                 }
                 else
                 {
@@ -519,7 +519,7 @@ public class ExpressionCompiler
             if (currentExpr == null)
             {
                 // Find type of first of tupples
-                String first = (String)tupple.get(0);
+                String first = tupple.get(0);
                 Symbol firstSym = symtbl.getSymbol(first);
                 if (firstSym != null)
                 {
@@ -569,14 +569,12 @@ public class ExpressionCompiler
             if (val instanceof Integer)
             {
                 // Positional parameter TODO Store as Integer to avoid confusion
-                currentExpr = new ParameterExpression("" + node.getNodeValue(),
-                    ((ParameterNode)node).getPosition());
+                currentExpr = new ParameterExpression("" + node.getNodeValue(), ((ParameterNode)node).getPosition());
             }
             else
             {
                 // Named parameter
-                currentExpr = new ParameterExpression((String)node.getNodeValue(),
-                    ((ParameterNode)node).getPosition());
+                currentExpr = new ParameterExpression(node.getNodeValueAsString(), ((ParameterNode)node).getPosition());
             }
 
             Node childNode = node.getFirstChild();
@@ -584,14 +582,14 @@ public class ExpressionCompiler
             {
                 if (childNode.getNodeType() == NodeType.INVOKE)
                 {
-                    String methodName = (String)childNode.getNodeValue();
+                    String methodName = childNode.getNodeValueAsString();
                     List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(childNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
                 }
                 else if (childNode.getNodeType() == NodeType.IDENTIFIER)
                 {
                     String identifier = childNode.getNodeId();
-                    List<String> tuples = new ArrayList();
+                    List<String> tuples = new ArrayList<>();
                     tuples.add(identifier);
                     boolean moreIdentifierNodes = true;
                     while (moreIdentifierNodes)
@@ -622,7 +620,7 @@ public class ExpressionCompiler
         else if (node.getNodeType() == NodeType.INVOKE)
         {
             Node currentNode = node;
-            List tupple = new ArrayList();
+            List tupple = new ArrayList<>();
             Expression currentExpr = null;
             while (currentNode != null)
             {
@@ -638,7 +636,7 @@ public class ExpressionCompiler
                     if (currentNode != null)
                     {
                         // Continue on along the chain
-                        tupple = new ArrayList();
+                        tupple = new ArrayList<>();
                         tupple.add(currentExpr); // Start from this expression
                     }
                 }
@@ -648,16 +646,17 @@ public class ExpressionCompiler
                     currentNode = currentNode.getFirstChild();
                 }
             }
+            // TODO We dont use the tupple variable here!
             return currentExpr;
         }
         else if (node.getNodeType() == NodeType.CREATOR)
         {
             Node currentNode = node.getFirstChild();
-            List tupple = new ArrayList();
+            List<String> tupple = new ArrayList<>();
             boolean method = false;
             while (currentNode != null)
             {
-                tupple.add(currentNode.getNodeValue());
+                tupple.add(currentNode.getNodeValueAsString());
                 if (currentNode.getNodeType() == NodeType.INVOKE)
                 {
                     method = true;
@@ -672,7 +671,7 @@ public class ExpressionCompiler
                 // Extract aliases of parameters if specified, and apply to compiled expressions
                 if (currentNode.hasProperties())
                 {
-                    parameterExprs = new ArrayList();
+                    parameterExprs = new ArrayList<>();
                     List<Node> paramNodes = currentNode.getProperties();
                     for (Node paramNode : paramNodes)
                     {
@@ -683,7 +682,7 @@ public class ExpressionCompiler
                             Node paramLastChild = paramChildNodes.get(paramChildNodes.size()-1);
                             if (paramLastChild.getNodeType() == NodeType.NAME)
                             {
-                                paramAlias = (String) paramLastChild.getNodeValue();
+                                paramAlias = paramLastChild.getNodeValueAsString();
                                 paramChildNodes.remove(paramChildNodes.size()-1);
                             }
                         }
@@ -702,18 +701,18 @@ public class ExpressionCompiler
             }
             else
             {
-                parameterExprs = new ArrayList();
+                parameterExprs = new ArrayList<>();
             }
             return new CreatorExpression(tupple, parameterExprs);
         }
         else if (node.getNodeType() == NodeType.LITERAL)
         {
             Node currentNode = node;
-            List tupple = new ArrayList();
+            List<String> tupple = new ArrayList<>();
             Expression currentExpr = null;
             while (currentNode != null)
             {
-                tupple.add(currentNode.getNodeValue());
+                tupple.add(currentNode.getNodeValueAsString());
 
                 if (currentNode.getNodeType() == NodeType.INVOKE)
                 {
@@ -723,12 +722,12 @@ public class ExpressionCompiler
                         currentExpr = new Literal(node.getNodeValue());
                     }
 
-                    String methodName = (String)tupple.get(tupple.size()-1);
+                    String methodName = tupple.get(tupple.size()-1);
                     List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
 
                     currentNode = currentNode.getFirstChild();
-                    tupple = new ArrayList();
+                    tupple = new ArrayList<>();
                 }
                 else
                 {
@@ -789,10 +788,10 @@ public class ExpressionCompiler
             }
             currentNode = currentNode.getFirstChild();
 
-            List tupple = new ArrayList();
+            List<String> tupple = new ArrayList<>();
             while (currentNode != null)
             {
-                tupple.add(currentNode.getNodeValue());
+                tupple.add(currentNode.getNodeValueAsString());
 
                 if (currentNode.getNodeType() == NodeType.INVOKE)
                 {
@@ -802,12 +801,12 @@ public class ExpressionCompiler
                         currentExpr = new Literal(node.getNodeValue());
                     }
 
-                    String methodName = (String)tupple.get(tupple.size()-1);
+                    String methodName = tupple.get(tupple.size()-1);
                     List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
 
                     currentNode = currentNode.getFirstChild();
-                    tupple = new ArrayList();
+                    tupple = new ArrayList<>();
                 }
                 else
                 {
@@ -826,7 +825,7 @@ public class ExpressionCompiler
             }
             Node varNode = children.get(0);
             VariableExpression subqueryExpr = new VariableExpression(varNode.getNodeId());
-            Expression currentExpr = new SubqueryExpression((String)node.getNodeValue(), subqueryExpr);
+            Expression currentExpr = new SubqueryExpression(node.getNodeValueAsString(), subqueryExpr);
             return currentExpr;
         }
         else if (node.getNodeType() == NodeType.CASE)
@@ -879,7 +878,7 @@ public class ExpressionCompiler
     {
         if (node.hasProperties())
         {
-            List<Expression> parameterExprs = new ArrayList();
+            List<Expression> parameterExprs = new ArrayList<>();
             List propNodes = node.getProperties();
             for (int i=0;i<propNodes.size();i++)
             {

@@ -279,7 +279,7 @@ public class TypeManagerTest extends TestCase
     /**
      * Only used for testing whether subclasses are supported 
      */
-    class TestOnlyList extends java.util.ArrayList
+    class TestOnlyList extends java.util.ArrayList<Object>
     {
         private static final long serialVersionUID = 197823989232L;
         public TestOnlyList()
@@ -290,7 +290,7 @@ public class TypeManagerTest extends TestCase
         {
             super(initialCapacity);
         }
-        public TestOnlyList(Collection c)
+        public TestOnlyList(Collection<Object> c)
         {
             super(c);
         }

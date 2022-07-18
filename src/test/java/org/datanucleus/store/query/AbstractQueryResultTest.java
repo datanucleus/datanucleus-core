@@ -11,9 +11,10 @@ import java.util.ListIterator;
 /**
  * Test case for AbstractQueryResult
  */
+@SuppressWarnings("unchecked") // To avoid lint unchecked warnings about toArray
 public class AbstractQueryResultTest extends TestCase
 {
-    List list = new AbstractQueryResultImpl(null);
+    List<Integer> list = new AbstractQueryResultImpl(null);
 
     Integer i10 = Integer.valueOf(10);
 
@@ -79,10 +80,10 @@ public class AbstractQueryResultTest extends TestCase
     /**
      * test implementation
      */
-    public static class AbstractQueryResultImpl extends AbstractQueryResult
+    public static class AbstractQueryResultImpl extends AbstractQueryResult<Integer>
     {
         private static final long serialVersionUID = 1765660364615061258L;
-        private ArrayList list = new ArrayList();
+        private List<Integer> list = new ArrayList<>();
 
         public AbstractQueryResultImpl(Query query)
         {
@@ -97,7 +98,7 @@ public class AbstractQueryResultTest extends TestCase
         {
         }
 
-        public boolean add(Object o)
+        public boolean add(Integer o)
         {
             return list.add(o);
         }
@@ -107,17 +108,17 @@ public class AbstractQueryResultTest extends TestCase
             return this == o;
         }
 
-        public Object get(int index)
+        public Integer get(int index)
         {
             return list.get(index);
         }
 
-        public Iterator iterator()
+        public Iterator<Integer> iterator()
         {
             return list.iterator();
         }
 
-        public ListIterator listIterator()
+        public ListIterator<Integer> listIterator()
         {
             return list.listIterator();
         }

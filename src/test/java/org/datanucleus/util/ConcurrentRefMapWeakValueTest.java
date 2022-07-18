@@ -31,8 +31,8 @@ public class ConcurrentRefMapWeakValueTest extends ReferenceValueMapTestCase
         super(name);
     }
 
-    protected Map newReferenceValueMap()
+    protected Map<String, Object> newReferenceValueMap()
     {
-        return new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+        return new ConcurrentReferenceHashMap<String, Object>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     }
 }
