@@ -192,6 +192,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      * @deprecated As of JDK version 1.1,
      * replaced by <code>Calendar.set(Calendar.YEAR, year + 1900)</code>.
      */
+    @Deprecated
     public void setYear(int year)
     {
         super.setYear(year);
@@ -212,6 +213,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      * @deprecated As of JDK version 1.1,
      * replaced by <code>Calendar.set(Calendar.MONTH, int month)</code>.
      */
+    @Deprecated
     public void setMonth(int month)
     {
         super.setMonth(month);
@@ -233,6 +235,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      * @deprecated As of JDK version 1.1,
      * replaced by <code>Calendar.set(Calendar.DAY_OF_MONTH, int date)</code>.
      */
+    @Deprecated
     public void setDate(int date)
     {
         super.setDate(date);
@@ -251,6 +254,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      * @deprecated As of JDK version 1.1,
      * replaced by <code>Calendar.set(Calendar.HOUR_OF_DAY, int hours)</code>.
      */
+    @Deprecated
     public void setHours(int hours)
     {
         super.setHours(hours);
@@ -268,6 +272,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      * @deprecated As of JDK version 1.1,
      * replaced by <code>Calendar.set(Calendar.MINUTE, int minutes)</code>.
      */
+    @Deprecated
     public void setMinutes(int minutes)
     {
         super.setMinutes(minutes);
@@ -285,6 +290,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      * @deprecated As of JDK version 1.1,
      * replaced by <code>Calendar.set(Calendar.SECOND, int seconds)</code>. 
      */
+    @Deprecated
     public void setSeconds(int seconds)
     {
         super.setSeconds(seconds);

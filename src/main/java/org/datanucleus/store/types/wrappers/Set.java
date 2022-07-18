@@ -66,15 +66,15 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
         initialise(newValue);
     }
 
-    public void initialise(java.util.Set c)
+    public void initialise(java.util.Set<E> c)
     {
         if (c != null)
         {
-            delegate = new java.util.HashSet(c); // Make copy of container rather than using same memory
+            delegate = new java.util.HashSet<>(c); // Make copy of container rather than using same memory
         }
         else
         {
-            delegate = new java.util.HashSet();
+            delegate = new java.util.HashSet<>();
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
@@ -185,9 +185,9 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param state State for detachment process
      * @return The detached container
      */
-    public java.util.Set detachCopy(FetchPlanState state)
+    public java.util.Set<E> detachCopy(FetchPlanState state)
     {
-        java.util.Set detached = new java.util.HashSet();
+        java.util.Set<E> detached = new java.util.HashSet<>();
         SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
@@ -199,7 +199,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * value are attached.
      * @param value The new (collection) value
      */
-    public void attachCopy(java.util.Set value)
+    public void attachCopy(java.util.Set<E> value)
     {
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
         SCOUtils.attachCopyElements(ownerSM, this, value, elementsWithoutIdentity);
@@ -243,7 +243,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection<?> c)
     {
         return delegate.containsAll(c);
     }
@@ -282,7 +282,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      **/
     public Iterator<E> iterator()
     {
-        return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
+        return new SCOCollectionIterator<>(this, ownerSM, delegate, null, true);
     }
 
     /**
@@ -330,7 +330,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
             if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
@@ -363,7 +363,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
             {
                 for (Object element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }
             }
             makeDirty();
@@ -399,7 +399,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -452,7 +452,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
@@ -478,7 +478,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param elements The collection to remove
      * @return Whether they were removed successfully.
      */
-    public boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection<?> elements)
     {
         if (elements == null)
         {
@@ -509,7 +509,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
                 // Queue the cascade delete
                 for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -540,13 +540,13 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection<?> c)
     {
         if (c == null)
         {
             throw new NullPointerException("Input collection was null");
         }
-        Collection collToRemove = new java.util.HashSet();
+        Collection<Object> collToRemove = new java.util.HashSet<>();
         for (Object o : delegate)
         {
             if (!c.contains(o))
@@ -564,7 +564,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
                 // Queue any cascade delete
                 for (Object elem : collToRemove)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -598,7 +598,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      */
     protected Object writeReplace() throws ObjectStreamException
     {
-        return new java.util.HashSet(delegate);
+        return new java.util.HashSet<>(delegate);
     }
 
     /* (non-Javadoc)

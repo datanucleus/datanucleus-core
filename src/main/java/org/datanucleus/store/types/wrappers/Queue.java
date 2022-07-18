@@ -64,7 +64,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         initialise(newValue);
     }
 
-    public void initialise(java.util.Queue c)
+    public void initialise(java.util.Queue<E> c)
     {
         if (c != null)
         {
@@ -92,14 +92,14 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      */
     protected void initialiseDelegate()
     {
-        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
+        Comparator<E> comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
-            this.delegate = new java.util.PriorityQueue(5, comparator);
+            this.delegate = new java.util.PriorityQueue<>(5, comparator);
         }
         else
         {
-            this.delegate = new java.util.PriorityQueue();
+            this.delegate = new java.util.PriorityQueue<>();
         }
     }
 
@@ -200,9 +200,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param state State for detachment process
      * @return The detached container
      */
-    public java.util.Queue detachCopy(FetchPlanState state)
+    public java.util.Queue<E> detachCopy(FetchPlanState state)
     {
-        java.util.Queue detached = new java.util.PriorityQueue();
+        java.util.Queue<E> detached = new java.util.PriorityQueue<>();
         SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
@@ -214,7 +214,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * value are attached.
      * @param value The new (collection) value
      */
-    public void attachCopy(java.util.Queue value)
+    public void attachCopy(java.util.Queue<E> value)
     {
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
         SCOUtils.attachCopyElements(ownerSM, this, value, elementsWithoutIdentity);
@@ -297,9 +297,9 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
-        return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
+        return new SCOCollectionIterator<>(this, ownerSM, delegate, null, true);
     }
 
     /**
@@ -351,7 +351,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
             if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
@@ -367,16 +367,24 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
      */
-    public boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
+        if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
+        {
+            // Relationship management
+            for (Object elem : elements)
+            {
+                ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationAdd(ownerMmd.getAbsoluteFieldNumber(), elem);
+            }
+        }
         if (success)
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 for (Object element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }
             }
             makeDirty();
@@ -398,17 +406,17 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                java.util.List copy = new java.util.ArrayList(delegate);
-                Iterator iter = copy.iterator();
+                java.util.List<E> copy = new java.util.ArrayList<>(delegate);
+                Iterator<E> iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                java.util.List copy = new java.util.ArrayList(delegate);
-                Iterator iter = copy.iterator();
+                java.util.List<E> copy = new java.util.ArrayList<>(delegate);
+                Iterator<E> iter = copy.iterator();
                 while (iter.hasNext())
                 {
                     ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
@@ -475,7 +483,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
@@ -500,7 +508,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param elements The collection to remove
      * @return Whether they were removed successfully.
      **/
-    public boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection<?> elements)
     {
         if (elements == null)
         {
@@ -518,15 +526,15 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                Iterator iter = elements.iterator();
+                Iterator<?> iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                Iterator iter = elements.iterator();
+                Iterator<?> iter = elements.iterator();
                 while (iter.hasNext())
                 {
                     ownerSM.getExecutionContext().deleteObjectInternal(iter.next());
@@ -551,7 +559,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection<?> c)
     {
         boolean success = delegate.retainAll(c);
         if (success)

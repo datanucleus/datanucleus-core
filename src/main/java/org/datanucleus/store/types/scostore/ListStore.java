@@ -50,7 +50,7 @@ public interface ListStore<E> extends CollectionStore<E>
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether the elements were added ok
      */
-	boolean addAll(DNStateManager ownerSM, Collection<E> c, int index, int size);
+	boolean addAll(DNStateManager ownerSM, Collection<? extends E> c, int index, int size);
 
     /**
      * Method to remove an element from the List.

@@ -97,14 +97,14 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         }
 
         // Set up our delegate, using a suitable comparator
-        Comparator comparator = SCOUtils.getComparator(mmd, sm.getExecutionContext().getClassLoaderResolver());
+        Comparator<E> comparator = SCOUtils.getComparator(mmd, sm.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
-            this.delegate = new java.util.TreeSet(comparator);
+            this.delegate = new java.util.TreeSet<>(comparator);
         }
         else
         {
-            this.delegate = new java.util.TreeSet();
+            this.delegate = new java.util.TreeSet<>();
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -144,7 +144,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
             initialising = true;
             if (useCache)
             {
-                Collection oldColl = (Collection)oldValue;
+                Collection<E> oldColl = (Collection<E>)oldValue;
                 if (oldColl != null)
                 {
                     delegate.addAll(oldColl);
@@ -189,7 +189,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.SortedSet c)
+    public void initialise(java.util.SortedSet<E> c)
     {
         if (c != null)
         {
@@ -197,10 +197,10 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
             if (SCOUtils.collectionHasSerialisedElements(ownerMmd) && ownerMmd.getCollection().elementIsPersistent())
             {
                 ExecutionContext ec = ownerSM.getExecutionContext();
-                Iterator iter = c.iterator();
+                Iterator<E> iter = c.iterator();
                 while (iter.hasNext())
                 {
-                    Object pc = iter.next();
+                    E pc = iter.next();
                     DNStateManager objSM = ec.findStateManager(pc);
                     if (objSM == null)
                     {
@@ -243,7 +243,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.SortedSet getValue()
+    public java.util.SortedSet<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -365,7 +365,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public Comparator comparator()
+    public Comparator<? super E> comparator()
     {
         return delegate.comparator();
     }
@@ -387,7 +387,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection<?> c)
     {
         if (useCache)
         {
@@ -395,8 +395,8 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         }
         else if (backingStore != null)
         {
-            java.util.SortedSet sorted = new java.util.TreeSet(c);
-            Iterator iter=iterator();
+            java.util.SortedSet<?> sorted = new java.util.TreeSet<>(c);
+            Iterator<E> iter = iterator();
             while (iter.hasNext())
             {
                 sorted.remove(iter.next());
@@ -485,11 +485,11 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         {
             loadFromStore();
         }
-        return new SCOCollectionIterator(this, ownerSM, delegate, backingStore, useCache);
+        return new SCOCollectionIterator<>(this, ownerSM, delegate, backingStore, useCache);
     }
 
     @Override
-    public java.util.SortedSet headSet(E toElement)
+    public java.util.SortedSet<E> headSet(E toElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -510,7 +510,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public java.util.SortedSet subSet(E fromElement, E toElement)
+    public java.util.SortedSet<E> subSet(E fromElement, E toElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -531,7 +531,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public java.util.SortedSet tailSet(E fromElement)
+    public java.util.SortedSet<E> tailSet(E fromElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -609,7 +609,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -617,8 +617,8 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
-        }  
+            return (T[])SCOUtils.toArray(backingStore, ownerSM, a);
+        }
         return delegate.toArray(a);
     }
 
@@ -651,7 +651,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, element));
             }
             else
             {
@@ -680,7 +680,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -701,9 +701,9 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : elements)
+                for (E element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, element));
                 }
             }
             else
@@ -829,7 +829,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection<?> elements)
     {
         if (elements == null)
         {
@@ -866,7 +866,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Check which are contained before updating the delegate
-                Collection contained = new java.util.HashSet();
+                Collection<Object> contained = new java.util.HashSet<>();
                 for (Object elem : elements)
                 {
                     if (contains(elem))
@@ -947,11 +947,11 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         if (useCache)
         {
             loadFromStore();
-            return new java.util.TreeSet(delegate);
+            return new java.util.TreeSet<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.TreeSet(delegate);
+        return new java.util.TreeSet<>(delegate);
     }
 
     @Override

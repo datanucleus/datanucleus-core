@@ -445,7 +445,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public synchronized boolean addAll(Collection elements)
+    public synchronized boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -482,7 +482,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public synchronized boolean addAll(int index, Collection elements)
+    public synchronized boolean addAll(int index, Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(index, elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())

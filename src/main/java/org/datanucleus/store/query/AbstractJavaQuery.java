@@ -150,10 +150,10 @@ public abstract class AbstractJavaQuery<T> extends Query<T>
         }
 
         String output = input;
-        Iterator subqueryIter = subqueries.entrySet().iterator();
+        Iterator<Map.Entry<String, Query.SubqueryDefinition>> subqueryIter = subqueries.entrySet().iterator();
         while (subqueryIter.hasNext())
         {
-            Map.Entry<String, SubqueryDefinition> entry = (Map.Entry) subqueryIter.next();
+            Map.Entry<String, SubqueryDefinition> entry = subqueryIter.next();
             SubqueryDefinition subqueryDefinition = entry.getValue();
             AbstractJavaQuery subquery = (AbstractJavaQuery) subqueryDefinition.getQuery();
             output = StringUtils.replaceAll(output, entry.getKey(), "("+subquery.getSingleStringQuery()+")");

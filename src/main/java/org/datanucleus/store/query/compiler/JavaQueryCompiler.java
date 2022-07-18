@@ -155,7 +155,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     {
         if (options == null)
         {
-            options = new HashMap();
+            options = new HashMap<>();
         }
         options.put(name, value);
     }
@@ -163,10 +163,9 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     /**
      * Method to set the linkage to the parent query.
      * @param parentCompiler Compiler for the parent query
-     * @param paramSubstitutionMap Map of parameters in this subquery and what they are
-     *      in the parent query.
+     * @param paramSubstitutionMap Map of parameters in this subquery and what they are in the parent query.
      */
-    public void setLinkToParentQuery(JavaQueryCompiler parentCompiler, Map paramSubstitutionMap)
+    public void setLinkToParentQuery(JavaQueryCompiler parentCompiler, Map<Object, String> paramSubstitutionMap)
     {
         this.parentCompiler = parentCompiler;
         this.parameterSubtitutionMap = paramSubstitutionMap;
@@ -178,7 +177,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
      * @param subqueryMap Map of subqueries keyed by the subquery name
      * @return The query compilation
      */
-    public abstract QueryCompilation compile(Map parameters, Map subqueryMap);
+    public abstract QueryCompilation compile(Map parameters, Map<String, Object> subqueryMap);
 
     /**
      * Compile the candidates, variables and parameters.

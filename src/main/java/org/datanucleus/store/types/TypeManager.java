@@ -121,8 +121,9 @@ public interface TypeManager
      * @param instantiatedType Type to instantiate the member as (if known), otherwise falls back to the type from metadata
      * @return The wrapper object of the required type
      * @throws NucleusUserException if an error occurred when creating the SCO instance
+     * @param <T> Type of the object that we are creating a wrapper for
      */
-    SCO createSCOWrapper(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType);
+    <T> SCO<T> createSCOWrapper(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class<T> instantiatedType);
 
     /**
      * Accessor for whether the type is a SCO wrapper itself.

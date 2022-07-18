@@ -66,7 +66,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
         initialise(newValue);
     }
 
-    public void initialise(java.util.SortedSet c)
+    public void initialise(java.util.SortedSet<E> c)
     {
         if (c != null)
         {
@@ -94,14 +94,14 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      */
     protected void initialiseDelegate()
     {
-        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
+        Comparator<E> comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
-            this.delegate = new java.util.TreeSet(comparator);
+            this.delegate = new java.util.TreeSet<>(comparator);
         }
         else
         {
-            this.delegate = new java.util.TreeSet();
+            this.delegate = new java.util.TreeSet<>();
         }
     }
 
@@ -202,30 +202,30 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param state State for detachment process
      * @return The detached container
      */
-    public java.util.SortedSet detachCopy(FetchPlanState state)
+    public java.util.SortedSet<E> detachCopy(FetchPlanState state)
     {
-        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
-        java.util.SortedSet detached = null;
+        Comparator<E> comparator = SCOUtils.getComparator(ownerMmd, ownerSM.getExecutionContext().getClassLoaderResolver());
+        java.util.SortedSet<E> detached = null;
         if (comparator != null)
         {
-            detached = new java.util.TreeSet(comparator);
+            detached = new java.util.TreeSet<>(comparator);
         } 
         else
         {
-            detached = new java.util.TreeSet();
+            detached = new java.util.TreeSet<>();
         }
         SCOUtils.detachCopyForCollection(ownerSM.getExecutionContext(), toArray(), state, detached);
         return detached;
     }
 
     /**
-     * Method to return an attached copy of the passed (detached) value. The returned attached copy
-     * is a SCO wrapper. Goes through the existing elements in the store for this owner field and
-     * removes ones no longer present, and adds new elements. All elements in the (detached)
-     * value are attached.
+     * Method to return an attached copy of the passed (detached) value. 
+     * The returned attached copy is a SCO wrapper. 
+     * Goes through the existing elements in the store for this owner field and removes ones no longer present, and adds new elements. 
+     * All elements in the (detached) value are attached.
      * @param value The new (collection) value
      */
-    public void attachCopy(java.util.SortedSet value)
+    public void attachCopy(java.util.SortedSet<E> value)
     {
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
         SCOUtils.attachCopyElements(ownerSM, this, value, elementsWithoutIdentity);
@@ -256,7 +256,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * Accessor for the comparator.
      * @return The comparator
      */
-    public Comparator comparator()
+    public Comparator<? super E> comparator()
     {
         return delegate.comparator();
     }
@@ -276,7 +276,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param c The collection
      * @return Whether it is contained.
      **/
-    public boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection<?> c)
     {
         return delegate.containsAll(c);
     }
@@ -321,10 +321,10 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
     /**
      * Accessor for an iterator for the Set.
      * @return The iterator
-     **/
+     */
     public Iterator<E> iterator()
     {
-        return new SCOCollectionIterator(this, ownerSM, delegate, null, true);
+        return new SCOCollectionIterator<>(this, ownerSM, delegate, null, true);
     }
 
     /**
@@ -386,11 +386,11 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
     }
 
     /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
+     * Method to return the Collection as an array.
+     * @param a The array to write the results to
      * @return The array
-     */
-    public Object[] toArray(Object a[])
+     **/
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }
@@ -412,7 +412,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
             if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
@@ -428,7 +428,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -445,7 +445,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
             {
                 for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem));
                 }
             }
             makeDirty();
@@ -481,7 +481,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -535,7 +535,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Queue the cascade delete
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
@@ -561,7 +561,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param elements The collection of elements to remove 
      * @return Whether it was removed ok.
      **/
-    public boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection<?> elements)
     {
         if (elements == null)
         {
@@ -592,7 +592,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
                 // Queue the cascade delete
                 for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -622,13 +622,13 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection<?> c)
     {
         if (c == null)
         {
             throw new NullPointerException("Input collection was null");
         }
-        Collection collToRemove = new java.util.TreeSet();
+        Collection<Object> collToRemove = new java.util.TreeSet<>();
         for (Object o : delegate)
         {
             if (!c.contains(o))
@@ -646,7 +646,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
                 // Queue any cascade delete
                 for (Object elem : collToRemove)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -680,7 +680,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      */
     protected Object writeReplace() throws ObjectStreamException
     {
-        return new java.util.TreeSet(delegate);
+        return new java.util.TreeSet<>(delegate);
     }
 
     /* (non-Javadoc)

@@ -265,7 +265,7 @@ public class FederatedStoreManager implements StoreManager
         return primaryStoreMgr.getDatastoreDate();
     }
 
-    public Extent getExtent(ExecutionContext ec, Class c, boolean subclasses)
+    public <T> Extent<T> getExtent(ExecutionContext ec, Class<T> c, boolean subclasses)
     {
         return getStoreManagerForClass(c.getName(), ec.getClassLoaderResolver()).getExtent(ec, c, subclasses);
     }
@@ -492,7 +492,7 @@ public class FederatedStoreManager implements StoreManager
         return primaryStoreMgr.supportsValueGenerationStrategy(language);
     }
 
-    public Collection getSupportedOptions()
+    public Collection<String> getSupportedOptions()
     {
         return primaryStoreMgr.getSupportedOptions();
     }

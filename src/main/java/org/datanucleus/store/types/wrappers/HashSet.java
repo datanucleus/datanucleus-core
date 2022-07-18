@@ -323,7 +323,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())

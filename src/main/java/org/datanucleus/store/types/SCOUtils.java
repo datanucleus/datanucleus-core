@@ -69,10 +69,10 @@ public class SCOUtils
      * If the value is null then just returns since we don't wrap nulls.
      * @param ownerSM StateManager of the owner
      * @param memberNumber The member number in the owner
-     * @param value The value for the member (to be unwrapped)
+     * @param value The wrapped value for the member (to be unwrapped)
      * @return The unwrapped member value
      */
-    public static Object unwrapSCOField(DNStateManager ownerSM, int memberNumber, Object value)
+    public static <T> T unwrapSCOField(DNStateManager ownerSM, int memberNumber, SCO<T> value)
     {
         if (value == null)
         {
@@ -85,7 +85,7 @@ public class SCOUtils
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getName()));
         }
 
-        Object unwrappedValue = ((SCO)value).getValue();
+        T unwrappedValue = value.getValue();
         ownerSM.replaceField(memberNumber, unwrappedValue);
         return unwrappedValue;
     }
@@ -103,7 +103,7 @@ public class SCOUtils
      * @param replaceField Whether to replace the field in the owner object with the created value
      * @return The SCO wrapper
      */
-    public static SCO wrapSCOField(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean replaceField)
+    public static <T> SCO<T> wrapSCOField(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType, T value, boolean replaceField)
     {
         if (value != null && value instanceof SCO)
         {
@@ -124,7 +124,7 @@ public class SCOUtils
             // Use declared type of the field to define the wrapper type
             requiredType = mmd.getType();
         }
-        SCO sco = ec.getTypeManager().createSCOWrapper(ownerSM, mmd, requiredType);
+        SCO<T> sco = ec.getTypeManager().createSCOWrapper(ownerSM, mmd, requiredType);
 
         if (replaceField)
         {
@@ -154,6 +154,7 @@ public class SCOUtils
      * @param value The value to initialise the wrapper with (if any)
      * @param replaceFieldIfChanged Whether to replace the member in the object if wrapping the value
      * @return The wrapper (or original value if not wrappable)
+     * TODO Change return type to SCO, Add generics to SCO based on value type
      */
     public static Object wrapSCOField(DNStateManager ownerSM, int memberNumber, Object value, boolean replaceFieldIfChanged)
     {
@@ -219,6 +220,7 @@ public class SCOUtils
      * @param oldValue The previous value that we are replacing with this value
      * @param replaceFieldIfChanged Whether to replace the member in the object if wrapping the value
      * @return The wrapper (or original value if not wrappable)
+     * TODO Change return type to SCO, Add generics to SCO based on value type
      */
     public static Object wrapAndReplaceSCOField(DNStateManager ownerSM, int memberNumber, Object newValue, Object oldValue, boolean replaceFieldIfChanged)
     {

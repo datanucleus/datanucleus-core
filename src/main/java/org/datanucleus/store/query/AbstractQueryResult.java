@@ -296,20 +296,33 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      * @param a The array to copy into. 
      * @return The array.
      */
-    public Object[] toArray(Object[] a)
+    public <T> T[] toArray(T[] a)
     {
+        if (a == null)
+        {
+            throw new NullPointerException();
+        }
+
         int theSize = size();
         if (a.length >= theSize)
         {
             for (int i = 0; i < a.length; i++)
             {
-                a[i] = (i < theSize) ? get(i) : null;
+                if (i >= theSize)
+                {
+                    a[i] = null;
+                }
+                else
+                {
+                    E elem = get(i);
+                    a[i] = (T)elem;
+                }
             }
             return a;
         }
 
         // Collection doesn't fit in the supplied array so allocate new as per Collection.toArray javadoc
-        return toArray();
+        return (T[]) toArray();
     }
 
     /**

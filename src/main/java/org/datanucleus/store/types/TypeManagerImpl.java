@@ -430,16 +430,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
         return false;
     }
 
-    /**
-     * Method to create a new SCO wrapper for member type.
-     * Will find a wrapper suitable for the instantiated type (if provided), otherwise suitable for the member metadata type.
-     * @param ownerSM StateManager for the owning object
-     * @param mmd The MetaData for the related member.
-     * @param instantiatedType Type to instantiate the member as (if known), otherwise falls back to the type from metadata
-     * @return The wrapper object of the required type
-     * @throws NucleusUserException if an error occurred when creating the SCO instance
-     */
-    public SCO createSCOWrapper(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType)
+    @Override
+    public <T> SCO<T> createSCOWrapper(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class<T> instantiatedType)
     {
         String typeName = (instantiatedType != null) ? instantiatedType.getName() : mmd.getTypeName();
 

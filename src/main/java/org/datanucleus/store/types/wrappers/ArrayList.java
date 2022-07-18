@@ -425,7 +425,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param elements The collection
      * @return Whether it was added ok.
      */
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -463,7 +463,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param elements The collection
      * @return Whether it was added ok.
      */
-    public boolean addAll(int index, Collection elements)
+    public boolean addAll(int index, Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(index, elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -631,7 +631,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param elements Collection of elements to remove
      * @return Whether it was successful.
      */
-    public boolean removeAll(Collection elements)
+    public boolean removeAll(Collection<?> elements)
     {
         if (elements == null)
         {
@@ -690,7 +690,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      */
-    public boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection<?> c)
     {
         boolean success = delegate.retainAll(c);
         if (success)

@@ -426,7 +426,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param elements The collection
      * @return Whether it was added ok.
      */
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -463,7 +463,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param index The position to add them
      * @return Whether they were added successfully.
      **/
-    public boolean addAll(int index, Collection elements)
+    public boolean addAll(int index, Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(index, elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())

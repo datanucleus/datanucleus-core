@@ -54,7 +54,7 @@ public class JPQLCompiler extends JavaQueryCompiler
      * @param subqueryMap Map of subquery variables, keyed by the subquery name
      * @return The compiled query
      */
-    public QueryCompilation compile(Map parameters, Map subqueryMap)
+    public QueryCompilation compile(Map parameters, Map<String, Object> subqueryMap)
     {
         parser = new JPQLParser();
         if (options != null && options.containsKey(Query.EXTENSION_JPQL_STRICT))

@@ -421,7 +421,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -554,7 +554,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @param elements The collection of elements to remove 
      * @return Whether it was removed ok.
      **/
-    public boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection<?> elements)
     {
         if (elements == null)
         {
@@ -615,7 +615,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      */
-    public boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection<?> c)
     {
         if (c == null)
         {

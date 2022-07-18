@@ -143,7 +143,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     return ((SCO)value).detachCopy(state);
                 }
 
-                return SCOUtils.detachAsWrapped(sm.getExecutionContext()) ? value : SCOUtils.unwrapSCOField(sm, mmd.getAbsoluteFieldNumber(), value);
+                return SCOUtils.detachAsWrapped(sm.getExecutionContext()) ? value : SCOUtils.unwrapSCOField(sm, mmd.getAbsoluteFieldNumber(), (SCO) value);
             }
         }
         else
@@ -199,7 +199,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 // The container can be already an SCO so unwrap it if necessary
                 if (detachedContainer instanceof SCO)
                 {
-                    detachedContainer = SCOUtils.unwrapSCOField(sm, mmd.getAbsoluteFieldNumber(), detachedContainer);
+                    detachedContainer = SCOUtils.unwrapSCOField(sm, mmd.getAbsoluteFieldNumber(), (SCO) detachedContainer);
                 }
             }
 

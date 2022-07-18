@@ -336,7 +336,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())

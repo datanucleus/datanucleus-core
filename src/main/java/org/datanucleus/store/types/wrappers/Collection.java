@@ -346,7 +346,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
      * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
      **/
-    public boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())

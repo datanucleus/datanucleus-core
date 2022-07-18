@@ -449,7 +449,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
 
         if (SCOUtils.useQueuedUpdate(ownerSM))
         {
-            ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, element));
+            ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, element));
         }
         makeDirty();
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
@@ -475,7 +475,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
             }
             makeDirty();
             if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
@@ -491,7 +491,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public synchronized boolean addAll(Collection elements)
+    public synchronized boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -510,7 +510,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
             {
                 for (Object element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element));
                 }
             }
             makeDirty();
@@ -528,7 +528,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public synchronized boolean addAll(int index, Collection elements)
+    public synchronized boolean addAll(int index, Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(index, elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -548,7 +548,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
                 int pos = index;
                 for (Object element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), pos++, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), pos++, element));
                 }
             }
             makeDirty();
@@ -593,7 +593,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
                 Iterator iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -645,7 +645,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
@@ -683,7 +683,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, element));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {
@@ -734,7 +734,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
             {
                 for (Object elem : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), elem, true));
                 }
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
@@ -821,7 +821,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, prevElement));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation<>(ownerSM, ownerMmd.getAbsoluteFieldNumber(), index, prevElement));
             }
             else if (SCOUtils.hasDependentElement(ownerMmd))
             {

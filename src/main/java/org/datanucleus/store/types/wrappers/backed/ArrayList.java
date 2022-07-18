@@ -605,7 +605,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, backingStore, index, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation<>(ownerSM, backingStore, index, element));
             }
             else
             {
@@ -651,7 +651,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, element));
             }
             else
             {
@@ -680,7 +680,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     }
 
     @Override
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -692,9 +692,9 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : elements)
+                for (E element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, element));
                 }
             }
             else
@@ -724,7 +724,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     }
 
     @Override
-    public boolean addAll(int index, Collection elements)
+    public boolean addAll(int index, Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -737,9 +737,9 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 int pos = index;
-                for (Object element : elements)
+                for (E element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerSM, backingStore, pos++, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new ListAddAtOperation<>(ownerSM, backingStore, pos++, element));
                 }
             }
             else
@@ -893,7 +893,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 backingObject = delegateObject;
-                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerSM, backingStore, index));
+                ownerSM.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation<>(ownerSM, backingStore, index));
             }
             else
             {
@@ -918,7 +918,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     }
 
     @Override
-    public boolean removeAll(Collection elements)
+    public boolean removeAll(Collection<?> elements)
     {
         if (elements == null)
         {
@@ -946,7 +946,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Check which are contained before updating the delegate
-                Collection contained = new java.util.HashSet();
+                Collection contained = new java.util.HashSet<>();
                 for (Object elem : elements)
                 {
                     if (contains(elem))

@@ -429,7 +429,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())
@@ -465,8 +465,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @param index Position to insert the collection.
      * @param elements The collection
      * @return Whether it was added ok.
-     **/
-    public boolean addAll(int index, Collection elements)
+     */
+    public boolean addAll(int index, Collection<? extends E> elements)
     {
         boolean success = delegate.addAll(index, elements);
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations())

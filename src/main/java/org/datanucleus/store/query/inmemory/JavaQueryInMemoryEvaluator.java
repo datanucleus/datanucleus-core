@@ -84,7 +84,7 @@ public abstract class JavaQueryInMemoryEvaluator
      * @param clr ClassLoader resolver
      * @param candidates Candidate objects
      */
-    public JavaQueryInMemoryEvaluator(String language, Query query, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr, Collection candidates)
+    public JavaQueryInMemoryEvaluator(String language, Query query, QueryCompilation compilation, Map<Object, Object> parameterValues, ClassLoaderResolver clr, Collection<Object> candidates)
     {
         this.language = language;
         this.query = query;
@@ -108,7 +108,7 @@ public abstract class JavaQueryInMemoryEvaluator
      * @param outerCandidate The current outer candidate (for use when linking back to outer query)
      * @return The result
      */
-    protected abstract Collection evaluateSubquery(Query subquery, QueryCompilation compilation, Collection candidates, Object outerCandidate);
+    protected abstract Collection<Object> evaluateSubquery(Query subquery, QueryCompilation compilation, Collection candidates, Object outerCandidate);
 
     /**
      * Method to perform the evaluation, applying the query restrictions that are required.
@@ -119,7 +119,7 @@ public abstract class JavaQueryInMemoryEvaluator
      * @param applyRange Whether to apply any range constraint on the results
      * @return The results after evaluation.
      */
-    public Collection execute(boolean applyFilter, boolean applyOrdering, boolean applyResult, boolean applyResultClass, boolean applyRange)
+    public Collection<Object> execute(boolean applyFilter, boolean applyOrdering, boolean applyResult, boolean applyResultClass, boolean applyRange)
     {
         if (!applyFilter && !applyOrdering && !applyResult && !applyResultClass && !applyRange)
         {
@@ -134,7 +134,7 @@ public abstract class JavaQueryInMemoryEvaluator
             if (applyResult && result != null && result.length > 1)
             {
                 // Have result but not returning rows of candidate type so remove dupd candidates
-                Iterator candIter = candidates.iterator();
+                Iterator<Object> candIter = candidates.iterator();
                 while (candIter.hasNext())
                 {
                     Object candidate = candIter.next();
@@ -184,7 +184,7 @@ public abstract class JavaQueryInMemoryEvaluator
         }
 
         // Evaluate filter
-        List<Object> resultSet = new ArrayList(executeCandidates);
+        List<Object> resultSet = new ArrayList<>(executeCandidates);
         Expression filter = compilation.getExprFilter();
         if (applyFilter && filter != null)
         {
@@ -255,7 +255,7 @@ public abstract class JavaQueryInMemoryEvaluator
             if (query.getResultDistinct())
             {
                 List<Object> tmpList = new ArrayList<>();
-                Iterator iter = resultSet.iterator();
+                Iterator<Object> iter = resultSet.iterator();
                 while (iter.hasNext())
                 {
                     Object obj = iter.next();
@@ -284,7 +284,7 @@ public abstract class JavaQueryInMemoryEvaluator
         return resultSet;
     }
 
-    private List handleFilter(List set)
+    private List<Object> handleFilter(List<Object> set)
     {
         Expression filter = compilation.getExprFilter();
         if (filter == null)
@@ -296,7 +296,7 @@ public abstract class JavaQueryInMemoryEvaluator
         state.put(RESULTS_SET, set);
 
         List<Object> result = new ArrayList<>();
-        Iterator it = set.iterator();
+        Iterator<Object> it = set.iterator();
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
             NucleusLogger.QUERY.debug("Evaluating filter for " + set.size() + " candidates");
@@ -392,15 +392,15 @@ public abstract class JavaQueryInMemoryEvaluator
         }
     }
 
-    private List handleRange(List set, long fromIncl, long toExcl)
+    private List<Object> handleRange(List<Object> set, long fromIncl, long toExcl)
     {
         if (toExcl - fromIncl <= 0)
         {
             return Collections.EMPTY_LIST;
         }
 
-        List resultList = new ArrayList<>();
-        Iterator it = set.iterator();
+        List<Object> resultList = new ArrayList<>();
+        Iterator<Object> it = set.iterator();
         // skipping the unnecessary objects
         for (long l = 0; l < fromIncl && it.hasNext(); l++)
         {
@@ -415,7 +415,7 @@ public abstract class JavaQueryInMemoryEvaluator
         return resultList;
     }
 
-    private List sortByGrouping(List<Object> set)
+    private List<Object> sortByGrouping(List<Object> set)
     {
         Object[] o = set.toArray();
         // TODO Shouldn't we handle "having" within this?
@@ -457,7 +457,7 @@ public abstract class JavaQueryInMemoryEvaluator
         return Arrays.asList(o);
     }
 
-    private List ordering(List set)
+    private List<Object> ordering(List<Object> set)
     {
         final Expression[] ordering = compilation.getExprOrdering();
         if (ordering == null)
@@ -476,7 +476,7 @@ public abstract class JavaQueryInMemoryEvaluator
      * @param resultSet The resultSet containing all elements
      * @return A list with aggregated elements
      */
-    private List handleAggregates(List resultSet)
+    private List<Object> handleAggregates(List<Object> resultSet)
     {
         final Expression[] grouping = compilation.getExprGrouping();
         Comparator<Object> c = new Comparator<>()
@@ -504,7 +504,7 @@ public abstract class JavaQueryInMemoryEvaluator
                     }
                     else
                     {
-                        int result = ((Comparable<Object>)a).compareTo(b);
+                        int result = ((Comparable)a).compareTo(b);
                         if (result != 0)
                         {
                             return result;
@@ -606,7 +606,7 @@ public abstract class JavaQueryInMemoryEvaluator
                         }
                         else
                         {
-                            int result = ((Comparable<Object>) a).compareTo(b);
+                            int result = ((Comparable)a).compareTo(b);
                             if (result != 0)
                             {
                                 return result;
@@ -721,7 +721,7 @@ public abstract class JavaQueryInMemoryEvaluator
         return r;
     }
 
-    private Object[] result(List set)
+    private Object[] result(List<Object> set)
     {
         // Store the results set so we can aggregate
         state.put(RESULTS_SET, set);
@@ -746,5 +746,5 @@ public abstract class JavaQueryInMemoryEvaluator
      * @param resultSet The resultSet containing the instances handled by setResult
      * @return The resultSet containing instances of the Class defined by setResultClass
      */
-    abstract Collection mapResultClass(Collection resultSet);
+    abstract Collection<Object> mapResultClass(Collection<Object> resultSet);
 }
