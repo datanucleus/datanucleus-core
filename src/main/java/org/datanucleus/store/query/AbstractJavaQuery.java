@@ -34,7 +34,7 @@ public abstract class AbstractJavaQuery<T> extends Query<T>
     private static final long serialVersionUID = 7429197167814283812L;
 
     /** Collection of candidates for this query. */
-    protected transient Collection candidateCollection = null;
+    protected transient Collection<T> candidateCollection = null;
 
     /** Cached form of the single string form of the query. */
     protected String singleString = null;

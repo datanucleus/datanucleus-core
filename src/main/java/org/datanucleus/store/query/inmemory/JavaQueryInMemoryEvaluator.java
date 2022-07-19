@@ -108,7 +108,7 @@ public abstract class JavaQueryInMemoryEvaluator
      * @param outerCandidate The current outer candidate (for use when linking back to outer query)
      * @return The result
      */
-    protected abstract Collection<Object> evaluateSubquery(Query subquery, QueryCompilation compilation, Collection candidates, Object outerCandidate);
+    protected abstract Collection<Object> evaluateSubquery(Query subquery, QueryCompilation compilation, Collection<Object> candidates, Object outerCandidate);
 
     /**
      * Method to perform the evaluation, applying the query restrictions that are required.

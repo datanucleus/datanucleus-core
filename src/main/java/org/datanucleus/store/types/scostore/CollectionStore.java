@@ -120,5 +120,5 @@ public interface CollectionStore<E> extends Store
      * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    void update(DNStateManager sm, Collection coll);
+    void update(DNStateManager sm, Collection<? extends E> coll);
 }
