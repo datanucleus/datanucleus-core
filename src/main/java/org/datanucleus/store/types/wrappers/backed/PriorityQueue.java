@@ -109,7 +109,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         }
     }
 
-    public void initialise(java.util.PriorityQueue newValue, Object oldValue)
+    public void initialise(java.util.PriorityQueue<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -174,7 +174,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.PriorityQueue c)
+    public void initialise(java.util.PriorityQueue<E> c)
     {
         if (c != null)
         {
@@ -228,7 +228,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.PriorityQueue getValue()
+    public java.util.PriorityQueue<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -417,7 +417,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -493,13 +493,13 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -507,7 +507,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -581,7 +581,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     }
 
     @Override
-    public boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -862,11 +862,11 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         if (useCache)
         {
             loadFromStore();
-            return new java.util.PriorityQueue(delegate);
+            return new java.util.PriorityQueue<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.PriorityQueue(delegate);
+        return new java.util.PriorityQueue<>(delegate);
     }
 
     @Override

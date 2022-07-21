@@ -107,7 +107,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
     }
 
-    public void initialise(java.util.Vector newValue, Object oldValue)
+    public void initialise(java.util.Vector<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -172,7 +172,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.Vector c)
+    public void initialise(java.util.Vector<E> c)
     {
         if (c != null)
         {
@@ -226,7 +226,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Vector getValue()
+    public java.util.Vector<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -454,7 +454,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
     }
 
     @Override
-    public synchronized void forEach(Consumer action)
+    public synchronized void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -638,13 +638,13 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public synchronized Object[] toArray(Object a[])
+    public synchronized <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -652,7 +652,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -750,7 +750,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
     }
 
     @Override
-    public synchronized boolean addAll(Collection elements)
+    public synchronized boolean addAll(Collection<? extends E> elements)
     {
         if (useCache)
         {

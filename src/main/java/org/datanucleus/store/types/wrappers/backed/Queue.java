@@ -111,7 +111,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
         }
     }
 
-    public void initialise(java.util.Queue newValue, Object oldValue)
+    public void initialise(java.util.Queue<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -176,7 +176,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.Queue c)
+    public void initialise(java.util.Queue<E> c)
     {
         if (c != null)
         {
@@ -230,7 +230,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Queue getValue()
+    public java.util.Queue<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -413,7 +413,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -489,13 +489,13 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -503,7 +503,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -577,7 +577,7 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
     }
 
     @Override
-    public boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -858,11 +858,11 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
         if (useCache)
         {
             loadFromStore();
-            return new java.util.PriorityQueue(delegate);
+            return new java.util.PriorityQueue<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.PriorityQueue(delegate);
+        return new java.util.PriorityQueue<>(delegate);
     }
 
     @Override

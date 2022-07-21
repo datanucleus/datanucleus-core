@@ -108,7 +108,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
      */
-    public void initialise(java.util.ArrayList newValue, Object oldValue)
+    public void initialise(java.util.ArrayList<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -173,7 +173,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.ArrayList c)
+    public void initialise(java.util.ArrayList<E> c)
     {
         if (c != null)
         {
@@ -227,7 +227,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.ArrayList getValue()
+    public java.util.ArrayList<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -422,7 +422,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -568,13 +568,13 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -582,7 +582,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -1069,11 +1069,11 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         if (useCache)
         {
             loadFromStore();
-            return new java.util.ArrayList(delegate);
+            return new java.util.ArrayList<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.ArrayList(delegate);
+        return new java.util.ArrayList<>(delegate);
     }
 
     @Override

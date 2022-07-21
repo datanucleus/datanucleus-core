@@ -87,7 +87,7 @@ public interface ListStore<E> extends CollectionStore<E>
      * @param allowDependentField Whether to enable dependent field during this operation
      * @return The previous element at that position.
      */
-	Object set(DNStateManager ownerSM, int index, Object element, boolean allowDependentField);
+	E set(DNStateManager ownerSM, int index, E element, boolean allowDependentField);
 
     /**
      * Accessor for a sublist of elements between from and to indices.

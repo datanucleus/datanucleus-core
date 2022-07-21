@@ -320,20 +320,13 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
         return delegate.size();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @return The array
-     */
+    @Override
     public Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @param a The array to write the results to
-     * @return The array
-     */
+    @Override
     public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);

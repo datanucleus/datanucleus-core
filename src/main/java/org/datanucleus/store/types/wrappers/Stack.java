@@ -71,7 +71,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
         initialise(newValue);
     }
 
-    public void initialise(java.util.Stack c)
+    public void initialise(java.util.Stack<E> c)
     {
         if (c != null)
         {
@@ -357,21 +357,14 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
         return delegate.subList(from,to);
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     **/
+    @Override
     public synchronized Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
-     * @return The array
-     **/
-    public synchronized Object[] toArray(Object a[])
+    @Override
+    public synchronized <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }

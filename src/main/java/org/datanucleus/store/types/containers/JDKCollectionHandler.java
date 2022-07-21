@@ -36,13 +36,13 @@ public class JDKCollectionHandler<C extends Collection> extends CollectionHandle
     @Override
     public C newContainer(AbstractMemberMetaData mmd)
     {
-        return (C) (mmd.getOrderMetaData() == null ? new HashSet() : new ArrayList());
+        return (C) (mmd.getOrderMetaData() == null ? new HashSet<>() : new ArrayList<>());
     }
 
     @Override
     public C newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         List<Object> asList = Arrays.asList(objects);
-        return (C) (mmd.getOrderMetaData() == null ? new HashSet(asList) : new ArrayList(asList));
+        return (C) (mmd.getOrderMetaData() == null ? new HashSet<>(asList) : new ArrayList<>(asList));
     }
 }

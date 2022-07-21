@@ -65,7 +65,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
         initialise(newValue);
     }
 
-    public void initialise(java.util.LinkedHashSet c)
+    public void initialise(java.util.LinkedHashSet<E> c)
     {
         if (c != null)
         {
@@ -282,25 +282,18 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
         return delegate.size();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     **/
+    @Override
     public Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
-     * @return The array
-     **/
-    public Object[] toArray(Object a[])
+    @Override
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }
- 
+
     // ------------------------------ Mutator methods --------------------------
 
     /**

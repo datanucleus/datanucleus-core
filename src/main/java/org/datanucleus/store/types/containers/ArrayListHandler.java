@@ -23,22 +23,22 @@ import java.util.List;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
-public class ArrayListHandler extends JDKCollectionHandler<List>
+public class ArrayListHandler extends JDKCollectionHandler<List<?>>
 {
     @Override
     public ArrayList newContainer(AbstractMemberMetaData mmm)
     {
-        return new ArrayList();
+        return new ArrayList<>();
     }
 
     @Override
     public List newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
-        return new ArrayList(Arrays.asList(objects));
+        return new ArrayList<>(Arrays.asList(objects));
     }
 
     @Override
-    public ElementContainerAdapter getAdapter(List container)
+    public ElementContainerAdapter getAdapter(List<?> container)
     {
         return new JDKListAdapter(container);
     }

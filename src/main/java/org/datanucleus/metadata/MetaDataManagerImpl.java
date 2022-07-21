@@ -516,7 +516,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             // Load MetaData files - will throw NucleusUserException if problems found
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
-            Collection fileMetaData = loadFiles(metadataFiles, clr);
+            Collection<FileMetaData> fileMetaData = loadFiles(metadataFiles, clr);
             if (!fileMetaData.isEmpty())
             {
                 // Populate/Initialise all loaded FileMetaData
@@ -532,7 +532,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 processListenerLoadingCall();
             }
 
-            return (FileMetaData[])fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
+            return fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
         }
         finally
         {
@@ -1198,7 +1198,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             userMetaDataNumber++;
 
             registerFile(fileMetaData.getFilename(), fileMetaData, clr);
-            Collection filemds = new ArrayList<>();
+            Collection<FileMetaData> filemds = new ArrayList<>();
             filemds.add(fileMetaData);
             initialiseFileMetaDataForUse(filemds, clr);
 
@@ -1469,8 +1469,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     @Override
     public FileMetaData[] getFileMetaData()
     {
-        Collection filemds = fileMetaDataByURLString.values();
-        return (FileMetaData[])filemds.toArray(new FileMetaData[filemds.size()]);
+        Collection<FileMetaData> filemds = fileMetaDataByURLString.values();
+        return filemds.toArray(new FileMetaData[filemds.size()]);
     }
 
     /* (non-Javadoc)
@@ -1568,7 +1568,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
 
             // Resolve the class
-            Class c = null;
+            Class<?> c = null;
             try
             {
                 c = (clr == null) ? Class.forName(className) : clr.classForName(className, null, false);
@@ -1869,7 +1869,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             // Normal persistence
             // Put the classes into a sorter so we make sure we get the initial implementations first followed by any subclasses of these implementations. 
             // This is needed because when generating the schema we require the subclass implementations to already have their datastore column created
-            Collection<Class> classesSorted = new TreeSet(new InterfaceClassComparator());
+            Collection<Class> classesSorted = new TreeSet<>(new InterfaceClassComparator());
             Iterator<Class> classesIter = classes.iterator();
             while (classesIter.hasNext())
             {

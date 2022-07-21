@@ -65,7 +65,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
         initialise(newValue);
     }
 
-    public void initialise(java.util.Collection c)
+    public void initialise(java.util.Collection<E> c)
     {
         if (c != null)
         {
@@ -294,21 +294,14 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
         return delegate.size();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @return The array
-     **/
+    @Override
     public Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @param a The array to write the results to
-     * @return The array
-     **/
-    public Object[] toArray(Object a[])
+    @Override
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }

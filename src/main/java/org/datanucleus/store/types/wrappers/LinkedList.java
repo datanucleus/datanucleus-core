@@ -69,7 +69,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
         initialise(newValue);
     }
 
-    public void initialise(java.util.LinkedList c)
+    public void initialise(java.util.LinkedList<E> c)
     {
         if (c != null)
         {
@@ -353,20 +353,13 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
         return delegate.subList(from,to);
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     */
+    @Override
     public Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
-     * @return The array
-     */
+    @Override
     public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);

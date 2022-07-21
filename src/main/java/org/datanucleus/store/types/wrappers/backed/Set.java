@@ -102,7 +102,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         this.allowNulls = allowNulls;
 
         // Set up our delegate
-        this.delegate = new java.util.HashSet();
+        this.delegate = new java.util.HashSet<>();
 
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(ownerSM, mmd);
@@ -153,7 +153,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             initialising = true;
             if (useCache)
             {
-                Collection oldColl = (Collection)oldValue;
+                Collection<E> oldColl = (Collection)oldValue;
                 if (oldColl != null)
                 {
                     delegate.addAll(oldColl);
@@ -198,7 +198,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.Set c)
+    public void initialise(java.util.Set<E> c)
     {
         if (c != null)
         {
@@ -252,7 +252,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Set getValue()
+    public java.util.Set<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -393,7 +393,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
     }
 
     @Override
-    public boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection<?> c)
     {
         if (useCache)
         {
@@ -401,7 +401,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         }
         else if (backingStore != null)
         {
-            java.util.HashSet h=new java.util.HashSet(c);
+            java.util.HashSet h = new java.util.HashSet<>(c);
             Iterator iter=iterator();
             while (iter.hasNext())
             {
@@ -436,7 +436,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -497,13 +497,13 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -511,7 +511,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -565,7 +565,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, element));
             }
             else
             {
@@ -594,7 +594,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
     }
 
     @Override
-    public boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -615,9 +615,9 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         {
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
-                for (Object element : elements)
+                for (E element : elements)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerSM, backingStore, element));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionAddOperation<>(ownerSM, backingStore, element));
                 }
             }
             else
@@ -861,11 +861,11 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         if (useCache)
         {
             loadFromStore();
-            return new java.util.HashSet(delegate);
+            return new java.util.HashSet<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.HashSet(delegate);
+        return new java.util.HashSet<>(delegate);
     }
 
     @Override

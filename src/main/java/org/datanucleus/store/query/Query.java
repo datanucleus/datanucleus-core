@@ -1839,7 +1839,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Method to compile the query. To be implemented by the query implementation.
      * @param parameterValues Parameter values keyed by name (when compiling for execution)
      */
-    protected abstract void compileInternal(Map parameterValues);
+    protected abstract void compileInternal(Map<Object, Object> parameterValues);
 
     /**
      * Accessor for the parsed imports.

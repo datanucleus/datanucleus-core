@@ -105,7 +105,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         }
     }
 
-    public void initialise(java.util.LinkedList newValue, Object oldValue)
+    public void initialise(java.util.LinkedList<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -170,7 +170,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.LinkedList c)
+    public void initialise(java.util.LinkedList<E> c)
     {
         if (c != null)
         {
@@ -224,7 +224,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.LinkedList getValue()
+    public java.util.LinkedList<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -421,7 +421,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -567,13 +567,13 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }        
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -581,7 +581,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }        
         return delegate.toArray(a);
     }
@@ -680,7 +680,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
     }
 
     @Override
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -1093,11 +1093,11 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         if (useCache)
         {
             loadFromStore();
-            return new java.util.LinkedList(delegate);
+            return new java.util.LinkedList<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.LinkedList(delegate);
+        return new java.util.LinkedList<>(delegate);
     }
 
     @Override

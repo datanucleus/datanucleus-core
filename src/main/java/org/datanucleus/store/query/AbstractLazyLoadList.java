@@ -312,7 +312,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
         return array;
     }
 
-    public Object[] toArray(Object[] a)
+    public <T> T[] toArray(T[] a)
     {
         if (a == null)
         {
@@ -340,7 +340,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
             }
         }
 
-        return array;
+        return (T[]) array;
     }
 
     /**

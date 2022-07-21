@@ -24,7 +24,7 @@ public class SCOUtilsTest extends TestCase
         java.util.List<String> elm = new java.util.ArrayList<>();
         elm.add("TEST1");
         elm.add("TEST2");
-        String[] arr = (String[]) SCOUtils.toArray(new BackingStore(elm),null,new String[2]);
+        String[] arr = SCOUtils.toArray(new BackingStore(elm), null, new String[2]);
         assertEquals(arr[0],"TEST1");
         assertEquals(arr[1],"TEST2");
     }

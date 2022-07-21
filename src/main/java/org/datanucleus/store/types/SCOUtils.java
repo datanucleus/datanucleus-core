@@ -1063,17 +1063,17 @@ public class SCOUtils
      * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the
      * runtime type of every element in this collection.
      */
-    public static Object[] toArray(CollectionStore backingStore, DNStateManager sm, Object a[])
+    public static <T> T[] toArray(CollectionStore backingStore, DNStateManager sm, T a[])
     {
         int size = backingStore.size(sm);
         if (a.length < size)
         {
-            a = (Object[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
+            a = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
         }
         Iterator it = backingStore.iterator(sm);
         for (int i = 0; i < size; i++)
         {
-            a[i] = it.next();
+            a[i] = (T) it.next();
         }
 
         if (a.length > size)

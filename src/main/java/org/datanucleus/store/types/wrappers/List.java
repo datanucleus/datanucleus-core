@@ -70,7 +70,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
         initialise(newValue);
     }
 
-    public void initialise(java.util.List c)
+    public void initialise(java.util.List<E> c)
     {
         if (c != null)
         {
@@ -350,21 +350,14 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
         return delegate.subList(from,to);
     }
 
-    /**
-     * Method to return the List as an array.
-     * @return The array
-     **/
+    @Override
     public Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the List as an array.
-     * @param a The array to copy to
-     * @return The array
-     **/
-    public Object[] toArray(Object a[])
+    @Override
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }

@@ -65,7 +65,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
         initialise(newValue);
     }
 
-    public void initialise(java.util.HashSet c)
+    public void initialise(java.util.HashSet<E> c)
     {
         if (c != null)
         {
@@ -271,21 +271,14 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
         return delegate.size();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     **/
+    @Override
     public Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
-     * @return The array
-     **/
-    public Object[] toArray(Object a[])
+    @Override
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }

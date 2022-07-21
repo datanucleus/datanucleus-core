@@ -72,7 +72,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
         initialise(newValue);
     }
 
-    public void initialise(java.util.Vector c)
+    public void initialise(java.util.Vector<E> c)
     {
         if (c != null)
         {
@@ -415,21 +415,14 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
         return delegate.subList(from,to);
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     **/
+    @Override
     public synchronized Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @param a The runtime types of the array being defined by this param
-     * @return The array
-     **/
-    public synchronized Object[] toArray(Object a[])
+    @Override
+    public synchronized <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }

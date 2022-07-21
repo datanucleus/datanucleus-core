@@ -48,7 +48,7 @@ public abstract class AbstractStoredProcedureQuery extends Query
     protected Class[] resultClasses = null;
 
     /** Repository for holding output parameter values after execution. */
-    protected Map outputParamValues = null;
+    protected Map<Object, Object> outputParamValues = null;
 
     /**
      * Constructs a new query instance from the existing query.

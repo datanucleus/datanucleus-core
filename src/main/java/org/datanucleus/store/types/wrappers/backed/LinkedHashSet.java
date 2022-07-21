@@ -178,7 +178,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.LinkedHashSet c)
+    public void initialise(java.util.LinkedHashSet<E> c)
     {
         if (c != null)
         {
@@ -232,7 +232,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.LinkedHashSet getValue()
+    public java.util.LinkedHashSet<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -413,7 +413,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -476,7 +476,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -543,7 +543,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
     }
 
     @Override
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -810,11 +810,11 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         if (useCache)
         {
             loadFromStore();
-            return new java.util.LinkedHashSet(delegate);
+            return new java.util.LinkedHashSet<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.LinkedHashSet(delegate);
+        return new java.util.LinkedHashSet<>(delegate);
     }
 
     @Override

@@ -329,12 +329,8 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @param a The array to write the results to
-     * @return The array
-     **/
-    public Object[] toArray(Object a[])
+    @Override
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }

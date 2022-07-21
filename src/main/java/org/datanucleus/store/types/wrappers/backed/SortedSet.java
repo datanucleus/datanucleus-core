@@ -430,7 +430,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -617,7 +617,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         }
         else if (backingStore != null)
         {
-            return (T[])SCOUtils.toArray(backingStore, ownerSM, a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }
         return delegate.toArray(a);
     }

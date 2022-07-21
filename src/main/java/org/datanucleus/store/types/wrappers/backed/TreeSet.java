@@ -190,7 +190,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.TreeSet c)
+    public void initialise(java.util.TreeSet<E> c)
     {
         if (c != null)
         {
@@ -244,7 +244,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.TreeSet getValue()
+    public java.util.TreeSet<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -604,13 +604,13 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -618,7 +618,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -681,7 +681,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     }
 
     @Override
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         if (useCache)
         {

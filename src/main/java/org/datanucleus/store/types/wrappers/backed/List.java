@@ -109,7 +109,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         }
     }
 
-    public void initialise(java.util.List newValue, Object oldValue)
+    public void initialise(java.util.List<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -174,7 +174,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.List c)
+    public void initialise(java.util.List<E> c)
     {
         if (c != null)
         {
@@ -228,7 +228,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.List getValue()
+    public java.util.List<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -421,7 +421,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -567,13 +567,13 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -581,7 +581,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -679,7 +679,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
     }
 
     @Override
-    public boolean addAll(Collection elements)
+    public boolean addAll(Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -1068,11 +1068,11 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         if (useCache)
         {
             loadFromStore();
-            return new java.util.ArrayList(delegate);
+            return new java.util.ArrayList<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.ArrayList(delegate);
+        return new java.util.ArrayList<>(delegate);
     }
 
     @Override

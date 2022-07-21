@@ -28,12 +28,12 @@ public class HashSetHandler extends JDKCollectionHandler<Set>
     @Override
     public Set newContainer(AbstractMemberMetaData mmm)
     {
-        return new HashSet();
+        return new HashSet<>();
     }
 
     @Override
     public Set newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
-        return new HashSet(Arrays.asList(objects));
+        return new HashSet<>(Arrays.asList(objects));
     }
 }

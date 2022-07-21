@@ -34,7 +34,7 @@ public abstract class FactoryBasedTransactionManagerLocator implements Transacti
      * @param clr ClassLoader resolver
      * @return The class
      */
-    protected abstract Class getFactoryClass(ClassLoaderResolver clr);
+    protected abstract Class<?> getFactoryClass(ClassLoaderResolver clr);
 
     /**
      * Method to return the TransactionManager.
@@ -42,7 +42,7 @@ public abstract class FactoryBasedTransactionManagerLocator implements Transacti
      */
     public TransactionManager getTransactionManager(ClassLoaderResolver clr)
     {
-        Class factoryClass = getFactoryClass(clr);
+        Class<?> factoryClass = getFactoryClass(clr);
         if (factoryClass == null)
         {
             return null;

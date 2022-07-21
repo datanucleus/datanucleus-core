@@ -376,20 +376,13 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
         return delegate.size();
     }
 
-    /**
-     * Method to return the list as an array.
-     * @return The array
-     */
+    @Override
     public Object[] toArray()
     {
         return delegate.toArray();
     }
 
-    /**
-     * Method to return the Collection as an array.
-     * @param a The array to write the results to
-     * @return The array
-     **/
+    @Override
     public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);

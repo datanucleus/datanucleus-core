@@ -277,7 +277,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
      */
-    public void initialise(java.util.Collection c)
+    public void initialise(java.util.Collection<E> c)
     {
         if (c instanceof java.util.List && !(delegate instanceof java.util.List))
         {
@@ -337,7 +337,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Collection getValue()
+    public java.util.Collection<E> getValue()
     {
         loadFromStore();
         return super.getValue();
@@ -524,7 +524,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
     }
 
     @Override
-    public void forEach(Consumer action)
+    public void forEach(Consumer<? super E> action)
     {
         Objects.requireNonNull(action);
         for (E t : this)
@@ -585,13 +585,13 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM);
+            return SCOUtils.toArray(backingStore, ownerSM);
         }  
         return delegate.toArray();
     }
 
     @Override
-    public Object[] toArray(Object a[])
+    public <T> T[] toArray(T a[])
     {
         if (useCache)
         {
@@ -599,7 +599,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         }
         else if (backingStore != null)
         {
-            return SCOUtils.toArray(backingStore,ownerSM,a);
+            return SCOUtils.toArray(backingStore, ownerSM, a);
         }  
         return delegate.toArray(a);
     }
@@ -682,7 +682,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
     }
 
     @Override
-    public boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection<? extends E> elements)
     {
         if (useCache)
         {
@@ -949,11 +949,11 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         if (useCache)
         {
             loadFromStore();
-            return new java.util.HashSet(delegate);
+            return new java.util.HashSet<>(delegate);
         }
 
         // TODO Cater for non-cached collection, load elements in a DB call.
-        return new java.util.HashSet(delegate);
+        return new java.util.HashSet<>(delegate);
     }
 
     @Override
