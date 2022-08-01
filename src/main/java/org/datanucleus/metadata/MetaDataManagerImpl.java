@@ -1651,7 +1651,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 if (!utilisedFileMetaData.isEmpty())
                 {
                     // Pass 1 - initialise anything loaded during the initialise of the requested class
-                    List<FileMetaData> utilisedFileMetaData1 = (ArrayList)utilisedFileMetaData.clone();
+                    List<FileMetaData> utilisedFileMetaData1 = List.copyOf(utilisedFileMetaData);
                     utilisedFileMetaData.clear();
                     for (FileMetaData filemd : utilisedFileMetaData1)
                     {
@@ -1661,7 +1661,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     if (!utilisedFileMetaData.isEmpty())
                     {
                         // Pass 2 - initialise anything loaded during the initialise of pass 1
-                        List<FileMetaData> utilisedFileMetaData2 = (List)utilisedFileMetaData.clone();
+                        List<FileMetaData> utilisedFileMetaData2 = List.copyOf(utilisedFileMetaData);
                         utilisedFileMetaData.clear();
                         for (FileMetaData filemd : utilisedFileMetaData2)
                         {
@@ -1697,7 +1697,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         if (!listenersLoadedMetaData.isEmpty() && listeners != null)
         {
             // Notify any listeners of the metadata loaded during this call
-            Iterator<AbstractClassMetaData> loadedIter = new ArrayList(listenersLoadedMetaData).iterator();
+            Iterator<AbstractClassMetaData> loadedIter = new ArrayList<>(listenersLoadedMetaData).iterator();
             while (loadedIter.hasNext())
             {
                 AbstractClassMetaData acmd = loadedIter.next();
@@ -1794,7 +1794,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     public String[] getClassesImplementingInterface(String interfaceName, ClassLoaderResolver clr)
     {
         Collection<Class> classes = new HashSet<>();
-        Class intfClass = clr.classForName(interfaceName);
+        Class<?> intfClass = clr.classForName(interfaceName);
         Collection<String> generatedClassNames = new HashSet<>();
 
         // Loop through all known classes and find the implementations
@@ -1802,7 +1802,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         boolean isPersistentInterface = false;
         for (AbstractClassMetaData acmd : cmds)
         {
-            Class implClass = null;
+            Class<?> implClass = null;
             try
             {
                 implClass = clr.classForName(acmd.getFullClassName());
@@ -1853,7 +1853,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             String[] classNames = new String[numClasses];
             int i = 0;
 
-            for (Class cls : classes)
+            for (Class<?> cls : classes)
             {
                 classNames[i++] = cls.getName();
             }
