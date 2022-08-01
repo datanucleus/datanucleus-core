@@ -217,7 +217,7 @@ public interface ExecutionContext extends ExecutionContextReference
     boolean isClosed();
 
     /**
-     * Method to find StateManager for the passed persistable object when it is managed by this manager.
+     * Method to find StateManager for the passed persistable object when it is managed by this manager. TODO Change the signature to use generics
      * @param pc The persistable object
      * @return StateManager
      */
@@ -268,7 +268,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param cls Type of persistable object
      * @param subclasses Whether to include subclasses
      */
-    void evictObjects(Class cls, boolean subclasses);
+    void evictObjects(Class<?> cls, boolean subclasses);
 
     /**
      * Method to evict all L1 cache objects
@@ -558,7 +558,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @return The objects meeting this requirement
      * @param <T> Type of the persistable
      */
-    <T> List<T> findObjects(Class<T> cls, List keys);
+    <T> List<T> findObjects(Class<T> cls, List<Object> keys);
 
     /**
      * Accessor for an object of the specified type with the provided values for a unique key.

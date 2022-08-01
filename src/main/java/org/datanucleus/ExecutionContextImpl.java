@@ -190,7 +190,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private Map<Object, BitSet> l2CacheTxFieldsToUpdateById = null;
 
     /** Set of ids to be Level2 cached at commit (if using L2 cache). */
-    private Set l2CacheTxIds = null;
+    private Set<Object> l2CacheTxIds = null;
 
     /** Objects that were updated in L2 cache before commit, which should be evicted if rollback happens */
     private List<Object> l2CacheObjectsToEvictUponRollback = null;
@@ -617,7 +617,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (flag && nucCtx.hasLevel2Cache() && !l2CacheEnabled)
         {
             // Create temporary storage to handle objects needing L2 caching after txn
-            l2CacheTxIds = new HashSet();
+            l2CacheTxIds = new HashSet<>();
             l2CacheTxFieldsToUpdateById = new HashMap<>();
             l2CacheEnabled = true;
         }
@@ -1416,7 +1416,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
 
             // Make sure lifecycle changes take place to all "enlisted" objects
-            List failures = null;
+            List<Throwable> failures = null;
             try
             {
                 // "commit" all enlisted StateManagers
@@ -1440,7 +1440,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     {
                         if (failures == null)
                         {
-                            failures = new ArrayList();
+                            failures = new ArrayList<>();
                         }
                         failures.add(e);
                     }
@@ -1452,7 +1452,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
             if (failures != null && !failures.isEmpty())
             {
-                throw new CommitStateTransitionException((Exception[]) failures.toArray(new Exception[failures.size()]));
+                throw new CommitStateTransitionException(failures.toArray(new Exception[failures.size()]));
             }
         }
 
@@ -1511,7 +1511,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param cls Type of persistable object
      * @param subclasses Whether to include subclasses
      */
-    public void evictObjects(Class cls, boolean subclasses)
+    public void evictObjects(Class<?> cls, boolean subclasses)
     {
         if (cache != null && !cache.isEmpty())
         {
@@ -1548,7 +1548,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // TODO All persistent non-transactional instances should be evicted here, but not yet supported
 
             // Evict StateManagers and remove objects from cache. Performed in separate loop to avoid ConcurrentModificationException
-            Set<DNStateManager> smsToEvict = new HashSet(cache.values());
+            Set<DNStateManager> smsToEvict = new HashSet<>(cache.values());
             for (DNStateManager sm : smsToEvict)
             {
                 if (sm != null)
@@ -1611,7 +1611,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             toRefresh.addAll(cache.values());
         }
 
-        List failures = null;
+        List<Throwable> failures = null;
         for (DNStateManager sm : toRefresh)
         {
             try
@@ -1622,7 +1622,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 if (failures == null)
                 {
-                    failures = new ArrayList();
+                    failures = new ArrayList<>();
                 }
                 failures.add(e);
             }
@@ -1630,7 +1630,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (failures != null && !failures.isEmpty())
         {
-            throw new NucleusUserException(Localiser.msg("010037"), (Exception[]) failures.toArray(new Exception[failures.size()]));
+            throw new NucleusUserException(Localiser.msg("010037"), failures.toArray(new Exception[failures.size()]));
         }
     }
 
@@ -1643,7 +1643,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         // TODO Consider doing these in bulk where possible if several objects of the same type
-        List failures = null;
+        List<Throwable> failures = null;
         for (Object pc : pcs)
         {
             if (pc == null)
@@ -1668,7 +1668,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 if (failures == null)
                 {
-                    failures = new ArrayList();
+                    failures = new ArrayList<>();
                 }
                 failures.add(e);
             }
@@ -1680,12 +1680,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (failures != null && !failures.isEmpty())
         {
-            throw new NucleusUserException(Localiser.msg("010037"), (Exception[]) failures.toArray(new Exception[failures.size()]));
+            throw new NucleusUserException(Localiser.msg("010037"), failures.toArray(new Exception[failures.size()]));
         }
     }
 
     @Override
-    public Object persistObject(Object obj, boolean merging)
+    public <T> T persistObject(T obj, boolean merging)
     {
         if (obj == null)
         {
@@ -1703,11 +1703,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
             if (threadInfo.attachedOwnerByObject == null)
             {
-                threadInfo.attachedOwnerByObject = new HashMap();
+                threadInfo.attachedOwnerByObject = new HashMap<>();
             }
             if (threadInfo.attachedPCById == null)
             {
-                threadInfo.attachedPCById = new HashMap();
+                threadInfo.attachedPCById = new HashMap<>();
             }
 
             if (tx.isActive())
@@ -1717,7 +1717,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             threadInfo.nontxPersistDelete = true;
             boolean success = true;
-            Set cachedIds = (cache != null && !cache.isEmpty()) ? new HashSet(cache.keySet()) : null;
+            Set cachedIds = (cache != null && !cache.isEmpty()) ? new HashSet<>(cache.keySet()) : null;
             try
             {
                 return persistObjectWork(obj);
@@ -1775,11 +1775,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             if (threadInfo.attachedOwnerByObject == null)
             {
-                threadInfo.attachedOwnerByObject = new HashMap();
+                threadInfo.attachedOwnerByObject = new HashMap<>();
             }
             if (threadInfo.attachedPCById == null)
             {
-                threadInfo.attachedPCById = new HashMap();
+                threadInfo.attachedPCById = new HashMap<>();
             }
             if (!tx.isActive())
             {
@@ -1803,7 +1803,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     {
                         if (failures == null)
                         {
-                            failures = new ArrayList();
+                            failures = new ArrayList<>();
                         }
                         failures.add(e);
                     }
@@ -1846,12 +1846,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @return The persisted object
      * @throws NucleusUserException if the object is managed by a different manager
      */
-    private Object persistObjectWork(Object obj)
+    private <T> T persistObjectWork(T obj)
     {
         boolean detached = getApiAdapter().isDetached(obj);
 
         // Persist the object
-        Object persistedPc = persistObjectInternal(obj, null, PersistableObjectType.PC);
+        T persistedPc = persistObjectInternal(obj, null, PersistableObjectType.PC);
 
         // If using reachability at commit and appropriate save it for reachability checks when we commit
         DNStateManager sm = findStateManager(persistedPc);
@@ -2112,7 +2112,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     if (failures == null)
                     {
-                        failures = new ArrayList();
+                        failures = new ArrayList<>();
                     }
                     failures.add(e);
                 }
@@ -2693,7 +2693,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             if (smAttachDetachObjectReferenceMap == null)
             {
-                smAttachDetachObjectReferenceMap = new HashMap<DNStateManager, Object>();
+                smAttachDetachObjectReferenceMap = new HashMap<>();
             }
             smAttachDetachObjectReferenceMap.put(sm,  obj);
         }
@@ -2781,7 +2781,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return null;
         }
 
-        Set objs = new HashSet();
+        Set<Object> objs = new HashSet<>();
         for (DNStateManager sm : enlistedSMCache.values())
         {
             objs.add(sm.getObject());
@@ -2802,7 +2802,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return null;
         }
 
-        Set objs = new HashSet();
+        Set<Object> objs = new HashSet<>();
         for (DNStateManager sm : enlistedSMCache.values())
         {
             for (int i=0;i<classes.length;i++)
@@ -2853,7 +2853,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return null;
         }
 
-        Set objs = new HashSet();
+        Set<Object> objs = new HashSet<>();
         for (DNStateManager sm : enlistedSMCache.values())
         {
             boolean matches = false;
@@ -2921,7 +2921,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public <T> List<T> findObjects(Class<T> cls, List keys)
+    public <T> List<T> findObjects(Class<T> cls, List<Object> keys)
     {
         if (cls == null || keys == null)
         {
@@ -3140,8 +3140,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ids[i] = identities[i];
         }
 
-        Map<Object, Persistable> pcById = new HashMap(identities.length);
-        List idsToFind = new ArrayList();
+        Map<Object, Persistable> pcById = new HashMap<>(identities.length);
+        List<Object> idsToFind = new ArrayList<>();
         ApiAdapter api = getApiAdapter();
 
         // Check the L1 cache
@@ -4175,7 +4175,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
                 if (idsToRemove == null)
                 {
-                    idsToRemove = new HashSet<Object>();
+                    idsToRemove = new HashSet<>();
                 }
                 idsToRemove.add(id);
             }
@@ -4197,7 +4197,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     }
                     if (idsToRemove == null)
                     {
-                        idsToRemove = new HashSet<Object>();
+                        idsToRemove = new HashSet<>();
                     }
                     idsToRemove.add(objID);
                 }
@@ -4359,7 +4359,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             performDetachAllOnTxnEnd();
         }
 
-        List failures = null;
+        List<Throwable> failures = null;
         try
         {
             // Commit all enlisted StateManagers
@@ -4388,7 +4388,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     if (failures == null)
                     {
-                        failures = new ArrayList();
+                        failures = new ArrayList<>();
                     }
                     failures.add(e);
                 }
@@ -4400,7 +4400,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         if (failures != null && !failures.isEmpty())
         {
-            throw new CommitStateTransitionException((Exception[]) failures.toArray(new Exception[failures.size()]));
+            throw new CommitStateTransitionException(failures.toArray(new Exception[failures.size()]));
         }
     }
 
@@ -4409,7 +4409,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void preRollback()
     {
-        List<Exception> failures = null;
+        List<Throwable> failures = null;
         try
         {
             for (DNStateManager sm : enlistedSMCache.values())
@@ -4422,7 +4422,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     if (failures == null)
                     {
-                        failures = new ArrayList();
+                        failures = new ArrayList<>();
                     }
                     failures.add(e);
                 }
@@ -4934,7 +4934,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         Persistable[] objs = new Persistable[ids.length];
 
         // Try L1 cache
-        Collection idsNotFound = new HashSet();
+        Collection<Object> idsNotFound = new HashSet<>();
         for (int i=0;i<ids.length;i++)
         {
             objs[i] = getObjectFromLevel1Cache(ids[i]);
@@ -5124,7 +5124,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // TODO Restrict to only those ids that are cacheable
             Level2Cache l2Cache = nucCtx.getLevel2Cache();
             Map<Object, CachedPC> cachedPCs = l2Cache.getAll(ids);
-            Map<Object, Persistable> pcsById = new HashMap(cachedPCs.size());
+            Map<Object, Persistable> pcsById = new HashMap<>(cachedPCs.size());
 
             for (Map.Entry<Object, CachedPC> entry : cachedPCs.entrySet())
             {
@@ -5564,7 +5564,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // Keyed by owner
         if (smEmbeddedInfoByOwner == null)
         {
-            smEmbeddedInfoByOwner = new HashMap<DNStateManager, List<EmbeddedOwnerRelation>>();
+            smEmbeddedInfoByOwner = new HashMap<>();
         }
         List<EmbeddedOwnerRelation> ownerRelations = smEmbeddedInfoByOwner.get(ownerSM);
         if (ownerRelations == null)
@@ -5662,7 +5662,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (stateManagerAssociatedValuesMap == null)
         {
             stateManagerAssociatedValuesMap = new HashMap<>();
-            valueMap = new HashMap();
+            valueMap = new HashMap<>();
             stateManagerAssociatedValuesMap.put(sm, valueMap);
         }
         else
@@ -5670,7 +5670,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             valueMap = stateManagerAssociatedValuesMap.get(sm);
             if (valueMap == null)
             {
-                valueMap = new HashMap();
+                valueMap = new HashMap<>();
                 stateManagerAssociatedValuesMap.put(sm, valueMap);
             }
         }

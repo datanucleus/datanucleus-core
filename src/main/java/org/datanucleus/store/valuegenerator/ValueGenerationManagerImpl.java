@@ -172,7 +172,7 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
     public Class getTypeForValueGeneratorForMember(String strategyName, String memberKey)
     {
         // Find the generator class for this strategy
-        Class generatorClass = null;
+        Class<?> generatorClass = null;
         ValueGenerator generator = generatorsByMemberKey.get(memberKey);
         if (generator == null)
         {
@@ -300,7 +300,7 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
 
         ConfigurationElement elem = pluginMgr.getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
                 new String[]{"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()});
-        Class generatorClass = (elem != null) ? pluginMgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name")) : null;
+        Class<?> generatorClass = (elem != null) ? pluginMgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name")) : null;
         if (generatorClass == null)
         {
             throw new NucleusException("Cannot create ValueGenerator for strategy "+seqName);
