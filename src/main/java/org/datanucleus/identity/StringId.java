@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single String field.
  */
-public class StringId extends SingleFieldId<String>
+public class StringId extends SingleFieldId<String, StringId>
 {
     private String key;
 
@@ -58,36 +58,20 @@ public class StringId extends SingleFieldId<String>
         return key;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
-     */
     @Override
-    protected boolean keyEquals(SingleFieldId obj)
+    protected boolean keyEquals(StringId obj)
     {
-        if (obj instanceof StringId)
-        {
-            return key.equals(((StringId)obj).key);
-        }
-        return false;
+        return key.equals(obj.key);
     }
 
-    public int compareTo(Object o)
+    public int compareTo(StringId other)
     {
-        if (o instanceof StringId)
+        int result = super.compare(other);
+        if (result == 0)
         {
-            StringId other = (StringId) o;
-            int result = super.compare(other);
-            if (result == 0)
-            {
-                return key.compareTo(other.key);
-            }
-            return result;
+            return key.compareTo(other.key);
         }
-        else if (o == null)
-        {
-            throw new ClassCastException("object is null");
-        }
-        throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
+        return result;
     }
 
     /**

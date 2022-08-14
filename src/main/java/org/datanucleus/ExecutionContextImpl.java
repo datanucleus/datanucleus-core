@@ -2380,7 +2380,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public void attachObject(DNStateManager ownerSM, Object pc, boolean sco)
+    public <T> void attachObject(DNStateManager ownerSM, T pc, boolean sco)
     {
         assertClassPersistable(pc.getClass());
 
@@ -2528,7 +2528,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     @Override
-    public void detachObject(FetchPlanState state, Object obj)
+    public <T> void detachObject(FetchPlanState state, T obj)
     {
         if (getApiAdapter().isDetached(obj))
         {

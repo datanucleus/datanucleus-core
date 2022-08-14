@@ -33,7 +33,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 /**
  * This class is for identity with a single Object type field.
  */
-public class ObjectId extends SingleFieldId
+public class ObjectId extends SingleFieldId<Object, ObjectId>
 {
     private Object key;
 
@@ -100,40 +100,24 @@ public class ObjectId extends SingleFieldId
         return key.getClass().getName() + STRING_DELIMITER + key.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
-     */
     @Override
-    protected boolean keyEquals(SingleFieldId obj)
+    protected boolean keyEquals(ObjectId obj)
     {
-        if (obj instanceof ObjectId)
-        {
-            return key.equals(((ObjectId)obj).key);
-        }
-        return false;
+        return key.equals(obj.key);
     }
 
-    public int compareTo(Object o)
+    public int compareTo(ObjectId other)
     {
-        if (o instanceof ObjectId)
+        int result = super.compare(other);
+        if (result == 0)
         {
-            ObjectId other = (ObjectId) o;
-            int result = super.compare(other);
-            if (result == 0)
+            if (other.key instanceof Comparable && key instanceof Comparable)
             {
-                if (other.key instanceof Comparable && key instanceof Comparable)
-                {
-                    return ((Comparable) key).compareTo(other.key);
-                }
-                throw new ClassCastException("The key class (" + key.getClass().getName() + ") does not implement Comparable");
+                return ((Comparable) key).compareTo(other.key);
             }
-            return result;
+            throw new ClassCastException("The key class (" + key.getClass().getName() + ") does not implement Comparable");
         }
-        else if (o == null)
-        {
-            throw new ClassCastException("object is null");
-        }
-        throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
+        return result;
     }
 
     /**

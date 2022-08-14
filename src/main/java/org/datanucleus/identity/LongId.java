@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single long field.
  */
-public class LongId extends SingleFieldId<Long>
+public class LongId extends SingleFieldId<Long, LongId>
 {
     private long key;
 
@@ -70,46 +70,30 @@ public class LongId extends SingleFieldId<Long>
         return Long.toString(key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
-     */
     @Override
-    protected boolean keyEquals(SingleFieldId obj)
+    protected boolean keyEquals(LongId obj)
     {
-        if (obj instanceof LongId)
-        {
-            return key == ((LongId)obj).key;
-        }
-        return false;
+        return key == obj.key;
     }
 
-    public int compareTo(Object o)
+    public int compareTo(LongId other)
     {
-        if (o instanceof LongId)
+        int result = super.compare(other);
+        if (result == 0)
         {
-            LongId other = (LongId) o;
-            int result = super.compare(other);
-            if (result == 0)
+            long diff = key - other.key;
+            if (diff == 0)
             {
-                long diff = key - other.key;
-                if (diff == 0)
-                {
-                    return 0;
-                }
-
-                if (diff < 0)
-                {
-                    return -1;
-                }
-                return 1;
+                return 0;
             }
-            return result;
+
+            if (diff < 0)
+            {
+                return -1;
+            }
+            return 1;
         }
-        else if (o == null)
-        {
-            throw new ClassCastException("object is null");
-        }
-        throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
+        return result;
     }
 
     /**

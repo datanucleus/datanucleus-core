@@ -28,7 +28,7 @@ import org.datanucleus.exceptions.NucleusUserException;
  * This class is the abstract base class for all single field identity classes.
  * TODO All subclasses should implement the same rules as applies to all identity classes, namely String constructor taking output of toString(), etc.
  */
-public abstract class SingleFieldId<T> implements Externalizable, Comparable
+public abstract class SingleFieldId<T, S extends SingleFieldId> implements Externalizable, Comparable<S>
 {
     protected static final String STRING_DELIMITER = ":";
 
@@ -62,18 +62,22 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
         }
     }
 
+    /**
+     * Accessor for the target class name
+     * @return Class name for the object represented by this id
+     */
     public String getTargetClassName()
     {
         return targetClassName;
     }
 
+    /**
+     * Accessor for the key
+     * @return The key
+     */
     public abstract T getKeyAsObject();
 
-    /**
-     * Check the class and class name and object type.
-     * @param obj the other object
-     * @return true if the class name is the same
-     */
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -86,7 +90,7 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
         }
         else
         {
-            SingleFieldId other = (SingleFieldId) obj;
+            S other = (S) obj;
             if (!targetClassName.equals(other.targetClassName))
             {
                 return false;
@@ -95,7 +99,7 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
         }
     }
 
-    protected abstract boolean keyEquals(SingleFieldId other);
+    protected abstract boolean keyEquals(S other);
 
     public int hashCode()
     {
@@ -127,7 +131,7 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
      * @param o Other identity
      * @return The relative ordering between the objects
      */
-    protected int compare(SingleFieldId o)
+    protected int compare(S o)
     {
         return targetClassName.compareTo(o.targetClassName);
     }

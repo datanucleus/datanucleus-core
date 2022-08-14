@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single short field.
  */
-public class ShortId extends SingleFieldId<Short>
+public class ShortId extends SingleFieldId<Short, ShortId>
 {
     private short key;
 
@@ -70,36 +70,20 @@ public class ShortId extends SingleFieldId<Short>
         return Short.toString(key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
-     */
     @Override
-    protected boolean keyEquals(SingleFieldId obj)
+    protected boolean keyEquals(ShortId obj)
     {
-        if (obj instanceof ShortId)
-        {
-            return key == ((ShortId)obj).key;
-        }
-        return false;
+        return key == obj.key;
     }
 
-    public int compareTo(Object o)
+    public int compareTo(ShortId other)
     {
-        if (o instanceof ShortId)
+        int result = super.compare(other);
+        if (result == 0)
         {
-            ShortId other = (ShortId) o;
-            int result = super.compare(other);
-            if (result == 0)
-            {
-                return key - other.key;
-            }
-            return result;
+            return key - other.key;
         }
-        else if (o == null)
-        {
-            throw new ClassCastException("object is null");
-        }
-        throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
+        return result;
     }
 
     /**

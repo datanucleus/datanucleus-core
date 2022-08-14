@@ -424,8 +424,9 @@ public interface ExecutionContext extends ExecutionContextReference
      * If the object is not persistent a NucleusUserException is thrown.
      * @param state State for the detachment process
      * @param pc The object
+     * @param <T> Type of the persistable object
      */
-    void detachObject(FetchPlanState state, Object pc);
+    <T> void detachObject(FetchPlanState state, T pc);
 
     /**
      * Method to detach the passed object(s).
@@ -458,8 +459,9 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param ownerSM StateManager of the owner object that has this in a field that causes this attach
      * @param pc The persistable object
      * @param sco Whether the PC object is stored without an identity (embedded/serialised)
+     * @param <T> Type of the persistable object
      */
-    void attachObject(DNStateManager ownerSM, Object pc, boolean sco);
+    <T> void attachObject(DNStateManager ownerSM, T pc, boolean sco);
 
     /**
      * Method to attach a persistent detached object returning an attached copy of the object.

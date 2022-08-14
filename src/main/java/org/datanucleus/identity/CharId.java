@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single character field.
  */
-public class CharId extends SingleFieldId<Character>
+public class CharId extends SingleFieldId<Character, CharId>
 {
     private char key;
 
@@ -74,36 +74,20 @@ public class CharId extends SingleFieldId<Character>
         return String.valueOf(key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
-     */
     @Override
-    protected boolean keyEquals(SingleFieldId obj)
+    protected boolean keyEquals(CharId obj)
     {
-        if (obj instanceof CharId)
-        {
-            return key == ((CharId)obj).key;
-        }
-        return false;
+        return key == obj.key;
     }
 
-    public int compareTo(Object o)
+    public int compareTo(CharId other)
     {
-        if (o instanceof CharId)
+        int result = super.compare(other);
+        if (result == 0)
         {
-            CharId other = (CharId) o;
-            int result = super.compare(other);
-            if (result == 0)
-            {
-                return key - other.key;
-            }
-            return result;
+            return key - other.key;
         }
-        else if (o == null)
-        {
-            throw new ClassCastException("object is null");
-        }
-        throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
+        return result;
     }
 
     /**

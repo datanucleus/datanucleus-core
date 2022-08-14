@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single byte field.
  */
-public class ByteId extends SingleFieldId<Byte>
+public class ByteId extends SingleFieldId<Byte, ByteId>
 {
     private byte key;
 
@@ -70,36 +70,20 @@ public class ByteId extends SingleFieldId<Byte>
         return Byte.toString(key);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
-     */
     @Override
-    protected boolean keyEquals(SingleFieldId obj)
+    protected boolean keyEquals(ByteId obj)
     {
-        if (obj instanceof ByteId)
-        {
-            return key == ((ByteId)obj).key;
-        }
-        return false;
+        return key == obj.key;
     }
 
-    public int compareTo(Object o)
+    public int compareTo(ByteId other)
     {
-        if (o instanceof ByteId)
+        int result = super.compare(other);
+        if (result == 0)
         {
-            ByteId other = (ByteId) o;
-            int result = super.compare(other);
-            if (result == 0)
-            {
-                return key - other.key;
-            }
-            return result;
+            return key - other.key;
         }
-        else if (o == null)
-        {
-            throw new ClassCastException("object is null");
-        }
-        throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
+        return result;
     }
 
     /**
