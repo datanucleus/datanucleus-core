@@ -20,7 +20,6 @@ package org.datanucleus.enhancement;
 /**
  * Reference for an ExecutionContext, for use in the enhancement contract.
  * This is used because if we just used ExecutionContext it would drag in many other classes etc, so reducing exposure.
- * TODO The signature of findObject could return Persistable. Would need to update enhancer if we do that.
  */
 public interface ExecutionContextReference
 {
@@ -32,6 +31,8 @@ public interface ExecutionContextReference
 
     /**
      * Accessor for an object given the object id.
+     * See copyKeyFieldsFromObjectId for calls to this.
+     * TODO The signature could return Persistable, or T. Would need to update enhancer if we do that.
      * @param id The id of the object
      * @param validate Whether to validate the id
      * @return The object
