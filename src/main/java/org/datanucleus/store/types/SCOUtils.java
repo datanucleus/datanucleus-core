@@ -71,6 +71,7 @@ public class SCOUtils
      * @param memberNumber The member number in the owner
      * @param value The wrapped value for the member (to be unwrapped)
      * @return The unwrapped member value
+     * @param <T> Type of the field
      */
     public static <T> T unwrapSCOField(DNStateManager ownerSM, int memberNumber, SCO<T> value)
     {
@@ -102,6 +103,7 @@ public class SCOUtils
      * @param value The value to wrap (or null, meaning load from datastore)
      * @param replaceField Whether to replace the field in the owner object with the created value
      * @return The SCO wrapper
+     * @param <T> Type of the field
      */
     public static <T> SCO<T> wrapSCOField(DNStateManager ownerSM, AbstractMemberMetaData mmd, Class instantiatedType, T value, boolean replaceField)
     {
@@ -1060,8 +1062,8 @@ public class SCOUtils
      * otherwise, a new array of the same runtime type is allocated for this purpose.
      * @return an array containing the elements of the collection.
      * @throws NullPointerException if the specified array is <i>null</i>.
-     * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the
-     * runtime type of every element in this collection.
+     * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every element in this collection.
+     * @param <T> Type of the array component
      */
     public static <T> T[] toArray(CollectionStore backingStore, DNStateManager sm, T a[])
     {
