@@ -37,7 +37,7 @@ public abstract class SingleFieldId<T, S extends SingleFieldId> implements Exter
 
     protected int hashCode;
 
-    protected SingleFieldId(Class pcClass) // TODO Pass in String instead of Class? But would need to change dnNewObjectIdInstance method to use String
+    protected SingleFieldId(Class<?> pcClass) // TODO Pass in String instead of Class? But would need to change dnNewObjectIdInstance method to use String
     {
         if (pcClass == null)
         {

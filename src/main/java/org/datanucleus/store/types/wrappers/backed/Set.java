@@ -95,7 +95,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
      * @param allowNulls Whether nulls are allowed
      * @param backingStore The backing store
      */
-    public Set(DNStateManager ownerSM, AbstractMemberMetaData mmd, boolean allowNulls, SetStore backingStore)
+    public Set(DNStateManager ownerSM, AbstractMemberMetaData mmd, boolean allowNulls, SetStore<E> backingStore)
     {
         super(ownerSM, mmd);
 
@@ -469,7 +469,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         {
             loadFromStore();
         }
-        return new SCOCollectionIterator(this, ownerSM, delegate, backingStore, useCache);
+        return new SCOCollectionIterator<E>(this, ownerSM, delegate, backingStore, useCache);
     }
 
     @Override
@@ -717,7 +717,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
                 backingSuccess = contained;
                 if (backingSuccess)
                 {
-                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, allowCascadeDelete));
+                    ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, backingStore, (E)element, allowCascadeDelete));
                 }
             }
             else
@@ -743,7 +743,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
     }
 
     @Override
-    public boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection<?> elements)
     {
         if (elements == null)
         {
@@ -780,21 +780,21 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             if (SCOUtils.useQueuedUpdate(ownerSM))
             {
                 // Check which are contained before updating the delegate
-                Collection contained = new java.util.HashSet();
+                Collection<E> contained = new java.util.HashSet<>();
                 for (Object elem : elements)
                 {
                     if (contains(elem))
                     {
-                        contained.add(elem);
+                        contained.add((E) elem);
                     }
                 }
                 if (!contained.isEmpty())
                 {
                     backingSuccess = false;
-                    for (Object element : contained)
+                    for (E element : contained)
                     {
                         backingSuccess = true;
-                        ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerSM, backingStore, element, true));
+                        ownerSM.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation<>(ownerSM, backingStore, element, true));
                     }
                 }
             }

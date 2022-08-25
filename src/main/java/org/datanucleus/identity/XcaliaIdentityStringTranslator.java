@@ -94,7 +94,7 @@ public class XcaliaIdentityStringTranslator implements IdentityStringTranslator
         }
         else
         {
-            // Maybe is an OID.toString() ?
+            // Maybe is an DatastoreId.toString() ?
             // TODO Support this
         }
         return id;

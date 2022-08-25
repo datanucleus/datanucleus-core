@@ -28,20 +28,20 @@ public class ShortId extends SingleFieldId<Short, ShortId>
 {
     private short key;
 
-    public ShortId(Class pcClass, short key)
+    public ShortId(Class<?> pcClass, short key)
     {
         super(pcClass);
         this.key = key;
         this.hashCode = targetClassName.hashCode() ^ key;
     }
 
-    public ShortId(Class pcClass, Short key)
+    public ShortId(Class<?> pcClass, Short key)
     {
         this(pcClass, key != null ? key.shortValue() : -1);
         assertKeyNotNull(key);
     }
 
-    public ShortId(Class pcClass, String str)
+    public ShortId(Class<?> pcClass, String str)
     {
         this(pcClass, Short.parseShort(str));
         assertKeyNotNull(str);

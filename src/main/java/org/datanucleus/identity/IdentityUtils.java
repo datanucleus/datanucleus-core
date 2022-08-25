@@ -147,7 +147,7 @@ public class IdentityUtils
         return id instanceof DatastoreId ? ((DatastoreId)id).getKeyAsObject() : null;
     }
 
-    public static Class getSingleFieldIdentityTypeForKeyType(Class keyType)
+    public static Class<? extends SingleFieldId> getSingleFieldIdentityTypeForKeyType(Class keyType)
     {
         if (keyType == null)
         {

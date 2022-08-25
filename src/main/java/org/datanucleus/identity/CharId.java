@@ -28,20 +28,20 @@ public class CharId extends SingleFieldId<Character, CharId>
 {
     private char key;
 
-    public CharId(Class pcClass, char key)
+    public CharId(Class<?> pcClass, char key)
     {
         super(pcClass);
         this.key = key;
         this.hashCode = targetClassName.hashCode() ^ key;
     }
 
-    public CharId(Class pcClass, Character key)
+    public CharId(Class<?> pcClass, Character key)
     {
         this(pcClass, key != null ? key.charValue() : 0);
         assertKeyNotNull(key);
     }
 
-    public CharId(Class pcClass, String str)
+    public CharId(Class<?> pcClass, String str)
     {
         this(pcClass, str.charAt(0));
         assertKeyNotNull(str);

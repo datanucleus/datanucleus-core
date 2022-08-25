@@ -45,6 +45,7 @@ public final class SCOID
 
     /**
      * Returns the class of the object identified by this SCOID.
+     * TODO Rename to getSCOClassName()
      * @return  The class of the object identified by this SCOID.
      */
     public String getSCOClass()

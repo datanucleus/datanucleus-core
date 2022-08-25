@@ -28,7 +28,7 @@ public class StringId extends SingleFieldId<String, StringId>
 {
     private String key;
 
-    public StringId(Class pcClass, String key)
+    public StringId(Class<?> pcClass, String key)
     {
         super(pcClass);
         this.key = key;

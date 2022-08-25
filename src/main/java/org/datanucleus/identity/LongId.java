@@ -28,20 +28,20 @@ public class LongId extends SingleFieldId<Long, LongId>
 {
     private long key;
 
-    public LongId(Class pcClass, long key)
+    public LongId(Class<?> pcClass, long key)
     {
         super(pcClass);
         this.key = key;
         this.hashCode = targetClassName.hashCode() ^ (int) key;
     }
 
-    public LongId(Class pcClass, Long key)
+    public LongId(Class<?> pcClass, Long key)
     {
         this(pcClass, key != null ? key.longValue() : -1);
         assertKeyNotNull(key);
     }
 
-    public LongId(Class pcClass, String str)
+    public LongId(Class<?> pcClass, String str)
     {
         this(pcClass, Long.parseLong(str));
         assertKeyNotNull(str);

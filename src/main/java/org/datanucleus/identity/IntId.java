@@ -28,20 +28,20 @@ public class IntId extends SingleFieldId<Integer, IntId>
 {
     private int key;
 
-    public IntId(Class pcClass, int key)
+    public IntId(Class<?> pcClass, int key)
     {
         super(pcClass);
         this.key = key;
         this.hashCode = targetClassName.hashCode() ^ key;
     }
 
-    public IntId(Class pcClass, Integer key)
+    public IntId(Class<?> pcClass, Integer key)
     {
         this(pcClass, key != null ? key.intValue() : -1);
         assertKeyNotNull(key);
     }
 
-    public IntId(Class pcClass, String str)
+    public IntId(Class<?> pcClass, String str)
     {
         this(pcClass, Integer.parseInt(str));
         assertKeyNotNull(str);

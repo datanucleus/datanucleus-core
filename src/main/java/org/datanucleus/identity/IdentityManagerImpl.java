@@ -50,7 +50,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Class[] CTR_LONG_ARG_TYPES = new Class[] {ClassConstants.JAVA_LANG_LONG};
 
     /** Default DatastoreId implementation used by DataNucleus. */
-    protected Class datastoreIdClass = null;
+    protected Class<? extends DatastoreId> datastoreIdClass = null;
 
     /** Identity string translator (if any). */
     protected IdentityStringTranslator idStringTranslator = null;
@@ -154,7 +154,7 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
     @Override
-    public Class getDatastoreIdClass()
+    public Class<? extends DatastoreId> getDatastoreIdClass()
     {
         return datastoreIdClass;
     }

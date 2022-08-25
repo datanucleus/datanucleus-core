@@ -42,7 +42,7 @@ public class ObjectId extends SingleFieldId<Object, ObjectId>
      * @param pcClass the class
      * @param param the key
      */
-    public ObjectId(Class pcClass, Object param)
+    public ObjectId(Class<?> pcClass, Object param)
     {
         super(pcClass);
         assertKeyNotNull(param);

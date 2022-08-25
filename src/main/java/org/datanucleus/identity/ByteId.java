@@ -28,20 +28,20 @@ public class ByteId extends SingleFieldId<Byte, ByteId>
 {
     private byte key;
 
-    public ByteId(Class pcClass, byte key)
+    public ByteId(Class<?> pcClass, byte key)
     {
         super(pcClass);
         this.key = key;
         this.hashCode = targetClassName.hashCode() ^ key;
     }
 
-    public ByteId(Class pcClass, Byte key)
+    public ByteId(Class<?> pcClass, Byte key)
     {
         this(pcClass, key != null ? key.byteValue() : 0);
         assertKeyNotNull(key);
     }
 
-    public ByteId(Class pcClass, String str)
+    public ByteId(Class<?> pcClass, String str)
     {
         this(pcClass, Byte.parseByte(str));
         assertKeyNotNull(str);
