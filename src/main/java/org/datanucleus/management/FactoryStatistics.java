@@ -17,15 +17,17 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.management;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Statistics for a factory of persistence (PMF/EMF).
  * Provides access to statistics about datastores accesses, queries, transactions as well as connections.
  */
 public class FactoryStatistics extends AbstractStatistics implements FactoryStatisticsMBean
 {
-    int connectionActiveCurrent;
-    int connectionActiveHigh;
-    int connectionActiveTotal;
+    final AtomicInteger connectionActiveCurrent = new AtomicInteger();
+    final AtomicInteger connectionActiveHigh = new AtomicInteger();
+    final AtomicInteger connectionActiveTotal = new AtomicInteger();
 
     public FactoryStatistics(ManagementManager mgmtManager)
     {
@@ -34,28 +36,28 @@ public class FactoryStatistics extends AbstractStatistics implements FactoryStat
 
     public int getConnectionActiveCurrent()
     {
-        return this.connectionActiveCurrent;
+        return this.connectionActiveCurrent.intValue();
     }
 
     public int getConnectionActiveHigh()
     {
-        return this.connectionActiveHigh;
+        return this.connectionActiveHigh.intValue();
     }
 
     public int getConnectionActiveTotal()
     {
-        return this.connectionActiveTotal;
+        return this.connectionActiveTotal.intValue();
     }
 
-    public void incrementActiveConnections()
+    public synchronized void incrementActiveConnections()
     {
-        this.connectionActiveCurrent++;
-        this.connectionActiveTotal++;
-        this.connectionActiveHigh = Math.max(this.connectionActiveHigh, this.connectionActiveCurrent);
+        final int current = this.connectionActiveCurrent.incrementAndGet();
+        this.connectionActiveTotal.incrementAndGet();
+        this.connectionActiveHigh.getAndAccumulate(current, Math::max);
     }
 
     public void decrementActiveConnections()
     {
-        this.connectionActiveCurrent--;
+        this.connectionActiveCurrent.decrementAndGet();
     }
 }
