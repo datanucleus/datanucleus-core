@@ -18,6 +18,8 @@ Contributors:
 package org.datanucleus.management;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Abstract base class for a statistics object.
@@ -33,34 +35,34 @@ public abstract class AbstractStatistics
     /** Parent for this object. */
     AbstractStatistics parent = null;
 
-    int numReads = 0;
-    int numWrites = 0;
-    int numReadsLastTxn = 0;
-    int numWritesLastTxn = 0;
+    final AtomicInteger numReads = new AtomicInteger();
+    final AtomicInteger numWrites = new AtomicInteger();
+    final AtomicInteger numReadsLastTxn = new AtomicInteger();
+    final AtomicInteger numWritesLastTxn = new AtomicInteger();
 
-    int numReadsStartTxn = 0; // Work variable
-    int numWritesStartTxn = 0; // Work variable
+    final AtomicInteger numReadsStartTxn = new AtomicInteger(); // Work variable
+    final AtomicInteger numWritesStartTxn = new AtomicInteger(); // Work variable
 
-    int insertCount = 0;
-    int deleteCount = 0;
-    int updateCount = 0;
-    int fetchCount = 0;
+    final AtomicInteger insertCount = new AtomicInteger();
+    final AtomicInteger deleteCount = new AtomicInteger();
+    final AtomicInteger updateCount = new AtomicInteger();
+    final AtomicInteger fetchCount = new AtomicInteger();
 
-    int txnTotalCount;
-    int txnCommittedTotalCount;
-    int txnRolledBackTotalCount;
-    int txnActiveTotalCount;
-    long txnExecutionTotalTime = 0;
-    long txnExecutionTimeHigh =-1;
-    long txnExecutionTimeLow =-1;
+    final AtomicInteger txnTotalCount = new AtomicInteger();
+    final AtomicInteger txnCommittedTotalCount = new AtomicInteger();
+    final AtomicInteger txnRolledBackTotalCount = new AtomicInteger();
+    final AtomicInteger txnActiveTotalCount = new AtomicInteger();
+    final AtomicLong txnExecutionTotalTime = new AtomicLong();
+    final AtomicLong txnExecutionTimeHigh = new AtomicLong(-1);
+    final AtomicLong txnExecutionTimeLow = new AtomicLong(-1);
     SMA txnExecutionTimeAverage = new SMA(50);
 
-    int queryActiveTotalCount;
-    int queryErrorTotalCount;
-    int queryExecutionTotalCount;
-    long queryExecutionTotalTime = 0;
-    long queryExecutionTimeHigh =-1;
-    long queryExecutionTimeLow =-1;
+    final AtomicInteger queryActiveTotalCount = new AtomicInteger();
+    final AtomicInteger queryErrorTotalCount = new AtomicInteger();
+    final AtomicInteger queryExecutionTotalCount = new AtomicInteger();
+    final AtomicLong queryExecutionTotalTime = new AtomicLong();
+    final AtomicLong queryExecutionTimeHigh = new AtomicLong(-1);
+    final AtomicLong queryExecutionTimeLow = new AtomicLong(-1);
     SMA queryExecutionTimeAverage = new SMA(50);
 
     /**
@@ -98,32 +100,32 @@ public abstract class AbstractStatistics
 
     public int getQueryActiveTotalCount()
     {
-        return queryActiveTotalCount;
+        return queryActiveTotalCount.intValue();
     }
 
     public int getQueryErrorTotalCount()
     {
-        return queryErrorTotalCount;
+        return queryErrorTotalCount.intValue();
     }
 
     public int getQueryExecutionTotalCount()
     {
-        return queryExecutionTotalCount;
+        return queryExecutionTotalCount.intValue();
     }
 
     public long getQueryExecutionTimeLow()
     {
-        return queryExecutionTimeLow;
+        return queryExecutionTimeLow.longValue();
     }
 
     public long getQueryExecutionTimeHigh()
     {
-        return queryExecutionTimeHigh;
+        return queryExecutionTimeHigh.longValue();
     }
 
     public long getQueryExecutionTotalTime()
     {
-        return queryExecutionTotalTime;
+        return queryExecutionTotalTime.longValue();
     }
 
     public long getQueryExecutionTimeAverage()
@@ -133,7 +135,7 @@ public abstract class AbstractStatistics
 
     public void queryBegin()
     {
-        this.queryActiveTotalCount++;
+        this.queryActiveTotalCount.incrementAndGet();
         if (parent != null)
         {
             parent.queryBegin();
@@ -142,8 +144,8 @@ public abstract class AbstractStatistics
 
     public void queryExecutedWithError()
     {
-        this.queryErrorTotalCount++;
-        this.queryActiveTotalCount--;
+        this.queryErrorTotalCount.incrementAndGet();
+        this.queryActiveTotalCount.decrementAndGet();
         if (parent != null)
         {
             parent.queryExecutedWithError();
@@ -152,12 +154,17 @@ public abstract class AbstractStatistics
 
     public void queryExecuted(long executionTime)
     {
-        this.queryExecutionTotalCount++;
-        this.queryActiveTotalCount--;
+        this.queryExecutionTotalCount.incrementAndGet();
+        this.queryActiveTotalCount.decrementAndGet();
         queryExecutionTimeAverage.compute(executionTime);
-        queryExecutionTimeLow = (int) Math.min(queryExecutionTimeLow==-1?executionTime:queryExecutionTimeLow,executionTime);
-        queryExecutionTimeHigh = (int) Math.max(queryExecutionTimeHigh,executionTime);
-        queryExecutionTotalTime += executionTime;
+        queryExecutionTimeLow.accumulateAndGet(executionTime, (prev, x) -> {
+            if (prev == -1) {
+                return x;
+            }
+            return Math.min(prev, x);
+        });
+        queryExecutionTimeHigh.accumulateAndGet(executionTime, Math::max);
+        queryExecutionTotalTime.addAndGet(executionTime);
         if (parent != null)
         {
             parent.queryExecuted(executionTime);
@@ -166,7 +173,7 @@ public abstract class AbstractStatistics
 
     public int getNumberOfDatastoreWrites()
     {
-        return numWrites;
+        return numWrites.intValue();
     }
 
     /* (non-Javadoc)
@@ -174,22 +181,22 @@ public abstract class AbstractStatistics
      */
     public int getNumberOfDatastoreReads()
     {
-        return numReads;
+        return numReads.intValue();
     }
 
     public int getNumberOfDatastoreWritesInLatestTxn()
     {
-        return numWritesLastTxn;
+        return numWritesLastTxn.intValue();
     }
 
     public int getNumberOfDatastoreReadsInLatestTxn()
     {
-        return numReadsLastTxn;
+        return numReadsLastTxn.intValue();
     }
 
     public void incrementNumReads()
     {
-        numReads++;
+        numReads.incrementAndGet();
         if (parent != null)
         {
             parent.incrementNumReads();
@@ -198,7 +205,7 @@ public abstract class AbstractStatistics
 
     public void incrementNumWrites()
     {
-        numWrites++;
+        numWrites.incrementAndGet();
         if (parent != null)
         {
             parent.incrementNumWrites();
@@ -207,27 +214,27 @@ public abstract class AbstractStatistics
 
     public int getNumberOfObjectFetches()
     {
-        return fetchCount;
+        return fetchCount.intValue();
     }
 
     public int getNumberOfObjectInserts()
     {
-        return insertCount;
+        return insertCount.intValue();
     }
 
     public int getNumberOfObjectUpdates()
     {
-        return updateCount;
+        return updateCount.intValue();
     }
 
     public int getNumberOfObjectDeletes()
     {
-        return deleteCount;
+        return deleteCount.intValue();
     }
 
     public void incrementInsertCount()
     {
-        insertCount++;
+        insertCount.incrementAndGet();
         if (parent != null)
         {
             parent.incrementInsertCount();
@@ -236,7 +243,7 @@ public abstract class AbstractStatistics
 
     public void incrementDeleteCount()
     {
-        deleteCount++;
+        deleteCount.incrementAndGet();
         if (parent != null)
         {
             parent.incrementDeleteCount();
@@ -245,7 +252,7 @@ public abstract class AbstractStatistics
 
     public void incrementFetchCount()
     {
-        fetchCount++;
+        fetchCount.incrementAndGet();
         if (parent != null)
         {
             parent.incrementFetchCount();
@@ -254,7 +261,7 @@ public abstract class AbstractStatistics
 
     public void incrementUpdateCount()
     {
-        updateCount++;
+        updateCount.incrementAndGet();
         if (parent != null)
         {
             parent.incrementUpdateCount();
@@ -268,50 +275,55 @@ public abstract class AbstractStatistics
 
     public long getTransactionExecutionTimeLow()
     {
-        return txnExecutionTimeLow;
+        return txnExecutionTimeLow.longValue();
     }
 
     public long getTransactionExecutionTimeHigh()
     {
-        return txnExecutionTimeHigh;
+        return txnExecutionTimeHigh.longValue();
     }
 
     public long getTransactionExecutionTotalTime()
     {
-        return txnExecutionTotalTime;
+        return txnExecutionTotalTime.longValue();
     }
 
     public int getTransactionTotalCount()
     {
-        return txnTotalCount;
+        return txnTotalCount.intValue();
     }
 
     public int getTransactionActiveTotalCount()
     {
-        return txnActiveTotalCount;
+        return txnActiveTotalCount.intValue();
     }
 
     public int getTransactionCommittedTotalCount()
     {
-        return txnCommittedTotalCount;
+        return txnCommittedTotalCount.intValue();
     }
 
     public int getTransactionRolledBackTotalCount()
     {
-        return txnRolledBackTotalCount;
+        return txnRolledBackTotalCount.intValue();
     }
 
     public void transactionCommitted(long executionTime)
     {
-        this.txnCommittedTotalCount++;
-        this.txnActiveTotalCount--;
+        this.txnCommittedTotalCount.incrementAndGet();
+        this.txnActiveTotalCount.decrementAndGet();
         txnExecutionTimeAverage.compute(executionTime);
-        txnExecutionTimeLow = (int) Math.min(txnExecutionTimeLow==-1?executionTime:txnExecutionTimeLow,executionTime);
-        txnExecutionTimeHigh = (int) Math.max(txnExecutionTimeHigh,executionTime);
-        txnExecutionTotalTime += executionTime;
+        txnExecutionTimeLow.accumulateAndGet(executionTime, (prev, x) -> {
+            if (prev == -1) {
+                return x;
+            }
+            return Math.min(prev, x);
+        });
+        txnExecutionTimeHigh.accumulateAndGet(executionTime, Math::max);
+        txnExecutionTotalTime.addAndGet(executionTime);
 
-        numReadsLastTxn = numReads - numReadsStartTxn;
-        numWritesLastTxn = numWrites - numWritesStartTxn;
+        numReadsLastTxn.accumulateAndGet(numReads.intValue(), (prev, x) -> x - prev);
+        numWritesLastTxn.accumulateAndGet(numWrites.intValue(), (prev, x) -> x - prev);
         if (parent != null)
         {
             parent.transactionCommitted(executionTime);
@@ -320,15 +332,20 @@ public abstract class AbstractStatistics
 
     public void transactionRolledBack(long executionTime)
     {
-        this.txnRolledBackTotalCount++;
-        this.txnActiveTotalCount--;
+        this.txnRolledBackTotalCount.incrementAndGet();
+        this.txnActiveTotalCount.decrementAndGet();
         txnExecutionTimeAverage.compute(executionTime);
-        txnExecutionTimeLow = (int) Math.min(txnExecutionTimeLow==-1?executionTime:txnExecutionTimeLow,executionTime);
-        txnExecutionTimeHigh = (int) Math.max(txnExecutionTimeHigh,executionTime);
-        txnExecutionTotalTime += executionTime;
+        txnExecutionTimeLow.accumulateAndGet(executionTime, (prev, x) -> {
+            if (prev == -1) {
+                return x;
+            }
+            return Math.min(prev, x);
+        });
+        txnExecutionTimeHigh.accumulateAndGet(executionTime, Math::max);
+        txnExecutionTotalTime.addAndGet(executionTime);
 
-        numReadsLastTxn = numReads - numReadsStartTxn;
-        numWritesLastTxn = numWrites - numWritesStartTxn;
+        numReadsLastTxn.accumulateAndGet(numReads.intValue(), (prev, x) -> x - prev);
+        numWritesLastTxn.accumulateAndGet(numWrites.intValue(), (prev, x) -> x - prev);
         if (parent != null)
         {
             parent.transactionRolledBack(executionTime);
@@ -337,11 +354,11 @@ public abstract class AbstractStatistics
 
     public void transactionStarted()
     {
-        this.txnTotalCount++;
-        this.txnActiveTotalCount++;
+        this.txnTotalCount.incrementAndGet();
+        this.txnActiveTotalCount.incrementAndGet();
 
-        numReadsStartTxn = numReads;
-        numWritesStartTxn = numWrites;
+        numReadsStartTxn.set(numReads.intValue());
+        numWritesStartTxn.set(numWrites.intValue());
         if (parent != null)
         {
             parent.transactionStarted();
