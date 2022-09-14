@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 *****************************************************************/
-package org.datanucleus.query;
+package org.datanucleus.store.query;
 
 /**
  * Sample result class, for use in testing QueryUtils.

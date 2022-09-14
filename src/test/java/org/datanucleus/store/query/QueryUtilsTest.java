@@ -15,9 +15,7 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.query;
-
-import org.datanucleus.store.query.QueryUtils;
+package org.datanucleus.store.query;
 
 import junit.framework.TestCase;
 
