@@ -364,6 +364,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void close()
     {
+        internalClose();
+
+        // Hand back to the pool for reuse
+        nucCtx.getExecutionContextPool().checkIn(this);
+    }
+
+    /**
+     * Method to clear out the context.
+     */
+    protected void internalClose()
+    {
         if (closed)
         {
             throw new NucleusUserException(Localiser.msg("010002"));
@@ -573,9 +584,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010001", this));
         }
-
-        // Hand back to the pool for reuse
-        nucCtx.getExecutionContextPool().checkIn(this);
     }
 
     /* (non-Javadoc)

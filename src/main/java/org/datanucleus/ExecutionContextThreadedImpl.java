@@ -80,6 +80,23 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
+    public void close()
+    {
+        try
+        {
+            threadLock();
+
+            internalClose();
+        }
+        finally
+        {
+            threadUnlock();
+
+            // Hand back to the pool for reuse
+            nucCtx.getExecutionContextPool().checkIn(this);
+        }
+    }
+
     /**
      * Accessor for whether the usage is multi-threaded.
      * @return True
@@ -166,20 +183,6 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
             threadLock();
 
             return super.findStateManager(pc);
-        }
-        finally
-        {
-            threadUnlock();
-        }
-    }
-
-    public void close()
-    {
-        try
-        {
-            threadLock();
-
-            super.close();
         }
         finally
         {

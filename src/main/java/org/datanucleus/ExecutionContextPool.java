@@ -58,25 +58,6 @@ public class ExecutionContextPool
         }
     }
 
-    protected ExecutionContext create(Object owner, Map<String, Object> options)
-    {
-        if (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED))
-        {
-            return new ExecutionContextThreadedImpl(nucCtx, owner, options);
-        }
-        return new ExecutionContextImpl(nucCtx, owner, options);
-    }
-
-    public boolean validate(ExecutionContext ec)
-    {
-        // TODO Any situations where we don't want to reuse it?
-        return true;
-    }
-
-    public void expire(ExecutionContext ec)
-    {
-    }
-
     public synchronized ExecutionContext checkOut(Object owner, Map<String, Object> options)
     {
         long now = System.currentTimeMillis();
@@ -113,8 +94,11 @@ public class ExecutionContextPool
         }
 
         // no objects available, create a new one
-        ec = create(owner, options);
-        return ec;
+        if (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED))
+        {
+            return new ExecutionContextThreadedImpl(nucCtx, owner, options);
+        }
+        return new ExecutionContextImpl(nucCtx, owner, options);
     }
 
     public synchronized void cleanUp()
@@ -141,6 +125,16 @@ public class ExecutionContextPool
         {
             recyclableECs.put(ec, System.currentTimeMillis());
         }
+    }
+
+    protected boolean validate(ExecutionContext ec)
+    {
+        // TODO Any situations where we don't want to reuse it? Typically if it is handed back then it is usable
+        return true;
+    }
+
+    protected void expire(ExecutionContext ec)
+    {
     }
 
     class CleanUpThread extends Thread
