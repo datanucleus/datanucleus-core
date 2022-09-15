@@ -375,9 +375,11 @@ public class SchemaTool
                 }
                 for (int i=0;i<filemds.length;i++)
                 {
-                    for (int j=0;j<filemds[i].getNoOfPackages();j++)
+                    int numPackages = filemds[i].getNoOfPackages();
+                    for (int j=0;j<numPackages;j++)
                     {
-                        for (int k=0;k<filemds[i].getPackage(j).getNoOfClasses();k++)
+                        int numClasses = filemds[i].getPackage(j).getNoOfClasses();
+                        for (int k=0;k<numClasses;k++)
                         {
                             String className = filemds[i].getPackage(j).getClass(k).getFullClassName();
                             if (!classNames.contains(className))

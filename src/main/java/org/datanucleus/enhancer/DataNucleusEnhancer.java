@@ -510,10 +510,12 @@ public class DataNucleusEnhancer
         boolean success = true;
         for (FileMetaData filemd : fileMetaData)
         {
-            for (int packagenum = 0; packagenum < filemd.getNoOfPackages(); packagenum++)
+            int numPackages = filemd.getNoOfPackages();
+            for (int packagenum = 0; packagenum < numPackages; packagenum++)
             {
                 PackageMetaData pmd = filemd.getPackage(packagenum);
-                for (int classnum = 0; classnum < pmd.getNoOfClasses(); classnum++)
+                int numClasses = pmd.getNoOfClasses();
+                for (int classnum = 0; classnum < numClasses; classnum++)
                 {
                     ClassMetaData cmd = pmd.getClass(classnum);
                     if (classNames.contains(cmd.getFullClassName()))
@@ -585,10 +587,12 @@ public class DataNucleusEnhancer
         Set<String> classNames = new HashSet<>();
         for (FileMetaData filemd : fileMetaData)
         {
-            for (int packagenum = 0; packagenum < filemd.getNoOfPackages(); packagenum++)
+            int numPackages = filemd.getNoOfPackages();
+            for (int packagenum = 0; packagenum < numPackages; packagenum++)
             {
                 PackageMetaData pmd = filemd.getPackage(packagenum);
-                for (int classnum = 0; classnum < pmd.getNoOfClasses(); classnum++)
+                int numClasses = pmd.getNoOfClasses();
+                for (int classnum = 0; classnum < numClasses; classnum++)
                 {
                     ClassMetaData cmd = pmd.getClass(classnum);
                     if (classNames.contains(cmd.getFullClassName()))

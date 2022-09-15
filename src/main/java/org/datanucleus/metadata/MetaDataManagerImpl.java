@@ -2381,10 +2381,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
 
         // Register all query result mappings for the classes in the file
-        for (int i=0;i<filemd.getNoOfPackages();i++)
+        int numPackages = filemd.getNoOfPackages();
+        for (int i=0;i<numPackages;i++)
         {
             PackageMetaData pmd = filemd.getPackage(i);
-            for (int j=0;j<pmd.getNoOfClasses();j++)
+            int numClasses = pmd.getNoOfClasses();
+            for (int j=0;j<numClasses;j++)
             {
                 AbstractClassMetaData cmd = pmd.getClass(j);
                 QueryResultMetaData[] qrmds = cmd.getQueryResultMetaData();
@@ -2450,12 +2452,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
         }
 
-        for (int i = 0; i < filemd.getNoOfPackages(); i++)
+        int numPackages = filemd.getNoOfPackages();
+        for (int i = 0; i < numPackages; i++)
         {
             PackageMetaData pmd = filemd.getPackage(i);
 
             // Register all classes (and their queries) into the respective lookup maps
-            for (int j = 0; j < pmd.getNoOfClasses(); j++)
+            int numClasses = pmd.getNoOfClasses();
+            for (int j = 0; j < numClasses; j++)
             {
                 // Store queries against "classname_queryname"
                 ClassMetaData cmd = pmd.getClass(j);
@@ -2480,7 +2484,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
 
             // Register all interfaces (and their queries) into the respective lookup maps
-            for (int j = 0; j < pmd.getNoOfInterfaces(); j++)
+            int numInterfaces = pmd.getNoOfInterfaces();
+            for (int j = 0; j < numInterfaces; j++)
             {
                 // Store queries against "classname_queryname"
                 InterfaceMetaData intfmd = pmd.getInterface(j);
@@ -2627,12 +2632,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      */
     protected void initialiseFileMetaData(FileMetaData filemd, ClassLoaderResolver clr, ClassLoader primary)
     {
-        for (int i=0;i<filemd.getNoOfPackages();i++)
+        int numPackages = filemd.getNoOfPackages();
+        for (int i=0;i<numPackages;i++)
         {
             PackageMetaData pmd = filemd.getPackage(i);
             pmd.initialise(clr);
 
-            for (int j=0;j<pmd.getNoOfClasses();j++)
+            int numClasses = pmd.getNoOfClasses();
+            for (int j=0;j<numClasses;j++)
             {
                 ClassMetaData cmd = pmd.getClass(j);
                 try
@@ -2658,7 +2665,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
             }
 
-            for (int j=0;j<pmd.getNoOfInterfaces();j++)
+            int numInterfaces = pmd.getNoOfInterfaces();
+            for (int j=0;j<numInterfaces;j++)
             {
                 InterfaceMetaData imd = pmd.getInterface(j);
                 try
