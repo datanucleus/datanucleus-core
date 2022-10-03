@@ -950,7 +950,6 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
 
         int[] elementIndexes = useCache ? ClassUtils.getIndexesOfCollectionInList(delegate, elements) : null;
         int size = useCache ? delegate.size() : -1;
-        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (backingStore != null && ownerSM != null)
         {
@@ -989,6 +988,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
                 }
             }
 
+            delegate.removeAll(elements);
+
             if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
                 ownerSM.getExecutionContext().processNontransactionalUpdate();
@@ -996,6 +997,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
 
             return backingSuccess;
         }
+
+        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {

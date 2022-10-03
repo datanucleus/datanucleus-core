@@ -849,7 +849,6 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
 
         int size = useCache ? delegate.size() : -1;
-        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
@@ -898,6 +897,8 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
                 }
             }
 
+            delegate.removeAll(elements);
+
             if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
                 ownerSM.getExecutionContext().processNontransactionalUpdate();
@@ -905,6 +906,8 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
             return backingSuccess;
         }
+
+        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {

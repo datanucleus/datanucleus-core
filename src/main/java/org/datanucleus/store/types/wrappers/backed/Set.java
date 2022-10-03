@@ -762,7 +762,6 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         }
 
         int size = useCache ? delegate.size() : -1;
-        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
@@ -811,6 +810,8 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
                 }
             }
 
+            delegate.removeAll(elements);
+
             if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
                 ownerSM.getExecutionContext().processNontransactionalUpdate();
@@ -818,6 +819,8 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
 
             return backingSuccess;
         }
+
+        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {

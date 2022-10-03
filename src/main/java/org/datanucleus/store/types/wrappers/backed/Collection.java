@@ -850,7 +850,6 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         }
 
         int size = useCache ? delegate.size() : -1;
-        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && ownerSM.getExecutionContext().getManageRelations() && !initialising)
         {
@@ -899,6 +898,8 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
                 }
             }
 
+            delegate.removeAll(elements);
+
             if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
                 ownerSM.getExecutionContext().processNontransactionalUpdate();
@@ -907,6 +908,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             return backingSuccess;
         }
 
+        boolean delegateSuccess = delegate.removeAll(elements);
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
             ownerSM.getExecutionContext().processNontransactionalUpdate();

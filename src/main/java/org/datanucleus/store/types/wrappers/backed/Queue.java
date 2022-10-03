@@ -769,7 +769,6 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
         }
 
         int size = useCache ? delegate.size() : -1;
-        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (backingStore != null && ownerSM != null)
         {
@@ -808,6 +807,8 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
                 }
             }
 
+            delegate.removeAll(elements);
+
             if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
                 ownerSM.getExecutionContext().processNontransactionalUpdate();
@@ -815,6 +816,8 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
 
             return backingSuccess;
         }
+
+        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {

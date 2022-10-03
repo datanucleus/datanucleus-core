@@ -773,7 +773,6 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         }
 
         int size = useCache ? delegate.size() : -1;
-        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (backingStore != null && ownerSM != null)
         {
@@ -812,6 +811,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
                 }
             }
 
+            delegate.removeAll(elements);
+
             if (!ownerSM.getExecutionContext().getTransaction().isActive())
             {
                 ownerSM.getExecutionContext().processNontransactionalUpdate();
@@ -819,6 +820,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
 
             return backingSuccess;
         }
+
+        boolean delegateSuccess = delegate.removeAll(elements);
 
         if (ownerSM != null && !ownerSM.getExecutionContext().getTransaction().isActive())
         {
