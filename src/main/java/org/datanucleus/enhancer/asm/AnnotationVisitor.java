@@ -86,6 +86,17 @@ protected AnnotationVisitor(final int api, final AnnotationVisitor annotationVis
   }
 
   /**
+   * The annotation visitor to which this visitor must delegate method calls. May be {@literal
+   * null}.
+   *
+   * @return the annotation visitor to which this visitor must delegate method calls, or {@literal
+   *     null}.
+   */
+  public AnnotationVisitor getDelegate() {
+    return av;
+  }
+
+  /**
    * Visits a primitive value of the annotation.
    *
    * @param name the value name.
