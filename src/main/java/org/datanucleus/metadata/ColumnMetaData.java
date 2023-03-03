@@ -184,7 +184,7 @@ public class ColumnMetaData extends MetaData
             }
             catch (IllegalArgumentException iae)
             {
-                NucleusLogger.METADATA.warn("Metadata has jdbc-type of " + jdbcType + " yet this is not valid. Ignored");
+                NucleusLogger.METADATA.warn("Metadata has jdbc-type of '" + jdbcTypeName + "' yet this is not valid. Ignored");
             }
         }
         return this;
