@@ -94,20 +94,11 @@ public class TypeConversionHelper
         }
         else if (type == Boolean.class)
         {
-            if (value instanceof Long)
+            if (value instanceof Number)
             {
                 // Convert a Long (0, 1) to Boolean (FALSE, TRUE) and null otherwise
-                return (Long)value == 0 ? Boolean.FALSE : ((Long)value == 1 ? Boolean.TRUE : null);
-            }
-            else if (value instanceof Integer)
-            {
-                // Convert a Integer (0, 1) to Boolean (FALSE, TRUE) and null otherwise
-                return (Integer)value == 0 ? Boolean.FALSE : ((Integer)value == 1 ? Boolean.TRUE : null);
-            }
-            else if (value instanceof Short)
-            {
-                // Convert a Short (0, 1) to Boolean (FALSE, TRUE) and null otherwise
-                return (Short)value == 0 ? Boolean.FALSE : ((Short)value == 1 ? Boolean.TRUE : null);
+                long number = ((Number)value).longValue();
+                return number == 0 ? Boolean.FALSE : (number == 1 ? Boolean.TRUE : null);
             }
             return Boolean.valueOf(value.toString());
         }
