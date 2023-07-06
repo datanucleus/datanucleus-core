@@ -83,6 +83,10 @@ public abstract class NucleusLogger
         {
             loggerClass = NullLogger.class;
         }
+        else if (!StringUtils.isWhitespace(loggerType) && "java.util.logging.Logger".equals(loggerType))
+        {
+            loggerClass = org.datanucleus.util.JRELogger.class;
+        }
         else
         {
             try
