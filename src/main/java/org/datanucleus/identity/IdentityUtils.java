@@ -20,6 +20,8 @@ package org.datanucleus.identity;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
@@ -43,6 +45,12 @@ import org.datanucleus.util.ClassUtils;
 public class IdentityUtils
 {
     /**
+     * For performance reasons we keep track of which ID classes that do NOT have a targetClassName field.
+     * This enabled us to avoid expensive exception handling and reflection work.
+     */
+    private static Map<Class<?>, Boolean> hasNoTargetClassName = new ConcurrentHashMap<>();
+
+    /**
      * Checks whether the passed class name is valid for a single field application-identity.
      * @param className the identity class name
      * @return Whether it is a single field class
@@ -60,6 +68,28 @@ public class IdentityUtils
                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT) || 
                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT) ||
                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_STRING);
+    }
+
+    /**
+     * Does ID class not have any targetClassName field?
+     * For performance reasons we keep track of which ID classes that do NOT have a targetClassName field.
+     * This enabled us to avoid expensive exception handling and reflection work.
+     *
+     * @param clazz ID class
+     * @return true if class has no targetClassName field
+     */
+    static boolean hasNoTargetClassName(Class<?> clazz)
+    {
+        return hasNoTargetClassName.containsKey(clazz);
+    }
+
+    /**
+     * Mark supplied ID class as not having any targetClassName field
+     * @param clazz ID class
+     */
+    static void markHasNoTargetClassName(Class<?> clazz)
+    {
+        hasNoTargetClassName.put(clazz, true);
     }
 
     /**
@@ -86,7 +116,7 @@ public class IdentityUtils
             // Using SingleFieldIdentity so can assume that object is of the target class
             return ((SingleFieldId)id).getTargetClassName();
         }
-        else
+        else if (!hasNoTargetClassName(id.getClass()))
         {
             // Try to find a field with name "targetClassName"
             // TODO Allow alternatives to this, for example using an annotation on the id class, and having a cache of what field name to use for which id type
@@ -100,6 +130,7 @@ public class IdentityUtils
             }
             catch (NucleusException ne)
             {
+                markHasNoTargetClassName(id.getClass());
             }
         }
 
@@ -192,6 +223,10 @@ public class IdentityUtils
         if (idType == null)
         {
             return null;
+        }
+        if (idType.isPrimitive())
+        {
+            return idType;
         }
         if (!IdentityUtils.isSingleFieldIdentityClass(idType.getName()))
         {

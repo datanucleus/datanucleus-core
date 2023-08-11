@@ -433,7 +433,7 @@ public class IdentityManagerImpl implements IdentityManager
                 ((Persistable)pc).dnCopyKeyFieldsToObjectId(id);
             }
 
-            if (!(id instanceof SingleFieldId))
+            if (!(id instanceof SingleFieldId) && !IdentityUtils.hasNoTargetClassName(id.getClass()))
             {
                 // DataNucleus feature to allow user-defined id classes to have a field "targetClassName" storing the class name of the object being represented
                 Field classField = ClassUtils.getFieldForClass(id.getClass(), IdentityManager.IDENTITY_CLASS_TARGET_CLASS_NAME_FIELD);
@@ -445,7 +445,12 @@ public class IdentityManagerImpl implements IdentityManager
                     }
                     catch (IllegalArgumentException | IllegalAccessException e)
                     {
+                        IdentityUtils.markHasNoTargetClassName(id.getClass());
                     }
+                }
+                else
+                {
+                    IdentityUtils.markHasNoTargetClassName(id.getClass());
                 }
             }
 
