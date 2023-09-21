@@ -188,13 +188,14 @@ public class ClassReader {
    * @param classFileOffset the offset in byteBuffer of the first byte of the ClassFile to be read.
    * @param checkClassVersion whether to check the class version or not.
    */
+  @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
   ClassReader(
       final byte[] classFileBuffer, final int classFileOffset, final boolean checkClassVersion) {
     this.classFileBuffer = classFileBuffer;
     this.b = classFileBuffer;
     // Check the class' major_version. This field is after the magic and minor_version fields, which
     // use 4 and 2 bytes respectively.
-    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V20) {
+    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V22) {
       throw new IllegalArgumentException(
           "Unsupported class file major version " + readShort(classFileOffset + 6));
     }
@@ -308,6 +309,7 @@ public class ClassReader {
    * @return the content of the given input stream.
    * @throws IOException if a problem occurs during reading.
    */
+  @SuppressWarnings("PMD.UseTryWithResources")
   private static byte[] readStream(final InputStream inputStream, final boolean close)
       throws IOException {
     if (inputStream == null) {
@@ -2049,6 +2051,7 @@ public class ClassReader {
     currentOffset = bytecodeStartOffset;
     while (currentOffset < bytecodeEndOffset) {
       final int currentBytecodeOffset = currentOffset - bytecodeStartOffset;
+      readBytecodeInstructionOffset(currentBytecodeOffset);
 
       // Visit the label and the line number(s) for this bytecode offset, if any.
       Label currentLabel = labels[currentBytecodeOffset];
@@ -2662,6 +2665,20 @@ public class ClassReader {
 
     // Visit the max stack and max locals values.
     methodVisitor.visitMaxs(maxStack, maxLocals);
+  }
+
+  /**
+   * Handles the bytecode offset of the next instruction to be visited in {@link
+   * #accept(ClassVisitor,int)}. This method is called just before the instruction and before its
+   * associated label and stack map frame, if any. The default implementation of this method does
+   * nothing. Subclasses can override this method to store the argument in a mutable field, for
+   * instance, so that {@link MethodVisitor} instances can get the bytecode offset of each visited
+   * instruction (if so, the usual concurrency issues related to mutable data should be addressed).
+   *
+   * @param bytecodeOffset the bytecode offset of the next instruction to be visited.
+   */
+  protected void readBytecodeInstructionOffset(final int bytecodeOffset) {
+    // Do nothing by default.
   }
 
   /**
