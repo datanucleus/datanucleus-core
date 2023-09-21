@@ -169,8 +169,15 @@ public class ClassUtilsTest extends TestCase
     {
         Collection<Class<?>> superintfs = ClassUtils.getSuperinterfaces(java.util.ArrayList.class);
 
-        assertTrue("java.util.ArrayList should have had 6 superinterfaces, but had " + superintfs.size(),
-            superintfs.size() == 6);
+        double javaSpecVersion = Double.parseDouble(System.getProperty("java.specification.version"));
+
+        if (javaSpecVersion < 21.0) {
+            assertTrue("java.util.ArrayList should have had 6 superinterfaces on Java " + javaSpecVersion + ", but had " + superintfs.size(),
+                    superintfs.size() == 6);
+        } else {
+            assertTrue("java.util.ArrayList should have had 7 superinterfaces on Java " + javaSpecVersion + ", but had " + superintfs.size(),
+                    superintfs.size() == 7);
+        }
         assertTrue("java.util.ArrayList should have had a superinterface of List, but didn't !",
             superintfs.contains(List.class));
         assertTrue("java.util.ArrayList should have had a superinterface of Collection, but didn't !",
@@ -183,6 +190,11 @@ public class ClassUtilsTest extends TestCase
             superintfs.contains(Cloneable.class));
         assertTrue("java.util.ArrayList should have had a superinterface of Serrializable, but didn't !",
             superintfs.contains(Serializable.class));
+
+        if (javaSpecVersion >= 21.0) {
+            assertTrue("java.util.ArrayList should have had a superinterface of SequencedCollection on Java " + javaSpecVersion + ", but didn't !",
+                    superintfs.stream().map(Class::getName).anyMatch("java.util.SequencedCollection"::equals));
+        }
     }
 
     /**
@@ -193,8 +205,15 @@ public class ClassUtilsTest extends TestCase
     {
         Collection<Class<?>> superintfs = ClassUtils.getSuperinterfaces(ListSet.class);
 
-        assertTrue("ListSet should have had 4 superinterfaces, but had " + superintfs.size(),
-            superintfs.size() == 4);
+        double javaSpecVersion = Double.parseDouble(System.getProperty("java.specification.version"));
+
+        if (javaSpecVersion < 21.0) {
+            assertTrue("ListSet should have had 4 superinterfaces on Java " + javaSpecVersion + ", but had " + superintfs.size(),
+                    superintfs.size() == 4);
+        } else {
+            assertTrue("ListSet should have had 5 superinterfaces on Java " + javaSpecVersion + ", but had " + superintfs.size(),
+                    superintfs.size() == 5);
+        }
         assertTrue("ListSet should have had a superinterface of List, but didn't !",
             superintfs.contains(List.class));
         assertTrue("ListSet should have had a superinterface of Collection, but didn't !",
@@ -203,6 +222,11 @@ public class ClassUtilsTest extends TestCase
             superintfs.contains(Iterable.class));
         assertTrue("ListSet should have had a superinterface of Set, but didn't !",
             superintfs.contains(Set.class));
+
+        if (javaSpecVersion >= 21.0) {
+            assertTrue("ListSet should have had a superinterface of SequencedCollection on Java " + javaSpecVersion + ", but didn't !",
+                    superintfs.stream().map(Class::getName).anyMatch("java.util.SequencedCollection"::equals));
+        }
     }
 
 // JDK 1.8 has issues with compiling this due to dup spliterator method
