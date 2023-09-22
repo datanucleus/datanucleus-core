@@ -63,8 +63,7 @@ public abstract class FieldVisitor {
    * @param fieldVisitor the field visitor to which this visitor must delegate method calls. May be
    *     null.
    */
-  @SuppressWarnings("deprecation")
-protected FieldVisitor(final int api, final FieldVisitor fieldVisitor) {
+  protected FieldVisitor(final int api, final FieldVisitor fieldVisitor) {
     if (api != Opcodes.ASM9
         && api != Opcodes.ASM8
         && api != Opcodes.ASM7
