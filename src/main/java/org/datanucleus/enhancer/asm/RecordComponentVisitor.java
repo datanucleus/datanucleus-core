@@ -64,8 +64,7 @@ public abstract class RecordComponentVisitor {
    * @param recordComponentVisitor the record component visitor to which this visitor must delegate
    *     method calls. May be null.
    */
-  @SuppressWarnings("deprecation")
-protected RecordComponentVisitor(
+  protected RecordComponentVisitor(
       final int api, final RecordComponentVisitor recordComponentVisitor) {
     if (api != Opcodes.ASM9
         && api != Opcodes.ASM8
