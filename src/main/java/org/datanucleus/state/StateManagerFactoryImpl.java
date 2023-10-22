@@ -32,6 +32,10 @@ import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Factory for StateManagers.
  */
@@ -41,6 +45,9 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     Class<? extends DNStateManager> smClass = null;
 
     public static final Class[] STATE_MANAGER_CTR_ARG_CLASSES = new Class[] {ClassConstants.EXECUTION_CONTEXT, AbstractClassMetaData.class};
+
+    /** Cache of initialised PC classes - for performance */
+    private volatile Set<Class<?>> initializedPcClasses = Collections.emptySet();
 
     // Single pool of all StateManager objects. TODO Consider having one pool per object type.
 //    StateManagerPool smPool = null;
@@ -218,8 +225,17 @@ public class StateManagerFactoryImpl implements StateManagerFactory
     {
         try
         {
+            if (initializedPcClasses.contains(pcCls))
+                return pcCls;
+
+            Set<Class<?>> updated = new HashSet<>(initializedPcClasses);
             // calling the CLR will make sure the class is initialized
-            return clr.classForName(pcCls.getName(), pcCls.getClassLoader(), true);
+            Class resolved = clr.classForName(pcCls.getName(), pcCls.getClassLoader(), true);
+            if (resolved != pcCls)
+                throw new IllegalStateException();
+            updated.add(pcCls);
+            initializedPcClasses = updated;
+            return pcCls;
         }
         catch (ClassNotResolvedException e)
         {
