@@ -32,6 +32,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
+import org.datanucleus.state.StateManagerImpl;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.containers.ContainerHandler;
@@ -169,13 +170,13 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         return mmd.hasContainer() ? processContainerField(mmd, value) : processField(mmd, value);
     }
 
-    private Object processContainerField(AbstractMemberMetaData mmd, Object container)
+    protected Object processContainerField(AbstractMemberMetaData mmd, Object container)
     {
         ContainerHandler containerHandler = sm.getExecutionContext().getTypeManager().getContainerHandler(mmd.getType());
         return mmd.hasMap() ? processMapContainer(mmd, container, containerHandler) : processElementContainer(mmd, container, containerHandler);
     }
 
-    private Object processMapContainer(AbstractMemberMetaData mmd, Object cachedMapContainer, ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
+    protected Object processMapContainer(AbstractMemberMetaData mmd, Object cachedMapContainer, ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
     {
         // Map field, with fieldValue being Map<OID, OID>
         try
@@ -249,7 +250,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         }
     }
 
-    private Object processElementContainer(AbstractMemberMetaData mmd, Object cachedContainer, ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
+    protected Object processElementContainer(AbstractMemberMetaData mmd, Object cachedContainer, ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
     {
         try
         {
@@ -327,7 +328,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         }
     }
 
-    private Object processField(AbstractMemberMetaData mmd, Object value)
+    protected Object processField(AbstractMemberMetaData mmd, Object value)
     {
         RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
         if (relType == RelationType.NONE)
@@ -363,7 +364,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         }
     }
 
-    private Object getObjectFromCachedId(Object cachedId)
+    protected Object getObjectFromCachedId(Object cachedId)
     {
         Object pcId = null;
         String pcClassName = null;
@@ -407,7 +408,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
      * @param objectType Type of object that is embedded/serialised
      * @return The (persistable) object
      */
-    private Object convertCachedPCToPersistable(CachedPC cachedPC, int memberNumber, PersistableObjectType objectType)
+    protected Object convertCachedPCToPersistable(CachedPC cachedPC, int memberNumber, PersistableObjectType objectType)
     {
         AbstractClassMetaData valueCmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
         DNStateManager valueSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, valueCmd, sm, memberNumber, objectType);
@@ -416,8 +417,15 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), valueCmd.getAllMemberPositions(), true);
         if (fieldsToLoad != null && fieldsToLoad.length > 0)
         {
-            valueSM.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueSM, cachedPC));
+            valueSM.replaceFields(fieldsToLoad, constructNew(valueSM, cachedPC));
         }
         return valueSM.getObject();
+    }
+
+    protected L2CacheRetrieveFieldManager constructNew(DNStateManager valueSM, CachedPC cachedPC) {
+        if (valueSM instanceof StateManagerImpl) {
+            return ((StateManagerImpl) valueSM).constructL2CacheRetrieveFieldManager(valueSM, cachedPC);
+        }
+        return new L2CacheRetrieveFieldManager(valueSM, cachedPC);
     }
 }

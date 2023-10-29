@@ -720,7 +720,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             // Put this object in L1 cache for easy referencing
             myEC.putObjectIntoLevel1Cache(this);
 
-            L2CacheRetrieveFieldManager l2RetFM = new L2CacheRetrieveFieldManager(this, cachedPC);
+            L2CacheRetrieveFieldManager l2RetFM = constructL2CacheRetrieveFieldManager(this, cachedPC);
             this.replaceFields(fieldsToLoad, l2RetFM);
             for (int i=0;i<fieldsToLoad.length;i++)
             {
@@ -758,13 +758,18 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
     }
 
+    public L2CacheRetrieveFieldManager constructL2CacheRetrieveFieldManager(DNStateManager stateManager, CachedPC cachedPC) {
+        // having this method enables custom implementation of this class
+        return new L2CacheRetrieveFieldManager(stateManager, cachedPC);
+    }
+
     /**
      * Convenience method to populate all members in the PC object that need their value generating (according to metadata) and that aren't datastore-attributed. 
      * This applies not just to PK members (main use-case) but also to any other member (DN extension). 
      * Members can be populated only if they are null, dependent on metadata. 
      * This method is called once on a PC object, when makePersistent is called.
      */
-    private void populateValueGenerationMembers()
+    protected void populateValueGenerationMembers()
     {
         int[] valueGenMemberPositions = cmd.getValueGenerationMemberPositions();
         if (valueGenMemberPositions != null)
@@ -1482,7 +1487,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                         NucleusLogger.CACHE.debug(Localiser.msg("026034", IdentityUtils.getPersistableIdentityForId(myID), StringUtils.intArrayToString(cacheFieldsToLoad)));
                     }
 
-                    L2CacheRetrieveFieldManager l2RetFM = new L2CacheRetrieveFieldManager(this, cachedPC);
+                    L2CacheRetrieveFieldManager l2RetFM = constructL2CacheRetrieveFieldManager(this, cachedPC);
                     this.replaceFields(cacheFieldsToLoad, l2RetFM);
                     int[] fieldsNotLoaded = l2RetFM.getFieldsNotLoaded();
                     if (fieldsNotLoaded != null)
