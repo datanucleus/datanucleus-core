@@ -758,9 +758,28 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
     }
 
-    public L2CacheRetrieveFieldManager constructL2CacheRetrieveFieldManager(DNStateManager stateManager, CachedPC cachedPC) {
+    /**
+     * Method to create a L2Cache retrieval FM.
+     * @param stateManager The SM
+     * @param cachedPC The Cached object
+     * @return The L2Cache retrieval FM
+     */
+    public L2CacheRetrieveFieldManager constructL2CacheRetrieveFieldManager(DNStateManager stateManager, CachedPC cachedPC) 
+    {
         // having this method enables custom implementation of this class
         return new L2CacheRetrieveFieldManager(stateManager, cachedPC);
+    }
+
+    /**
+     * Method to create a L2Cache population FM.
+     * @param stateManager The SM
+     * @param cachedPC The Cached object
+     * @return The L2Cache population FM
+     */
+    public L2CachePopulateFieldManager constructL2CachePopulateFieldManager(DNStateManager stateManager, CachedPC cachedPC) 
+    {
+        // having this method enables custom implementation of this class
+        return new L2CachePopulateFieldManager(stateManager, cachedPC);
     }
 
     /**
@@ -1441,7 +1460,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                     NucleusLogger.CACHE.debug(Localiser.msg("026033", IdentityUtils.getPersistableIdentityForId(myID), StringUtils.intArrayToString(cacheFieldsToLoad)));
                 }
 
-                provideFields(cacheFieldsToLoad, new L2CachePopulateFieldManager(this, copyCachedPC));
+                provideFields(cacheFieldsToLoad, constructL2CachePopulateFieldManager(this, copyCachedPC));
 
                 // Replace the current L2 cached object with this one
                 myEC.getNucleusContext().getLevel2Cache().put(getInternalObjectId(), copyCachedPC);
