@@ -498,7 +498,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             // URL for file containing the manifest
             return pluginURL;
         }
-        else if (pluginURL.toString().startsWith("vfs"))
+        else if (pluginURL.toString().startsWith("vfs") || pluginURL.toString().startsWith("bundle"))
         {
             // JBoss (5+) proprietary protocols input:
             // vfsfile:C:/appserver/jboss-5.0.0.Beta4/server/default/deploy/datanucleus-jca-1.0.0.rar/datanucleus-core-1.0-SNAPSHOT.jar/plugin.xml
