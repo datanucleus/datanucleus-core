@@ -3116,8 +3116,11 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                         equal = true;
                         if (oldValue instanceof SCOContainer && ((SCOContainer)oldValue).getValue() != newValue && !(newValue instanceof SCO))
                         {
-                            // Field value is container and equal (i.e same elements/keys/values) BUT different container reference so need to update the delegate in SCO wrappers
-                            equalButContainerRefChanged = true;
+                            if (oldValue.getClass().isAssignableFrom(newValue.getClass()) || newValue.getClass().isAssignableFrom(oldValue.getClass()))
+                            {
+                                // Field value is container and equal (i.e same elements/keys/values) BUT different container reference so need to update the delegate in SCO wrappers
+                                equalButContainerRefChanged = true;
+                            }
                         }
                     }
                 }
