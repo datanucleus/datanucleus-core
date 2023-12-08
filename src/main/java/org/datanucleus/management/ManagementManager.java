@@ -63,7 +63,7 @@ public class ManagementManager
     {
         this.nucleusContext = ctxt;
 
-        this.domainName = ctxt.getConfiguration().getStringProperty("datanucleus.PersistenceUnitName");
+        this.domainName = ctxt.getConfiguration().getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME);
         if (this.domainName == null)
         {
             this.domainName = "datanucleus";
