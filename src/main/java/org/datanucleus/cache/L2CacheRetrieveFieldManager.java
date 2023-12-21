@@ -47,15 +47,15 @@ import org.datanucleus.util.NucleusLogger;
 public class L2CacheRetrieveFieldManager extends AbstractFieldManager
 {
     /** StateManager of the object we are copying values into. */
-    DNStateManager sm;
+    protected final DNStateManager sm;
 
     /** Execution Context. */
-    ExecutionContext ec;
+    protected final ExecutionContext ec;
 
     /** CachedPC that we are taking values from. */
-    CachedPC cachedPC;
+    protected final CachedPC cachedPC;
 
-    List<Integer> fieldsNotLoaded = null;
+    protected List<Integer> fieldsNotLoaded = null;
 
     public L2CacheRetrieveFieldManager(DNStateManager sm, CachedPC cachedpc)
     {
