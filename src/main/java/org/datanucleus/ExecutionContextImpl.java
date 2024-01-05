@@ -352,11 +352,37 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             pbrAtCommitHandler = new ReachabilityAtCommitHandler(this);
         }
 
-        lockMgr = new LockManagerImpl(this);
+        lockMgr = createLockManager();
 
         l2CacheObjectsToEvictUponRollback = null;
 
         setLevel2Cache(true);
+    }
+
+    private LockManager createLockManager()
+    {
+        String lockManagerType = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_LOCKMANAGER_TYPE);
+        if (lockManagerType != null && !lockManagerType.isEmpty())
+        {
+            final Object tmpLocManager;
+            try
+            {
+                // Create an instance of the lock manager
+                tmpLocManager = nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.lockmanager", "name", lockManagerType, "class-name",
+                        new Class[]{ExecutionContext.class}, new Object[]{this});
+            }
+            catch (Exception e)
+            {
+                // Class name for this lockmanager plugin is not found!
+                throw new NucleusUserException("Failed to create requested lock manager: " + lockManagerType, e).setFatal();
+            }
+            if (tmpLocManager instanceof LockManager)
+            {
+                return (LockManager) tmpLocManager;
+            }
+            throw new NucleusUserException("Requested lock manager not found: " + lockManagerType).setFatal();
+        }
+        return new LockManagerImpl(this);
     }
 
     /**
