@@ -39,13 +39,13 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class LockManagerImpl implements LockManager
 {
-    ExecutionContext ec;
+    protected final ExecutionContext ec;
 
     /** Map of lock mode, keyed by the object identity. Utilised on a find operation. */
-    Map<Object, LockMode> requiredLockModesById = null;
+    private Map<Object, LockMode> requiredLockModesById = null;
 
     /** Map of lock mode, keyed by StateManager. */
-    Map<DNStateManager, LockMode> lockModeBySM = null;
+    private Map<DNStateManager, LockMode> lockModeBySM = null;
 
     public LockManagerImpl(ExecutionContext ec)
     {
@@ -282,7 +282,15 @@ public class LockManagerImpl implements LockManager
         }
         else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
         {
-            if (currentVersion == null)
+            // First check if a max-value is defined in version-meta-data
+            // and if so then check if we should roll over - back to initial value.
+            Integer maxValue = null;
+            if (vermd.hasExtension(MetaData.EXTENSION_VERSION_NUMBER_MAX_VALUE))
+            {
+                maxValue = Integer.valueOf(vermd.getValueForExtension(MetaData.EXTENSION_VERSION_NUMBER_MAX_VALUE));
+            }
+            if (currentVersion == null ||
+                    (maxValue != null && currentVersion instanceof Number && ((Number)currentVersion).intValue() >= maxValue))
             {
                 // Get the initial value from the VersionMetaData extension if provided, otherwise the global default (for the context)
                 Integer initValue = null;
