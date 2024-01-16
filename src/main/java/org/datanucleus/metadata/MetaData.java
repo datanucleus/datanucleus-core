@@ -112,6 +112,9 @@ public class MetaData implements Serializable
     /** Class : initial value to use for this class for versioning (when using version-number strategy). */
     public static final String EXTENSION_VERSION_NUMBER_INITIAL_VALUE = "version-initial-value";
 
+    /** Class : max value for version field before rolling over to initial value again (when using version-number strategy). */
+    public static final String EXTENSION_VERSION_NUMBER_MAX_VALUE = "version-max-value";
+
     /** Member : name of type converter to use. */
     public final static String EXTENSION_MEMBER_TYPE_CONVERTER_NAME = "type-converter-name";
 

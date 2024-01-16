@@ -252,4 +252,5 @@ public class PropertyNames
     public static final String PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS = "datanucleus.query.resultcache.validateobjects";
     public static final String PROPERTY_QUERY_RESULT_SIZE_METHOD = "datanucleus.query.resultsizemethod";
     public static final String PROPERTY_QUERY_COMPILE_NAMED_QUERIES_AT_STARTUP = "datanucleus.query.compilenamedqueriesatstartup";
+    public static final String PROPERTY_LOCKMANAGER_TYPE = "datanucleus.lockmanager.type";
 }
