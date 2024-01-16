@@ -4165,6 +4165,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return;
         }
 
+        String updateMode = getStringProperty(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE);
+        if (updateMode != null && updateMode.equalsIgnoreCase("datastore-read-only"))
+        {
+            return;
+        }
+
         // Process all modified objects adding/updating/removing from L2 cache as appropriate
         Set<DNStateManager> smsToCache = null;
         Set<Object> idsToRemove = null;
@@ -4731,7 +4737,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Performs the "put" in batches
      * @param sms StateManagers whose objects are to be cached
      */
-    protected void putObjectsIntoLevel2Cache(Set<DNStateManager> sms)
+    public void putObjectsIntoLevel2Cache(Set<DNStateManager> sms)
     {
         int batchSize = nucCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_BATCHSIZE);
         Level2Cache l2Cache = nucCtx.getLevel2Cache();
