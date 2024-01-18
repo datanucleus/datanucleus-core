@@ -59,6 +59,7 @@ import org.datanucleus.exceptions.ObjectDetachedException;
 import org.datanucleus.exceptions.RollbackStateTransitionException;
 import org.datanucleus.exceptions.TransactionActiveOnCloseException;
 import org.datanucleus.exceptions.TransactionNotActiveException;
+import org.datanucleus.flush.ControlOperationQueueForBackingStoreFlushProcess;
 import org.datanucleus.flush.FlushMode;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.flush.Operation;
@@ -3993,6 +3994,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 throw new NucleusOptimisticException(Localiser.msg("010031"), optimisticFailures.toArray(new Throwable[optimisticFailures.size()]));
             }
         }
+        catch (Throwable e)
+        {
+            if (Boolean.TRUE.equals(getBooleanProperty(PropertyNames.PROPERTY_MARK_ROLLBACKONLY_ON_ERROR_IN_FLUSH)))
+            {
+                // Ensure that we rollback in case errors occur in flush.
+                // Otherwise, there is a risc that user continues in transaction and commits
+                // more data that is inconsistent with persistent java objects content.
+                tx.setRollbackOnly();
+            }
+            throw e;
+        }
         finally
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -4030,8 +4042,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (operationQueue != null)
         {
-            // TODO Remove this when core-50 is implemented, and process operationQueue in flush()
-            operationQueue.performAll(backingStore, sm);
+            FlushProcess flusher = getStoreManager().getFlushProcess();
+            if (!(flusher instanceof ControlOperationQueueForBackingStoreFlushProcess)
+                    || ((ControlOperationQueueForBackingStoreFlushProcess) flusher).flushOperationQueueForBackingStore())
+            {
+                // TODO Remove this when core-50 is implemented, and process operationQueue in flush()
+                operationQueue.performAll(backingStore, sm);
+            }
         }
     }
 

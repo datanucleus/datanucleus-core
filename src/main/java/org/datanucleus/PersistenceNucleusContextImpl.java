@@ -225,6 +225,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         // Flush process
         conf.addDefaultProperty(PropertyNames.PROPERTY_FLUSH_MODE, null, null, CorePropertyValidator.class.getName(), false, true);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_FLUSH_AUTO_OBJECT_LIMIT, null, 1, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_MARK_ROLLBACKONLY_ON_ERROR_IN_FLUSH, null, null, false, true);
 
         // Value Generation
         conf.addDefaultProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION, null, "read-committed", CorePropertyValidator.class.getName(), false, false);
