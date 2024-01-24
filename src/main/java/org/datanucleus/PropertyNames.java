@@ -103,6 +103,7 @@ public class PropertyNames
 
     public static final String PROPERTY_FLUSH_MODE = "datanucleus.flush.mode";
     public static final String PROPERTY_FLUSH_AUTO_OBJECT_LIMIT = "datanucleus.flush.auto.objectLimit".toLowerCase();
+    public static final String PROPERTY_MARK_ROLLBACKONLY_ON_ERROR_IN_FLUSH = "datanucleus.mark.rollbackonly.on.error.in.flush";
 
     public static final String PROPERTY_ATTACH_SAME_DATASTORE = "datanucleus.attachSameDatastore".toLowerCase();
     public static final String PROPERTY_DETACH_ALL_ON_COMMIT = "datanucleus.detachAllOnCommit".toLowerCase();
