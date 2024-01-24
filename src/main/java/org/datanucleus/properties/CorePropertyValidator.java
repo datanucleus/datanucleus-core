@@ -316,6 +316,7 @@ public class CorePropertyValidator implements PropertyValidator
             {
                 String strVal = ((String)value).toLowerCase();
                 if (strVal.equals("commit-and-datastore-read") ||
+                    strVal.equals("datastore-read-only") ||
                     strVal.equals("commit-only"))
                 {
                     return true;
