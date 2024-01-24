@@ -1599,7 +1599,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
 
         // Add on version field if not currently set and using version field (surrogate will be added automatically by the query if required)
         int[] fieldNumbersToFetch = fieldNumbers;
-        if (cmd.isVersioned())
+        if (isVersioned())
         {
             VersionMetaData vermd = cmd.getVersionMetaDataForClass();
             if (vermd != null && vermd.getMemberName() != null)
@@ -2355,7 +2355,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     {
         if (pc == myPC)
         {
-            if (transactionalVersion == null && cmd.isVersioned())
+            if (transactionalVersion == null && isVersioned())
             {
                 // If the object is versioned and no version is loaded (e.g obtained via findObject without loading fields) and in a state where we need it then pull in the version
                 VersionMetaData vermd = cmd.getVersionMetaDataForClass();
@@ -2387,7 +2387,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     public boolean isVersionLoaded()
     {
-        if (cmd.isVersioned())
+        if (isVersioned())
         {
             return transactionalVersion != null;
         }
@@ -2614,7 +2614,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2661,7 +2661,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2708,7 +2708,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2755,7 +2755,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2802,7 +2802,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2849,7 +2849,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2896,7 +2896,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2943,7 +2943,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -2990,7 +2990,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -3048,7 +3048,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
         }
         else if (myLC != null)
         {
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 // Not got version but should have
                 loadUnloadedFieldsInFetchPlanAndVersion();
@@ -3970,7 +3970,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
      */
     protected void loadUnloadedFieldsInFetchPlanAndVersion()
     {
-        if (!cmd.isVersioned())
+        if (!isVersioned())
         {
             loadUnloadedFieldsInFetchPlan();
         }
@@ -5573,7 +5573,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             }
 
             boolean versionNeedsLoading = false;
-            if (cmd.isVersioned() && transactionalVersion == null)
+            if (isVersioned() && transactionalVersion == null)
             {
                 versionNeedsLoading = true;
             }
@@ -6239,5 +6239,10 @@ public class StateManagerImpl implements DNStateManager<Persistable>
             // Create the id for the new PC
             myID = myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
         }
+    }
+
+    public boolean isVersioned()
+    {
+        return cmd.isVersioned();
     }
 }

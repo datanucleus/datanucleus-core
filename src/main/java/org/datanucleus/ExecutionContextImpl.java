@@ -43,6 +43,7 @@ import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.cache.SoftRefCache;
 import org.datanucleus.cache.StrongRefCache;
 import org.datanucleus.cache.SupportsConcurrentModificationsIteration;
+import org.datanucleus.cache.TieredLevel1Cache;
 import org.datanucleus.cache.WeakRefCache;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancer.ImplementationCreator;
@@ -85,6 +86,7 @@ import org.datanucleus.state.LockManagerImpl;
 import org.datanucleus.state.LockMode;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
+import org.datanucleus.state.StateManagerImpl;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StorePersistenceHandler;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
@@ -4092,6 +4094,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    private static Iterable<? extends DNStateManager> getMostlyNonHollowValues(Level1Cache cache) {
+        if (cache instanceof TieredLevel1Cache) {
+            TieredLevel1Cache tieredCache = (TieredLevel1Cache) cache;
+            return tieredCache.hotValues();
+        } else {
+            return new HashSet<>(cache.values());
+        }
+    }
+
     /**
      * Method to perform any pre-commit checks.
      */
@@ -4100,11 +4111,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             // Check for objects that are managed but not dirty, yet require a version update
-            Collection<DNStateManager> cachedSMs = new HashSet<>(cache.values());
+            final Iterable<? extends DNStateManager> cachedSMs = getMostlyNonHollowValues(cache);
             for (DNStateManager cachedSM : cachedSMs)
             {
                 LockMode lockMode = getLockManager().getLockMode(cachedSM);
-                if (cachedSM != null && cachedSM.isFlushedToDatastore() && cachedSM.getClassMetaData().isVersioned() && 
+                if (cachedSM != null && cachedSM.isFlushedToDatastore() && isVersioned(cachedSM) &&
                         (lockMode == LockMode.LOCK_OPTIMISTIC_WRITE || lockMode == LockMode.LOCK_PESSIMISTIC_WRITE))
                 {
                     // Not dirty, but locking requires a version update, so force it
@@ -4158,6 +4169,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // "detach-on-commit"
             performDetachAllOnTxnEndPreparation();
         }
+    }
+
+    private static boolean isVersioned(DNStateManager cachedSM)
+    {
+        if (cachedSM instanceof StateManagerImpl)
+        {
+            return ((StateManagerImpl) cachedSM).isVersioned();
+        }
+        return cachedSM.getClassMetaData().isVersioned();
     }
 
     /**
