@@ -42,6 +42,7 @@ import org.datanucleus.cache.Level1Cache;
 import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.cache.SoftRefCache;
 import org.datanucleus.cache.StrongRefCache;
+import org.datanucleus.cache.SupportsConcurrentModificationsIteration;
 import org.datanucleus.cache.WeakRefCache;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancer.ImplementationCreator;
@@ -85,7 +86,9 @@ import org.datanucleus.state.LockMode;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.FieldValues;
+import org.datanucleus.store.StorePersistenceHandler;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
+import org.datanucleus.store.ValidatingStorePersistenceHandler;
 import org.datanucleus.store.query.Extent;
 import org.datanucleus.store.types.converters.TypeConversionHelper;
 import org.datanucleus.store.types.scostore.Store;
@@ -512,8 +515,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
-            Collection<DNStateManager> cachedSMsClone = new HashSet<>(cache.values());
-            for (DNStateManager sm : cachedSMsClone)
+            Collection<DNStateManager> cachedSMs = cache.values();
+            if (!(cachedSMs instanceof SupportsConcurrentModificationsIteration))
+            {
+                cachedSMs = new HashSet<>(cachedSMs);
+            }
+
+            for (DNStateManager sm : cachedSMs)
             {
                 if (sm != null)
                 {
@@ -3066,10 +3074,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Check if an object exists in the L1/L2 caches for this id
             pc = getObjectFromCache(id);
         }
+        else
+        {
+            // ALWAYS look in level 1 as otherwise we might end up with two PC
+            // instances for same object
+            pc = getObjectFromLevel1Cache(id);
+        }
 
-        if (pc == null)
+        if (pc == null && fv == null)
         {
             // Find direct from the datastore if supported
+            // Only invoke findObject from datastore if we DON'T already have a way to provide field values, e.g. from result set.
             pc = (Persistable) getStoreManager().getPersistenceHandler().findObject(this, id);
         }
 
@@ -3370,6 +3385,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             throw new NucleusUserException(Localiser.msg("010044"));
         }
 
+        boolean foundViaPersistenceHandler = false;
+
         IdentityStringTranslator translator = getNucleusContext().getIdentityManager().getIdentityStringTranslator();
         if (translator != null && id instanceof String)
         {
@@ -3407,6 +3424,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             pc = (Persistable) getStoreManager().getPersistenceHandler().findObject(this, id);
             if (pc != null)
             {
+                foundViaPersistenceHandler = true;
                 sm = findStateManager(pc);
                 putObjectIntoLevel1Cache(sm);
                 putObjectIntoLevel2Cache(sm, false);
@@ -3469,7 +3487,20 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             try
             {
-                sm.validate();
+                final StorePersistenceHandler persistenceHandler = getStoreManager().getPersistenceHandler();
+                if (persistenceHandler instanceof ValidatingStorePersistenceHandler)
+                {
+                    // If the object was loaded in findObject from persistence handler in store manager
+                    // then it might not be necessary to check for its existence again in DB
+                    // by calling sm.validate().
+                    // We leave this decision to the persistence handler if it supports this optimization.
+                    ((ValidatingStorePersistenceHandler) persistenceHandler).validate(sm, foundViaPersistenceHandler);
+                }
+                else
+                {
+                    sm.validate();
+                }
+
 
                 if (sm.getObject() != pc)
                 {
