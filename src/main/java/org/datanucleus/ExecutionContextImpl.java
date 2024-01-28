@@ -42,6 +42,8 @@ import org.datanucleus.cache.Level1Cache;
 import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.cache.SoftRefCache;
 import org.datanucleus.cache.StrongRefCache;
+import org.datanucleus.cache.SupportsConcurrentModificationsIteration;
+import org.datanucleus.cache.TieredLevel1Cache;
 import org.datanucleus.cache.WeakRefCache;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancer.ImplementationCreator;
@@ -85,8 +87,11 @@ import org.datanucleus.state.LockManagerImpl;
 import org.datanucleus.state.LockMode;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
+import org.datanucleus.state.StateManagerImpl;
 import org.datanucleus.store.FieldValues;
+import org.datanucleus.store.StorePersistenceHandler;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
+import org.datanucleus.store.ValidatingStorePersistenceHandler;
 import org.datanucleus.store.query.Extent;
 import org.datanucleus.store.types.converters.TypeConversionHelper;
 import org.datanucleus.store.types.scostore.Store;
@@ -513,8 +518,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
-            Collection<DNStateManager> cachedSMsClone = new HashSet<>(cache.values());
-            for (DNStateManager sm : cachedSMsClone)
+            Collection<DNStateManager> cachedSMs = cache.values();
+            if (!(cachedSMs instanceof SupportsConcurrentModificationsIteration))
+            {
+                cachedSMs = new HashSet<>(cachedSMs);
+            }
+
+            for (DNStateManager sm : cachedSMs)
             {
                 if (sm != null)
                 {
@@ -3067,10 +3077,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Check if an object exists in the L1/L2 caches for this id
             pc = getObjectFromCache(id);
         }
+        else
+        {
+            // ALWAYS look in level 1 as otherwise we might end up with two PC
+            // instances for same object
+            pc = getObjectFromLevel1Cache(id);
+        }
 
-        if (pc == null)
+        if (pc == null && fv == null)
         {
             // Find direct from the datastore if supported
+            // Only invoke findObject from datastore if we DON'T already have a way to provide field values, e.g. from result set.
             pc = (Persistable) getStoreManager().getPersistenceHandler().findObject(this, id);
         }
 
@@ -3371,6 +3388,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             throw new NucleusUserException(Localiser.msg("010044"));
         }
 
+        boolean foundViaPersistenceHandler = false;
+
         IdentityStringTranslator translator = getNucleusContext().getIdentityManager().getIdentityStringTranslator();
         if (translator != null && id instanceof String)
         {
@@ -3408,6 +3427,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             pc = (Persistable) getStoreManager().getPersistenceHandler().findObject(this, id);
             if (pc != null)
             {
+                foundViaPersistenceHandler = true;
                 sm = findStateManager(pc);
                 putObjectIntoLevel1Cache(sm);
                 putObjectIntoLevel2Cache(sm, false);
@@ -3470,7 +3490,20 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             try
             {
-                sm.validate();
+                final StorePersistenceHandler persistenceHandler = getStoreManager().getPersistenceHandler();
+                if (persistenceHandler instanceof ValidatingStorePersistenceHandler)
+                {
+                    // If the object was loaded in findObject from persistence handler in store manager
+                    // then it might not be necessary to check for its existence again in DB
+                    // by calling sm.validate().
+                    // We leave this decision to the persistence handler if it supports this optimization.
+                    ((ValidatingStorePersistenceHandler) persistenceHandler).validate(sm, foundViaPersistenceHandler);
+                }
+                else
+                {
+                    sm.validate();
+                }
+
 
                 if (sm.getObject() != pc)
                 {
@@ -4078,6 +4111,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    private static Iterable<? extends DNStateManager> getMostlyNonHollowValues(Level1Cache cache) {
+        if (cache instanceof TieredLevel1Cache) {
+            TieredLevel1Cache tieredCache = (TieredLevel1Cache) cache;
+            return tieredCache.hotValues();
+        } else {
+            return new HashSet<>(cache.values());
+        }
+    }
+
     /**
      * Method to perform any pre-commit checks.
      */
@@ -4086,11 +4128,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             // Check for objects that are managed but not dirty, yet require a version update
-            Collection<DNStateManager> cachedSMs = new HashSet<>(cache.values());
+            final Iterable<? extends DNStateManager> cachedSMs = getMostlyNonHollowValues(cache);
             for (DNStateManager cachedSM : cachedSMs)
             {
                 LockMode lockMode = getLockManager().getLockMode(cachedSM);
-                if (cachedSM != null && cachedSM.isFlushedToDatastore() && cachedSM.getClassMetaData().isVersioned() && 
+                if (cachedSM != null && cachedSM.isFlushedToDatastore() && isVersioned(cachedSM) &&
                         (lockMode == LockMode.LOCK_OPTIMISTIC_WRITE || lockMode == LockMode.LOCK_PESSIMISTIC_WRITE))
                 {
                     // Not dirty, but locking requires a version update, so force it
@@ -4144,6 +4186,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // "detach-on-commit"
             performDetachAllOnTxnEndPreparation();
         }
+    }
+
+    private static boolean isVersioned(DNStateManager cachedSM)
+    {
+        if (cachedSM instanceof StateManagerImpl)
+        {
+            return ((StateManagerImpl) cachedSM).isVersioned();
+        }
+        return cachedSM.getClassMetaData().isVersioned();
     }
 
     /**
