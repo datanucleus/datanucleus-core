@@ -4111,11 +4111,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    private static Iterable<? extends DNStateManager> getMostlyNonHollowValues(Level1Cache cache) {
-        if (cache instanceof TieredLevel1Cache) {
+    private static Iterable<? extends DNStateManager> getMostlyNonHollowValues(Level1Cache cache) 
+    {
+        if (cache instanceof TieredLevel1Cache) 
+        {
             TieredLevel1Cache tieredCache = (TieredLevel1Cache) cache;
             return tieredCache.hotValues();
-        } else {
+        }
+        else
+        {
             return new HashSet<>(cache.values());
         }
     }
