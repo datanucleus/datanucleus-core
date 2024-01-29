@@ -25,6 +25,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,6 +38,7 @@ import java.util.Set;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CacheUniqueKey;
 import org.datanucleus.cache.CachedPC;
+import org.datanucleus.cache.EnlistedSMCacheFactory;
 import org.datanucleus.cache.L2CachePopulateFieldManager;
 import org.datanucleus.cache.Level1Cache;
 import org.datanucleus.cache.Level2Cache;
@@ -178,7 +180,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private FlushMode flushMode = null;
 
     /** Cache of StateManagers enlisted in the current transaction, keyed by the object id. */
-    private final Map<Object, DNStateManager> enlistedSMCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    private final Map<Object, DNStateManager> enlistedSMCache;
 
     /** List of StateManagers for all current dirty objects managed by this context. */
     private final Collection<DNStateManager> dirtySMs = new LinkedHashSet<>();
@@ -263,11 +265,34 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public ExecutionContextImpl(PersistenceNucleusContext ctx, Object owner, Map<String, Object> options)
     {
         this.nucCtx = ctx;
+        this.enlistedSMCache = createEnlistedSMCache();
 
         initialise(owner, options);
 
         // Set up the Level 1 Cache, allowing reuse by subsequent uses of the ExecutionContext
         initialiseLevel1Cache();
+    }
+
+    private Map<Object, DNStateManager> createEnlistedSMCache()
+    {
+        final String enlistedCacheFactoryClassName = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_ENLISTED_CACHE_FACTORY_CLASS);
+        if (enlistedCacheFactoryClassName != null && !enlistedCacheFactoryClassName.isEmpty())
+        {
+            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+            final ClassLoaderResolver classLoaderResolver = nucCtx.getClassLoaderResolver(contextLoader);
+            final Class<EnlistedSMCacheFactory> flushProcessClass = classLoaderResolver.classForName(enlistedCacheFactoryClassName);
+            try
+            {
+                return flushProcessClass.getDeclaredConstructor().newInstance().createEnlistedSMCache();
+            }
+            catch (InstantiationException | IllegalAccessException |
+                   InvocationTargetException | NoSuchMethodException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        // default enlisted-sm-cache
+        return new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     }
 
     public void initialise(Object owner, Map<String, Object> options)
@@ -2815,6 +2840,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
+     * Get all managed StateManager objects enlisted in this execution context -
+     * without doing performance expensive defensive copy of the set.
+     * @return direct (readonly) access to all enlisted StageManagers
+     */
+    public Collection<DNStateManager> getEnlistedSMCacheValues() {
+        return Collections.unmodifiableCollection(enlistedSMCache.values());
+    }
+
+    /**
      * Accessor for the currently managed objects for the current transaction.
      * If the transaction is not active this returns null.
      * @return Collection of managed objects enlisted in the current transaction
@@ -4377,7 +4411,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 for (int j=0;j<rootClasses.length;j++)
                 {
                     // Check if object is of this root type
-                    if (txSMs[i].getObject().getClass() == rootClasses[j])
+                    if (txSMs[i] != null && txSMs[i].getObject().getClass() == rootClasses[j])
                     {
                         // This StateManager is for a valid root object
                         sms.add(txSMs[i]);
