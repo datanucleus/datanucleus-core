@@ -89,6 +89,7 @@ public class PropertyNames
     public static final String PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD = "datanucleus.executioncontext.reaperthread";
     public static final String PROPERTY_EXECUTION_CONTEXT_MAX_IDLE = "datanucleus.executioncontext.maxidle";
     public static final String PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION = "datanucleus.executioncontext.closeactivetxaction";
+    public static final String PROPERTY_EXECUTION_CONTEXT_ENLISTED_CACHE_FACTORY_CLASS = "datanucleus.executioncontext.enlistedSMCacheFactoryClass".toLowerCase();
 //    public static final String PROPERTY_STATE_MANAGER_REAPER_THREAD = "datanucleus.stateManager.reaperThread".toLowerCase();
 //    public static final String PROPERTY_STATE_MANAGER_MAX_IDLE = "datanucleus.stateManager.maxIdle".toLowerCase();
     public static final String PROPERTY_STATE_MANAGER_CLASS_NAME = "datanucleus.statemanager.classname";
