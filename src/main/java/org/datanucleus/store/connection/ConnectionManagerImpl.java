@@ -211,7 +211,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
 
         ManagedConnection mconn = allocateManagedConnection(primary, ec, ec.getTransaction(), options);
-        ((AbstractManagedConnection)mconn).incrementUseCount(); // Will be decremented on calling mconn.release
+        mconn.incrementUseCount(); // Will be decremented on calling mconn.release
         return mconn;
     }
 
@@ -231,7 +231,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
 
         ManagedConnection mconn = allocateManagedConnection(primary, null, null, options);
-        ((AbstractManagedConnection)mconn).incrementUseCount(); // Will be decremented on calling mconn.release
+        mconn.incrementUseCount(); // Will be decremented on calling mconn.release
         return mconn;
     }
 
@@ -242,7 +242,7 @@ public class ConnectionManagerImpl implements ConnectionManager
     public ManagedConnection getConnection(boolean primary, ExecutionContext ec, Transaction txn)
     {
         ManagedConnection mconn = allocateManagedConnection(primary, ec, txn, null);
-        ((AbstractManagedConnection)mconn).incrementUseCount(); // Will be decremented on calling mconn.release
+        mconn.incrementUseCount(); // Will be decremented on calling mconn.release
         return mconn;
     }
 
