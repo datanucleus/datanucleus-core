@@ -56,7 +56,7 @@ public abstract class AbstractManagedConnection implements ManagedConnection
     /** Count on the number of outstanding uses of this connection. Incremented on get. Decremented on release(). */
     protected int useCount = 0;
 
-    protected void incrementUseCount()
+    public void incrementUseCount()
     {
         useCount = useCount + 1;
     }

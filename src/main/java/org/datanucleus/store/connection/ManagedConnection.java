@@ -32,6 +32,13 @@ public interface ManagedConnection
     Object getConnection();
 
     /**
+     * Implementations may override this method to keep track of the number of times the connection is used.
+     * Method is called when a connection has been handed out to a user.
+     * Implementation should then decrement the use count when the connection is released.
+     */
+    default void incrementUseCount() {}
+
+    /**
      * Method to release the datastore connection back. Will have been handed out with a getConnection().
      * This may trigger a commit() of the connection depending on its operating mode at the time.
      */
