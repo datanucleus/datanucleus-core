@@ -2097,8 +2097,8 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     /**
      * Method to cancel any currently running queries.
-     * Operates if the implementation supports cancelling of queries via the method
-     * <pre>assertSupportsCancel()</pre>
+     * Operates if the implementation supports cancelling of queries via the method <pre>assertSupportsCancel()</pre>.
+     * Note that the implementation may not know if they are supported until trying the driver, so could throw UnsupportedOperationException when actually trying the cancel.
      */
     public void cancel()
     {
@@ -2108,16 +2108,15 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         {
             Map.Entry entry = (Map.Entry)taskIterator.next();
             boolean success = cancelTaskObject(entry.getValue());
-            NucleusLogger.QUERY.debug("Query cancelled for thread=" + ((Thread)entry.getKey()).getId() + 
-                " with success=" + success);
+            NucleusLogger.QUERY.debug("Query cancel called for thread=" + ((Thread)entry.getKey()).getId() + " with success=" + success);
         }
         tasks.clear();
     }
 
     /**
      * Method to cancel a running query in the specified Thread.
-     * Operates if the implementation supports cancelling of queries via the method
-     * <pre>assertSupportsCancel()</pre>
+     * Operates if the implementation supports cancelling of queries via the method <pre>assertSupportsCancel()</pre>.
+     * Note that the implementation may not know if they are supported until trying the driver, so could throw UnsupportedOperationException when actually trying the cancel.
      * @param thread The thread
      */
     public void cancel(Thread thread)
@@ -2153,11 +2152,13 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     /**
      * Method to perform the cancellation of a query task.
-     * This implementation does nothing. Override if you
+     * This implementation does nothing. Override as appropriate.
      * @param obj The task
      * @return Whether the task was cancelled
+     * @throws UnsupportedOperationException if the implementation finds at runtime that the operation is not supported.
      */
     protected boolean cancelTaskObject(Object obj)
+    throws UnsupportedOperationException
     {
         return true;
     }
