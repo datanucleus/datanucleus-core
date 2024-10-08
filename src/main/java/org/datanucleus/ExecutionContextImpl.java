@@ -302,6 +302,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         String password = (String)options.get(ExecutionContext.OPTION_PASSWORD);*/
         this.owner = owner;
         this.closed = false;
+        this.flushMode = null;
 
         // Set up class loading
         ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
