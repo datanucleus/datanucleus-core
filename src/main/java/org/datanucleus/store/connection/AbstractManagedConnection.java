@@ -37,7 +37,7 @@ import org.datanucleus.util.StringUtils;
  * the connection it is handed back into a pooled state, available for reuse.</li>
  * </ul>
  */
-public abstract class AbstractManagedConnection implements ManagedConnection, ManagedConnectionWithListenerAccess
+public abstract class AbstractManagedConnection implements ManagedConnectionWithListenerAccess
 {
     /** The underlying (datastore-specific) connection. */
     protected Object conn;
