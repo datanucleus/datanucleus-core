@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.connection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.transaction.xa.XAResource;
@@ -36,7 +37,7 @@ import org.datanucleus.util.StringUtils;
  * the connection it is handed back into a pooled state, available for reuse.</li>
  * </ul>
  */
-public abstract class AbstractManagedConnection implements ManagedConnection
+public abstract class AbstractManagedConnection implements ManagedConnection, ManagedConnectionWithListenerAccess
 {
     /** The underlying (datastore-specific) connection. */
     protected Object conn;
@@ -147,6 +148,12 @@ public abstract class AbstractManagedConnection implements ManagedConnection
     public void removeListener(ManagedConnectionResourceListener listener)
     {
         listeners.remove(listener);            
+    }
+
+    @Override
+    public Collection<ManagedConnectionResourceListener> getListeners()
+    {
+        return listeners;
     }
 
     public boolean isLocked()
