@@ -4246,9 +4246,8 @@ public class StateManagerImpl implements DNStateManager<Persistable>
     {
         if (isEmbedded())
         {
-            // Inform the owner of this change in the embedded object if necessary
             EmbeddedOwnerRelation ownerRel = myEC.getOwnerInformationForEmbedded(this);
-            if (ownerRel != null)
+            if (ownerRel != null && makeDirty)
             {
                 // Notify the owner of this embedded object that it has just changed
                 // We do this before we actually change the object so we can compare with the old value
@@ -4287,10 +4286,7 @@ public class StateManagerImpl implements DNStateManager<Persistable>
                 if ((ownerSM.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
                 {
                     // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
-                    if (makeDirty)
-                    {
-                        ownerSM.makeDirty(ownerRel.getOwnerMemberNum());
-                    }
+                    ownerSM.makeDirty(ownerRel.getOwnerMemberNum());
                 }
             }
 
