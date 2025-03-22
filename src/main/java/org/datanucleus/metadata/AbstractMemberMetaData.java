@@ -1538,7 +1538,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         else if (parent instanceof EmbeddedMetaData)
         {
             // <embedded> is contained in a <field>, <element>, <key>, <value>
-            MetaData parentMd = ((EmbeddedMetaData)parent).getParent();
+            MetaData parentMd = parent.getParent();
             String typeName = null;
             if (parentMd instanceof AbstractMemberMetaData)
             {
@@ -1546,17 +1546,17 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             }
             else if (parentMd instanceof ElementMetaData)
             {
-                AbstractMemberMetaData fmd = (AbstractMemberMetaData)((ElementMetaData)parentMd).getParent();
+                AbstractMemberMetaData fmd = (AbstractMemberMetaData)parentMd.getParent();
                 typeName = fmd.getCollection().getElementType();
             }
             else if (parentMd instanceof KeyMetaData)
             {
-                AbstractMemberMetaData fmd = (AbstractMemberMetaData)((KeyMetaData)parentMd).getParent();
+                AbstractMemberMetaData fmd = (AbstractMemberMetaData)parentMd.getParent();
                 typeName = fmd.getMap().getKeyType();
             }
             else if (parentMd instanceof ValueMetaData)
             {
-                AbstractMemberMetaData fmd = (AbstractMemberMetaData)((ValueMetaData)parentMd).getParent();
+                AbstractMemberMetaData fmd = (AbstractMemberMetaData)parentMd.getParent();
                 typeName = fmd.getMap().getValueType();
             }
             else
@@ -1572,7 +1572,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
         else if (parent instanceof UniqueMetaData)
         {
-            MetaData grandparent = ((UniqueMetaData)parent).getParent();
+            MetaData grandparent = parent.getParent();
             if (grandparent instanceof AbstractClassMetaData)
             {
                 String fullClassName = ((AbstractClassMetaData)grandparent).getFullClassName();

@@ -138,9 +138,8 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
         long oldValue = getTimeInMillis();
         initialise(value);
 
-        // Check if the field has changed, and set the owner field as dirty if
-        // necessary
-        long newValue = ((java.util.Calendar) value).getTime().getTime();
+        // Check if the field has changed, and set the owner field as dirty if necessary
+        long newValue = value.getTime().getTime();
         if (oldValue != newValue)
         {
             makeDirty();

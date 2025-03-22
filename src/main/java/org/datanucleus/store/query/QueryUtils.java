@@ -619,7 +619,7 @@ public class QueryUtils
         }
         else if (obj instanceof Number)
         {
-            value = ((Number) obj).toString();
+            value = obj.toString();
         }
         else if (obj != null)
         {

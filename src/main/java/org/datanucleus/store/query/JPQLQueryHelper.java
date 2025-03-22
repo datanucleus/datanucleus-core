@@ -466,7 +466,7 @@ public class JPQLQueryHelper
                     throw new NucleusUserException("Attempt to perform COUNT without any arguments");
                 }
                 Expression argExpr = args.get(0);
-                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                if (argExpr instanceof DyadicExpression && argExpr.getOperator() == Expression.OP_DISTINCT)
                 {
                     DyadicExpression dyExpr = (DyadicExpression)argExpr;
                     return "COUNT(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
@@ -533,7 +533,7 @@ public class JPQLQueryHelper
                     throw new NucleusUserException("Attempt to perform AVG without any arguments");
                 }
                 Expression argExpr = args.get(0);
-                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                if (argExpr instanceof DyadicExpression && argExpr.getOperator() == Expression.OP_DISTINCT)
                 {
                     DyadicExpression dyExpr = (DyadicExpression)argExpr;
                     return "AVG(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
@@ -547,7 +547,7 @@ public class JPQLQueryHelper
                     throw new NucleusUserException("Attempt to perform MAX without any arguments");
                 }
                 Expression argExpr = args.get(0);
-                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                if (argExpr instanceof DyadicExpression && argExpr.getOperator() == Expression.OP_DISTINCT)
                 {
                     DyadicExpression dyExpr = (DyadicExpression)argExpr;
                     return "MAX(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
@@ -561,7 +561,7 @@ public class JPQLQueryHelper
                     throw new NucleusUserException("Attempt to perform MIN without any arguments");
                 }
                 Expression argExpr = args.get(0);
-                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                if (argExpr instanceof DyadicExpression && argExpr.getOperator() == Expression.OP_DISTINCT)
                 {
                     DyadicExpression dyExpr = (DyadicExpression)argExpr;
                     return "MIN(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
@@ -584,7 +584,7 @@ public class JPQLQueryHelper
                     throw new NucleusUserException("Attempt to perform SUM without any arguments");
                 }
                 Expression argExpr = args.get(0);
-                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                if (argExpr instanceof DyadicExpression && argExpr.getOperator() == Expression.OP_DISTINCT)
                 {
                     DyadicExpression dyExpr = (DyadicExpression)argExpr;
                     return "SUM(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";

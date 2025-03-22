@@ -2005,7 +2005,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                         while (cmdCls != null)
                         {
 //                          if (!referenceClass.isAssignableFrom(clr.classForName(((ClassMetaData)cmd_superclass).getFullClassName())))
-                            if (referenceClass != Object.class && !clr.isAssignableFrom(referenceClass, ((ClassMetaData)cmdCls).getFullClassName()))
+                            if (referenceClass != Object.class && !clr.isAssignableFrom(referenceClass, cmdCls.getFullClassName()))
                             {
                                 // No point going further up since no longer an implementation
                                 break;
@@ -2280,13 +2280,13 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
         else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
         {
-            AbstractClassMetaData baseCmd = (AbstractClassMetaData)((InheritanceMetaData)dismd.getParent()).getParent();
+            AbstractClassMetaData baseCmd = (AbstractClassMetaData)dismd.getParent().getParent();
             AbstractClassMetaData rootCmd = baseCmd.getBaseAbstractClassMetaData();
             return getClassNameForDiscriminatorValueWithRoot(rootCmd, discrimValue);
         }
         else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME)
         {
-            AbstractClassMetaData baseCmd = (AbstractClassMetaData)((InheritanceMetaData)dismd.getParent()).getParent();
+            AbstractClassMetaData baseCmd = (AbstractClassMetaData)dismd.getParent().getParent();
             AbstractClassMetaData rootCmd = baseCmd.getBaseAbstractClassMetaData();
             String value = getClassNameForDiscriminatorValueWithRoot(rootCmd, discrimValue);
             if (value != null)

@@ -354,7 +354,7 @@ public class JDOQLCompiler extends JavaQueryCompiler
         }
         else if (expr instanceof OrderExpression)
         {
-            Expression orderExpr = ((OrderExpression)expr).getLeft();
+            Expression orderExpr = expr.getLeft();
             return isExpressionGroupingOrAggregate(orderExpr, exprGrouping);
         }
         else if (expr instanceof Literal)

@@ -598,7 +598,7 @@ public class MapMetaData extends ContainerMetaData
 
     public String[] getKeyTypes()
     {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES);
+        return getParent().getValuesForExtension(MetaData.EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES);
     }
 
     // TODO Keep implementation types separate from declared type
@@ -638,7 +638,7 @@ public class MapMetaData extends ContainerMetaData
 
     public String[] getValueTypes()
     {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES);
+        return getParent().getValuesForExtension(MetaData.EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES);
     }
 
     // TODO Keep implementation types separate from declared type

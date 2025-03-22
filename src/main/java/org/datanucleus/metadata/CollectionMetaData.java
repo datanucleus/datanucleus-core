@@ -316,7 +316,7 @@ public class CollectionMetaData extends ContainerMetaData
 
     public String[] getElementTypes()
     {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
+        return getParent().getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
     }
 
     // TODO Keep implementation types separate from declared type
