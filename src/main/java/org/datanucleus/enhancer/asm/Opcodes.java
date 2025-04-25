@@ -54,9 +54,9 @@ public interface Opcodes {
    * <i>Experimental, use at your own risk. This field will be renamed when it becomes stable, this
    * will break existing code using it. Only code compiled with --enable-preview can use this.</i>
    *
-   * This API is experimental.
+   * deprecated This API is experimental.
    */
-  /* @Deprecated */ int ASM10_EXPERIMENTAL = 1 << 24 | 10 << 16 | 0 << 8;
+  /* @Deprecated */int ASM10_EXPERIMENTAL = 1 << 24 | 10 << 16 | 0 << 8;
 
   /*
    * Internal flags used to redirect calls to deprecated methods. For instance, if a visitOldStuff
@@ -290,6 +290,7 @@ public interface Opcodes {
   int V22 = 0 << 16 | 66;
   int V23 = 0 << 16 | 67;
   int V24 = 0 << 16 | 68;
+  int V25 = 0 << 16 | 69;
 
   /**
    * Version flag indicating that the class is using 'preview' features.
