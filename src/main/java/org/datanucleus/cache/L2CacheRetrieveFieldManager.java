@@ -387,6 +387,11 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
      * Copy container without using the container handler and metadata type info. 
      * Calling newContainer from container handler for interfaces will return the default chosen implementation, but this causes the JDO TCK
      * (TestCollectionCollections) to fail because it expects Collection fields to return the same or at most a List.
+     * @param container The container
+     * @param mmd Metadata for the member that this container is for
+     * @param containerHandler the handler for the container
+     * @return The container
+     * @param <T> generic type
      */
     protected static <T> T newContainer(Object container, AbstractMemberMetaData mmd, ContainerHandler containerHandler)
     {

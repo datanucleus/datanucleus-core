@@ -178,6 +178,7 @@ public class Attribute {
    * @param labels the already created labels, indexed by their offset. If a label already exists
    *     for bytecodeOffset this method does not create a new one. Otherwise it stores the new label
    *     in this array.
+   * @param classReader the class reader
    * @return a label for the given bytecode offset.
    */
   public static Label readLabel(
