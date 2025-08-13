@@ -77,18 +77,36 @@ public abstract class AbstractManagedConnection implements ManagedConnectionWith
      */
     public void release()
     {
-        if (closeOnRelease)
+        if (useCount > 0)
         {
-            useCount = useCount -1;
-            if (useCount == 0)
+            useCount = useCount - 1;
+        }
+
+        if (useCount == 0)
+        {
+            if (commitOnRelease)
             {
-                // Close if this is the last use of the connection
+                // This connection is managed by DataNucleus, so commit the work.
+                // Note: The XAResource holds the real "commit" logic for the datastore.
+                XAResource xaRes = getXAResource();
+                if (xaRes != null)
+                {
+                    try
+                    {
+                        // We are committing a RESOURCE_LOCAL transaction.
+                        xaRes.commit(null, true);
+                    }
+                    catch (javax.transaction.xa.XAException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            else if (closeOnRelease)
+            {
+                // This is the original logic for non-transactional connections.
                 if (!processingClose) 
                 {
-                    // Note that we don't allow attempts to close a connection that is already being closed.
-                    // This is because we may have e.g a JDOQL which retrieves some objects when non-tx, the connection close is called
-                    // This then tries to load all results of the query. If the results load requires a subsequent SQL to get some additional info
-                    // that then would result in a further attempt to call close(), which would go back to the original JDOQL and reattempt the load.
                     processingClose = true;
                     close();
                 }
