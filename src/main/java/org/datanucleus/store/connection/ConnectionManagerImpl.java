@@ -44,18 +44,15 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Manager of connections for a datastore, allowing caching of ManagedConnections, enlistment in transaction.
- * Manages a "primary" and (optionally) a "secondary" ConnectionFactory. When caching is enabled it maintains
- * caches of the allocated ManagedConnection per ExecutionContext (an EC can have a single ManagedConnection
- * per ConnectionFactory at any time).
+ * Manages a "primary" and (optionally) a "secondary" ConnectionFactory.
+ * When caching is enabled it maintains caches of the allocated ManagedConnection per ExecutionContext (an EC can have a single ManagedConnection per ConnectionFactory at any time).
  * <p>
- * The "allocateConnection" method can create connections and enlist them (like most normal persistence
- * operations need) or create a connection and return it without enlisting it into a transaction, for example
- * on a read-only operation, or when running non-transactional, or to get schema information.
+ * The "allocateConnection" method can create connections and enlist them (like most normal persistence operations need) or create a connection and return it 
+ * without enlisting it into a transaction, for example on a read-only operation, or when running non-transactional, or to get schema information.
  * </p>
  * <p>
- * Connections can be locked per ExecutionContext basis. Locking of connections is used to handle the
- * connection over to the user application. A locked connection denies any further access to the datastore,
- * until the user application unlock it.
+ * Connections can be locked per ExecutionContext basis. Locking of connections is used to handle the connection over to the user application. 
+ * A locked connection denies any further access to the datastore, until the user application unlock it.
  * </p>
  */
 public class ConnectionManagerImpl implements ConnectionManager
@@ -74,20 +71,15 @@ public class ConnectionManagerImpl implements ConnectionManager
     /** "Secondary" ConnectionFactory, normally used for non-transactional operations. */
     ConnectionFactory secondaryConnectionFactory = null;
 
-    /**
-     * Cache of ManagedConnection from the "primary" ConnectionFactory, keyed by the ExecutionContext (since
-     * an EC can have max 1 per factory).
-     */
+    /** Cache of ManagedConnection from the "primary" ConnectionFactory, keyed by the ExecutionContext (since an EC can have max 1 per factory). */
     Map<ExecutionContext, ManagedConnection> primaryConnectionsCache;
 
-    /**
-     * Cache of ManagedConnection from the "secondary" ConnectionFactory, keyed by the ExecutionContext (since
-     * an EC can have max 1 per factory).
-     */
+    /** Cache of ManagedConnection from the "secondary" ConnectionFactory, keyed by the ExecutionContext (since an EC can have max 1 per factory). */
     Map<ExecutionContext, ManagedConnection> secondaryConnectionsCache;
 
     /**
-     * Constructor. This will register the "primary" and "secondary" ConnectionFactory objects.
+     * Constructor.
+     * This will register the "primary" and "secondary" ConnectionFactory objects.
      * @param storeMgr Store manager for whom we are managing connections
      */
     public ConnectionManagerImpl(StoreManager storeMgr)
@@ -99,16 +91,14 @@ public class ConnectionManagerImpl implements ConnectionManager
 
         // "Primary" Factory for connections - transactional
         ConfigurationElement cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
-            new String[]{"datastore", "transactional"}, new String[]{storeMgr.getStoreManagerKey(), "true"});
+            new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "true"});
         if (cfElem != null)
         {
             try
             {
-                this.primaryConnectionFactory = (ConnectionFactory) nucleusContext.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_connectionfactory",
-                    new String[]{"datastore", "transactional"}, new String[]{storeMgr.getStoreManagerKey(), "true"}, "class-name",
-                    new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING},
-                    new Object[]{storeMgr, AbstractConnectionFactory.RESOURCE_NAME_TX});
+                this.primaryConnectionFactory = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
+                    new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "true"}, "class-name",
+                    new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {storeMgr, AbstractConnectionFactory.RESOURCE_NAME_TX});
                 this.primaryConnectionsCache = new ConcurrentHashMap<>();
 
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
@@ -133,16 +123,14 @@ public class ConnectionManagerImpl implements ConnectionManager
 
         // "Secondary" Factory for connections - typically for schema/sequences etc
         cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
-            new String[]{"datastore", "transactional"}, new String[]{storeMgr.getStoreManagerKey(), "false"});
+            new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "false"});
         if (cfElem != null)
         {
             try
             {
-                this.secondaryConnectionFactory = (ConnectionFactory) nucleusContext.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_connectionfactory",
-                    new String[]{"datastore", "transactional"}, new String[]{storeMgr.getStoreManagerKey(), "false"}, "class-name",
-                    new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING},
-                    new Object[]{storeMgr, AbstractConnectionFactory.RESOURCE_NAME_NONTX});
+                this.secondaryConnectionFactory = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
+                    new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "false"}, "class-name",
+                    new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {storeMgr, AbstractConnectionFactory.RESOURCE_NAME_NONTX});
                 this.secondaryConnectionsCache = new ConcurrentHashMap<>();
 
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
@@ -162,8 +150,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.datanucleus.store.connection.ConnectionManager#close()
      */
     @Override
@@ -188,8 +175,7 @@ public class ConnectionManagerImpl implements ConnectionManager
     }
 
     /**
-     * Disable binding objects to ExecutionContext references, so automatically disables the connection
-     * caching.
+     * Disable binding objects to ExecutionContext references, so automatically disables the connection caching. 
      */
     public void disableConnectionCaching()
     {
@@ -199,10 +185,8 @@ public class ConnectionManagerImpl implements ConnectionManager
         secondaryConnectionsCache = null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.datanucleus.store.connection.ConnectionManager#getConnection(org.datanucleus.ExecutionContext,
-     * java.util.Map)
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#getConnection(org.datanucleus.ExecutionContext, java.util.Map)
      */
     @Override
     public ManagedConnection getConnection(ExecutionContext ec, Map options)
@@ -231,8 +215,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         return mconn;
     }
 
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.datanucleus.store.connection.ConnectionManager#getConnection(int)
      */
     @Override
@@ -252,10 +235,8 @@ public class ConnectionManagerImpl implements ConnectionManager
         return mconn;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.datanucleus.store.connection.ConnectionManager#getConnection(boolean,
-     * org.datanucleus.ExecutionContext, org.datanucleus.Transaction)
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#getConnection(boolean, org.datanucleus.ExecutionContext, org.datanucleus.Transaction)
      */
     @Override
     public ManagedConnection getConnection(boolean primary, ExecutionContext ec, Transaction txn)
@@ -265,10 +246,8 @@ public class ConnectionManagerImpl implements ConnectionManager
         return mconn;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.datanucleus.store.connection.ConnectionManager#closeAllConnections(org.datanucleus.
-     * ExecutionContext)
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#closeAllConnections(org.datanucleus.ExecutionContext)
      */
     @Override
     public void closeAllConnections(ExecutionContext ec)
@@ -353,17 +332,18 @@ public class ConnectionManagerImpl implements ConnectionManager
     }
 
     /**
-     * Method to return a ManagedConnection for this ExecutionContext. If a connection for the
-     * ExecutionContext exists in the cache will return it. If no connection exists will create a new one
-     * using the ConnectionFactory.
+     * Method to return a ManagedConnection for this ExecutionContext.
+     * If a connection for the ExecutionContext exists in the cache will return it.
+     * If no connection exists will create a new one using the ConnectionFactory.
+     * This implementation provides the core fix for making the XA and non-XA commit
+     * paths mutually exclusive.
      * @param primary Whether this is the primary connection pool
      * @param ec Key in the pool
      * @param transaction The transaction
      * @param options Options for the connection (e.g isolation). These will override those of the txn itself
      * @return The ManagedConnection
      */
-    private ManagedConnection allocateManagedConnection(boolean primary, final ExecutionContext ec, final org.datanucleus.transaction.Transaction transaction,
-            Map options)
+    private ManagedConnection allocateManagedConnection(final boolean primary, final ExecutionContext ec, final org.datanucleus.transaction.Transaction transaction, Map options)
     {
         ConnectionFactory factory = primary ? primaryConnectionFactory : secondaryConnectionFactory;
         if (ec != null && connectionCachingEnabled)
@@ -371,62 +351,47 @@ public class ConnectionManagerImpl implements ConnectionManager
             ManagedConnection mconnFromPool = getManagedConnection(primary, ec);
             if (mconnFromPool != null)
             {
-                // Factory already has a ManagedConnection
-                if (!mconnFromPool.closeAfterTransactionEnd())
+                // A pooled connection exists; its state must be reset for the current context.
+                if (transaction != null && transaction.isActive())
                 {
-                    if (transaction != null && transaction.isActive())
+                    ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
+                    XAResource res = mconnFromPool.getXAResource();
+
+                    // Determine which commit path to use.
+                    if (res != null && tx != null && !tx.isEnlisted(res))
                     {
-                        // *** THE FIX IS HERE (Block 1) ***
-                        // Only override commitOnRelease for JTA transactions. Respect the setting for
-                        // RESOURCE_LOCAL.
+                        // "Official" XA Path: This connection can be managed by the transaction manager.
+                        // Disable the fallback commit path to prevent double-commit deadlocks.
+                        mconnFromPool.setCommitOnRelease(false);
+                        mconnFromPool.setCloseOnRelease(false);
+
                         String cfResourceType = factory.getResourceType();
-                        if (ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
+                        if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
                         {
-                            // For JTA, the container commits, so DataNucleus should not.
-                            if (mconnFromPool.commitOnRelease())
-                            {
-                                mconnFromPool.setCommitOnRelease(false);
-                            }
-                        }
-
-                        if (mconnFromPool.closeOnRelease())
-                        {
-                            mconnFromPool.setCloseOnRelease(false);
-                        }
-
-                        // Enlist the connection resource if is not enlisted and has enlistable resource
-                        XAResource res = mconnFromPool.getXAResource();
-                        ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
-                        if (res != null && tx != null && !tx.isEnlisted(res))
-                        {
-                            if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
-                            {
-                                // Enlist the resource with this transaction EXCEPT where using external JTA
-                                // container
-                                tx.enlistResource(res);
-                            }
+                            tx.enlistResource(res);
                         }
                     }
-                    else
+                    else if (res == null)
                     {
-                        // Nontransactional : Reset to commit-on-release
-                        if (!mconnFromPool.commitOnRelease())
-                        {
-                            mconnFromPool.setCommitOnRelease(true);
-                        }
-                        if (mconnFromPool.closeOnRelease())
-                        {
-                            mconnFromPool.setCloseOnRelease(false);
-                        }
+                        // "Fallback" Non-XA Path (e.g., Neo4j): No XAResource is available.
+                        // The connection MUST use the commit-on-release fallback mechanism.
+                        mconnFromPool.setCommitOnRelease(true);
+                        mconnFromPool.setCloseOnRelease(false);
                     }
                 }
-
+                else
+                {
+                    // Not in a transaction: reset to default non-transactional behavior.
+                    // This enables the fallback commit path for the next single operation.
+                    mconnFromPool.setCommitOnRelease(true);
+                    mconnFromPool.setCloseOnRelease(false); // Keep in pool
+                }
                 return mconnFromPool;
             }
         }
 
-        // No cached connection so create new ManagedConnection with required options
-        Map txnOptions = new HashMap();
+        // No cached connection, so create a new one with the required options.
+        Map<String, Object> txnOptions = new HashMap<>();
         if (transaction != null && transaction.getOptions() != null && !transaction.getOptions().isEmpty())
         {
             txnOptions.putAll(transaction.getOptions());
@@ -437,68 +402,58 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
         final ManagedConnection mconn = factory.createManagedConnection(ec, txnOptions);
 
-        // Enlist the connection in this transaction
         if (ec != null)
         {
             if (transaction != null && transaction.isActive())
             {
-                // Connection is "managed", and enlist with txn
+                // An active transaction exists; configure the new connection for it.
                 configureTransactionEventListener(transaction, mconn);
                 ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
-
-                // *** THE FIX IS HERE (Block 2) ***
-                // Only override commitOnRelease for JTA transactions. Respect the setting for RESOURCE_LOCAL.
-                String cfResourceType = factory.getResourceType();
-                if (ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
-                {
-                    // For JTA, the container commits, so DataNucleus should not.
-                    mconn.setCommitOnRelease(false);
-                }
-                mconn.setCloseOnRelease(false); // must be set before getting the XAResource
-
-                // Enlist the connection resource if has enlistable resource
                 XAResource res = mconn.getXAResource();
-                if (res != null && tx != null && !tx.isEnlisted(res))
+
+                // Determine which commit path to use.
+                if (res != null && tx != null)
                 {
+                    // "Official" XA Path: Enlist the resource and disable the fallback path.
+                    mconn.setCommitOnRelease(false);
+                    mconn.setCloseOnRelease(false);
+
+                    String cfResourceType = factory.getResourceType();
                     if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
                     {
-                        // Enlist the resource with this transaction EXCEPT where using external JTA container
                         tx.enlistResource(res);
                     }
                 }
+                else
+                {
+                    // "Fallback" Non-XA Path: Enable the commit-on-release mechanism.
+                    mconn.setCommitOnRelease(true);
+                    mconn.setCloseOnRelease(false);
+                }
+            }
+            else
+            {
+                // Not in a transaction, default to commit-on-release for non-transactional operations.
+                mconn.setCommitOnRelease(true);
             }
 
             if (connectionCachingEnabled)
             {
-                // Add listener to remove the connection from the pool when the connection closes
+                // Add listener to remove the connection from the pool when the connection closes.
                 mconn.addListener(new ManagedConnectionResourceListener()
                 {
-                    public void transactionFlushed()
-                    {
-                    }
-
-                    public void transactionPreClose()
-                    {
-                    }
-
-                    public void managedConnectionPreClose()
-                    {
-                    }
-
+                    public void transactionFlushed() {}
+                    public void transactionPreClose() {}
+                    public void managedConnectionPreClose() {}
                     public void managedConnectionPostClose()
                     {
                         removeManagedConnection(primary, ec); // Connection closed so remove
-
-                        // Remove this listener
-                        mconn.removeListener(this);
+                        mconn.removeListener(this); // Remove this listener
                     }
-
-                    public void resourcePostClose()
-                    {
-                    }
+                    public void resourcePostClose() {}
                 });
 
-                // Cache this connection against the ExecutionContext
+                // Cache this connection against the ExecutionContext.
                 putManagedConnection(primary, ec, mconn);
             }
         }
@@ -507,8 +462,7 @@ public class ConnectionManagerImpl implements ConnectionManager
     }
 
     /**
-     * Configure a TransactionEventListener that closes the managed connection when a transaction commits or
-     * rolls back
+     * Configure a TransactionEventListener that closes the managed connection when a transaction commits or rolls back
      * @param transaction The transaction that we add a listener to
      * @param mconn Managed connection being used
      */
@@ -520,10 +474,7 @@ public class ConnectionManagerImpl implements ConnectionManager
             transaction.addTransactionEventListener(
                 new TransactionEventListener()
                 {
-                    public void transactionStarted()
-                    {
-                    }
-
+                    public void transactionStarted() {}
                     public void transactionRolledBack()
                     {
                         try
@@ -535,7 +486,6 @@ public class ConnectionManagerImpl implements ConnectionManager
                             transaction.removeTransactionEventListener(this);
                         }
                     }
-
                     public void transactionCommitted()
                     {
                         try
@@ -547,7 +497,6 @@ public class ConnectionManagerImpl implements ConnectionManager
                             transaction.removeTransactionEventListener(this);
                         }
                     }
-
                     public void transactionEnded()
                     {
                         try
@@ -559,7 +508,6 @@ public class ConnectionManagerImpl implements ConnectionManager
                             transaction.removeTransactionEventListener(this);
                         }
                     }
-
                     public void transactionPreCommit()
                     {
                         if (mconn.isLocked())
@@ -569,7 +517,6 @@ public class ConnectionManagerImpl implements ConnectionManager
                         }
                         mconn.transactionPreClose();
                     }
-
                     public void transactionPreRollBack()
                     {
                         if (mconn.isLocked())
@@ -579,26 +526,19 @@ public class ConnectionManagerImpl implements ConnectionManager
                         }
                         mconn.transactionPreClose();
                     }
-
-                    public void transactionPreFlush()
-                    {
-                    }
-
+                    public void transactionPreFlush() {}
                     public void transactionFlushed()
                     {
                         mconn.transactionFlushed();
                     }
-
                     public void transactionSetSavepoint(String name)
                     {
                         mconn.setSavepoint(name);
                     }
-
                     public void transactionReleaseSavepoint(String name)
                     {
                         mconn.releaseSavepoint(name);
                     }
-
                     public void transactionRollbackToSavepoint(String name)
                     {
                         mconn.rollbackToSavepoint(name);
@@ -610,19 +550,12 @@ public class ConnectionManagerImpl implements ConnectionManager
             transaction.bindTransactionEventListener(
                 new TransactionEventListener()
                 {
-                    public void transactionStarted()
-                    {
-                    }
-
-                    public void transactionPreFlush()
-                    {
-                    }
-
+                    public void transactionStarted() {}
+                    public void transactionPreFlush() {}
                     public void transactionFlushed()
                     {
                         mconn.transactionFlushed();
                     }
-
                     public void transactionPreCommit()
                     {
                         if (mconn.isLocked())
@@ -632,11 +565,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         }
                         mconn.transactionPreClose();
                     }
-
-                    public void transactionCommitted()
-                    {
-                    }
-
+                    public void transactionCommitted() {}
                     public void transactionPreRollBack()
                     {
                         if (mconn.isLocked())
@@ -646,25 +575,16 @@ public class ConnectionManagerImpl implements ConnectionManager
                         }
                         mconn.transactionPreClose();
                     }
-
-                    public void transactionRolledBack()
-                    {
-                    }
-
-                    public void transactionEnded()
-                    {
-                    }
-
+                    public void transactionRolledBack() {}
+                    public void transactionEnded() {}
                     public void transactionSetSavepoint(String name)
                     {
                         mconn.setSavepoint(name);
                     }
-
                     public void transactionReleaseSavepoint(String name)
                     {
                         mconn.releaseSavepoint(name);
                     }
-
                     public void transactionRollbackToSavepoint(String name)
                     {
                         mconn.rollbackToSavepoint(name);

@@ -57,60 +57,82 @@ public abstract class AbstractManagedConnection implements ManagedConnectionWith
     /** Count on the number of outstanding uses of this connection. Incremented on get. Decremented on release(). */
     protected int useCount = 0;
 
+    boolean processingClose = false;
+
     public void incrementUseCount()
     {
         useCount = useCount + 1;
     }
 
+    /**
+     * Commits the underlying connection.
+     * This provides a default empty implementation. Connectors that use the fallback commit path (non-XA)
+     * should override this method to provide datastore-specific commit logic.
+     */
+    public void commit()
+    {
+        // Do nothing by default. Override if your connector needs fallback commit logic.
+    }
+
+    /**
+     * Rolls back the underlying connection.
+     * This provides a default empty implementation. Connectors that use the fallback commit path (non-XA)
+     * should override this method to provide datastore-specific rollback logic.
+     */
+    public void rollback()
+    {
+        // Do nothing by default. Override if your connector needs fallback rollback logic.
+    }
+    
     public void close()
     {
         this.listeners.clear();
         this.conn = null;
     }
 
-    boolean processingClose = false;
-
     /**
-     * Release this connection back to us so we can pool it if required. In the case of a transactional
-     * connection it is allocated and released and always pooled (not committed) during the transaction. 
-     * With non-transactional connections, they can be pooled (where selected), or not (default).
+     * Release this connection back to the connection manager.
+     * This method implements the "fallback" commit path for simple, non-XA datastores.
+     * It decrements the usage count. When the count reaches zero, it checks the commitOnRelease
+     * and closeOnRelease flags to perform the necessary actions.
      */
     public void release()
     {
-        if (useCount > 0)
-        {
-            useCount = useCount - 1;
-        }
+        useCount = useCount - 1;
 
         if (useCount == 0)
         {
+            // This is the "fallback" commit path, used by connectors (like Neo4j) that
+            // do not provide an XAResource and thus cannot be enlisted in the main transaction.
             if (commitOnRelease)
             {
-                // This connection is managed by DataNucleus, so commit the work.
-                // Note: The XAResource holds the real "commit" logic for the datastore.
-                XAResource xaRes = getXAResource();
-                if (xaRes != null)
-                {
-                    try
-                    {
-                        // We are committing a RESOURCE_LOCAL transaction.
-                        xaRes.commit(null, true);
-                    }
-                    catch (javax.transaction.xa.XAException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                }
+                commit();
             }
-            else if (closeOnRelease)
+
+            // If the connection is configured to be closed after its last use, close it.
+            if (closeOnRelease)
             {
-                // This is the original logic for non-transactional connections.
                 if (!processingClose) 
                 {
+                    // This check prevents re-entrant close calls, which can occur during
+                    // lazy loading triggered by a close operation itself.
                     processingClose = true;
-                    close();
+                    try
+                    {
+                        close();
+                    }
+                    finally
+                    {
+                        // Reset flag in case this ManagedConnection is pooled and reused.
+                        processingClose = false;
+                    }
                 }
             }
+        }
+        else if (useCount < 0)
+        {
+            // This indicates a potential logic error (more releases than gets), so we reset to a safe state.
+            useCount = 0;
         }
     }
 
