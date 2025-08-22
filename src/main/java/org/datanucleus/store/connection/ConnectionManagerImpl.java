@@ -335,13 +335,15 @@ public class ConnectionManagerImpl implements ConnectionManager
      * Method to return a ManagedConnection for this ExecutionContext.
      * If a connection for the ExecutionContext exists in the cache will return it.
      * If no connection exists will create a new one using the ConnectionFactory.
+     * This implementation provides the core fix for making the XA and non-XA commit
+     * paths mutually exclusive.
      * @param primary Whether this is the primary connection pool
      * @param ec Key in the pool
      * @param transaction The transaction
      * @param options Options for the connection (e.g isolation). These will override those of the txn itself
      * @return The ManagedConnection
      */
-    private ManagedConnection allocateManagedConnection(boolean primary, final ExecutionContext ec, final org.datanucleus.transaction.Transaction transaction, Map options)
+    private ManagedConnection allocateManagedConnection(final boolean primary, final ExecutionContext ec, final org.datanucleus.transaction.Transaction transaction, Map options)
     {
         ConnectionFactory factory = primary ? primaryConnectionFactory : secondaryConnectionFactory;
         if (ec != null && connectionCachingEnabled)
@@ -349,54 +351,47 @@ public class ConnectionManagerImpl implements ConnectionManager
             ManagedConnection mconnFromPool = getManagedConnection(primary, ec);
             if (mconnFromPool != null)
             {
-                // Factory already has a ManagedConnection
-                if (!mconnFromPool.closeAfterTransactionEnd())
+                // A pooled connection exists; its state must be reset for the current context.
+                if (transaction != null && transaction.isActive())
                 {
-                    if (transaction != null && transaction.isActive())
-                    {
-                        // ManagedConnection that is not closed after commit, so make sure it is enlisted
-                        if (mconnFromPool.commitOnRelease())
-                        {
-                            mconnFromPool.setCommitOnRelease(false);
-                        }
-                        if (mconnFromPool.closeOnRelease())
-                        {
-                            mconnFromPool.setCloseOnRelease(false);
-                        }
+                    ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
+                    XAResource res = mconnFromPool.getXAResource();
 
-                        // Enlist the connection resource if is not enlisted and has enlistable resource
-                        XAResource res = mconnFromPool.getXAResource();
-                        ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
-                        if (res != null && tx != null && !tx.isEnlisted(res))
+                    // Determine which commit path to use.
+                    if (res != null && tx != null && !tx.isEnlisted(res))
+                    {
+                        // "Official" XA Path: This connection can be managed by the transaction manager.
+                        // Disable the fallback commit path to prevent double-commit deadlocks.
+                        mconnFromPool.setCommitOnRelease(false);
+                        mconnFromPool.setCloseOnRelease(false);
+
+                        String cfResourceType = factory.getResourceType();
+                        if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
                         {
-                            String cfResourceType = factory.getResourceType();
-                            if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
-                            {
-                                // Enlist the resource with this transaction EXCEPT where using external JTA container
-                                tx.enlistResource(res);
-                            }
+                            tx.enlistResource(res);
                         }
                     }
-                    else
+                    else if (res == null)
                     {
-                        // Nontransactional : Reset to commit-on-release
-                        if (!mconnFromPool.commitOnRelease())
-                        {
-                            mconnFromPool.setCommitOnRelease(true);
-                        }
-                        if (mconnFromPool.closeOnRelease())
-                        {
-                            mconnFromPool.setCloseOnRelease(false);
-                        }
+                        // "Fallback" Non-XA Path (e.g., Neo4j): No XAResource is available.
+                        // The connection MUST use the commit-on-release fallback mechanism.
+                        mconnFromPool.setCommitOnRelease(true);
+                        mconnFromPool.setCloseOnRelease(false);
                     }
                 }
-
+                else
+                {
+                    // Not in a transaction: reset to default non-transactional behavior.
+                    // This enables the fallback commit path for the next single operation.
+                    mconnFromPool.setCommitOnRelease(true);
+                    mconnFromPool.setCloseOnRelease(false); // Keep in pool
+                }
                 return mconnFromPool;
             }
         }
 
-        // No cached connection so create new ManagedConnection with required options
-        Map txnOptions = new HashMap();
+        // No cached connection, so create a new one with the required options.
+        Map<String, Object> txnOptions = new HashMap<>();
         if (transaction != null && transaction.getOptions() != null && !transaction.getOptions().isEmpty())
         {
             txnOptions.putAll(transaction.getOptions());
@@ -407,33 +402,44 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
         final ManagedConnection mconn = factory.createManagedConnection(ec, txnOptions);
 
-        // Enlist the connection in this transaction
         if (ec != null)
         {
             if (transaction != null && transaction.isActive())
             {
-                // Connection is "managed", and enlist with txn
+                // An active transaction exists; configure the new connection for it.
                 configureTransactionEventListener(transaction, mconn);
                 ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
-                mconn.setCommitOnRelease(false); //must be set before getting the XAResource
-                mconn.setCloseOnRelease(false); //must be set before getting the XAResource
-
-                // Enlist the connection resource if has enlistable resource
                 XAResource res = mconn.getXAResource();
-                if (res != null && tx != null && !tx.isEnlisted(res))
+
+                // Determine which commit path to use.
+                if (res != null && tx != null)
                 {
+                    // "Official" XA Path: Enlist the resource and disable the fallback path.
+                    mconn.setCommitOnRelease(false);
+                    mconn.setCloseOnRelease(false);
+
                     String cfResourceType = factory.getResourceType();
                     if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
                     {
-                        // Enlist the resource with this transaction EXCEPT where using external JTA container
                         tx.enlistResource(res);
                     }
                 }
+                else
+                {
+                    // "Fallback" Non-XA Path: Enable the commit-on-release mechanism.
+                    mconn.setCommitOnRelease(true);
+                    mconn.setCloseOnRelease(false);
+                }
+            }
+            else
+            {
+                // Not in a transaction, default to commit-on-release for non-transactional operations.
+                mconn.setCommitOnRelease(true);
             }
 
             if (connectionCachingEnabled)
             {
-                // Add listener to remove the connection from the pool when the connection closes
+                // Add listener to remove the connection from the pool when the connection closes.
                 mconn.addListener(new ManagedConnectionResourceListener()
                 {
                     public void transactionFlushed() {}
@@ -442,14 +448,12 @@ public class ConnectionManagerImpl implements ConnectionManager
                     public void managedConnectionPostClose()
                     {
                         removeManagedConnection(primary, ec); // Connection closed so remove
-
-                        // Remove this listener
-                        mconn.removeListener(this);
+                        mconn.removeListener(this); // Remove this listener
                     }
                     public void resourcePostClose() {}
                 });
 
-                // Cache this connection against the ExecutionContext
+                // Cache this connection against the ExecutionContext.
                 putManagedConnection(primary, ec, mconn);
             }
         }
