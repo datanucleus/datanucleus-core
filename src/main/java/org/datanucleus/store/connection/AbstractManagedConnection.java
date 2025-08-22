@@ -66,22 +66,22 @@ public abstract class AbstractManagedConnection implements ManagedConnectionWith
 
     /**
      * Commits the underlying connection.
-     * This provides a default empty implementation. Connectors that use the fallback commit path (non-XA)
+     * This provides a default empty implementation. Connectors that use the Non-XA commit path
      * should override this method to provide datastore-specific commit logic.
      */
     public void commit()
     {
-        // Do nothing by default. Override if your connector needs fallback commit logic.
+        // Do nothing by default. Override if your connector needs Non-XA commit logic.
     }
 
     /**
      * Rolls back the underlying connection.
-     * This provides a default empty implementation. Connectors that use the fallback commit path (non-XA)
+     * This provides a default empty implementation. Connectors that use the Non-XA commit path
      * should override this method to provide datastore-specific rollback logic.
      */
     public void rollback()
     {
-        // Do nothing by default. Override if your connector needs fallback rollback logic.
+        // Do nothing by default. Override if your connector needs Non-XA rollback logic.
     }
     
     public void close()
@@ -92,7 +92,7 @@ public abstract class AbstractManagedConnection implements ManagedConnectionWith
 
     /**
      * Release this connection back to the connection manager.
-     * This method implements the "fallback" commit path for simple, non-XA datastores.
+     * This method implements the "Non-XA" commit path for simple, non-XA datastores.
      * It decrements the usage count. When the count reaches zero, it checks the commitOnRelease
      * and closeOnRelease flags to perform the necessary actions.
      */
@@ -102,8 +102,7 @@ public abstract class AbstractManagedConnection implements ManagedConnectionWith
 
         if (useCount == 0)
         {
-            // This is the "fallback" commit path, used by connectors (like Neo4j) that
-            // do not provide an XAResource and thus cannot be enlisted in the main transaction.
+            // Non-XA commit path, used by connectors (like Neo4j) that do not provide an XAResource and thus cannot be enlisted in the main transaction.
             if (commitOnRelease)
             {
                 commit();

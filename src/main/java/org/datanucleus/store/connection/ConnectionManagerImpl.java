@@ -45,7 +45,8 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * Manager of connections for a datastore, allowing caching of ManagedConnections, enlistment in transaction.
  * Manages a "primary" and (optionally) a "secondary" ConnectionFactory.
- * When caching is enabled it maintains caches of the allocated ManagedConnection per ExecutionContext (an EC can have a single ManagedConnection per ConnectionFactory at any time).
+ * When caching is enabled it maintains caches of the allocated ManagedConnection per ExecutionContext (an EC can have a single ManagedConnection per 
+ * ConnectionFactory at any time).
  * <p>
  * The "allocateConnection" method can create connections and enlist them (like most normal persistence operations need) or create a connection and return it 
  * without enlisting it into a transaction, for example on a read-only operation, or when running non-transactional, or to get schema information.
@@ -360,8 +361,8 @@ public class ConnectionManagerImpl implements ConnectionManager
                     // Determine which commit path to use.
                     if (res != null && tx != null && !tx.isEnlisted(res))
                     {
-                        // "Official" XA Path: This connection can be managed by the transaction manager.
-                        // Disable the fallback commit path to prevent double-commit deadlocks.
+                        // XA Path: This connection can be managed by the transaction manager.
+                        // Disable the Non-XA commit path to prevent double-commit deadlocks.
                         mconnFromPool.setCommitOnRelease(false);
                         mconnFromPool.setCloseOnRelease(false);
 
@@ -373,8 +374,8 @@ public class ConnectionManagerImpl implements ConnectionManager
                     }
                     else if (res == null)
                     {
-                        // "Fallback" Non-XA Path (e.g., Neo4j): No XAResource is available.
-                        // The connection MUST use the commit-on-release fallback mechanism.
+                        // Non-XA Path (e.g., Neo4j): No XAResource is available.
+                        // The connection MUST use the commit-on-release mechanism.
                         mconnFromPool.setCommitOnRelease(true);
                         mconnFromPool.setCloseOnRelease(false);
                     }
@@ -382,7 +383,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 else
                 {
                     // Not in a transaction: reset to default non-transactional behavior.
-                    // This enables the fallback commit path for the next single operation.
+                    // This enables the Non-XA commit path for the next single operation.
                     mconnFromPool.setCommitOnRelease(true);
                     mconnFromPool.setCloseOnRelease(false); // Keep in pool
                 }
@@ -414,7 +415,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Determine which commit path to use.
                 if (res != null && tx != null)
                 {
-                    // "Official" XA Path: Enlist the resource and disable the fallback path.
+                    // XA Path: Enlist the resource and disable the Non-XA path.
                     mconn.setCommitOnRelease(false);
                     mconn.setCloseOnRelease(false);
 
@@ -426,7 +427,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 }
                 else
                 {
-                    // "Fallback" Non-XA Path: Enable the commit-on-release mechanism.
+                    // Non-XA Path: Enable the commit-on-release mechanism.
                     mconn.setCommitOnRelease(true);
                     mconn.setCloseOnRelease(false);
                 }
