@@ -1,8 +1,8 @@
-ObjectWeb ASM 4.1 is repackaged in this datanucleus-core jar under
+ObjectWeb ASM 9.8 is repackaged in this datanucleus-core jar under
 org.datanucleus.asm. The files in that package are licensed under
 the following terms
 =====================================================================
-Copyright (c) 2000-2011 INRIA, France Telecom
+Copyright (c) 2000-2025 INRIA, France Telecom
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
