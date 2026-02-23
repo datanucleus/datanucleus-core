@@ -329,6 +329,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         properties.getFrequentProperties().setDefaults(conf.getFrequentProperties());
 
+        // Initialise flushMode from copied properties since properties.setProperty() above
+        // only stores the value without triggering the field assignment in setProperty()
+        String flushModeProp = properties.getProperty(PropertyNames.PROPERTY_FLUSH_MODE) != null ?
+            properties.getProperty(PropertyNames.PROPERTY_FLUSH_MODE).toString() : null;
+        if (flushModeProp != null)
+        {
+            flushMode = FlushMode.getFlushModeForString(flushModeProp);
+        }
+
         // Set up FetchPlan
         fetchPlan = new FetchPlan(this, clr).setMaxFetchDepth(properties.getIntProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH));
 
