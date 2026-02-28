@@ -4570,6 +4570,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             for (DNStateManager sm : enlistedSMCache.values())
             {
+                if (sm == null)
+                {
+                    // Weak reference cleared by GC during iteration
+                    continue;
+                }
                 try
                 {
                     sm.preRollback(getTransaction());
