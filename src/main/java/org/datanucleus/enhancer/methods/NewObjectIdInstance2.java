@@ -27,6 +27,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Method to generate the method "dnNewObjectIdInstance" using ASM.
@@ -48,11 +49,18 @@ import org.datanucleus.util.ClassUtils;
  *     return new YYYIdentity(this.getClass(), (String) key);
  * }
  * </pre>
- * and for user-supplied object ids
+ * and for user-supplied object ids with a String constructor
  * <pre>
  * public Object dnNewObjectIdInstance(Object key)
  * {
  *     return new UserPrimaryKey((String) key);
+ * }
+ * </pre>
+ * and for user-supplied object ids without a String constructor (e.g. JPA IdClass)
+ * <pre>
+ * public Object dnNewObjectIdInstance(Object key)
+ * {
+ *     return new UserPrimaryKey();
  * }
  * </pre>
  */
@@ -182,11 +190,35 @@ public class NewObjectIdInstance2 extends ClassMethod
                     // User-provided app identity, and compound identity
                     String ACN_objectIdClass = objectIdClass.replace('.', '/');
 
-                    visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
-                    visitor.visitInsn(Opcodes.DUP);
-                    visitor.visitVarInsn(Opcodes.ALOAD, 1);
-                    visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "(Ljava/lang/String;)V", false);
+                    // Check if the object id class has a String constructor (required by JDO but not by JPA)
+                    boolean hasStringConstructor = false;
+                    try
+                    {
+                        Class objectIdCls = enhancer.getClassLoaderResolver().classForName(objectIdClass);
+                        objectIdCls.getConstructor(new Class[] {String.class});
+                        hasStringConstructor = true;
+                    }
+                    catch (Exception e)
+                    {
+                        NucleusLogger.GENERAL.debug("Object id class " + objectIdClass + " has no String constructor, using no-arg constructor");
+                    }
+
+                    if (hasStringConstructor)
+                    {
+                        // Generate: return new CompoundPK((String) key);
+                        visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
+                        visitor.visitInsn(Opcodes.DUP);
+                        visitor.visitVarInsn(Opcodes.ALOAD, 1);
+                        visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
+                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "(Ljava/lang/String;)V", false);
+                    }
+                    else
+                    {
+                        // Generate: return new CompoundPK();
+                        visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
+                        visitor.visitInsn(Opcodes.DUP);
+                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "()V", false);
+                    }
                     visitor.visitInsn(Opcodes.ARETURN);
 
                     Label endLabel = new Label();
