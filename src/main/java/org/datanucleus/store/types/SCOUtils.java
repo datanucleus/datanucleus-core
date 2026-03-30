@@ -857,13 +857,16 @@ public class SCOUtils
             }
         }
 
-        // Update position of elements in the list to match the new order
+        // Update position of elements in the list to match the new order.
+        // Take a snapshot of the current order via iteration rather than using list.get(position) directly,
+        // to avoid inconsistencies between delegate and backing store when collection caching is disabled.
+        java.util.ArrayList currentOrder = new java.util.ArrayList(list);
         elementsIter = elements.iterator();
         int position = 0;
         while (elementsIter.hasNext())
         {
             Object element = elementsIter.next();
-            Object currentElement = list.get(position);
+            Object currentElement = currentOrder.get(position);
             boolean updatePosition = false;
             if ((element == null && currentElement != null) || (element != null && currentElement == null))
             {
@@ -879,6 +882,7 @@ public class SCOUtils
             {
                 // Update the position, taking care not to have dependent-field deletes taking place
                 ((SCOList) list).set(position, element, false);
+                currentOrder.set(position, element);
                 updated = true;
             }
 

@@ -1131,10 +1131,8 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
 
         makeDirty();
 
-        if (useCache)
-        {
-            loadFromStore();
-        }
+        // Always load the delegate, even when useCache=false, since delegate.set() requires it to be populated
+        loadFromStore();
 
         E delegateReturn = delegate.set(index, element);
         if (backingStore != null)

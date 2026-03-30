@@ -1116,10 +1116,8 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
 
         makeDirty();
 
-        if (useCache)
-        {
-            loadFromStore();
-        }
+        // Always load the delegate, even when useCache=false, since delegate.set() requires it to be populated
+        loadFromStore();
 
         E delegateReturn = delegate.set(index, element);
         if (backingStore != null)
