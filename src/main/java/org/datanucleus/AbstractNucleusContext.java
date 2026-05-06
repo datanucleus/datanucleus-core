@@ -48,7 +48,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
     protected final PluginManager pluginManager;
 
     /** MetaDataManager for handling the MetaData. */
-    protected MetaDataManager metaDataManager = null;
+    protected volatile MetaDataManager metaDataManager = null;
 
     /** API adapter used by the context. **/
     protected final ApiAdapter apiAdapter;
@@ -197,32 +197,41 @@ public abstract class AbstractNucleusContext implements NucleusContext
     }
 
     @Override
-    public synchronized MetaDataManager getMetaDataManager()
+    public MetaDataManager getMetaDataManager()
     {
-        if (metaDataManager == null)
+        MetaDataManager mdm = metaDataManager;
+        if (mdm == null)
         {
-            String apiName = getApiName();
-            try
+            synchronized (this)
             {
-                metaDataManager = (MetaDataManager)pluginManager.createExecutableExtension("org.datanucleus.metadata_manager", new String[]{"name"}, new String[]{apiName}, 
-                    "class", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
-                if (metaDataManager != null && config.hasProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT))
+                mdm = metaDataManager;
+                if (mdm == null)
                 {
-                    MetaDataListener mdl = (MetaDataListener)config.getProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT);
-                    metaDataManager.registerListener(mdl);
+                    String apiName = getApiName();
+                    try
+                    {
+                        mdm = (MetaDataManager)pluginManager.createExecutableExtension("org.datanucleus.metadata_manager", new String[]{"name"}, new String[]{apiName},
+                                "class", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
+                        if (mdm != null && config.hasProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT))
+                        {
+                            MetaDataListener mdl = (MetaDataListener)config.getProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT);
+                            mdm.registerListener(mdl);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new NucleusException(Localiser.msg("008010", apiName, e.getMessage()), e);
+                    }
+                    if (mdm == null)
+                    {
+                        throw new NucleusException(Localiser.msg("008009", apiName));
+                    }
+                    metaDataManager = mdm;
                 }
             }
-            catch (Exception e)
-            {
-                throw new NucleusException(Localiser.msg("008010", apiName, e.getMessage()), e);
-            }
-            if (metaDataManager == null)
-            {
-                throw new NucleusException(Localiser.msg("008009", apiName));
-            }
         }
-    
-        return metaDataManager;
+
+        return mdm;
     }
 
     @Override
