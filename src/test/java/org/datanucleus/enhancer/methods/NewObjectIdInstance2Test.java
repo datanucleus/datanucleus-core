@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer.methods;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import org.datanucleus.enhancer.asm.ClassWriter;
