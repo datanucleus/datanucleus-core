@@ -5,9 +5,11 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.types.SCOList;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.scostore.CollectionStore;
 
@@ -42,6 +44,105 @@ public class SCOUtilsTest extends TestCase
         assertEquals(arr[1],"TEST2");
     }
     
+    /**
+     * Test that updateListWithListElements handles reordering when an element is inserted at the beginning.
+     * Reproduces the scenario from GitHub issue #526.
+     * @see <a href="https://github.com/datanucleus/datanucleus-core/issues/526">GitHub #526</a>
+     * @see <a href="https://github.com/datanucleus/tests/pull/92">Integration test</a>
+     */
+    public void testUpdateListWithListElementsReorder()
+    {
+        TestSCOList list = new TestSCOList();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+
+        // Desired order: insert "D" at beginning
+        java.util.List<String> elements = new java.util.ArrayList<>();
+        elements.add("D");
+        elements.add("A");
+        elements.add("B");
+        elements.add("C");
+
+        boolean updated = SCOUtils.updateListWithListElements(list, elements);
+
+        assertTrue("List should be marked as updated", updated);
+        assertEquals(4, list.size());
+        assertEquals("D", list.get(0));
+        assertEquals("A", list.get(1));
+        assertEquals("B", list.get(2));
+        assertEquals("C", list.get(3));
+    }
+
+    /**
+     * Test that updateListWithListElements handles combined add, remove, and reorder.
+     */
+    public void testUpdateListWithListElementsAddRemoveReorder()
+    {
+        TestSCOList list = new TestSCOList();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+
+        // Remove "B", add "D", reorder to [C, D, A]
+        java.util.List<String> elements = new java.util.ArrayList<>();
+        elements.add("C");
+        elements.add("D");
+        elements.add("A");
+
+        boolean updated = SCOUtils.updateListWithListElements(list, elements);
+
+        assertTrue("List should be marked as updated", updated);
+        assertEquals(3, list.size());
+        assertEquals("C", list.get(0));
+        assertEquals("D", list.get(1));
+        assertEquals("A", list.get(2));
+    }
+
+    /**
+     * Test that updateListWithListElements returns false when nothing changes.
+     */
+    public void testUpdateListWithListElementsNoChange()
+    {
+        TestSCOList list = new TestSCOList();
+        list.add("A");
+        list.add("B");
+
+        java.util.List<String> elements = new java.util.ArrayList<>();
+        elements.add("A");
+        elements.add("B");
+
+        boolean updated = SCOUtils.updateListWithListElements(list, elements);
+        assertFalse("List should not be marked as updated when nothing changes", updated);
+    }
+
+    /**
+     * Minimal SCOList implementation backed by an ArrayList, for testing updateListWithListElements.
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static class TestSCOList extends java.util.ArrayList implements SCOList
+    {
+        public Object set(int index, Object element, boolean allowDependentField)
+        {
+            return super.set(index, element);
+        }
+
+        public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty) {}
+        public boolean remove(Object element, boolean allowCascadeDelete) { return super.remove(element); }
+        public void load() {}
+        public boolean isLoaded() { return true; }
+        public void setValue(Object value) {}
+        public void initialise(Object value) {}
+        public void initialise() {}
+        public void initialise(Object newValue, Object oldValue) {}
+        public String getFieldName() { return null; }
+        public Object getOwner() { return null; }
+        public void unsetOwner() {}
+        public Object getValue() { return this; }
+        public Object detachCopy(FetchPlanState state) { return null; }
+        public void attachCopy(Object value) {}
+    }
+
     private static class BackingStore implements CollectionStore
     {
         Collection elm;

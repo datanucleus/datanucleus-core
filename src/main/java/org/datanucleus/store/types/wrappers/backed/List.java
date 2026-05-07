@@ -1033,10 +1033,8 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
 
         makeDirty();
 
-        if (useCache)
-        {
-            loadFromStore();
-        }
+        // Always load the delegate, even when useCache=false, since delegate.set() requires it to be populated
+        loadFromStore();
 
         // Update the delegate since updating this can cause removal of the original object
         E delegateReturn = delegate.set(index, element);
