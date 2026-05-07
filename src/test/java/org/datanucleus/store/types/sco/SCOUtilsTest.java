@@ -122,6 +122,7 @@ public class SCOUtilsTest extends TestCase
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static class TestSCOList extends java.util.ArrayList implements SCOList
     {
+        private static final long serialVersionUID = 1L;
         public Object set(int index, Object element, boolean allowDependentField)
         {
             return super.set(index, element);
