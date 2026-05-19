@@ -39,6 +39,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class RuntimeEnhancer
 {
+    private final String api;
+    
     private final ClassLoaderResolver clr;
 
     private final NucleusContext nucleusContext;
@@ -136,6 +138,7 @@ public class RuntimeEnhancer
      */
     public RuntimeEnhancer(String api, Map contextProps)
     {
+        this.api = api;
         nucleusContext = new EnhancementNucleusContextImpl(api, contextProps);
         clr = nucleusContext.getClassLoaderResolver(null);
 
@@ -188,10 +191,13 @@ public class RuntimeEnhancer
                 return null;
             }
 
+            EnhancementNamer namer = api.equalsIgnoreCase("jpa") || api.equalsIgnoreCase("jakarta")
+                    ? JPAEnhancementNamer.getInstance()
+                    : JDOEnhancementNamer.getInstance();
             // Create a ClassEnhancer to enhance this class
             ClassEnhancer classEnhancer = new ClassEnhancerImpl((ClassMetaData)acmd, clr, 
-                nucleusContext.getMetaDataManager(), JDOEnhancementNamer.getInstance(), classdefinition);
-            // TODO Allow use of JPAEnhancementNamer?
+                nucleusContext.getMetaDataManager(), namer, classdefinition);
+
             classEnhancer.setOptions(classEnhancerOptions);
             classEnhancer.enhance();
             return classEnhancer.getClassBytes();
