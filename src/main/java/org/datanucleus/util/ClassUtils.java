@@ -78,7 +78,14 @@ public class ClassUtils
     {
         try
         {
-            return type.getConstructor(parameterTypes).newInstance(parameters);
+            Constructor<T> constructor = (parameterTypes == null) 
+                    ? type.getConstructor(parameterTypes) 
+                    : getConstructorWithArguments(type, parameterTypes);
+            
+            if (constructor == null)
+                throw new NoSuchMethodException();
+            
+            return constructor.newInstance(parameters);        
         }
         catch (NoSuchMethodException e)
         {
