@@ -28,6 +28,8 @@ public class StoredProcQueryParameterMetaData extends MetaData
 
     String type;
 
+    int position;
+    
     StoredProcQueryParameterMode mode;
 
     public String getName()
@@ -52,6 +54,17 @@ public class StoredProcQueryParameterMetaData extends MetaData
         return this;
     }
 
+    public int getPosition()
+    {
+        return position;
+    }
+
+    public StoredProcQueryParameterMetaData setPosition(int position)
+    {
+        this.position = position;
+        return this;
+    }
+    
     public StoredProcQueryParameterMode getMode()
     {
         return mode;
