@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.query;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -138,6 +139,11 @@ public abstract class AbstractStoredProcedureQuery extends Query
         storedProcParams.add(param);
     }
 
+    public Set<StoredProcedureParameter> getStoredProcedureParameters()
+    {
+        return storedProcParams == null ? Collections.emptySet() : Collections.unmodifiableSet(storedProcParams);
+    }
+    
     /**
      * Accessor for whether there are more results after the current one.
      * @return Whether there are more results
@@ -166,9 +172,12 @@ public abstract class AbstractStoredProcedureQuery extends Query
     {
         if (outputParamValues != null)
         {
-            return outputParamValues.get(pos);
+            if (outputParamValues.containsKey(pos))
+            {
+                return outputParamValues.get(pos);                
+            }
         }
-        return null;
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -181,9 +190,12 @@ public abstract class AbstractStoredProcedureQuery extends Query
     {
         if (outputParamValues != null)
         {
-            return outputParamValues.get(name);
+            if (outputParamValues.containsKey(name))
+            {
+                return outputParamValues.get(name);                
+            }
         }
-        return null;
+        throw new IllegalArgumentException();
     }
 
     public static class StoredProcedureParameter
