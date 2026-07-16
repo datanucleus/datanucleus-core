@@ -1422,7 +1422,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Method called when a non-tx update has been performed (via setter call on the persistable object, or via
-     * use of mutator methods of a field). Only hands the update across to be "committed" if not part of an owning 
+     * use of mutator methods of a field). Only hands the update across to be "committed" if not part of an owning
      * persist/delete call.
      */
     public void processNontransactionalUpdate()
@@ -1502,6 +1502,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // "commit" all enlisted StateManagers
                 ApiAdapter api = getApiAdapter();
                 DNStateManager[] sms = enlistedSMCache.values().toArray(new DNStateManager[enlistedSMCache.size()]);
+                int maximumCollectNestedExceptions = this.getMaximumCollectNestedExceptions();
                 for (int i = 0; i < sms.length; ++i)
                 {
                     try
@@ -1523,6 +1524,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             failures = new ArrayList<>();
                         }
                         failures.add(e);
+                        if (failures.size() >= maximumCollectNestedExceptions) {
+                            throw new CommitStateTransitionException(failures.toArray(new Exception[failures.size()]));
+                        }
                     }
                 }
             }
@@ -1692,6 +1696,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         List<Throwable> failures = null;
+        int maximumCollectNestedExceptions = this.getMaximumCollectNestedExceptions();
         for (DNStateManager sm : toRefresh)
         {
             try
@@ -1705,6 +1710,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     failures = new ArrayList<>();
                 }
                 failures.add(e);
+                if (failures.size() >= maximumCollectNestedExceptions) {
+                    throw new NucleusUserException(Localiser.msg("010037"), failures.toArray(new Exception[failures.size()]));
+                }
             }
         }
 
@@ -1724,6 +1732,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // TODO Consider doing these in bulk where possible if several objects of the same type
         List<Throwable> failures = null;
+        int maximumCollectNestedExceptions = this.getMaximumCollectNestedExceptions();
         for (Object pc : pcs)
         {
             if (pc == null)
@@ -1751,6 +1760,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     failures = new ArrayList<>();
                 }
                 failures.add(e);
+                if (failures.size() >= maximumCollectNestedExceptions) {
+                    throw new NucleusUserException(Localiser.msg("010037"), failures.toArray(new Exception[failures.size()]));
+                }
             }
             finally
             {
@@ -1870,6 +1882,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 getStoreManager().getPersistenceHandler().batchStart(this, PersistenceBatchType.PERSIST);
                 List<RuntimeException> failures = null;
+                int maximumCollectNestedExceptions = this.getMaximumCollectNestedExceptions();
                 for (int i=0;i<objs.length;i++)
                 {
                     try
@@ -1886,6 +1899,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             failures = new ArrayList<>();
                         }
                         failures.add(e);
+                        if (failures.size() >= maximumCollectNestedExceptions) {
+                            RuntimeException ex = failures.get(0);
+                            if (ex instanceof NucleusException && ((NucleusException)ex).isFatal())
+                            {
+                                // Should really check all and see if any are fatal not just first one
+                                throw new NucleusFatalUserException(Localiser.msg("010039"), failures.toArray(new Exception[failures.size()]));
+                            }
+                            throw new NucleusUserException(Localiser.msg("010039"), failures.toArray(new Exception[failures.size()]));
+                        }
                     }
                 }
                 if (failures != null && !failures.isEmpty())
@@ -2179,6 +2201,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             getStoreManager().getPersistenceHandler().batchStart(this, PersistenceBatchType.DELETE);
 
             List<RuntimeException> failures = null;
+            int maximumCollectNestedExceptions = this.getMaximumCollectNestedExceptions();
             for (int i=0;i<objs.length;i++)
             {
                 try
@@ -2195,6 +2218,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         failures = new ArrayList<>();
                     }
                     failures.add(e);
+                    if (failures.size() >= maximumCollectNestedExceptions) {
+                        RuntimeException ex = failures.get(0);
+                        if (ex instanceof NucleusException && ((NucleusException)ex).isFatal())
+                        {
+                            // Should really check all and see if any are fatal not just first one
+                            throw new NucleusFatalUserException(Localiser.msg("010040"), failures.toArray(new Exception[failures.size()]));
+                        }
+                        throw new NucleusUserException(Localiser.msg("010040"), failures.toArray(new Exception[failures.size()]));
+                    }
                 }
             }
             if (failures != null && !failures.isEmpty())
@@ -4521,6 +4553,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Commit all enlisted StateManagers
             ApiAdapter api = getApiAdapter();
             DNStateManager[] sms = enlistedSMCache.values().toArray(new DNStateManager[enlistedSMCache.size()]);
+            int maximumCollectNestedExceptions = this.getMaximumCollectNestedExceptions();
             for (int i = 0; i < sms.length; ++i)
             {
                 try
@@ -4547,6 +4580,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         failures = new ArrayList<>();
                     }
                     failures.add(e);
+                    if (failures.size() >= maximumCollectNestedExceptions) {
+                        throw new CommitStateTransitionException(failures.toArray(new Exception[failures.size()]));
+                    }
                 }
             }
         }
@@ -4566,6 +4602,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public void preRollback()
     {
         List<Throwable> failures = null;
+        int maximumCollectNestedExceptions = this.getMaximumCollectNestedExceptions();
         try
         {
             for (DNStateManager sm : enlistedSMCache.values())
@@ -4586,12 +4623,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         failures = new ArrayList<>();
                     }
                     failures.add(e);
+                    if (failures.size() >= maximumCollectNestedExceptions) {
+                        throw new RollbackStateTransitionException(failures.toArray(new Exception[failures.size()]));
+                    }
                 }
             }
-            clearDirty();
         }
         finally
         {
+            clearDirty();
             resetTransactionalVariables();
         }
 
@@ -5870,6 +5910,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return stateManagerAssociatedValuesMap.get(sm).containsKey(key);
         }
         return false;
+    }
+
+    @Override
+    public int getMaximumCollectNestedExceptions() {
+        return Math.max(1, nucCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_PERSISTENCE_MAXIMUM_COLLECT_NESTED_EXCEPTIONS));
     }
 
     /**
