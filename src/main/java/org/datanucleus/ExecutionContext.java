@@ -1026,6 +1026,15 @@ public interface ExecutionContext extends ExecutionContextReference
     boolean containsStateManagerAssociatedValue(DNStateManager sm, Object key);
 
     /**
+     * Maximum nested exception can be collected, when collected exceptions greater or equal to this value,
+     * the persist process will throw Exception for fast-failed.
+     * @return maximum nested exception can be collected.
+     *         default value is Integer.MAX_VALUE, which means no limit,
+     *         minimum value is 1, which means only one exception can be collected.
+     */
+    int getMaximumCollectNestedExceptions();
+
+    /**
      * Register a listener to be called when this ExecutionContext is closing.
      * @param listener The listener
      */
