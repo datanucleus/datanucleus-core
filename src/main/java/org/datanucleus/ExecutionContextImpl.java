@@ -1524,7 +1524,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             failures = new ArrayList<>();
                         }
                         failures.add(e);
-                        if (failures.size() >= maximumCollectNestedExceptions) {
+                        if (failures.size() >= maximumCollectNestedExceptions)
+                        {
                             throw new CommitStateTransitionException(failures.toArray(new Exception[failures.size()]));
                         }
                     }
@@ -1710,7 +1711,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     failures = new ArrayList<>();
                 }
                 failures.add(e);
-                if (failures.size() >= maximumCollectNestedExceptions) {
+                if (failures.size() >= maximumCollectNestedExceptions)
+                {
                     throw new NucleusUserException(Localiser.msg("010037"), failures.toArray(new Exception[failures.size()]));
                 }
             }
@@ -1760,7 +1762,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     failures = new ArrayList<>();
                 }
                 failures.add(e);
-                if (failures.size() >= maximumCollectNestedExceptions) {
+                if (failures.size() >= maximumCollectNestedExceptions)
+                {
                     throw new NucleusUserException(Localiser.msg("010037"), failures.toArray(new Exception[failures.size()]));
                 }
             }
@@ -1899,7 +1902,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             failures = new ArrayList<>();
                         }
                         failures.add(e);
-                        if (failures.size() >= maximumCollectNestedExceptions) {
+                        if (failures.size() >= maximumCollectNestedExceptions)
+                        {
                             RuntimeException ex = failures.get(0);
                             if (ex instanceof NucleusException && ((NucleusException)ex).isFatal())
                             {
@@ -2218,7 +2222,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         failures = new ArrayList<>();
                     }
                     failures.add(e);
-                    if (failures.size() >= maximumCollectNestedExceptions) {
+                    if (failures.size() >= maximumCollectNestedExceptions)
+                    {
                         RuntimeException ex = failures.get(0);
                         if (ex instanceof NucleusException && ((NucleusException)ex).isFatal())
                         {
@@ -4580,7 +4585,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         failures = new ArrayList<>();
                     }
                     failures.add(e);
-                    if (failures.size() >= maximumCollectNestedExceptions) {
+                    if (failures.size() >= maximumCollectNestedExceptions)
+                    {
                         throw new CommitStateTransitionException(failures.toArray(new Exception[failures.size()]));
                     }
                 }
@@ -4623,7 +4629,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         failures = new ArrayList<>();
                     }
                     failures.add(e);
-                    if (failures.size() >= maximumCollectNestedExceptions) {
+                    if (failures.size() >= maximumCollectNestedExceptions)
+                    {
                         throw new RollbackStateTransitionException(failures.toArray(new Exception[failures.size()]));
                     }
                 }
