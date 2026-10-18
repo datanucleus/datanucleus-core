@@ -24,8 +24,10 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -960,33 +962,43 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     @Override
     public Spliterator<E> spliterator()
     {
+        if (backingStore != null && !useCache)
+        {
+            // Not caching, so traverse a single iterator() over the backing store (not SIZED since size() is a separate query)
+            return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.DISTINCT | Spliterator.ORDERED);
+        }
         if (backingStore != null && useCache && !isCacheLoaded)
         {
             loadFromStore();
         }
-        // TODO If using backing store yet not caching, then this will fail
         return delegate.spliterator();
     }
 
     @Override
     public Stream<E> stream()
     {
+        if (backingStore != null && !useCache)
+        {
+            return StreamSupport.stream(spliterator(), false);
+        }
         if (backingStore != null && useCache && !isCacheLoaded)
         {
             loadFromStore();
         }
-        // TODO If using backing store yet not caching, then this will fail
         return delegate.stream();
     }
 
     @Override
     public Stream<E> parallelStream()
     {
+        if (backingStore != null && !useCache)
+        {
+            return StreamSupport.stream(spliterator(), true);
+        }
         if (backingStore != null && useCache && !isCacheLoaded)
         {
             loadFromStore();
         }
-        // TODO If using backing store yet not caching, then this will fail
         return delegate.parallelStream();
     }
 }

@@ -22,8 +22,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -875,22 +877,30 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     @Override
     public Stream<E> stream()
     {
+        if (backingStore != null && !useCache)
+        {
+            // Not caching, so traverse a single iterator() over the backing store. Can't use spliterator() since
+            // java.util.PriorityQueue makes it final and it doesn't see the delegate
+            return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(), 0), false);
+        }
         if (backingStore != null && useCache && !isCacheLoaded)
         {
             loadFromStore();
         }
-        // TODO If using backing store yet not caching, then this will fail
         return delegate.stream();
     }
 
     @Override
     public Stream<E> parallelStream()
     {
+        if (backingStore != null && !useCache)
+        {
+            return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(), 0), true);
+        }
         if (backingStore != null && useCache && !isCacheLoaded)
         {
             loadFromStore();
         }
-        // TODO If using backing store yet not caching, then this will fail
         return delegate.parallelStream();
     }
 }
