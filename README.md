@@ -43,7 +43,7 @@ the datastore.
 * The query is compiled generically. This involves converting each component of the query (filter, ordering, grouping, result etc) into Node trees, and then converting that into Expression trees. 
 This is then stored in a QueryCompilation, and can be cached.
 * The query is then converted into a datastore-specific compilation. In the case of RDBMS this will be an RDBMSCompilation, and will be an SQL string (and associated parameter/result lookups).
-* The query is executed in the datastore and/or in-memory. The in-memory evaluator is in datanucleus-core under org.datanucleus.query.evaluator.memory. 
+* The query is executed in the datastore and/or in-memory. The in-memory evaluator is in datanucleus-core under org.datanucleus.store.query.inmemory. 
 The execution process will return a QueryResult (which is a List).
 * Operations on the QueryResult such as "iterator()" will result in lazy loading of results from the underlying ResultSet (in the case of RDBMS)
 
@@ -257,7 +257,7 @@ the values are loaded in that field there will be no need to make any call to th
 when compared to relaying all calls via the datastore. You can change to <b>not</b> use caching by setting either
 
 * Globally for the PersistenceManagerFactory - this is controlled by setting the persistence property 
-__org.datanucleus.cache.collections__. Set it to false to pass through to the datastore.
+__datanucleus.cache.collections__. Set it to false to pass through to the datastore.
 * For the specific Collection/Map - add a MetaData &lt;collection&gt; or &lt;map&gt; extension 
 _cache_ setting it to false to pass through to the datastore.
 
@@ -273,7 +273,7 @@ as being part of the default fetch group it should be loaded eagerly which means
 If the user overrides the lazy loading for that field in that situation to make it lazy, DataNucleus will instantiate the owning object and instantiate the 
 collection but leave it marked as "to be loaded" and the elements will be loaded up when needed. You can change the lazy loading setting via
 
-* Globally for the PMF/EMF - this is controlled by setting the persistence property __org.datanucleus.cache.collections.lazy__. 
+* Globally for the PMF/EMF - this is controlled by setting the persistence property __datanucleus.cache.collections.lazy__. 
 Set it to true to use lazy loading, and set it to false to load the elements when the collection/map is initialised.
 * For the specific Collection/Map - add a MetaData &lt;collection&gt; or &lt;map&gt; extension __cache-lazy-loading__. 
 Set it to true to use lazy loading, and false to load once at initialisation.
